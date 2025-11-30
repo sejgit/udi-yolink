@@ -1377,7 +1377,6 @@ class YoLinkMQTTDevice(object):
     def updateStatusData  (yolink, data):
         try:
             logging.debug('{} - updateStatusData : {}'.format(yolink.type , json.dumps(data, indent=4)))
-            temp =
             
             yolink.data = data
             yolink.Status(data)
@@ -1401,8 +1400,9 @@ class YoLinkMQTTDevice(object):
                 yolink.dataAPI['emptyData'] = False
                 yolink.data['emptyData'] = False
 
-
+                temp = yolink.dataAPI['lastMessage']
                 yolink.reset_structure() #do not let old data persist
+                yolink.dataAPI['lastMessage'] = temp    
             if 'reportAt' in data[yolink.dData] :
                 reportAt = datetime.strptime(data[yolink.dData]['reportAt'], '%Y-%m-%dT%H:%M:%S.%fZ')
                 yolink.dataAPI['lastStateTime'] = (reportAt.timestamp() -  yolink.timezoneOffsetSec)*1000
