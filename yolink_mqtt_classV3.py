@@ -1333,7 +1333,19 @@ class YoLinkMQTTDevice(object):
 
 
     #@measure_time
-    def get_data(yolink, category, key, WM_index = None):    
+    def get_data(yolink, key = None):    
+        try:
+            ret_val = None  
+            if yolink.online :
+                logging.debug(yolink.type+f' - getinfo category key {key} {yolink.data}')
+                if key in yolink.data:
+                    ret_val = yolink.data[key]
+
+            return(ret_val)
+        except KeyError as e:
+            logging.error(f'EXCEPTION - getData {e}')      
+
+    def get_info(yolink, category, key, WM_index = None):    
         try:
             ret_val = None  
             if yolink.online and yolink.dData in yolink.data:
@@ -1359,17 +1371,16 @@ class YoLinkMQTTDevice(object):
                     ret_val = res
             return(ret_val)
         except KeyError as e:
-            logging.error(f'EXCEPTION - getData {e}')      
-
-
+            logging.error(f'EXCEPTION - getData {e}')    
 
     #@measure_time
     def updateStatusData  (yolink, data):
         try:
             logging.debug('{} - updateStatusData : {}'.format(yolink.type , json.dumps(data, indent=4)))
-            yolink.reset_structure() #do not let old data persist
+            temp =
+            
             yolink.data = data
-            yolink.Status()
+            yolink.Status(data)
             if 'time' in data:
                 logging.debug('Empty data received - do not update time')
                 yolink.data['report_time'] = int(data['time']/1000)
@@ -1389,7 +1400,9 @@ class YoLinkMQTTDevice(object):
             else:
                 yolink.dataAPI['emptyData'] = False
                 yolink.data['emptyData'] = False
-        
+
+
+                yolink.reset_structure() #do not let old data persist
             if 'reportAt' in data[yolink.dData] :
                 reportAt = datetime.strptime(data[yolink.dData]['reportAt'], '%Y-%m-%dT%H:%M:%S.%fZ')
                 yolink.dataAPI['lastStateTime'] = (reportAt.timestamp() -  yolink.timezoneOffsetSec)*1000
