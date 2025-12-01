@@ -1350,14 +1350,13 @@ class YoLinkMQTTDevice(object):
             ret_val = None  
             if yolink.online and yolink.dData in yolink.data:
                 logging.debug(yolink.type+f' - getData category {category} key {key} {WM_index} {yolink.data[yolink.dData]}')
-                if yolink.online and yolink.dData in yolink.data:
-                    if yolink.data[yolink.dData] is {}:
-                        logging.info(f'No data exists (no data returned)')
-                        return("no data")
-                    if category is None:
-                        if key in yolink.data[yolink.dData]:
-                            logging.debug(f'ret_val0 {ret_val} {key} {category}')
-                            return(yolink.data[yolink.dData][key])
+
+                if yolink.data[yolink.dData] is {}:
+                    logging.info(f'No data exists (no data returned)')
+                    return("no data")
+                if key in yolink.data[yolink.dData] and not isinstance(yolink.data[yolink.dData][key], dict): # MAy need to add list in ffuture if it exists
+                        logging.debug(f'ret_val0 {ret_val} {key} {category}')
+                        return(yolink.data[yolink.dData][key])
                         
                 res = yolink.extract_two_level(category, key)
                 logging.debug(f'extract_two_level result: {res}')
