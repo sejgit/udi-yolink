@@ -1179,7 +1179,7 @@
    <nodeDef id="yomotionsens" nls="nlsmotionsens">
       <editors />
       <sts>
-         <st id="GV0" editor="motionstateO" />
+         <st id="GV0" editor="motionstate" />
          <st id="GV1" editor="batlevel" />
          <st id="GV2" editor="cmdsetting" />
           <st id="CLITEMP" editor="celsius" />
