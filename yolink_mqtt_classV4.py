@@ -1379,6 +1379,10 @@ class YoLinkMQTTDevice(object):
             
             yolink.data = data
             yolink.Status(data)
+            if 'event' in data: 
+                yolink.data['action'] = data['event']
+            if 'method' in data:
+                yolink.data['action'] = data['method']                
             if 'time' in data:
                 yolink.data['report_time'] = int(data['time']/1000)
             else:
@@ -1392,9 +1396,16 @@ class YoLinkMQTTDevice(object):
                 yolink.dataAPI['emptyData'] = False
                 yolink.data['emptyData'] = False
 
+
+
+
+
                 temp = yolink.dataAPI['lastMessage']
                 yolink.reset_structure() #do not let old data persist
                 yolink.dataAPI['lastMessage'] = temp    
+
+
+
             if 'reportAt' in data[yolink.dData] :
                 reportAt = datetime.strptime(data[yolink.dData]['reportAt'], '%Y-%m-%dT%H:%M:%S.%fZ')
                 yolink.dataAPI['lastStateTime'] = (reportAt.timestamp() -  yolink.timezoneOffsetSec)*1000
