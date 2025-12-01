@@ -1333,7 +1333,7 @@ class YoLinkMQTTDevice(object):
 
 
     #@measure_time
-    def get_data(yolink, key = None):    
+    def get_info(yolink, key = None):    
         try:
             ret_val = None  
             if yolink.online :
@@ -1345,7 +1345,7 @@ class YoLinkMQTTDevice(object):
         except KeyError as e:
             logging.error(f'EXCEPTION - getData {e}')      
 
-    def get_info(yolink, category, key, WM_index = None):    
+    def get_data(yolink, category, key, WM_index = None):    
         try:
             ret_val = None  
             if yolink.online and yolink.dData in yolink.data:
