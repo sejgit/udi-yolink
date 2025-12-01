@@ -64,9 +64,8 @@ class udiYoMotionSensor(udi_interface.Node):
 
         self.yoMotionsSensor  = None
         self.node_ready = False
-        self.last_state = 99
         self.cmd_state = self.retrieve_cmd_state()
-        
+        self.last_state = 99        
         self.n_queue = []
         #self.Parameters = Custom(polyglot, 'customparams')
         # subscribe to the events we want
@@ -135,17 +134,20 @@ class udiYoMotionSensor(udi_interface.Node):
                 if motion_state in ['normal'] :
                     self.my_setDriver('GV0', 1)  
                     self.my_setDriver('ST', 1)                
-                    if  self.cmd_state in [0,1]:
+                    if  self.last_state!= 1 and self.cmd_state in [0,1]:
                         self.node.reportCmd('DON')
+                        self.last_state = 1
                 elif motion_state in ['alert']:
                     self.my_setDriver('GV0', 0)
                     self.my_setDriver('ST', 0)
-                    if self.cmd_state in [0,2]:
+                    if self.last_state!= 0 and  self.cmd_state in [0,2]:
                         self.node.reportCmd('DOF')
+                        self.last_state = 0
                 else:
                     self.my_setDriver('GV0', 99)
                     self.my_setDriver('ST', 99)
-                self.last_state = motion_state
+                    self.last_state = 99
+
                 self.my_setDriver('GV1', self.yoMotionsSensor.get_data('state', 'battery'))
                 self.my_setDriver('GV2', self.cmd_state)
                 self.my_setDriver('GV30', 1)

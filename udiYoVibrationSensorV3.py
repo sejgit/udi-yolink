@@ -111,27 +111,30 @@ class udiYoVibrationSensor(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            self.my_setDriver('TIME', self.yoVibrationSensor.getLastUpdateTime(), 151)
+            unix_time = self.yoVibrationSensor.get_report_time('reportAt')
+            self.my_setDriver('TIME', unix_time, 151)
             if self.yoVibrationSensor.online:               
-                vib_state = self.getVibrationState()
-                if vib_state == 1:
+                vib_state = self.yoVibrationSensor.get_data('state', 'state')
+                if vib_state == ['normal'] :
                     self.my_setDriver('GV0', 1)
                     self.my_setDriver('ST', 1)
-                    if self.last_state != vib_state and self.cmd_state in [0,1]:
+                    if self.last_state!= 1 and self.cmd_state in [0,1]:
                         self.node.reportCmd('DON')   
-                elif vib_state == 0:
+                        self.last_state = 1
+                elif vib_state == ['alert']:
                     self.my_setDriver('GV0', 0)
                     self.my_setDriver('ST', 0)
-                    if self.last_state != vib_state and self.cmd_state in [0,2]:
-                        self.node.reportCmd('DOF')  
+                    if self.last_state!= 0 and self.cmd_state in [0,2]:
+                        self.node.reportCmd('DOF')
+                        self.last_state = 0
                 else:
                     self.my_setDriver('GV0', 99) 
                     self.my_setDriver('ST', 99)
-                self.last_state = vib_state
-                self.my_setDriver('GV1', self.yoVibrationSensor.getBattery())
-                #self.my_setDriver('ST', 1)
+                    self.last_state = 99
+                self.my_setDriver('GV1', self.yoVibrationSensor.get_data('state', 'battery'))
+
                 self.my_setDriver('GV30', 1)
-                devTemp =  self.yoVibrationSensor.getDeviceTemperature()
+                devTemp =  self.yoVibrationSensor.get_data('state', 'devTemperature')
                 if devTemp != 'NA':
                     if self.temp_unit == 0:
                         self.my_setDriver('CLITEMP', round(devTemp,0), 4)
@@ -152,15 +155,6 @@ class udiYoVibrationSensor(udi_interface.Node):
                 self.my_setDriver('GV20', 2)
 
 
-
-    def getVibrationState(self):
-        if self.yoVibrationSensor.online:
-            if  self.yoVibrationSensor.getVibrationState() == 'normal':
-                return(0)
-            else:
-                return(1)
-        else:
-            return(99)
 
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoLinkVibrationSensor')
