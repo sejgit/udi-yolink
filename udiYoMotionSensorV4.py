@@ -138,8 +138,8 @@ class udiYoMotionSensor(udi_interface.Node):
                     if  self.cmd_state in [0,1]:
                         self.node.reportCmd('DON')
                 elif motion_state in ['alert']:
-                    self.my_setDriver('GV0', motion_state)
-                    self.my_setDriver('ST', motion_state)
+                    self.my_setDriver('GV0', 0)
+                    self.my_setDriver('ST', 0)
                     if self.cmd_state in [0,2]:
                         self.node.reportCmd('DOF')
                 else:
