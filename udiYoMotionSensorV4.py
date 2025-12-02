@@ -131,7 +131,7 @@ class udiYoMotionSensor(udi_interface.Node):
             self.my_setDriver('TIME', unix_time, 151)
             if self.yoMotionsSensor.online:
                 logging.debug('Motion sensor CMD setting: {}'.format(self.cmd_state))
-                motion_state = self.yoMotionsSensor.get_data('state', 'state', type=message_type)
+                motion_state = self.yoMotionsSensor.get_data('state', 'state')
                 if motion_state in ['normal'] :
                     self.my_setDriver('GV0', 1, type=message_type)  
                     self.my_setDriver('ST', 1, type=message_type)                
@@ -149,10 +149,10 @@ class udiYoMotionSensor(udi_interface.Node):
                     self.my_setDriver('ST', 99)
                     self.last_state = 99
 
-                self.my_setDriver('GV1', self.yoMotionsSensor.get_data('state', 'battery', type=message_type))
+                self.my_setDriver('GV1', self.yoMotionsSensor.get_data('battery', 'state'), type=message_type)
                 self.my_setDriver('GV2', self.cmd_state)
                 self.my_setDriver('GV30', 1)
-                devTemp =  self.yoMotionsSensor.get_data('state', 'devTemperature')
+                devTemp =  self.yoMotionsSensor.get_data('devTemperature', 'state')
                 if devTemp != None:
                     if self.temp_unit == 0:
                         self.my_setDriver('CLITEMP', round(devTemp,0), 4, type=message_type)

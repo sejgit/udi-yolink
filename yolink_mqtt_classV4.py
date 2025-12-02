@@ -1345,7 +1345,7 @@ class YoLinkMQTTDevice(object):
         except KeyError as e:
             logging.error(f'EXCEPTION - getData {e}')      
 
-    def get_data(yolink, category, key, WM_index = None):    
+    def get_data(yolink, key, categor=None, WM_index = None):    
         try:
             ret_val = None  
             if yolink.online and yolink.dData in yolink.data:
