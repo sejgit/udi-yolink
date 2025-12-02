@@ -1073,6 +1073,13 @@
          <st id="GV11" editor="celsius" />
          <st id="GV12" editor="humidity" />
          <st id="GV13" editor="humidity" />
+         <st id="GV14" editor="celsius" />
+         <st id="GV15" editor="celsius" />
+         <st id="GV16" editor="humidity" />
+         <st id="GV17" editor="humidity" />
+
+
+
          <st id="GV20" editor="suspendstate" />
          <st id="GV30" editor="status" />
          <st id="TIME" editor="unixtime" />                              
@@ -1109,6 +1116,10 @@
          <st id="GV11" editor="farenheit" />
          <st id="GV12" editor="humidity" />
          <st id="GV13" editor="humidity" />
+         <st id="GV14" editor="farenheit" />
+         <st id="GV15" editor="farenheit" />
+         <st id="GV16" editor="humidity" />
+         <st id="GV17" editor="humidity" />         
          <st id="GV20" editor="suspendstate" />
          <st id="GV30" editor="status" />
          <st id="TIME" editor="unixtime" />                              

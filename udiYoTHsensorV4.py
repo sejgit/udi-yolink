@@ -77,7 +77,7 @@ class udiYoTHsensor(udi_interface.Node):
 
         self.temp_unit = self.yoAccess.get_temp_unit()   
         if self.temp_unit == 1:
-            self.id = 'yothsensF'
+            self.id = 'yothsensF'  
 
         self.cmd_state = self.retrieve_cmd_state()
         model = str(self.devInfo['modelName'][:6])
@@ -86,6 +86,7 @@ class udiYoTHsensor(udi_interface.Node):
         else:
             self.meas_support = ['temp', 'hum']
         self.alarm_state = False
+        self.sensordata_24_hours = {}
         #self.address = address
         #self.poly = polyglot
 
@@ -116,6 +117,10 @@ class udiYoTHsensor(udi_interface.Node):
         time.sleep(1)
         self.yoTHsensor.initNode()
         time.sleep(1)
+        while not self.yoTHsensor.online:
+            logging.info('Waiting for TH sensor to come online...')
+            time.sleep(2)
+
         self.temp_unit = self.yoAccess.get_temp_unit()
         self.node_ready = True
         self.alarm_state = self.get_alarms_state()
@@ -149,7 +154,39 @@ class udiYoTHsensor(udi_interface.Node):
                 if alarms[a_type]:
                     alarm_on = True
         return(alarm_on)
-                    
+
+    def update_data_24_hours(self, tempC, hum, unix_time):
+        timeNow = int(time.time())
+        self.sensordata_24_hours[unix_time] = {'tempC': tempC, 'hum': hum}
+        tmax = -273.15
+        tmin = 1000
+        hmax = -1
+        hmin = 101
+        for timestamp in list(self.sensordata_24_hours.keys()):
+            if timeNow - timestamp > 86400:
+                del self.sensordata_24_hours[timestamp]
+            else:
+                if isinstance(self.sensordata_24_hours[timestamp]['tempC'], (int, float)):
+                    if self.sensordata_24_hours[timestamp]['tempC'] > tmax:
+                        tmax = self.sensordata_24_hours[timestamp]['tempC']
+                    if self.sensordata_24_hours[timestamp]['tempC'] < tmin:
+                        tmin = self.sensordata_24_hours[timestamp]['tempC']
+                if 'hum' in self.meas_support and isinstance(self.sensordata_24_hours[timestamp]['hum'], (int, float)):
+                    if self.sensordata_24_hours[timestamp]['hum'] > hmax:
+                        hmax = self.sensordata_24_hours[timestamp]['hum']
+                    if self.sensordata_24_hours[timestamp]['hum'] < hmin:
+                        hmin = self.sensordata_24_hours[timestamp]['hum']
+        if tmax == -273.15:
+            tmax = None
+        if tmin == 1000:
+            tmin = None 
+        if hmax == -1:
+            hmax = None     
+        if hmin == 101:
+            hmin = None
+        logging.debug(f'24H Data - tmin: {tmin}, tmax: {tmax}, hmin: {hmin}, hmax: {hmax}')
+        return(tmin, tmax, hmin, hmax)
+
 
     def updateData(self):
         alarms = self.yoTHsensor.getAlarms()
@@ -164,31 +201,58 @@ class udiYoTHsensor(udi_interface.Node):
             self.alarm_state = alarm_det
             
         if self.node is not None:
-            self.my_setDriver('TIME', self.yoTHsensor.getLastUpdateTime(), 151)
-
+            message_type = self.yoTHsensor.get_last_message_type() # if event some data may not be updated 
+            unix_time = self.yoTHsensor.get_report_time('reportAt')
+            self.my_setDriver('TIME', unix_time, 151)
             if self.yoTHsensor.online:
-                logging.debug("yoTHsensor temp: {}".format(self.yoTHsensor.getTempValueC()))
-                if self.temp_unit == 0:
-                    self.my_setDriver('CLITEMP', round(self.yoTHsensor.getTempValueC(),1),  4)
-                    self.my_setDriver('ST', round(self.yoTHsensor.getTempValueC(),1),  4)
-                    if 'tempLimit' in limits:
-                        self.my_setDriver('GV10', limits['tempLimit']['min'],  4)
-                        self.my_setDriver('GV11', limits['tempLimit']['max'],  4)
-                elif self.temp_unit == 1:
-                    self.my_setDriver('CLITEMP', round(self.yoTHsensor.getTempValueC()*9/5+32,1),  17)
-                    self.my_setDriver('ST', round(self.yoTHsensor.getTempValueC()*9/5+32,1),  17)
-                    if 'tempLimit' in limits:
-                        self.my_setDriver('GV10', round(limits['tempLimit']['min']*9/5+32,1),  17)
-                        self.my_setDriver('GV11', round(limits['tempLimit']['max']*9/5+32,1),  17)                    
-                elif self.temp_unit == 2:
-                    self.my_setDriver('CLITEMP', round(self.yoTHsensor.getTempValueC()+273.15,1), 26)
-                    self.my_setDriver('ST', round(self.yoTHsensor.getTempValueC()+273.15,1), 26)
-                    if 'tempLimit' in limits:
-                        self.my_setDriver('GV10', round(limits['tempLimit']['min']+273.15,1), 26)
-                        self.my_setDriver('GV11', round(limits['tempLimit']['max']+273.15,1),  26)    
+                tempC = self.yoTHsensor.get_data('temperature', 'state')
+                tempLimMin = self.yoTHsensor.get_data('min', 'tempLimit')
+                tempLimMax = self.yoTHsensor.get_data('max', 'tempLimit')                
+                if 'hum' in self.meas_support:
+                    hum = self.yoTHsensor.get_data('humidity', 'state')
+                    humLimMin = self.yoTHsensor.get_data('min', 'humidityLimit')
+                    humLimMax = self.yoTHsensor.get_data('max', 'humidityLimit')    
+                tempMeasMin, tempMeasMax, humMeasMin, humMeasMax = self.update_data_24_hours(tempC, hum, unix_time)
+
+                #tempMeas = self.yoTHsensor.get_data('temperature', 'statistics')
+                #if isinstance(tempMeas, dict):
+                #    tempMeasMin = tempMeas.get('min', None)
+                ##    tempMeasMax = tempMeas.get('max', None)
+                #else:
+
+                #    tempMeasMin = None
+                #    tempMeasMax = None
+                
+                if isinstance(tempC, (int, float)):
+
+                    if self.temp_unit == 0:
+                        self.my_setDriver('CLITEMP', round(tempC,1),  4, type=message_type)
+                        self.my_setDriver('ST', round(tempC,1),  4)
+                        #if 'tempLimit' in limits:
+                        self.my_setDriver('GV10', tempLimMin,  4, type=message_type)
+                        self.my_setDriver('GV11', tempLimMax,  4, type=message_type)
+                        self.my_setDriver('GV14', tempMeasMin,  4, type=message_type)
+                        self.my_setDriver('GV15', tempMeasMax,  4, type=message_type)                        
+
+                    elif self.temp_unit == 1:
+                        self.my_setDriver('CLITEMP', round(tempC*9/5+32,1),  17, type=message_type)
+                        self.my_setDriver('ST', round(tempC*9/5+32,1),  17, type=message_type)
+                        if isinstance(tempLimMin, (int, float)):
+                            self.my_setDriver('GV10', round(tempLimMin*9/5+32,1),  17, type=message_type)
+                        if isinstance(tempLimMax, (int, float)):
+                            self.my_setDriver('GV11', round(tempLimMax*9/5+32,1),  17, type=message_type) 
+                        if isinstance(tempMeasMin, (int, float)):   
+                            self.my_setDriver('GV14', round(tempMeasMin*9/5+32,1),  17, type=message_type)
+                        if isinstance(tempMeasMax, (int, float)):   
+                            self.my_setDriver('GV15', round(tempMeasMax*9/5+32,1),  17, type=message_type)      
                 else:
-                    self.my_setDriver('CLITEMP', 99, 25)
-                    self.my_setDriver('ST', 99, 25)
+                    self.my_setDriver('CLITEMP', 99,  25)
+                    self.my_setDriver('ST', 99,  25)
+                    self.my_setDriver('GV10', 99, 25)
+                    self.my_setDriver('GV11', 99, 25)
+                    self.my_setDriver('GV14', 99, 25)
+                    self.my_setDriver('GV15', 99, 25)
+                    
 
                 self.my_setDriver('GV1', self.yoTHsensor.bool2Nbr(alarms['lowTemp']))
                 self.my_setDriver('GV2', self.yoTHsensor.bool2Nbr(alarms['highTemp']))
