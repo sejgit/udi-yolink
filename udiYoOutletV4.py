@@ -16,7 +16,7 @@ from os import truncate
 #import udi_interface
 #import sys
 import time
-from yolinkOutletV2 import YoLinkOutl
+from yolinkOutletV2 import YoLinkOutlet
 
 
 
@@ -103,7 +103,7 @@ class udiYoOutlet(udi_interface.Node):
     def start(self):
         logging.info('start - YoOutlet')
         self.my_setDriver('GV30', 0)
-        self.yoOutlet  = YoLinkOutl(self.yoAccess, self.devInfo, self.updateStatus)
+        self.yoOutlet  = YoLinkOutlet(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoOutlet.initNode()
         time.sleep(2)

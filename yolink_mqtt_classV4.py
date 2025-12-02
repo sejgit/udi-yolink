@@ -1386,14 +1386,14 @@ class YoLinkMQTTDevice(object):
             logging.debug('{} - updateStatusData : {}'.format(yolink.type , json.dumps(data, indent=4)))
             
             yolink.data = data
-            yolink.Status(data)
+            yolink.online = yolink.Status(data)
 
             if 'event' in data: 
                 yolink.data['type'] = 'event'
-                yolink.data['action'] = data['event']
+                yolink.data['action'] = data['event'].split('.')[-1]
             if 'method' in data:
                 yolink.data['type'] = 'method'
-                yolink.data['action'] = data['method']                
+                yolink.data['action'] = data['method'].split('.')[-1]  
             if 'time' in data:
                 yolink.data['report_time'] = int(data['time']/1000)
             else:
@@ -1611,7 +1611,7 @@ class YoLinkMQTTDevice(object):
                     #logging.debug('END State is not dict 1 - {}'.format(yolink.dataAPI[yolink.dData][yolink.dState]))
                     #logging.debug('END State is not dict 2 - {}'.format(yolink.dataAPI[yolink.dData]))
             #yolink.dataAPI['nbrPorts'] = yolink.nbrPorts
-            yolink.online = yolink.Status(data)
+            #yolink.online = yolink.Status(data)
             logging.debug('After parsing {}'.format(json.dumps(yolink.data, indent=4)))
 
         except Exception as e:
