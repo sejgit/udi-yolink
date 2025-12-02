@@ -151,15 +151,15 @@ def wait_for_node_done(self):
         time.sleep(0.1)
     self.n_queue.pop()
 
-def my_setDriver(self, key, value, Unit=None, force=False):
+def my_setDriver(self, key, value, Unit=None, force=False, type=None):
     logging.debug(f'my_setDriver : {key} {value} {Unit} ')
     try:
         if any(item.get('driver') == key for item in self.drivers):
             if value is None:
-                logging.debug('None value passed = seting 99, UOM 25')
-                self.node.setDriver(key, 99, True, force, 25)
-            else:
-                
+                if type is not 'event':
+                    logging.debug('None value passed = seting 99, UOM 25')
+                    self.node.setDriver(key, 99, True, force, 25)
+            else:                
                 if key in ['GV20']: # Connection state o
                     try:
                         if self.yoAccess.local:
@@ -167,7 +167,7 @@ def my_setDriver(self, key, value, Unit=None, force=False):
                             value = value + 3
                     except Exception as e:
                         logging.debug('Local connection - yolink class not ready - continue : {}'.format(e))
-                if isinstance(Unit, int):
+                if isinstance(Unit, (int, float)):
                     self.node.setDriver(key, value, True, force, uom=Unit)
                 else:
                     self.node.setDriver(key, value,True, force)

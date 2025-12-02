@@ -1354,7 +1354,7 @@ class YoLinkMQTTDevice(object):
                 if yolink.data[yolink.dData] is {}:
                     logging.info(f'No data exists (no data returned)')
                     return("no data")
-                if key in yolink.data[yolink.dData] and not isinstance(yolink.data[yolink.dData][key], dict): # MAy need to add list in ffuture if it exists
+                if key in yolink.data[yolink.dData] and not isinstance(yolink.data[yolink.dData][key], dict): # MAy need to add list in future if it exists
                         logging.debug(f'ret_val0 {ret_val} {key} {category}')
                         return(yolink.data[yolink.dData][key])
                         
@@ -1372,6 +1372,14 @@ class YoLinkMQTTDevice(object):
         except KeyError as e:
             logging.error(f'EXCEPTION - getData {e}')    
 
+    def get_last_message_type(yolink):
+        try:
+            return(yolink.data['type'])
+        except KeyError as e:
+            logging.error(f'EXCEPTION - get_last_message_type {e}')
+            return(None)
+
+
     #@measure_time
     def updateStatusData  (yolink, data):
         try:
@@ -1379,9 +1387,12 @@ class YoLinkMQTTDevice(object):
             
             yolink.data = data
             yolink.Status(data)
+
             if 'event' in data: 
+                yolink.data['type'] = 'event'
                 yolink.data['action'] = data['event']
             if 'method' in data:
+                yolink.data['type'] = 'method'
                 yolink.data['action'] = data['method']                
             if 'time' in data:
                 yolink.data['report_time'] = int(data['time']/1000)

@@ -132,6 +132,7 @@ class udiYoOutlet(udi_interface.Node):
     def updateData(self):
         logging.info('udiYoOutlet updateData -  {}'.format(self.schedule_selected))
         if self.node is not None:
+            message_type = self.yoOutlet.get_last_message_type()
             unix_time = self.yoOutlet.get_report_time('time')
             self.my_setDriver('TIME', unix_time, 151)
             if self.yoOutlet.online: 
@@ -141,14 +142,14 @@ class udiYoOutlet(udi_interface.Node):
                 state = str(self.yoOutlet.get_data('state'))
                 logging.debug('Outlet State : {} '. format(state))
                 if state in ['on', 'open']:
-                    self.my_setDriver('GV0',1 )
-                    self.my_setDriver('ST',1 )
+                    self.my_setDriver('GV0',1, type=message_type)
+                    self.my_setDriver('ST',1, type=message_type)
                     state =  'open'
                     #if self.last_state != state:
                     #    self.node.reportCmd('DON')  
                 elif state in [ 'off', 'closed']:
-                    self.my_setDriver('GV0', 0)
-                    self.my_setDriver('ST', 0)
+                    self.my_setDriver('GV0', 0, type=message_type)
+                    self.my_setDriver('ST', 0, type=message_type)
                     state = 'closed'
                     #if self.last_state != state:
                     #    self.node.reportCmd('DOF')  
@@ -161,20 +162,20 @@ class udiYoOutlet(udi_interface.Node):
                 #logging.debug('Power/Energy info : {} '. format(tmp))
                 
                 if self.powerSupported: 
-                    power = self.yoOutlet.get_data(None, 'power')
-                    if isinstance(power, int, float):
+                    power = self.yoOutlet.get_data(None, 'power', type=message_type)
+                    if isinstance(power, (int, float)):
                         powerkW = round(power/10000,3) # reports 1/10W
-                    self.my_setDriver('GV3', powerkW, 30)
+                    self.my_setDriver('GV3', powerkW, 30, type=message_type)
 
-                    energykWh = self.yoOutlet.get_data(None, 'watt')  
-                    if isinstance(energykWh, int, float):            
+                    energykWh = self.yoOutlet.get_data(None, 'watt', type=message_type)  
+                    if isinstance(energykWh, (int, float)):            
                         energykWh = round(energykWh/10000,3) # reports 1/10Wh                    
-                    self.my_setDriver('GV4', energykWh, 33)
+                    self.my_setDriver('GV4', energykWh, 33, type=message_type)
 
-                    self.my_setDriver('GV5', self.bool2ISY(self.yoOutlet.get_data('alertType', 'overload')))
-                    self.my_setDriver('GV6', self.bool2ISY(self.yoOutlet.get_data('alertType', 'highLoad')))   
-                    self.my_setDriver('GV7', self.bool2ISY(self.yoOutlet.get_data('alertType', 'lowLoad')))
-                    self.my_setDriver('GV8', self.bool2ISY(self.yoOutlet.get_data('alertType', 'highTemperature'))) 
+                    self.my_setDriver('GV5', self.bool2ISY(self.yoOutlet.get_data('alertType', 'overload')), type=message_type)
+                    self.my_setDriver('GV6', self.bool2ISY(self.yoOutlet.get_data('alertType', 'highLoad')), type=message_type)   
+                    self.my_setDriver('GV7', self.bool2ISY(self.yoOutlet.get_data('alertType', 'lowLoad')), type=message_type)
+                    self.my_setDriver('GV8', self.bool2ISY(self.yoOutlet.get_data('alertType', 'highTemperature')), type=message_type)
                     
                 #logging.debug('Timer info : {} '. format(time.time() - self.timer_expires))
                 if time.time() >= self.timer_expires - self.timer_update and self.timer_expires != 0:

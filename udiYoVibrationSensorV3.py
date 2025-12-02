@@ -111,19 +111,20 @@ class udiYoVibrationSensor(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
+            message_type = self.yoVibrationSensor.get_last_message_type() # if event some data may not be updated 
             unix_time = self.yoVibrationSensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
             if self.yoVibrationSensor.online:               
                 vib_state = self.yoVibrationSensor.get_data('state', 'state')
                 if vib_state == ['normal'] :
-                    self.my_setDriver('GV0', 1)
-                    self.my_setDriver('ST', 1)
+                    self.my_setDriver('GV0', 1, type=message_type)
+                    self.my_setDriver('ST', 1, type=message_type)
                     if self.last_state!= 1 and self.cmd_state in [0,1]:
                         self.node.reportCmd('DON')   
                         self.last_state = 1
                 elif vib_state == ['alert']:
-                    self.my_setDriver('GV0', 0)
-                    self.my_setDriver('ST', 0)
+                    self.my_setDriver('GV0', 0, type=message_type)
+                    self.my_setDriver('ST', 0, type=message_type)
                     if self.last_state!= 0 and self.cmd_state in [0,2]:
                         self.node.reportCmd('DOF')
                         self.last_state = 0
@@ -131,15 +132,15 @@ class udiYoVibrationSensor(udi_interface.Node):
                     self.my_setDriver('GV0', 99) 
                     self.my_setDriver('ST', 99)
                     self.last_state = 99
-                self.my_setDriver('GV1', self.yoVibrationSensor.get_data('state', 'battery'))
+                self.my_setDriver('GV1', self.yoVibrationSensor.get_data('state', 'battery'), type=message_type)
 
                 self.my_setDriver('GV30', 1)
                 devTemp =  self.yoVibrationSensor.get_data('state', 'devTemperature')
                 if devTemp != 'NA':
                     if self.temp_unit == 0:
-                        self.my_setDriver('CLITEMP', round(devTemp,0), 4)
+                        self.my_setDriver('CLITEMP', round(devTemp,0), 4, type=message_type)
                     elif self.temp_unit == 1:
-                        self.my_setDriver('CLITEMP', round(devTemp*9/5+32,0), 17)
+                        self.my_setDriver('CLITEMP', round(devTemp*9/5+32,0), 17, type=message_type)
                 else:
                     self.my_setDriver('CLITEMP', 99,  25)
                 if self.yoVibrationSensor.suspended:
