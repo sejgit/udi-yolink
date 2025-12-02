@@ -3,7 +3,7 @@
 Yolink Control Main Node  program 
 MIT License
 """
-version = '1.6.13'
+version = '1.6.14'
 import sys
 import re
 import time
@@ -33,12 +33,12 @@ from udiYoSpeakerHubV2 import udiYoSpeakerHub
 from udiYoLockV2 import udiYoLock
 from udiYoInfraredRemoterV3 import udiYoInfraredRemoter
 from udiYoDimmerV2 import udiYoDimmer
-from udiYoVibrationSensorV3 import udiYoVibrationSensor
+from udiYoVibrationSensorV4 import udiYoVibrationSensor
 from udiYoSmartRemoterV3 import udiYoSmartRemoter
 from udiYoPowerFailV3 import udiYoPowerFailSenor
 from udiYoSirenV2 import udiYoSiren
-from udiYoWaterMeterControllerV3 import udiYoWaterMeterController
-from udiYoWaterMeterMultiControllerV3 import udiYoWaterMeterMulti 
+from udiYoWaterMeterControllerV4 import udiYoWaterMeterController
+from udiYoWaterMeterMultiControllerV4 import udiYoWaterMeterMulti 
 from udiYoWaterMeterOnlyV3 import udiYoWaterMeterOnly 
 from udiYoHubV2 import udiYoHub, udiYoBatteryHub
 #import udiProfileHandler
@@ -150,7 +150,7 @@ def addNodes (self, deviceList) -> list:
     #                    'PowerFailureAlarm', 'SmartRemoter', 'COSmokeSensor', 'Siren', 'WaterMeterController',
     #                    'WaterDepthSensor', ]    'WaterMeterController', 
     
-    supportedYoTypes = ['MotionSensor', 'WaterMeterController', 'Outlet','THSensor',  'WaterMeterMultiController', 'VibrationSensor'  ]     
+    #supportedYoTypes = ['MotionSensor', 'WaterMeterController', 'Outlet','THSensor',  'WaterMeterMultiController', 'VibrationSensor'  ]     
 
     
     remove_list= []
