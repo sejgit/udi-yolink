@@ -564,7 +564,7 @@ class YoLinkInitPAC(object):
             #else:
             #    logging.error('Unsupported device: {}'.format(deviceId))
             #yoAccess.messageLock.release()
-        except Empty # Ensure this is imported
+        except Empty: # Ensure this is imported
             logging.debug('message processing timeout - queue empty')
             pass
         except Exception as e:
