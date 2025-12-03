@@ -17,7 +17,7 @@ import xml.etree.ElementTree as ET
 from udiYoSwitchV2 import udiYoSwitch
 from udiYoSwitchSecV2 import udiYoSwitchSec
 from udiYoSwitchPwrSecV2 import udiYoSwitchPwrSec
-from udiYoTHsensorV3 import udiYoTHsensor 
+from udiYoTHsensorV4 import udiYoTHsensor 
 from udiYoWaterDeptV3 import udiYoWaterDept 
 from udiYoGarageDoorCtrlV2 import udiYoGarageDoor
 from udiYoGarageFingerCtrlV2 import udiYoGarageFinger
