@@ -45,14 +45,14 @@ class YoLinkTHSen(YoLinkMQTTDevice):
     #    return(yolink.getOnlineStatus( ))
 
        
-    def getTempValueF(yolink):
-        return(yolink.getStateValue('temperature')*9/5+32)
+    #def getTempValueF(yolink):
+    #   return(yolink.getStateValue('temperature')*9/5+32)
     
-    def getTempValueC(yolink):
-        return(yolink.getStateValue('temperature'))
+    #def getTempValueC(yolink):
+    #    return(yolink.getStateValue('temperature'))
 
-    def getHumidityValue(yolink):
-        return(yolink.getStateValue('humidity'))
+    #def getHumidityValue(yolink):
+    #   return(yolink.getStateValue('humidity'))
     
     
     '''
