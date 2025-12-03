@@ -1078,8 +1078,6 @@
          <st id="GV16" editor="humidity" />
          <st id="GV17" editor="humidity" />
 
-
-
          <st id="GV20" editor="suspendstate" />
          <st id="GV30" editor="status" />
          <st id="TIME" editor="unixtime" />                              
@@ -1137,6 +1135,72 @@
          </accepts>
       </cmds>
    </nodeDef> 
+<nodeDef id="yotsens" nls="nlstsens">
+      <editors />
+      <sts>
+         <st id="ST" editor="celsius" />
+         <st id="CLITEMP" editor="celsius" />
+         <st id="GV1" editor="alarm" />
+         <st id="GV2" editor="alarm" />
+         <st id="BATLVL" editor="batlevel" />
+         <st id="GV7" editor="alarm" />
+         <st id="GV8" editor="alarm" />
+         <st id="GV9" editor="cmdsetting" />
+         <st id="GV10" editor="celsius" />
+         <st id="GV11" editor="celsius" />
+         <st id="GV14" editor="celsius" />
+         <st id="GV15" editor="celsius" />
+         <st id="GV20" editor="suspendstate" />
+         <st id="GV30" editor="status" />
+         <st id="TIME" editor="unixtime" />                              
+      </sts>
+      <cmds>
+         <sends>
+            <cmd id="DON"   />               
+            <cmd id="DOF"   />    
+         </sends>
+         <accepts>
+            <cmd id="SETCMD" > 
+               <p id="" editor="cmdsetting" init="GV2" /> 
+            </cmd >          
+            <cmd id="UPDATE" /> 
+         </accepts>
+      </cmds>
+   </nodeDef> 
+
+<nodeDef id="yotsensF" nls="nlstsens">
+      <editors />
+      <sts>
+         <st id="ST" editor="celsius" />
+         <st id="CLITEMP" editor="farenheit" />
+         <st id="GV1" editor="alarm" />
+         <st id="GV2" editor="alarm" />
+         <st id="BATLVL" editor="batlevel" />
+         <st id="GV7" editor="alarm" />
+         <st id="GV8" editor="alarm" />
+         <st id="GV9" editor="cmdsetting" />
+         <st id="GV10" editor="farenheit" />
+         <st id="GV11" editor="farenheit" />
+         <st id="GV14" editor="farenheit" />
+         <st id="GV15" editor="farenheit" />
+         <st id="GV20" editor="suspendstate" />
+         <st id="GV30" editor="status" />
+         <st id="TIME" editor="unixtime" />                              
+      </sts>
+      <cmds>
+         <sends>
+            <cmd id="DON"   />               
+            <cmd id="DOF"   />    
+         </sends>
+         <accepts>
+            <cmd id="SETCMD" > 
+               <p id="" editor="cmdsetting" init="GV2" /> 
+            </cmd >          
+            <cmd id="UPDATE" /> 
+         </accepts>
+      </cmds>
+   </nodeDef> 
+
 
    <nodeDef id="yodoorsens" nls="nlsdoorsens">
       <editors />
