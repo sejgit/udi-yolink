@@ -475,7 +475,7 @@ class YoLinkInitPAC(object):
         try:
             #yoAccess.messageLock.acquire()
             msg = yoAccess.messageQueue.get(timeout = 10) 
-            logging.debug(f'{yoAccess.access_mode} Received message - Q size={yoAccess.messageQueue.qsize()}')
+            #logging.debug(f'{yoAccess.access_mode} Received message - Q size={yoAccess.messageQueue.qsize()}')
             payload = json.loads(msg.payload.decode("utf-8"))
             #logging.debug('process_message : {}'.format(payload))
             
@@ -490,9 +490,8 @@ class YoLinkInitPAC(object):
             logging.debug(f'{yoAccess.access_mode} process_message for {deviceId}: {payload} {msg.topic}')
             
 
-            #if deviceId in yoAccess.mqttList:
-
-            #    tempCallback = yoAccess.mqttList[deviceId]['callback']
+            if deviceId in yoAccess.mqttList:
+                tempCallback = yoAccess.mqttList[deviceId]['callback']
                 
             #if payload['msgid'] in yoAccess.pendingDict:
             #    yoAccess.pendingDict.pop(payload['msgid'] )
