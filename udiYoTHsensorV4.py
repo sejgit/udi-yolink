@@ -15,6 +15,7 @@ except ImportError:
     logging.basicConfig(level=logging.INFO)
 #import sys
 import time
+
 from yolinkTHsensorV2 import YoLinkTHSen
 
 
@@ -162,39 +163,6 @@ class udiYoTHsensor(udi_interface.Node):
                     alarm_on = True
         return(alarm_on)
 
-    def update_data_24_hours(self, tempC, hum, unix_time):
-        timeNow = int(time.time())
-        self.sensordata_24_hours[unix_time] = {'tempC': tempC, 'hum': hum}
-        tmax = -273.15
-        tmin = 1000
-        hmax = -1
-        hmin = 101
-        for timestamp in list(self.sensordata_24_hours.keys()):
-            if timeNow - timestamp > 86400:
-                del self.sensordata_24_hours[timestamp]
-            else:
-                if isinstance(self.sensordata_24_hours[timestamp]['tempC'], (int, float)):
-                    if self.sensordata_24_hours[timestamp]['tempC'] > tmax:
-                        tmax = self.sensordata_24_hours[timestamp]['tempC']
-                    if self.sensordata_24_hours[timestamp]['tempC'] < tmin:
-                        tmin = self.sensordata_24_hours[timestamp]['tempC']
-                if 'hum' in self.meas_support and isinstance(self.sensordata_24_hours[timestamp]['hum'], (int, float)):
-                    if self.sensordata_24_hours[timestamp]['hum'] > hmax:
-                        hmax = self.sensordata_24_hours[timestamp]['hum']
-                    if self.sensordata_24_hours[timestamp]['hum'] < hmin:
-                        hmin = self.sensordata_24_hours[timestamp]['hum']
-        
-        if tmax == -273.15:
-            tmax = None
-        if tmin == 1000:
-            tmin = None 
-        if hmax == -1:
-            hmax = None     
-        if hmin == 101:
-            hmin = None
-        logging.debug(f'24H Data - tmin: {tmin}, tmax: {tmax}, hmin: {hmin}, hmax: {hmax}')
-        return(tmin, tmax, hmin, hmax)
-
 
     def updateData(self):
         #alarms = self.yoTHsensor.getAlarms()
@@ -214,6 +182,7 @@ class udiYoTHsensor(udi_interface.Node):
                 lowTempAlarm = self.yoTHsensor.get_data('lowTemp', 'alarms')
                 highTempAlarm = self.yoTHsensor.get_data('highTemp', 'alarms')     
                 alarm_det = alarm_det or lowTempAlarm or highTempAlarm        
+                hum = None
                 if 'hum' in self.meas_support:
                     hum = self.yoTHsensor.get_data('humidity', 'state')
                     humLimMin = self.yoTHsensor.get_data('min', 'humidityLimit')
@@ -221,7 +190,7 @@ class udiYoTHsensor(udi_interface.Node):
                     lowHumAlarm = self.yoTHsensor.get_data('lowHumidity', 'alarms')
                     highHumAlarm = self.yoTHsensor.get_data('highHumidity', 'alarms')  
                     alarm_det = alarm_det or lowHumAlarm or highHumAlarm
-                tempMeasMin, tempMeasMax, humMeasMin, humMeasMax = self.update_data_24_hours(tempC, hum, unix_time)
+                tempMeasMin, tempMeasMax, humMeasMin, humMeasMax = self.yoTHsensor.update_data_24_hours(unix_time, tempC, hum)
                 bat_lvl = self.yoTHsensor.get_data('battery', 'state')
                 bat_alarm = self.yoTHsensor.get_data('batteryLow', 'alarms')
                 #tempMeas = self.yoTHsensor.get_data('temperature', 'statistics')
@@ -274,6 +243,8 @@ class udiYoTHsensor(udi_interface.Node):
         
                         self.my_setDriver('GV12', humLimMin, 51, type=message_type)
                         self.my_setDriver('GV13', humLimMax, 51, type=message_type)
+                        self.my_setDriver('GV16', humMeasMin, 51, type=message_type)
+                        self.my_setDriver('GV17', humMeasMax, 51, type=message_type)
                     self.my_setDriver('GV4', self.yoTHsensor.bool2Nbr(lowHumAlarm))
                     self.my_setDriver('GV5', self.yoTHsensor.bool2Nbr(highHumAlarm))
                     if alarm_det or lowHumAlarm or highHumAlarm:
@@ -282,6 +253,8 @@ class udiYoTHsensor(udi_interface.Node):
                     self.my_setDriver('CLIHUM', 98, 25)
                     self.my_setDriver('GV12', 98, 25)
                     self.my_setDriver('GV13', 98, 25)
+                    self.my_setDriver('GV16', 98, 25)
+                    self.my_setDriver('GV17', 98, 25)   
                     self.my_setDriver('GV4', 98, 25)
                     self.my_setDriver('GV5', 98, 25)
 

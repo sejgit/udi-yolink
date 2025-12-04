@@ -259,7 +259,6 @@ class udiYoInfraredRemoter(udi_interface.Node):
             self.my_setDriver('ST', self.err_code2nbr(code), type=message_type)
             self.my_setDriver('GV0',len(self.codes_used) )                 
             self.my_setDriver('GV1',self.yoIRrem.get_data('battery'), type=message_type)
-
             self.my_setDriver('GV2',self.err_code2nbr(code), type=message_type)
 
             self.my_setDriver('GV30', 1)

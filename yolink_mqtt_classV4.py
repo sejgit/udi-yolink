@@ -1,4 +1,5 @@
 
+from os import link
 import time
 import datetime
 import json
@@ -1700,6 +1701,7 @@ class YoLinkMQTTDevice(object):
     def updateScheduleStatus(yolink, data):
         logging.debug(yolink.type + ' updateScheduleStatus ;{}'.format(data))
         try:
+            yolink.data['schedules'] = data[yolink.dData]
             #yolink.setOnline(data)
             #yolink.setNbrPorts(data)
             #yolink.updateLoraInfo(data)
