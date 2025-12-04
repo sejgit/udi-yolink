@@ -51,10 +51,11 @@ class YoLinkInfraredRem(YoLinkMQTTDevice):
     def get_status_code(yolink):
         logging.debug('{} - get_error_code'.format(yolink.type))
         if 'success' in yolink.dataAPI[yolink.dData]:
-            if  yolink.dataAPI[yolink.dData]['success']:
+            if  yolink.get_data('success'):
                 return('success')
-            if 'errorCode' in yolink.dataAPI[yolink.dData]:
-                return(yolink.dataAPI[yolink.dData]['errorCode'])
+            code = yolink.get_data('errorCode')
+            if code is not None:
+                return(code)
             else:
                 return('unknown')
 

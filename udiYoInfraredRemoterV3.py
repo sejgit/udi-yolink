@@ -249,22 +249,25 @@ class udiYoInfraredRemoter(udi_interface.Node):
     def updateData(self):
         if self.node is not None:
             logging.debug('updateData - {}'.format(self.yoIRrem.online))
-            self.my_setDriver('TIME', self.yoIRrem.getLastUpdateTime(), 151)
+            message_type = self.yoIRrem.get_last_message_type()
+            unix_time = self.yoIRrem.get_report_time('reportAt')
+            self.my_setDriver('TIME', unix_time, 151)
 
         if  self.yoIRrem.online:
-            self.my_setDriver('ST', self.err_code2nbr(self.yoIRrem.get_status_code()))
+            code = self.yoIRrem.get_status_code()
+            logging.debug*(f'IR remote status code: {code}')
+            self.my_setDriver('ST', self.err_code2nbr(code), type=message_type)
             self.my_setDriver('GV0',len(self.codes_used) )                 
-            self.my_setDriver('GV1',self.yoIRrem.getBattery())
-            self.my_setDriver('GV2',self.err_code2nbr(self.yoIRrem.get_status_code()))
+            self.my_setDriver('GV1',self.yoIRrem.get_data('battery'), type=message_type)
+
+            self.my_setDriver('GV2',self.err_code2nbr(code), type=message_type)
+
             self.my_setDriver('GV30', 1)
             if self.yoIRrem.suspended:
                 self.my_setDriver('GV20', 1)
             else:
                 self.my_setDriver('GV20', 0)
         else:
-            #self.my_setDriver('GV0', 0)
-            #self.my_setDriver('GV1', 99)
-            #self.my_setDriver('GV2', 99)
             self.my_setDriver('ST', 0)
             self.my_setDriver('GV20', 2)
             self.my_setDriver('GV30', 0)
