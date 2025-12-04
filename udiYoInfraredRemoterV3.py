@@ -82,13 +82,13 @@ class udiYoInfraredCode(udi_interface.Node):
         try:
             logging.info('udiIRremote send_IRcode')
             if self.yoIRrem.send_code( self.code):
-                time.sleep(0.5)
-                res = self.yoIRrem.get_send_status()
-                while res is {} and self.yoIRrem.online:
-                    time.sleep(1)
-                    res = self.yoIRrem.get_send_status()
-                logging.debug(f'Send code {self.code} {res}')
-                if res['success'] == True and res['key'] == self.code:
+                #time.sleep(0.5)
+                #res = self.yoIRrem.get_send_status()
+                #while res is {} and self.yoIRrem.online:
+                time.sleep(1)
+                #res = self.yoIRrem.get_send_status()
+                #logging.debug(f'Send code {self.code} {res}')
+                if self.yoIRrem.get_data('success') and self.yoIRrem.get_data('key') == self.code:
                     logging.info('Code {} sent successfully'.format(self.code))
                     self.node.reportCmd('DON')  
                     self.my_setDriver('ST', 1)
@@ -236,12 +236,13 @@ class udiYoInfraredRemoter(udi_interface.Node):
             self.updateData()
 
     def err_code2nbr(self, status_code):
-        if status_code == 'notLearn':
-            return(0)
-        elif status_code == 'success': 
-            return(1)
-        elif status_code in ['keyError', 'errorCode', 'notLearn']: 
-            return(2)
+        #if status_code == 'notLearn':
+        #    return(0)
+        if isinstance(status_code, bool):
+            if status_code == True: 
+                return(1)
+            else: 
+                return(2)
         else:
             return(99)
 

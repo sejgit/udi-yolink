@@ -48,14 +48,11 @@ class YoLinkInfraredRem(YoLinkMQTTDevice):
         #self.refreshFWversion()
         #print(' YoLinkSW - finished intializing')
     '''      
-    
+
     def get_status_code(yolink):
         logging.debug('{} - get_error_code'.format(yolink.type))
-        code = yolink.get_data('success')
-        if code in ['success', 'errorCode',  'keyError', 'notLearn']:
-            return(code)
-        else:
-            return('unknown')
+        res = yolink.get_data('success')
+        return(res)
 
     def getIRstatus_info (yolink):
         logging.debug('{} - getIRinfo'.format(yolink.type))
