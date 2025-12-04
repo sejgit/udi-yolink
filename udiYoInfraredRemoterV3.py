@@ -240,7 +240,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
             return(0)
         elif status_code == 'success': 
             return(1)
-        elif status_code == 'keyError': 
+        elif status_code in ['keyError', 'errorCode', 'notLearn']: 
             return(2)
         else:
             return(99)
