@@ -1407,13 +1407,9 @@ class YoLinkMQTTDevice(object):
                 yolink.dataAPI['emptyData'] = False
                 yolink.data['emptyData'] = False
 
-
-
-
-
-                temp = yolink.dataAPI['lastMessage']
-                yolink.reset_structure() #do not let old data persist
-                yolink.dataAPI['lastMessage'] = temp    
+            temp = yolink.dataAPI['lastMessage']
+            yolink.reset_structure() #do not let old data persist
+            yolink.dataAPI['lastMessage'] = temp    
 
 
 
@@ -1525,9 +1521,7 @@ class YoLinkMQTTDevice(object):
                                     yolink.nbrPorts = yolink.nbrOutlets + yolink.nbrUsb
 
                     yolink.updateLoraInfo(data)
-                    yolink.updateMessageInfo(data)
-                    logging.debug('updateStatusData - Method data : {}'.format(yolink.dataAPI))   
-                logging.debug('After parsing NEW {}'.format(json.dumps(yolink.data, indent=4)))                 
+                    yolink.updateMessageInfo(data)                                                 
             else: #event
                 if ".setDelay" in data['event']:
                     logging.debug("setDelay detected")

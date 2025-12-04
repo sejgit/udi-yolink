@@ -328,7 +328,7 @@ class udiYoSmartRemoter(udi_interface.Node):
 
             self.keys[key] = udiRemoteKey(self.poly, self.address, k_address, k_name, key)
             self.adr_list.append(k_address)
-            self.wait_for_node_done()
+        self.wait_for_node_done()
         self.nodesOK = True
         self.node_ready = True
 

@@ -197,10 +197,10 @@ class udiYoInfraredRemoter(udi_interface.Node):
         while not self.yoIRrem.check_system_online():
             logging.warning('System offline - need to obtain learned codes before continuing - trying again')
             time.sleep(5)
-            self.yoIRrem.refreshDevice()
-            time.sleep(2)  
-            code_dict_temp = self.yoIRrem.get_code_dict()
-            logging.debug(f'Code dict temp: {code_dict_temp}')
+            #self.yoIRrem.refreshDevice()
+            #time.sleep(2)  
+        code_dict_temp = self.yoIRrem.get_code_dict()
+        logging.debug(f'Code dict temp: {code_dict_temp}')
 
         for code in range(0, len(code_dict_temp)):
             if code_dict_temp[code]:
