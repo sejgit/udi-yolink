@@ -1384,7 +1384,7 @@ class YoLinkMQTTDevice(object):
     #@measure_time
     def updateStatusData  (yolink, data):
         try:
-            logging.debug('{} - updateStatusData : {}'.format(yolink.type , json.dumps(data, indent=4)))
+            logging.debug('{} - updateStatusData - start: '.format(yolink.type ))
             
             yolink.data = data
             yolink.online = yolink.Status(data)
@@ -1411,7 +1411,10 @@ class YoLinkMQTTDevice(object):
             temp = yolink.dataAPI['lastMessage']
             yolink.reset_structure() #do not let old data persist
             yolink.dataAPI['lastMessage'] = temp    
-
+            if 'delays' in data['data']:
+                    yolink.nbrOutlets = len(data['data']['delays'])
+                    yolink.nbrUsb = data['data']['delays'][0]['ch']
+                    yolink.nbrPorts = yolink.nbrOutlets + yolink.nbrUsb
 
 
             if 'reportAt' in data[yolink.dData] :
@@ -1421,10 +1424,7 @@ class YoLinkMQTTDevice(object):
                 yolink.dataAPI['lastStateTime'] = data[yolink.dData]['stateChangedAt' ]
             else:
                 yolink.dataAPI['lastStateTime'] = data[yolink.messageTime]
-            if 'delays' in data['data']:
-                    yolink.nbrOutlets = len(data['data']['delays'])
-                    yolink.nbrUsb = data['data']['delays'][0]['ch']
-                    yolink.nbrPorts = yolink.nbrOutlets + yolink.nbrUsb
+
             if 'method' in data:
                 if data['method'] == 'getSchedules' or data['method'] == 'setSchedules':
                     yolink.updateScheduleStatus(data)

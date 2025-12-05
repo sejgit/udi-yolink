@@ -23,7 +23,7 @@ from udiYoGarageDoorCtrlV2 import udiYoGarageDoor
 from udiYoGarageFingerCtrlV2 import udiYoGarageFinger
 from udiYoMotionSensorV4 import udiYoMotionSensor
 from udiYoLeakSensorV3 import udiYoLeakSensor
-from udiYoCOSmokeSensorV3 import udiYoCOSmokeSensor
+from udiYoCOSmokeSensorV4 import udiYoCOSmokeSensor
 from udiYoDoorSensorV3 import udiYoDoorSensor
 from udiYoOutletV4 import udiYoOutlet
 #from udiYoOutletPwrV2 import udiYoOutletPwr
@@ -40,7 +40,7 @@ from udiYoSirenV2 import udiYoSiren
 from udiYoWaterMeterControllerV4 import udiYoWaterMeterController
 from udiYoWaterMeterMultiControllerV4 import udiYoWaterMeterMulti 
 from udiYoWaterMeterOnlyV3 import udiYoWaterMeterOnly 
-from udiYoHubV2 import udiYoHub, udiYoBatteryHub
+from udiYoHubV4 import udiYoHub, udiYoBatteryHub
 #import udiProfileHandler
 
 try:

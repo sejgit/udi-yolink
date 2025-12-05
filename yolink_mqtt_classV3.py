@@ -1204,10 +1204,13 @@ class YoLinkMQTTDevice(object):
 
     
     def bool2Nbr(yolink, bool):
-        if bool:
-            return(1)
+        if isinstance(bool, bool):
+            if bool:
+                return(1)
+            else:
+                return(0)
         else:
-            return(0)
+            return(None)
 
 
     

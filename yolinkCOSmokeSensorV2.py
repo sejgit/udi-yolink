@@ -1,7 +1,7 @@
 
 
 import time
-from yolink_mqtt_classV3 import YoLinkMQTTDevice
+from yolink_mqtt_classV4 import YoLinkMQTTDevice
 
 try:
     import udi_interface
@@ -14,7 +14,7 @@ except ImportError:
 
 
 
-class YoLinkCOSmokeSen(YoLinkMQTTDevice):
+class YoLinkCOSmokeSensor(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__(yoAccess,  deviceInfo, callback)
         yolink.methodList = ['getState' ]
@@ -67,7 +67,7 @@ class YoLinkCOSmokeSen(YoLinkMQTTDevice):
             else:
                 return (None)             
 
-    def get_self_ckheck_state (yolink):
+    def get_self_check_state (yolink):
          state = yolink.getDataStateValue('metadata')
          if 'inspect' in state:
              return( state['inspect'])
@@ -78,12 +78,12 @@ class YoLinkCOSmokeSen(YoLinkMQTTDevice):
 
 
 
-class YoLinkCOSmokeSensor(YoLinkCOSmokeSen):
-    def __init__(yolink, yoAccess,  deviceInfo):
-        super().__init__(   yoAccess,  deviceInfo, yolink.updateStatus)
-        yolink.initNode()
+#class YoLinkCOSmokeSensor(YoLinkCOSmokeSen):
+#    def __init__(yolink, yoAccess,  deviceInfo):
+#        super().__init__(   yoAccess,  deviceInfo, yolink.updateStatus)
+#        yolink.initNode()
 
-    def updateStatus(yolink, data):
-        yolink.updateCallbackStatus(data, True)
+#    def updateStatus(yolink, data):
+#    yolink.updateCallbackStatus(data, True)
     
 

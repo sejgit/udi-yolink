@@ -230,10 +230,9 @@ class udiYoTHsensor(udi_interface.Node):
                     self.my_setDriver('GV15', 99, 25)
    
                 
-               
-
-                self.my_setDriver('GV1', self.yoTHsensor.bool2Nbr(lowTempAlarm))
-                self.my_setDriver('GV2', self.yoTHsensor.bool2Nbr(highTempAlarm))
+            
+                self.my_setDriver('GV1', self.yoTHsensor.bool2Nbr(lowTempAlarm), type=message_type)
+                self.my_setDriver('GV2', self.yoTHsensor.bool2Nbr(highTempAlarm), type=message_type)
 
                 if 'hum' in self.meas_support:
                     if isinstance(hum,(int,float)):
@@ -243,8 +242,8 @@ class udiYoTHsensor(udi_interface.Node):
                         self.my_setDriver('GV13', humLimMax, 51, type=message_type)
                         self.my_setDriver('GV16', humMeasMin, 51, type=message_type)
                         self.my_setDriver('GV17', humMeasMax, 51, type=message_type)
-                    self.my_setDriver('GV4', self.yoTHsensor.bool2Nbr(lowHumAlarm))
-                    self.my_setDriver('GV5', self.yoTHsensor.bool2Nbr(highHumAlarm))
+                    self.my_setDriver('GV4', self.yoTHsensor.bool2Nbr(lowHumAlarm), type=message_type)
+                    self.my_setDriver('GV5', self.yoTHsensor.bool2Nbr(highHumAlarm), type=message_type)
                     if alarm_det or lowHumAlarm or highHumAlarm:
                         alarm_det = True
                 else:
