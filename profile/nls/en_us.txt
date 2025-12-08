@@ -792,7 +792,7 @@ powerstate-3=Full
 powerstate-99=Unknow 
 
 
-poweralert-0=Normal
+poweralert-0=No Alert (normal)
 poweralert-1=Alert
 poweralert-2=Unit Off
 poweralert-99=Unknown
