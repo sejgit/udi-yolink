@@ -257,13 +257,13 @@ class YoLinkMQTTDevice(object):
             return(yolink.data[yolink.dData]['stateChangedAt'])
         elif 'lastStateTime' in yolink.dataAPI:
             logging.debug('lastUpdate lastStateTime {}'.format(yolink.dataAPI['lastStateTime' ]))
-            if type(yolink.data['lastStateTime']) in [int, float]:
+            if isinstance(yolink.data['lastStateTime'], (int, float)):
                 return(yolink.data['lastStateTime'] )
             else:
                 return(0)        
         elif yolink.lastUpd in yolink.data:
             logging.debug('lastUpdate lastUpdTime {}'.format(yolink.dataAPI[yolink.lastUpd ]))
-            if type(yolink.data[yolink.lastUpd ]) in [int, float]:
+            if isinstance(yolink.data[yolink.lastUpd ], (int, float)):
                 return(yolink.data[yolink.lastUpd ])
             else:
                 return(0)            
@@ -290,13 +290,13 @@ class YoLinkMQTTDevice(object):
             return(yolink.dataAPI[yolink.dData]['stateChangedAt'])
         elif 'lastStateTime' in yolink.dataAPI:
             logging.debug('lastUpdate lastStateTime {}'.format(yolink.dataAPI['lastStateTime' ]))
-            if type(yolink.dataAPI['lastStateTime']) in [int, float]:
+            if isinstance(yolink.dataAPI['lastStateTime'], (int, float)):
                 return(yolink.dataAPI['lastStateTime'] )
             else:
                 return(0)        
         elif yolink.lastUpd in yolink.dataAPI:
             logging.debug('lastUpdate lastUpdTime {}'.format(yolink.dataAPI[yolink.lastUpd ]))
-            if type(yolink.dataAPI[yolink.lastUpd ]) in [int, float]:
+            if isinstance(yolink.dataAPI[yolink.lastUpd ], (int, float)):
                 return(yolink.dataAPI[yolink.lastUpd ])
             else:
                 return(0)            
@@ -1325,7 +1325,7 @@ class YoLinkMQTTDevice(object):
             tz = yolink.get_data('tz')
             logging.debug('Time String: {} TZ: {}'.format(time_str, tz))
             dt = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S.%fZ")
-            if isinstance(dt, int,float): # Adjust for the timezone offset
+            if isinstance(dt, (int,float)): # Adjust for the timezone offset
                 dt = dt.replace(tzinfo=timezone.utc) + timedelta(hours=int(tz))
             # Convert to epoch time
             epoch_time = int(dt.timestamp())
