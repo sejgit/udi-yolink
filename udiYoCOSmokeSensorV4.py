@@ -7,7 +7,7 @@ MIT License
 """
 from os import truncate
 
-from yolinkCOSmokeSensorV2 import YoLinkCOSmokeSen
+from yolinkCOSmokeSensorV3 import YoLinkCOSmokeSensor
 try:
     import udi_interface
     logging = udi_interface.LOGGER

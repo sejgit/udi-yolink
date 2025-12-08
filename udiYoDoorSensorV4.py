@@ -6,7 +6,7 @@ Polyglot TEST v3 node server
 MIT License
 """
 import time
-from yolinkDoorSensorV2 import YoLinkDoorSens
+from yolinkDoorSensorV3 import YoLinkDoorSensor
 
 try:
     import udi_interface
