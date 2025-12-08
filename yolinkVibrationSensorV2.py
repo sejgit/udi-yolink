@@ -10,7 +10,7 @@ except ImportError:
 from yolink_mqtt_classV4 import YoLinkMQTTDevice
 
 
-class YoLinkVibrationSen(YoLinkMQTTDevice):
+class YoLinkVibrationSensor(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__(yoAccess,  deviceInfo, callback)
         yolink.methodList = ['getState' ]
@@ -35,11 +35,11 @@ class YoLinkVibrationSen(YoLinkMQTTDevice):
 
 
 
-class YoLinkVibrationSensor(YoLinkVibrationSen):
-    def __init__(yolink, yoAccess,  deviceInfo):
-        super().__init__( yoAccess,  deviceInfo, yolink.updateStatus)
+#class YoLinkVibrationSensor(YoLinkVibrationSen):
+#    def __init__(yolink, yoAccess,  deviceInfo):
+#        super().__init__( yoAccess,  deviceInfo, yolink.updateStatus)
         yolink.initNode()
-
-    # Enable Event Support (True below)
-    def updateStatus(yolink, data):
-        yolink.updateCallbackStatus(data, True)
+#
+#    # Enable Event Support (True below)
+#    def updateStatus(yolink, data):
+#        yolink.updateCallbackStatus(data, True)
