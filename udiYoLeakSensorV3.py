@@ -7,7 +7,7 @@ MIT License
 """
 from os import truncate
 
-from yolinkLeakSensorV3 import YoLinkLeakSenor
+from yolinkLeakSensorV2 import YoLinkLeakSen
 try:
     import udi_interface
     logging = udi_interface.LOGGER
@@ -83,7 +83,7 @@ class udiYoLeakSensor(udi_interface.Node):
     def start(self):
         logging.info('start - YoLinkLeakSensor')
         self.my_setDriver('GV30', 0)
-        self.yoLeakSensor  = YoLinkLeakSensor(self.yoAccess, self.devInfo, self.updateStatus)
+        self.yoLeakSensor  = YoLinkLeakSen(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoLeakSensor.initNode()
         self.node_ready = True
