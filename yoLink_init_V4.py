@@ -567,8 +567,8 @@ class YoLinkInitPAC(object):
             logging.debug('message processing timeout - queue empty')
             pass
         except Exception as e:
-            logging.debug('message processing timeout - no new commands') 
-            pass
+            logging.error(f'process_message error: {e}', exc_info=True)
+            #pass
             #yoAccess.messageLock.release()
 
 

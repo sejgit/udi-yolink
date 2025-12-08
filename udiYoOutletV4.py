@@ -134,8 +134,10 @@ class udiYoOutlet(udi_interface.Node):
         if self.node is not None:
             message_type = self.yoOutlet.get_last_message_type()
             unix_time = self.yoOutlet.get_report_time('time')
+            logging.debug(f'unix time {unix_time}')
             self.my_setDriver('TIME', unix_time, 151)
             if self.yoOutlet.online: 
+                logging.debug('Outlet is online')
                 #if  self.yoOutlet.online:
                 self.my_setDriver('GV30',1)
                 #state = str(self.yoOutlet.getState()).upper()

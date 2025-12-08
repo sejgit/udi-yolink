@@ -1320,6 +1320,7 @@ class YoLinkMQTTDevice(object):
 
     def get_report_time(yolink,  target_str=None):
         time_str = yolink.get_data(target_str)
+        logging.debug('Getting report time for target_str: {}'.format(target_str))
         if time_str is not None:
             tz = yolink.get_data('tz')
             logging.debug('Time String: {} TZ: {}'.format(time_str, tz))
@@ -1350,13 +1351,13 @@ class YoLinkMQTTDevice(object):
         try:
             ret_val = None  
             if yolink.online and yolink.dData in yolink.data:
-                logging.debug(yolink.type+f' - getData category {category} key {key} {WM_index} {yolink.data[yolink.dData]}')
+                logging.debug(yolink.type+f' - getData key {key} category {category} index {WM_index} {yolink.data[yolink.dData]}')
 
                 if yolink.data[yolink.dData] is {}:
                     logging.info(f'No data exists (no data returned)')
                     return("no data")
                 if key in yolink.data[yolink.dData] and not isinstance(yolink.data[yolink.dData][key], dict): # MAy need to add list in future if it exists
-                        logging.debug(f'ret_val0 {ret_val} {key} {category}')
+                        logging.debug(f'ret_val0  {key} {yolink.data[yolink.dData][key]}')
                         return(yolink.data[yolink.dData][key])
                         
                 res = yolink.extract_two_level(category, key)
