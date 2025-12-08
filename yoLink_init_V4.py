@@ -576,7 +576,7 @@ class YoLinkInitPAC(object):
     def process_messageORG(yoAccess):
         try:
             #yoAccess.messageLock.acquire()
-            msg = yoAccess.messageQueue.get(timeout = 10) 
+            msg = yoAccess.messageQueue.get(timeout = 30) 
             logging.debug(f'{yoAccess.access_mode} Received message - Q size={yoAccess.messageQueue.qsize()}')
             payload = json.loads(msg.payload.decode("utf-8"))
             #logging.debug('process_message : {}'.format(payload))
