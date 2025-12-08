@@ -12,14 +12,24 @@
   <editor id="swctrl">
     <range uom="25" subset="0,1,2,5" nls="swctrl" />
   </editor>
+  
   <editor id="watt">
-    <range uom="30" min="-1" max="2000" prec="2" />
+    <range uom="73" min="-1" max="2000" prec="2" />
     <range uom="25" subset="0,98,99" nls="nosupport" />
   </editor>
   <editor id="energy">
+    <range uom="119" min="-1" max="2000" prec="2" />
+    <range uom="25" subset="0,98,99" nls="nosupport" />
+  </editor>
+  <editor id="kwatt">
+    <range uom="30" min="-1" max="2000" prec="2" />
+    <range uom="25" subset="0,98,99" nls="nosupport" />
+  </editor>
+  <editor id="Kenergy">
     <range uom="33" min="-1" max="2000" prec="2" />
     <range uom="25" subset="0,98,99" nls="nosupport" />
   </editor>
+
   <editor id="waterlevel">
     <range uom="56" min="0" max="1000" prec="0" />
     <range uom="25" subset="0,97,99" nls="wl_state" />

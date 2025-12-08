@@ -37,8 +37,8 @@ class udiYoOutlet(udi_interface.Node):
             {'driver': 'GV0', 'value': 99, 'uom': 25},
             {'driver': 'GV1', 'value': 0, 'uom': 57}, 
             {'driver': 'GV2', 'value': 0, 'uom': 57}, 
-            {'driver': 'GV3', 'value': -1, 'uom': 30},
-            {'driver': 'GV4', 'value': -1, 'uom': 33},
+            {'driver': 'GV3', 'value': -1, 'uom': 73},
+            {'driver': 'GV4', 'value': -1, 'uom': 119},
             {'driver': 'GV5', 'value': 99, 'uom': 25},
             {'driver': 'GV6', 'value': 99, 'uom': 25},
             {'driver': 'GV7', 'value': 99, 'uom': 25},
@@ -167,13 +167,13 @@ class udiYoOutlet(udi_interface.Node):
                 if self.powerSupported: 
                     power = self.yoOutlet.get_data('power')
                     if isinstance(power, (int, float)):
-                        powerkW = round(power/10000,3) # reports 1/10W
-                    self.my_setDriver('GV3', powerkW, 30, type=message_type)
+                        powerW = round(power/10,3) # reports 1/10W
+                    self.my_setDriver('GV3', powerW, 73, type=message_type)
 
-                    energykWh = self.yoOutlet.get_data('watt')  
-                    if isinstance(energykWh, (int, float)):            
-                        energykWh = round(energykWh/10000,3) # reports 1/10Wh                    
-                    self.my_setDriver('GV4', energykWh, 33, type=message_type)
+                    energyWh = self.yoOutlet.get_data('watt')  
+                    if isinstance(energyWh, (int, float)):            
+                        energyWh = round(energyWh/10,3) # reports 1/10Wh                    
+                    self.my_setDriver('GV4', energyWh, 119, type=message_type)
 
                     self.my_setDriver('GV5', self.bool2ISY(self.yoOutlet.get_data('overload', 'alertType')), type=message_type)
                     self.my_setDriver('GV6', self.bool2ISY(self.yoOutlet.get_data('highLoad', 'alertType')), type=message_type)   

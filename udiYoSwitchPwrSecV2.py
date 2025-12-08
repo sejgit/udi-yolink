@@ -28,8 +28,8 @@ class udiYoSwitchPwrSec(udi_interface.Node):
             {'driver': 'GV0', 'value': 99, 'uom': 25},
             {'driver': 'GV1', 'value': 0, 'uom': 57}, 
             {'driver': 'GV2', 'value': 0, 'uom': 57}, 
-            {'driver': 'GV3', 'value': -1, 'uom': 30},
-            {'driver': 'GV4', 'value': -1, 'uom': 33},
+            {'driver': 'GV3', 'value': -1, 'uom': 73},
+            {'driver': 'GV4', 'value': -1, 'uom': 119},
             {'driver': 'GV5', 'value': 99, 'uom': 25},
             {'driver': 'GV6', 'value': 99, 'uom': 25},
             {'driver': 'GV7', 'value': 99, 'uom': 25},
@@ -212,13 +212,13 @@ class udiYoSwitchPwrSec(udi_interface.Node):
                 tmp =  self.yoSwitch.getEnergy()
                 if tmp is not None:
                     if 'power' in tmp:
-                        power = round(tmp['power']/10000,3) # reports 1/10W
-                        self.my_setDriver('GV3', power, 30)
+                        power = round(tmp['power']/10,1) # reports 1/10W
+                        self.my_setDriver('GV3', power, 73)
                     else:
-                        self.my_setDriver('GV3', 99, 30)
+                        self.my_setDriver('GV3', 99, 25)
                     if 'watt' in tmp:                    
-                        energy = round(tmp['watt']/10000,3) # reports 1/10Wh                    
-                        self.my_setDriver('GV4', energy, 33)
+                        energy = round(tmp['watt']/10,3) # reports 1/10Wh                    
+                        self.my_setDriver('GV4', energy, 119)
                     else:
                         self.my_setDriver('GV4', 99, 25)
                 else:

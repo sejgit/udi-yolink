@@ -135,7 +135,7 @@ class udiYoVibrationSensor(udi_interface.Node):
                 self.my_setDriver('GV1', self.yoVibrationSensor.get_data( 'battery', 'state'), type=message_type)
 
                 self.my_setDriver('GV30', 1)
-                devTemp =  self.yoVibrationSensor.get_data('devTemperature', 'state', type=message_type)
+                devTemp =  self.yoVibrationSensor.get_data('devTemperature', 'state')
                 if devTemp != 'NA':
                     if self.temp_unit == 0:
                         self.my_setDriver('CLITEMP', round(devTemp,0), 4, type=message_type)
