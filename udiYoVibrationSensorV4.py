@@ -15,7 +15,7 @@ except ImportError:
     logging.basicConfig(level=logging.INFO)
 
 import time
-from yolinkVibrationSensorV2 import YoLinkVibrationSen
+from yolinkVibrationSensorV3 import YoLinkVibrationSensor
 
 
 class udiYoVibrationSensor(udi_interface.Node):
