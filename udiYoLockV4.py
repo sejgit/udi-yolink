@@ -144,8 +144,15 @@ class udiYoLock(udi_interface.Node):
                 battery = self.yoLock.get_data('battery')
                 self.my_setDriver('GV1', battery, type=message_type)
                 #bell = self.yoLock.getDoorBellRing()
-                door_state = self.yoLock.get_data('door')
-                self.my_setDriver('GV3', door_state, type=message_type)
+                door_state = self.yoLock.get_data('door', 'state')
+                if door_state in ['closed']:
+                    self.my_setDriver('GV3', 0)
+                elif  door_state in ['open']:
+                    self.my_setDriver('GV3', 1)
+                else:
+                    self.my_setDriver('GV3', 99, type=message_type)
+                self.my_setDriver('GV30', 1)                
+  
 
                 alert_type, info = self.get_alerts()   
                 lock_list = ['Lock','Unlock','LockFailed','UnLockFailed']             
@@ -163,14 +170,8 @@ class udiYoLock(udi_interface.Node):
                     logging.debug('Unknown alert type: {}'.format(alert_type))
                 #self.my_setDriver('GV2', self.bool2ISY(self.yoLock.getDoorBellRing()), type=message_type)
 
-                doorstate = self.yoLock.getDoorState()
-                if doorstate in ['closed']:
-                    self.my_setDriver('GV3', 0)
-                elif  doorstate in ['open']:
-                    self.my_setDriver('GV3', 1)
-                else:
-                    self.my_setDriver('GV3', 99)
-                self.my_setDriver('GV30', 1)
+                #doorstate = self.yoLock.getDoorState()
+
                 if self.yoLock.suspended:
                     self.my_setDriver('GV20', 1)
                 else:

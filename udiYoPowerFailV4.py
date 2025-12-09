@@ -15,7 +15,7 @@ except ImportError:
     logging.basicConfig(level=logging.INFO)
 
 import time
-from yolinkPowerFailV2 import YoLinkPowerFailSen
+from yolinkPowerFailV3 import YoLinkPowerFailSensor
 
 
 
@@ -85,7 +85,7 @@ class udiYoPowerFailSenor(udi_interface.Node):
     def start(self):
         logging.info('start - udiYoPowerFailSenor')
         self.my_setDriver('GV30', 0)
-        self.yoPowerFail  = YoLinkPowerFailSen(self.yoAccess, self.devInfo, self.updateStatus)
+        self.yoPowerFail  = YoLinkPowerFailSensor(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoPowerFail.initNode()
         self.node_ready = True
@@ -109,39 +109,44 @@ class udiYoPowerFailSenor(udi_interface.Node):
 
 
     def updateData(self):
+        alert_state = ['normal', 'alert', 'off']
         if self.node is not None:
-            self.my_setDriver('TIME', self.yoPowerFail.getLastUpdateTime(), 151)            
+            message_type = self.yoPowerFail.get_last_message_type() # if event some data may not be updated 
+            unix_time = self.yoPowerFail.get_report_time('reportAt')
+            self.my_setDriver('TIME', unix_time, 151)
+     
             if self.yoPowerFail.online:               
-                state = self.yoPowerFail.getAlertState()
+                #state = self.yoPowerFail.getAlertState()
+                state = self.yoPowerFail.get_data('state', 'state')
                 logging.debug('state GV0 : {}'.format(state))
-                self.my_setDriver('GV0', state)
-                self.my_setDriver('ST', state)
+                if state in alert_state:    
+                    state_val = alert_state.index(state) 
+                    self.my_setDriver('GV0', state_val, type=message_type)
+                    self.my_setDriver('ST', state_val, type=message_type)
+                else:
+                    self.my_setDriver('GV0', 99, type=message_type)
+                    self.my_setDriver('ST', 99, type=message_type)
                 if state != self.last_state:
                     if state ==1 and self.cmd_state in [0,1]:
                         self.node.reportCmd('DON')
                     elif state == 0 and self.cmd_state in [0,2]:
                         self.node.reportCmd('DOF')                    
-                self.my_setDriver('GV1', self.yoPowerFail.getBattery())
-                alert = self.yoPowerFail.getAlertType()
+                self.my_setDriver('GV1', self.yoPowerFail.get_data('battery', 'state'))
+                alert = self.yoPowerFail.get_data('alertType', 'state')
                 logging.debug('AlertState GV2 : {}'.format(alert))
-                self.my_setDriver('GV2', alert)
-                powered = self.yoPowerFail.getPowerSupplyConnected()
+                self.my_setDriver('GV2', alert, type=message_type)
+                powered = self.yoPowerFail.get_data('powerSupply', 'state')
                 logging.debug('Powered  GV3 : {}'.format(powered))
-                self.my_setDriver('GV3', self.bool2ISY(powered))
-                muted = self.yoPowerFail.muted()
+                self.my_setDriver('GV3', self.bool2ISY(powered), type=message_type)
+                muted = self.yoPowerFail.get_data('mute', 'state')
                 logging.debug('Muted GV4 : {}'.format(muted))
-                self.my_setDriver('GV4', self.bool2ISY(muted))
+                self.my_setDriver('GV4', self.bool2ISY(muted), type=message_type)
                 self.my_setDriver('GV30', 1)
                 if self.yoPowerFail.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
                     self.my_setDriver('GV20', 0)
             else:
-                #self.my_setDriver('GV0', 99)
-                #self.my_setDriver('GV1', 99)
-                #self.my_setDriver('GV2', 99)
-                #self.my_setDriver('GV3', 99)
-                #self.my_setDriver('GV4', 99)
 
                 self.my_setDriver('GV30', 1)
                 self.my_setDriver('GV20', 2)

@@ -537,6 +537,7 @@ ST-nlssiren-ST-NAME=Siren State
 ST-nlssiren-GV0-NAME=Siren State (Legacy)
 ST-nlssiren-GV1-NAME=Siren Duration
 ST-nlssiren-GV2-NAME=Supply State
+ST-nlssiren-GV3-NAME=Sound Level
 ST-nlssiren-GV20-NAME=Connection State
 ST-nlssiren-GV30-NAME=Online State
 ST-nlssiren-BATLVL-NAME=Battery Level
@@ -545,6 +546,8 @@ ST-nlssiren-CLITEMP-NAME=Sensor Temperature
 ST-nlssiren-CLIHUM-NAME=Current Rel Humidity (%)
 CMD-nlssiren-SIRENCTRL-NAME=Set Control
 CMD-nlssiren-UPDATE-NAME=Update Status
+soundlevel-98=No Support
+soundlevel-99=Unknown
 
 ND-yosmremote-NAME=YoLink Smart Remoter
 ND-yosmremote-ICON=Input
