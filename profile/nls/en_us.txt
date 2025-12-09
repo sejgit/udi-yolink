@@ -546,6 +546,11 @@ ST-nlssiren-CLITEMP-NAME=Sensor Temperature
 ST-nlssiren-CLIHUM-NAME=Current Rel Humidity (%)
 CMD-nlssiren-SIRENCTRL-NAME=Set Control
 CMD-nlssiren-UPDATE-NAME=Update Status
+
+soundlevel-0=Off
+soundlevel-1=Low (100dB)
+soundlevel-2=Mid (104dB)
+soundlevel-3=High (110dB)
 soundlevel-98=No Support
 soundlevel-99=Unknown
 

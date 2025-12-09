@@ -35,8 +35,8 @@ from udiYoInfraredRemoterV4 import udiYoInfraredRemoter
 from udiYoDimmerV2 import udiYoDimmer
 from udiYoVibrationSensorV4 import udiYoVibrationSensor
 from udiYoSmartRemoterV3 import udiYoSmartRemoter
-from udiYoPowerFailV3 import udiYoPowerFailSenor
-from udiYoSirenV2 import udiYoSiren
+from udiYoPowerFailV4 import udiYoPowerFailSenor
+from udiYoSirenV4 import udiYoSiren
 from udiYoWaterMeterControllerV4 import udiYoWaterMeterController
 from udiYoWaterMeterMultiControllerV4 import udiYoWaterMeterMulti 
 from udiYoWaterMeterOnlyV3 import udiYoWaterMeterOnly 

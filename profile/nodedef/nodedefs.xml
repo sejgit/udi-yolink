@@ -1757,7 +1757,7 @@
          <st id="GV0" editor="sirenstate" />
          <st id="GV1" editor="sirenduration" />
          <st id="GV2" editor="sirenbatlevel" />
-         <st id="GV4" editor="soundlevel" />
+         <st id="GV3" editor="soundlevel" />
          <st id="ST"  editor="sirenstate" />
          <st id="GV20" editor="suspendstate" />
          <st id="GV30"  editor="status" />                    

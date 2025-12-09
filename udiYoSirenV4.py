@@ -132,11 +132,20 @@ class udiYoSiren(udi_interface.Node):
                 self.my_setDriver('GV1', duration, type=message_type)
                 if self.soundLevelSupport:
                     sound_level = self.yoSiren.get_data('soundLevel')
-                    logging.debug('Sound Level : {}'.format(sound_level))
-                    self.my_setDriver('GV3', sound_level, uom=12, type=message_type)
+                    if sound_level in [1,100]:
+                        sound_level = 1
+                    elif sound_level in [2,104]:
+                        sound_level = 2
+                    elif sound_level in [3,110]:
+                        sound_level = 3
+                    elif sound_level in [0]:
+                        sound_level = 0
+                    else:
+                        sound_level = 99
                 else:   
                     sound_level = 98
-                    self.my_setDriver('GV3', sound_level, uom=25)
+                logging.debug('Sound Level : {}'.format(sound_level))                    
+                self.my_setDriver('GV3', sound_level,  type=message_type)
 
                 self.my_setDriver('GV30', 1)
 
