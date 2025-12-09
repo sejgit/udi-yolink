@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Polyglot TEST v3 node server 
+Polyglot  v3 node server 
 
 
 MIT License
 """
 from os import truncate
 
-from yolinkLeakSensorV3 import YoLinkLeakSenor
+from yolinkLeakSensorV3 import YoLinkLeakSensor
 try:
     import udi_interface
     logging = udi_interface.LOGGER
@@ -39,6 +39,7 @@ class udiYoLeakSensor(udi_interface.Node):
             {'driver': 'GV1', 'value': 99, 'uom': 25}, 
             {'driver': 'GV2', 'value': 0, 'uom': 25}, 
             {'driver': 'CLITEMP', 'value': 99, 'uom': 25},
+            {'driver': 'GV3', 'value': int(time.time()), 'uom': 151},
             {'driver': 'ST', 'value': 0, 'uom': 25},
             {'driver': 'GV30', 'value': 0, 'uom': 25},
             {'driver': 'GV20', 'value': 99, 'uom': 25},   
@@ -124,38 +125,46 @@ class udiYoLeakSensor(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            self.my_setDriver('TIME', self.yoLeakSensor.getLastUpdateTime(), 151)
+            message_type = self.yoLeakSensor.get_last_message_type() # if event some data may not be updated 
+            unix_time = self.yoLeakSensor.get_report_time('reportAt')
+            self.my_setDriver('TIME', unix_time, 151)
 
             if self.yoLeakSensor.online:
-                waterState =   self.waterState()  
+                waterState =   self.yoLeakSensor.get_data('state', 'state')
+
                 #logging.debug( 'Leak Sensor 0,1,8: {}  {} {}'.format(waterState,self.yoLeakSensor.getBattery(),self.yoLeakSensor.bool2Nbr(self.yoLeakSensor.online)  ))
-                if waterState == 1:
-                    self.my_setDriver('GV0', 1)
-                    self.my_setDriver('ST', 1)
+                if waterState in ['alert' , 'wet']:
+                    self.my_setDriver('GV0', 1, type=message_type)
+                    self.my_setDriver('ST', 1, type=message_type)
                     if waterState != self.last_state:
                         if self.cmd_state in [0,1]:
                             self.node.reportCmd('DON')
-                elif waterState == 0:
-                    self.my_setDriver('GV0', 0)
-                    self.my_setDriver('ST', 0)                    
+                elif waterState in ['normal', 'dry']:
+                    self.my_setDriver('GV0', 0, type=message_type)
+                    self.my_setDriver('ST', 0, type=message_type)                    
                     if waterState != self.last_state:
                         if self.cmd_state in [0,2]:
                             self.node.reportCmd('DOF')
                 else:
-                    self.my_setDriver('GV0', 99)
+                    self.my_setDriver('GV0', 99, type=message_type)
                 self.last_state = waterState
-                self.my_setDriver('GV1', self.yoLeakSensor.getBattery())
-                self.my_setDriver('GV2', self.cmd_state)
+                self.my_setDriver('GV1', self.yoLeakSensor.get_data('battery', 'state'), type=message_type)
+                self.my_setDriver('GV2', self.cmd_state, type=message_type)
                 #self.my_setDriver('ST', 1)
-                self.my_setDriver('GV30', 1)
-                devTemp =  self.yoLeakSensor.getDeviceTemperature()
-                if devTemp != 'NA':
+                self.my_setDriver('GV30', 1, type=message_type)
+                state_change = self.yoLeakSensor.get_data('stateChangedAt', 'state')
+                logging.debug('state_change : {}'.format(state_change))
+                if state_change is not None:
+                    self.my_setDriver('GV3', int(state_change/1000), type=message_type)
+                else:
+                    self.my_setDriver('GV3', 99, uom=25, type=message_type)
+
+                devTemp =  self.yoLeakSensor.get_data('devTemperature', 'state')
+                if isinstance(devTemp, (int, float)):
                     if self.temp_unit == 0:
-                        self.my_setDriver('CLITEMP', round(devTemp,0), 4)
+                        self.my_setDriver('CLITEMP', round(devTemp,0), 4, type=message_type)
                     elif self.temp_unit == 1:
-                        self.my_setDriver('CLITEMP', round(devTemp*9/5+32,0), 17)
-                    #elif self.temp_unit == 2:
-                    #    self.my_setDriver('CLITEMP', round(devTemp+273.15,0), 26)
+                        self.my_setDriver('CLITEMP', round(devTemp*9/5+32,0), 17, type=message_type)
                 else:
                     self.my_setDriver('CLITEMP', 99, 25)
                 if self.yoLeakSensor.suspended:

@@ -33,7 +33,8 @@ class udiYoDoorSensor(udi_interface.Node):
         
     drivers = [ {'driver': 'GV0', 'value': 99, 'uom': 25}, 
             {'driver': 'GV1', 'value': 99, 'uom': 25}, 
-            {'driver': 'GV2', 'value': 0, 'uom': 25},      
+            {'driver': 'GV2', 'value': 0, 'uom': 25},     
+            {'driver': 'GV3', 'value': int(time.time()), 'uom': 151},
             {'driver': 'ST', 'value': 0, 'uom': 25},
             {'driver': 'GV30', 'value': 0, 'uom': 25},
             {'driver': 'GV20', 'value': 99, 'uom': 25}, 
@@ -119,7 +120,10 @@ class udiYoDoorSensor(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            self.my_setDriver('TIME', self.yoDoorSensor.getLastUpdateTime(), 151)
+            message_type = self.yoDoorSensor.get_last_message_type() # if event some data may not be updated 
+            unix_time = self.yoDoorSensor.get_report_time('reportAt')
+            self.my_setDriver('TIME', unix_time, 151)
+
             if self.yoDoorSensor.online:
                 doorstate = self.doorState()
                 if doorstate == 1:
@@ -139,6 +143,14 @@ class udiYoDoorSensor(udi_interface.Node):
                 self.my_setDriver('GV1', self.yoDoorSensor.getBattery())
                 self.my_setDriver('GV2', self.cmd_state)
                 #self.my_setDriver('ST', 1)
+                state_change = self.yoDoorSensor.get_data('stateChangedAt', 'state')
+                logging.debug('state_change : {}'.format(state_change))
+                if state_change is not None:
+                    self.my_setDriver('GV3', int(state_change/1000), type=message_type)
+                else:
+                    self.my_setDriver('GV3', 99, uom=25, type=message_type)
+
+
                 self.my_setDriver('GV30', 1)
                 if self.yoDoorSensor.suspended:
                     self.my_setDriver('GV20', 1)

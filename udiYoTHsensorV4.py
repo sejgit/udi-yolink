@@ -46,7 +46,7 @@ class udiYoTHsensor(udi_interface.Node):
 
             {'driver': 'CLITEMP', 'value': 0, 'uom': 4},
             {'driver': 'GV1', 'value': 2, 'uom': 25}, 
-            {'driver': 'GV2', 'value': 2, 'uom': 25}, 
+            {'driver': 'GV2', 'value': 2, 'uom': 25},           
             {'driver': 'CLIHUM', 'value': 0, 'uom': 51},
             {'driver': 'GV4', 'value': 2, 'uom': 25},
             {'driver': 'GV5', 'value': 2, 'uom': 25},
@@ -254,6 +254,7 @@ class udiYoTHsensor(udi_interface.Node):
                     self.my_setDriver('GV17', 98, 25)   
                     self.my_setDriver('GV4', 98, 25)
                     self.my_setDriver('GV5', 98, 25)
+
 
                 self.my_setDriver('BATLVL', bat_lvl, 25, type=message_type)
                 self.my_setDriver('GV7', self.yoTHsensor.bool2Nbr(bat_alarm))

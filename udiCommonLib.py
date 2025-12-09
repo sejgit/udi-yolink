@@ -18,11 +18,11 @@ from udiYoSwitchV2 import udiYoSwitch
 from udiYoSwitchSecV2 import udiYoSwitchSec
 from udiYoSwitchPwrSecV2 import udiYoSwitchPwrSec
 from udiYoTHsensorV4 import udiYoTHsensor 
-from udiYoWaterDeptV3 import udiYoWaterDept 
+from udiYoWaterDeptV4 import udiYoWaterDept 
 from udiYoGarageDoorCtrlV2 import udiYoGarageDoor
 from udiYoGarageFingerCtrlV2 import udiYoGarageFinger
 from udiYoMotionSensorV4 import udiYoMotionSensor
-from udiYoLeakSensorV3 import udiYoLeakSensor
+from udiYoLeakSensorV4 import udiYoLeakSensor
 from udiYoCOSmokeSensorV4 import udiYoCOSmokeSensor
 from udiYoDoorSensorV4 import udiYoDoorSensor
 from udiYoOutletV4 import udiYoOutlet

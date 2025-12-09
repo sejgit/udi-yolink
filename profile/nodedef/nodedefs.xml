@@ -1208,6 +1208,7 @@
          <st id="GV0" editor="doorstate" />
          <st id="GV1" editor="batlevel" />
          <st id="GV2" editor="cmdsetting" />
+         <st id="GV3" editor="unixtime" />   
          <!-- <st id="GV8" editor="online" /> -->
          <st id="GV30"  editor="status" />
          <st id="GV20" editor="suspendstate" />
@@ -1329,7 +1330,7 @@
          <st id="GV1" editor="batlevel" />
          <st id="GV2" editor="cmdsetting" />
          <st id="CLITEMP" editor="celsius" />
-         <!-- <st id="GV8" editor="online" /> -->
+         <st id="GV3" editor="unixtime" /> 
          <st id="ST"  editor="waterstate" />
          <st id="GV30"  editor="status" />  
          <st id="GV20" editor="suspendstate" /> 

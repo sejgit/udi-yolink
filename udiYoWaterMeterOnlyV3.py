@@ -155,7 +155,9 @@ class udiYoWaterMeterOnly(udi_interface.Node):
     def updateData(self):
         try:
             if self.node is not None:
-                self.my_setDriver('TIME', self.yoWaterCtrl.getLastUpdateTime(), 151)
+                message_type = self.yoWaterCtrl.get_last_message_type() # if event some data may not be updated 
+                unix_time = self.yoWaterCtrl.get_report_time('reportAt')
+                self.my_setDriver('TIME', unix_time, 151)
                 if self.yoWaterCtrl.online:
                     self.my_setDriver('GV30', 1)
                     '''
