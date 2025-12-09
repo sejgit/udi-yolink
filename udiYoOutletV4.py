@@ -165,10 +165,10 @@ class udiYoOutlet(udi_interface.Node):
                 #logging.debug('Power/Energy info : {} '. format(tmp))
                 
                 if self.powerSupported: 
-                    power = self.yoOutlet.get_data('power')
+                    powerW = self.yoOutlet.get_data('power')
                     if isinstance(power, (int, float)):
-                        powerW = round(power/10,3) # reports 1/10W
-                    self.my_setDriver('GV3', powerW, 73, type=message_type)
+                        powerW = round(powerW/10,3) # reports 1/10W
+                        self.my_setDriver('GV3', powerW, 73, type=message_type)
 
                     energyWh = self.yoOutlet.get_data('watt')  
                     if isinstance(energyWh, (int, float)):            
