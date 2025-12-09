@@ -231,13 +231,13 @@ class udiYoWaterMeterController(udi_interface.Node):
                     if isinstance(total_meter, (int,float)):
                         total_meter =round(float(self.calculate_water_volume(total_meter,  self.meter_unit,  self.ISYwater_unit)), 1)
                     logging.debug(f'total meter : {total_meter}')
-                    self.my_setDriver('GV10', total_meter,  self.ISYmeter_uom, type=message_type)
+                    self.my_setDriver('GV1', total_meter,  self.ISYmeter_uom, type=message_type)
     
                     daily_use = self.yoWaterCtrl.get_data('amount', 'dailyUsage')
                     if isinstance(daily_use, (int,float)):   
                         daily_use =round(float(self.calculate_water_volume(daily_use,  self.meter_unit,  self.ISYwater_unit)), 1)
                     logging.debug(f'daily use : {daily_use}')
-                    self.my_setDriver('GV1', daily_use,  self.ISYmeter_uom, type=message_type   )
+                    self.my_setDriver('GV10', daily_use,  self.ISYmeter_uom, type=message_type   )
                     recent_amount = self.yoWaterCtrl.get_data('amount','recentUsage')
                     if isinstance(recent_amount, (int,float)):
                         recent_amount = round(float(self.calculate_water_volume(recent_amount,  self.meter_unit,  self.ISYwater_unit)), 1)
