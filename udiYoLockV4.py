@@ -16,7 +16,7 @@ from os import truncate
 #import udi_interface
 #import sys
 import time
-from yolinkLockV3 import YoLink_lock
+from yolinkLockV3 import YoLinkLock
 
 
 
@@ -76,7 +76,7 @@ class udiYoLock(udi_interface.Node):
 
     def start(self):
         logging.info('start - YoLinkLock')
-        self.yoLock  = YoLink_lock(self.yoAccess, self.devInfo, self.updateStatus)
+        self.yoLock  = YoLinkLock(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoLock.initNode()
         self.node_ready = True
