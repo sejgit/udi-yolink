@@ -140,6 +140,12 @@
   <editor id="lock">
     <range uom="25" subset="0,1" nls="lockstate" />
   </editor>
+    <editor id="lockaction">
+    <range uom="25" subset="0,1,2,3,4,99" nls="lockaction" />
+  </editor> 
+  <editor id="locksource">
+    <range uom="25" subset="0,1,2,3,99" nls="locksource" />
+  </editor>  
   <editor id="doorbell">
     <range uom="25" subset="0,1,99" nls="doorbell" />
   </editor>

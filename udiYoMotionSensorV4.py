@@ -111,7 +111,7 @@ class udiYoMotionSensor(udi_interface.Node):
 
     def getMotionState(self):
         if self.yoMotionsSensor.online:
-            if  self.yoMotionsSensor.get_data('state', 'state') == 'normal':
+            if  self.yoMotionsSensor.get_data('state', 'state') in ['normal']:
                 return(0)
             else:
                 return(1)

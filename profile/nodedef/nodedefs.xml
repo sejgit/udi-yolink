@@ -1613,6 +1613,8 @@
          <st id="GV1" editor="batlevel" />
          <st id="GV2" editor="doorbell" />
          <st id="GV3" editor="doorstate" /> 
+         <st id="GV4" editor="lockaction" />
+         <st id="GV5" editor="locksource" />
          <st id="ST"  editor="lockstate" />
          <st id="GV20" editor="suspendstate" />  
          <st id="GV30"  editor="status" />         

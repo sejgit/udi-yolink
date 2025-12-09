@@ -408,6 +408,8 @@ ST-nlslock-GV0-NAME=Lock State (legacy)
 ST-nlslock-GV1-NAME=Battery Level
 ST-nlslock-GV2-NAME=Doorbell Active
 ST-nlslock-GV3-NAME=Door State
+ST-nlslock-GV4-NAME=Lock Action
+ST-nlslock-GV5-NAME=Source
 ST-nlslock-GV20-NAME=Connection State
 ST-nlslock-GV30-NAME=Online State
 ST-nlslock-BATLVL-NAME=Battery Level
@@ -874,6 +876,20 @@ lockstate-99=Unknown
 
 lock-0=Unlocked
 lock-1=Locked
+
+locksource-0=Password
+locksource-1=Manual
+locksource-2=Key
+locksource-3=Auto Lock
+locksource-4=Fingerprint
+locksource-99=Unknown
+
+lockaction-0=No Action
+lockaction-1=Lock
+lockaction-2=Unlock
+lockaction-3=Lock Failed
+lockaction-4=Unlock Failed
+lockaction-99=Unknown
 
 doorbell-0=Idle
 doorbell-1=Activated
