@@ -166,7 +166,7 @@ class udiYoOutlet(udi_interface.Node):
                 
                 if self.powerSupported: 
                     powerW = self.yoOutlet.get_data('power')
-                    if isinstance(power, (int, float)):
+                    if isinstance(powerW, (int, float)):
                         powerW = round(powerW/10,3) # reports 1/10W
                         self.my_setDriver('GV3', powerW, 73, type=message_type)
 
