@@ -91,6 +91,17 @@ class udiYoLock(udi_interface.Node):
         if self.yoLock.data_updated():
             self.updateData()
 
+    def get_alerts(self):
+        type = None
+        info = {}
+        alert_info = self.get_data('alert')
+        if isinstance(alert_info, dict):
+            type = alert_info.get('type')
+            info = alert_info
+            del info['type']
+        return type, info
+
+
     def updateData(self):
         if self.node is not None:
             message_type = self.yoLock.get_last_message_type() # if event some data may not be updated 
@@ -98,15 +109,15 @@ class udiYoLock(udi_interface.Node):
             self.my_setDriver('TIME', unix_time, 151)
 
             if  self.yoLock.online:
-                state = str(self.yoLock.get_data('state'))
+                state = str(self.yoLock.get_data('lock','state'))
                 logging.debug('Lock state: {}'.format(state))
-                if state == 'LOCK':
+                if state in ['lock','locked'] :
                     self.my_setDriver('GV0', 1, type=message_type)
                     self.my_setDriver('ST', 1, type=message_type)
 
                     if self.last_state != state:
                         self.node.reportCmd('DON')
-                elif state == 'UNLOCK' :
+                elif state in ['unlock', 'unlocked']: 
                     self.my_setDriver('GV0', 0, type=message_type)
                     self.my_setDriver('ST', 0, type=message_type    )
                     if self.last_state != state:
@@ -115,10 +126,25 @@ class udiYoLock(udi_interface.Node):
                     self.my_setDriver('GV0', 99)
                     self.my_setDriver('ST', 99)
                 self.last_state = state
-                battery = self.yoLock.getBattery()
-                self.my_setDriver('GV1', battery)
+                battery = self.yoLock.get_data('battery')
+                self.my_setDriver('GV1', battery, type=message_type)
+                #bell = self.yoLock.getDoorBellRing()
+                alert_type, info = self.get_alerts()
                 
-                self.my_setDriver('GV2', self.bool2ISY(self.yoLock.getDoorBellRing()))
+                if alert_type is None:
+                    logging.debug('No alert')
+                elif alert_type in ['doorbell']:
+                    logging.debug('Doorbell rung')
+                    self.my_setDriver('GV2', 1, type=message_type)
+                elif alert_type is ['Unlock', 'Lock']:
+                    logging.debug('Lock/Unlock event')
+                    #self.my_setDriver('GV2', 0, type=message_type)
+                elif alert_type in ['UnLockFailed']:
+                    logging.debug('Unlock Failed event')
+                    #self.my_setDriver('GV2', 2, type=message_type)
+                else:
+                    logging.debug('Unknown alert type: {}'.format(alert_type))
+                #self.my_setDriver('GV2', self.bool2ISY(self.yoLock.getDoorBellRing()), type=message_type)
 
                 doorstate = self.yoLock.getDoorState()
                 if doorstate in ['closed']:

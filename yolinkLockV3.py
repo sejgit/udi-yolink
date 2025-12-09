@@ -11,7 +11,7 @@ except ImportError:
     logging.basicConfig(level=logging.DEBUG)
 
 
-class YoLink_lock(YoLinkMQTTDevice):
+class YoLinkLock(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__(yoAccess,  deviceInfo, callback)
         
@@ -129,12 +129,3 @@ class YoLink_lock(YoLinkMQTTDevice):
         yolink.getState()
     
     
-class YoLinkLock(YoLink_lock):
-    def __init__(yolink, yoAccess,  deviceInfo):
-        super().__init__(  yoAccess,  deviceInfo, yolink.updateStatus)
-        yolink.initNode()
-        #yolink.fetchDevice()
-
-
-    def updateStatus(yolink, data):
-        yolink.updateCallbackStatus(data, True)

@@ -70,11 +70,3 @@ class YoLinkHub(YoLinkMQTTDevice):
         logging.debug('getEthernetInfo')
         return(yolink.dataAPI['lastMessage']['data']['eth'])
 
-#class YoLinkHub(YoLinkHu):        
-#    def __init__(yolink, yoAccess,  deviceInfo):
-#        super().__init__( yoAccess,  deviceInfo,  yolink.updateStatus)    
-        #yolink.initNode()
-
-    # Enable Event Support (True below)
-    #def updateStatus(yolink, data):
-        #yolink.updateCallbackStatus(data, True)

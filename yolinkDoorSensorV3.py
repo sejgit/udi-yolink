@@ -38,11 +38,3 @@ class YoLinkDoorSensor(YoLinkMQTTDevice):
     def updateStatus(yolink, data):
         yolink.updateCallbackStatus(data, False)
 
-    
-#class YoLinkDoorSensor(YoLinkDoorSens):
-#    def __init__(yolink, yoAccess,  deviceInfo):
-#        super().__init__(  yoAccess,  deviceInfo, yolink.updateStatus)
-#        yolink.initNode()
-
-#    def updateStatus(yolink, data):
-#        yolink.updateCallbackStatus(data, True)

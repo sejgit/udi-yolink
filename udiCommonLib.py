@@ -30,7 +30,7 @@ from udiYoOutletV4 import udiYoOutlet
 from udiYoMultiOutletV2 import udiYoMultiOutlet
 from udiYoManipulatorV2 import udiYoManipulator
 from udiYoSpeakerHubV2 import udiYoSpeakerHub
-from udiYoLockV2 import udiYoLock
+from udiYoLockV4 import udiYoLock
 from udiYoInfraredRemoterV4 import udiYoInfraredRemoter
 from udiYoDimmerV2 import udiYoDimmer
 from udiYoVibrationSensorV4 import udiYoVibrationSensor

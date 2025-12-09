@@ -48,12 +48,5 @@ class YoLinkLeakSensor(YoLinkMQTTDevice):
     def probeData(yolink):
         return(yolink.getData() )
 
-#class YoLinkLeakSensor(YoLinkLeakSen):
-#    def __init__(yolink, yoAccess,  deviceInfo):
-#        super().__init__(   yoAccess,  deviceInfo, yolink.updateStatus)
-#        yolink.initNode()
-
-#   def updateStatus(yolink, data):
-#        yolink.updateCallbackStatus(data, True)
     
 
