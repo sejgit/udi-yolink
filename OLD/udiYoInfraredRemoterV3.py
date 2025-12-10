@@ -273,19 +273,25 @@ class udiYoInfraredRemoter(udi_interface.Node):
             self.my_setDriver('GV30', 0)
 
 
+
+
     def updateStatus(self, data):
         logging.info('udiIRremote updateStatus')
         self.yoIRrem.updateStatus(data)
         self.updateData()
-        res = self.yoIRrem.getIRstatus_info()
+        success = self.yoIRrem.get_data('success')
+        errorCode = self.yoIRrem.get_data('errorCode')
+        key = self.yoIRrem.get_data('key')  
+    
+        res = {'success': success, 'errorCode': errorCode, 'key': key}
         logging.debug(f'IR status info: {res}')
         logging.debug(f'Code nodes: {self.code_nodes}')
         for code in self.code_nodes:
             logging.debug(f'Checking code node {code}')
             if self.code_nodes[code] is not None:
                 self.code_nodes[code].updateData()
-                if res['key'] == code:
-                    if res['success'] == True:
+                if key == code:
+                    if success:
                         self.code_nodes[code].my_setDriver('ST', 1)
                     else:
                         self.code_nodes[code].my_setDriver('ST', 2)

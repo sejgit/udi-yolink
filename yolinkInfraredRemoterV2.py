@@ -189,23 +189,24 @@ class YoLinkInfraredRem(YoLinkMQTTDevice):
         try:
             #temp = yolink.dataAPI['lastMessage']
             logging.debug('Analyzed Message: {}'.format(yolink.dataAPI))
-            if 'key' in yolink.dataAPI[yolink.dData]:
-                if  yolink.dataAPI[yolink.dData]['key'] == code:                                   
-                    if 'errorCode' in yolink.dataAPI[yolink.dData]:
-                        if yolink.dataAPI[yolink.dData]['errorCode'] == 'started':
-                            logging.debug('Learn in progress')
-                            return('learning')
-                        else:
-                            logging.error('Error code {}'.format(yolink.dataAPI[yolink.dData]['errorCode']))
-                    elif 'success' in yolink.dataAPI[yolink.dData]:
-                        if yolink.dataAPI[yolink.dData]['success']:
-                            return('success')
-                        else:
-                            return('failure')
+            key = yolink.get_data('key' )
+            errorCode = yolink.get_data('errorCode' )
+            success = yolink.get_data('success' )
+            if  key == code:                                   
+
+                if errorCode == 'started':
+                    logging.debug('Learn in progress')
+                    return('learning')
                 else:
-                    return('ignore')  
-            else:         
-                return('ignore')    
+                    logging.error('Error code {}'.format(errorCode))
+                if 'success' in yolink.dataAPI[yolink.dData]:
+                    if yolink.dataAPI[yolink.dData]['success']:
+                        return('success')
+                    else:
+                        return('failure')
+            else:
+                return('ignore')  
+
 
         except Exception as E:
             logging.error('YoLinkInfraredRem check_learn_completed - Exception: {}'.format(E))
