@@ -150,7 +150,7 @@ def addNodes (self, deviceList) -> list:
     #                    'PowerFailureAlarm', 'SmartRemoter', 'COSmokeSensor', 'Siren', 'WaterMeterController',
     #                    'WaterDepthSensor', ]    'WaterMeterController', 
     
-    supportedYoTypes = [ 'Outlet','VibrationSensor'  ]     
+    #supportedYoTypes = [ 'Outlet','VibrationSensor'  ]     
 
     
     remove_list= []
@@ -413,11 +413,11 @@ def addNodes (self, deviceList) -> list:
 
             elif dev['type'] in ['WaterMeterController']:
                 logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) ))                       
-                if  model in ['YS5007']:    
-                    temp = udiYoWaterMeterOnly(self.poly, address, address, name, dev_access, dev )
-                elif model in ['YS5029']: 
-                    temp = udiYoWaterMeterMulti(self.poly, address, address, name, dev_access, dev )
-                elif model in ['YS5018', 'YS5008', 'YS5009']:  
+                #if  model in ['YS5007']:    
+                #    temp = udiYoWaterMeterOnly(self.poly, address, address, name, dev_access, dev )
+                #elif model in ['YS5029']: 
+                #    temp = udiYoWaterMeterMulti(self.poly, address, address, name, dev_access, dev )
+                if model in ['YS5018', 'YS5008', 'YS5009', 'YS5007']:  
                     temp = udiYoWaterMeterController(self.poly, address, address, name, dev_access, dev )
                 else:
                     logging.warning('Currently unsupported Water Meter Controller model: {} - {} - trying default '.format(model, dev['name'] ))
@@ -433,7 +433,7 @@ def addNodes (self, deviceList) -> list:
                 logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) )) 
                 if model in ['YS5029']: 
                     temp = udiYoWaterMeterMulti(self.poly, address, address, name, dev_access, dev )
-                else: #YS5018 or YS5008 YS5009
+                else: 
                     temp = udiYoWaterMeterMulti(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
