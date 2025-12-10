@@ -423,6 +423,21 @@ CMD-nlslock-UNLOCK-NAME=Unlock
 CMD-nlslock-LOCKCTRL-NAME=Set Lock
 CMD-nlslock-UPDATE-NAME=Update 
 
+ND-yoschedule-NAME=Schedule
+ND-yoschedule-ICON=GenericCtl
+
+ST-nlsschedule-GV13-NAME=Schedule Index
+ST-nlsschedule-GV14-NAME=Activated
+ST-nlsschedule-GV15-NAME=On Hour
+ST-nlsschedule-GV16-NAME=On Minute
+ST-nlsschedule-GV21-NAME=On Sec
+ST-nlsschedule-GV17-NAME=Off Hour
+ST-nlsschedule-GV18-NAME=Off Minute
+ST-nlsschedule-GV22-NAME=Off Sec
+ST-nlsschedule-GV19-NAME=Active Days
+
+
+
 ND-yodimmer-NAME=YoLink Dimmer
 ND-yodimmer-ICON=Switch
 ST-nlsdimmer-ST-NAME=Dim Setting

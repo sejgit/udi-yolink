@@ -17,7 +17,7 @@ from os import truncate
 #import sys
 import time
 from yolinkOutletV2 import YoLinkOutlet
-
+from udiYoSchedule import YoLinkSchedule
 
 
 class udiYoOutlet(udi_interface.Node):
@@ -67,7 +67,7 @@ class udiYoOutlet(udi_interface.Node):
 
         logging.debug('udiYoOutletPwr INIT- {}'.format(deviceInfo['name']))
         self.n_queue = []
-     
+        self.address = address
         self.yoAccess = yoAccess
         self.devInfo =  deviceInfo   
         self.yoOutlet = None
@@ -103,7 +103,9 @@ class udiYoOutlet(udi_interface.Node):
     def start(self):
         logging.info('start - YoOutlet')
         self.my_setDriver('GV30', 0)
-        self.yoOutlet  = YoLinkOutlet(self.yoAccess, self.devInfo, self.updateStatus)
+        sch_address = self.address[4:14] + '_SCH'
+        self.schedule = YoLinkSchedule( self.poly, self.address, sch_address, 'Schedule' , self.yoAccess, self.devInfo)
+        self.yoOutlet = YoLinkOutlet(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoOutlet.initNode()
         time.sleep(2)
