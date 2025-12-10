@@ -430,13 +430,11 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)     
 
             elif dev['type'] in ['WaterMeterMultiController']:
-                logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) ))                       
-                if  model in ['YS5007']:    
-                    temp = udiYoWaterMeterOnly(self.poly, address, address, name, dev_access, dev )
-                elif model in ['YS5029']: 
+                logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) )) 
+                if model in ['YS5029']: 
                     temp = udiYoWaterMeterMulti(self.poly, address, address, name, dev_access, dev )
                 else: #YS5018 or YS5008 YS5009
-                    temp = udiYoWaterMeterController(self.poly, address, address, name, dev_access, dev )
+                    temp = udiYoWaterMeterMulti(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
                     time.sleep(4)
