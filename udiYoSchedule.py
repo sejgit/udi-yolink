@@ -69,8 +69,8 @@ class udiYoSchedule(udi_interface.Node):
         logging.info('start - Schedule subnode')
         self.my_setDriver('GV30', 0)
         self.yoSchedule = YoLinkSchedule(self.yoAccess, self.devInfo, self.updateStatus)
-        time.sleep(2)
-        self.yoSchedule.initNode()
+        #time.sleep(2)
+        #self.yoSchedule.initNode()
         time.sleep(2)
         self.yoSchedule.refreshSchedules()
         self.node_ready = True
@@ -184,12 +184,6 @@ class udiYoSchedule(udi_interface.Node):
         self.activated, self.schedule_selected = self.activate_schedule(query)
         self.yoSchedule.activateSchedule(self.schedule_selected, self.activated)
         
-
-
-
-
-
-
 
 
 

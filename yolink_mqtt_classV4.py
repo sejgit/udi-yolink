@@ -86,6 +86,7 @@ class YoLinkMQTTDevice(object):
         yolink.eventSupport = False # Support adding to EventQueue
         yolink.disconnect = False
         yolink.data = {}
+        yolink.schedule = {}
         if yolink.type in yolink.delaySupport and yolink.type not in yolink.scheduleSupport :
             yolink.dataAPI = {
                               yolink.lastUpd:0
@@ -1409,6 +1410,11 @@ class YoLinkMQTTDevice(object):
                 yolink.dataAPI['emptyData'] = False
                 yolink.data['emptyData'] = False
 
+            if yolink.data['action'] in ['getSchedules' , 'setSchedules'] and 'data' in data:
+                yolink.schdeule = data['data']
+
+
+
             temp = yolink.dataAPI['lastMessage']
             yolink.reset_structure() #do not let old data persist
             yolink.dataAPI['lastMessage'] = temp    
@@ -1418,6 +1424,9 @@ class YoLinkMQTTDevice(object):
                     yolink.nbrPorts = yolink.nbrOutlets + yolink.nbrUsb
 
 
+                
+    
+    
             if 'reportAt' in data[yolink.dData] :
                 reportAt = datetime.strptime(data[yolink.dData]['reportAt'], '%Y-%m-%dT%H:%M:%S.%fZ')
                 yolink.dataAPI['lastStateTime'] = (reportAt.timestamp() -  yolink.timezoneOffsetSec)*1000
@@ -1659,8 +1668,8 @@ class YoLinkMQTTDevice(object):
 
     def getNbrScheduleDefined(yolink):
         try:
-            logging.debug('getNbrScheduleDefined : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule]))
-            nbr_sch = len(yolink.dataAPI[yolink.dData][yolink.dSchedule])
+            logging.debug('getNbrScheduleDefined : {} '.format(yolink.schedule))
+            nbr_sch = len(yolink.schedule)
             if nbr_sch == 0:
                 return (None)
             else:
@@ -1671,20 +1680,40 @@ class YoLinkMQTTDevice(object):
         
     def schedule_support_sec(yolink):
         logging.debug('schedule_support_sec') 
-        if 'supportSeconds' in yolink.dataAPI[yolink.dData][yolink.dSchedule]:
-            return(yolink.dataAPI[yolink.dData][yolink.dSchedule]['supportSeconds'])
-        else:
-            return(False)
-        return()
+
+        return('supportSeconds' in yolink.schedule)
 
     def getScheduleInfo(yolink, index):
-        logging.debug(yolink.type + ' getScheduleInfo {} -- {}'.format( index, yolink.dataAPI))       
+        logging.debug(f'{yolink.type} getScheduleInfo {index} -- {yolink.schedule}')      
         indexS = str(index)
         try: 
             #logging.debug( 'getScheduleInfo 1 : {} '.format(yolink.dataAPI[yolink.dData]))
             #logging.debug( 'getScheduleInfo 2 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule]))
             #logging.debug( 'getScheduleInfo 3 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule][indexS]))
-            if 'supportSeconds' in yolink.dataAPI[yolink.dData][yolink.dSchedule]:
+            if  yolink.schedule_support_sec():
+                yolink.scheduleSec = yolink.dataAPI[yolink.dData][yolink.dSchedule]['supportSeconds']
+            else:
+                yolink.scheduleSec = False
+            if  indexS in yolink.schedule:
+                sch = yolink.schedule[indexS]
+            else:
+                sch = None
+            logging.debug(' return {}'.format(sch) )
+            return(sch)
+    
+        except Exception as e:
+            logging.debug('No schedules found {}'.format(e))
+            return(None)
+        
+
+    def getScheduleInfoOLD(yolink, index):
+        logging.debug(f'{yolink.type} getScheduleInfo {index} -- {yolink.schedule}')     
+        indexS = str(index)
+        try: 
+            #logging.debug( 'getScheduleInfo 1 : {} '.format(yolink.dataAPI[yolink.dData]))
+            #logging.debug( 'getScheduleInfo 2 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule]))
+            #logging.debug( 'getScheduleInfo 3 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule][indexS]))
+            if 'supportSeconds' in yolink.schedule:
                 yolink.scheduleSec = yolink.dataAPI[yolink.dData][yolink.dSchedule]['supportSeconds']
             else:
                 yolink.scheduleSec = False
@@ -1700,6 +1729,30 @@ class YoLinkMQTTDevice(object):
             return(None)
 
     def updateScheduleStatus(yolink, data):
+        logging.debug(yolink.type + ' updateScheduleStatus ;{}'.format(yolink.schedule))
+        try:
+            if 'event' in data: 
+                yolink.data['type'] = 'event'
+                yolink.data['action'] = data['event'].split('.')[-1]
+            if 'method' in data:
+                yolink.data['type'] = 'method'
+                yolink.data['action'] = data['method'].split('.')[-1]  
+
+            yolink.schedules'] = data[yolink.dData]
+            #yolink.setOnline(data)
+            #yolink.setNbrPorts(data)
+            #yolink.updateLoraInfo(data)
+            if yolink.dSchedule not in yolink.dataAPI[yolink.dData]:
+                yolink.dataAPI[yolink.dData][yolink.dSchedule] = {}
+            #logging.debug('updateScheduleStatus 1: {}'.format(yolink.dataAPI) )
+            yolink.dataAPI[yolink.dData][yolink.dSchedule] = data[yolink.dData]
+            #logging.debug('updateScheduleStatus 2: {}'.format(yolink.dataAPI) )
+            #yolink.dataAPI[yolink.lastMessage] = data
+            #logging.debug('updateScheduleStatus finish: {}'.format(yolink.dataAPI) )
+        except Exception as e:
+            logging.debug(' Error schedules not fully supported yet {}'.format(e))
+
+    def updateScheduleStatusOLF(yolink, data):
         logging.debug(yolink.type + ' updateScheduleStatus ;{}'.format(data))
         try:
             yolink.data['schedules'] = data[yolink.dData]
@@ -1714,8 +1767,7 @@ class YoLinkMQTTDevice(object):
             #yolink.dataAPI[yolink.lastMessage] = data
             #logging.debug('updateScheduleStatus finish: {}'.format(yolink.dataAPI) )
         except Exception as e:
-            logging.debug(' Error schedules not fully supported yet {}'.format(e))
-            
+            logging.debug(' Error schedules not fully supported yet {}'.format(e)) 
     def isScheduleActive(yolink, index):
         
         logging.debug(yolink.type + ' scheduleActive {} '.format( index))   
