@@ -1738,21 +1738,21 @@ class YoLinkMQTTDevice(object):
                 yolink.data['type'] = 'method'
                 yolink.data['action'] = data['method'].split('.')[-1]  
 
-            yolink.schedules = data[yolink.dData]
+            yolink.schedules = data['data']
             #yolink.setOnline(data)
             #yolink.setNbrPorts(data)
             #yolink.updateLoraInfo(data)
-            if yolink.dSchedule not in yolink.dataAPI[yolink.dData]:
-                yolink.dataAPI[yolink.dData][yolink.dSchedule] = {}
+            #if yolink.dSchedule not in yolink.dataAPI[yolink.dData]:
+            #    yolink.dataAPI[yolink.dData][yolink.dSchedule] = {}
             #logging.debug('updateScheduleStatus 1: {}'.format(yolink.dataAPI) )
-            yolink.dataAPI[yolink.dData][yolink.dSchedule] = data[yolink.dData]
+            #yolink.dataAPI[yolink.dData][yolink.dSchedule] = data[yolink.dData]
             #logging.debug('updateScheduleStatus 2: {}'.format(yolink.dataAPI) )
             #yolink.dataAPI[yolink.lastMessage] = data
             #logging.debug('updateScheduleStatus finish: {}'.format(yolink.dataAPI) )
         except Exception as e:
             logging.debug(' Error schedules not fully supported yet {}'.format(e))
 
-    def updateScheduleStatusOLF(yolink, data):
+    def updateScheduleStatusOLD(yolink, data):
         logging.debug(yolink.type + ' updateScheduleStatus ;{}'.format(data))
         try:
             yolink.data['schedules'] = data[yolink.dData]
@@ -1768,8 +1768,28 @@ class YoLinkMQTTDevice(object):
             #logging.debug('updateScheduleStatus finish: {}'.format(yolink.dataAPI) )
         except Exception as e:
             logging.debug(' Error schedules not fully supported yet {}'.format(e)) 
+
     def isScheduleActive(yolink, index):
+        logging.debug(yolink.type + ' scheduleActive {} '.format( index))   
+        active = None
+        indexS = str(index)
+        try: 
+            #logging.debug( 'getScheduleInfo 1 : {} '.format(yolink.dataAPI[yolink.dData]))
+            #logging.debug( 'getScheduleInfo 2 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule]))
+            #logging.debug( 'getScheduleInfo 3 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule][indexS]))
+            active
+            
+            if  indexS in yolink.schedule:
+                active = yolink.schedule[indexS]['isValid']
+            logging.debug( 'getScheduleInfo {}'.format(active))
+            return(active)
         
+        except Exception as e:
+            logging.debug('Schedules not fully supported yet {}'.format(e))
+            return(None)
+
+
+    def isScheduleActiveOLD(yolink, index):        
         logging.debug(yolink.type + ' scheduleActive {} '.format( index))   
         active = None
         indexS = str(index)
@@ -1781,10 +1801,10 @@ class YoLinkMQTTDevice(object):
                 active = yolink.dataAPI[yolink.dData][yolink.dSchedule][indexS]['isValid']
             logging.debug( 'getScheduleInfo {}'.format(active))
             return(active)
-    
         except Exception as e:
             logging.debug('Schedules not fully supported yet {}'.format(e))
-            return(None)
+            return(None)    
+
 
     def eventPending(yolink):
         return( not yolink.eventQueue.empty())
