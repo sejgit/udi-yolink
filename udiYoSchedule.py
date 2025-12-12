@@ -91,10 +91,170 @@ class udiYoSchedule(udi_interface.Node):
         #    self.my_setDriver('GV2', 0, True, False)     
 
 
+    def prep_schedule(self, query):
+        logging.debug('prep_schedule {} '.format(query))
+        params = {}
+        onH = 25
+        onM = 0     
+        onS = 0
+        offH = 25
+        offM = 0   
+        offS = 0
+        include_sec = False
+        #query = command.get("query")
+        if 'port.uom25' in query:
+            port = int(query.get('port.uom25'))-1
+            params['ch'] = port
+        schedule_selected = int(query.get('index.uom25'))
+        tmp = int(query.get('active.uom25'))
+        activated = (tmp == 1)
+        if 'onH.uom19' in query:
+            onH = int(query.get('onH.uom19'))
+        if 'onM.uom44' in query:    
+            onM = int(query.get('onM.uom44'))
+        if 'offH.uom19' in query:
+            offH = int(query.get('offH.uom19'))
+        if 'offM.uom44' in query:    
+            offM = int(query.get('offM.uom44'))  
+        if 'onS.' in query:
+            include_sec = True
+            if 'onS.uom57' in query:            
+                onS = int(query.get('onS.uom57'))
+            else:
+                onS = 0
+        if 'offS.' in query:            
+            include_sec = True  
+            if 'offS.uom57' in query:            
+                offS = int(query.get('onS.uom57'))
+            else:
+                offS = 0
+            
+        binDays = int(query.get('bindays.uom25'))
+
+        
+        params['index'] = str(schedule_selected )
+        params['isValid'] = activated 
+        params['on'] = str(onH)+':'+str(onM)
+        params['off'] = str(offH)+':'+str(offM)
+        if include_sec:
+            params['on'] = params['on'] + ':' + str(onS)
+            params['off'] =  params['off'] + ':' + str(offS)
+
+        params['week'] = binDays
+        #self.yolink.setSchedule(self.schedule_selected, params)
+        return(schedule_selected, params)
+
+    def activate_schedule(self, query):
+        logging.info('activate_schedule {}'.format(query))       
+        #query = command.get("query")
+        schedule_selected = int(query.get('index.uom25'))
+        tmp = int(query.get('active.uom25'))
+        activated = (tmp == 1)
+        #self.yolink.activateSchedule(schedule_selected, activated)
+        return(activated, schedule_selected)
+
+    def check_name_in_drivers(self,  name):
+        logging.debug('check_name_in_drivers: {}'.format(name))
+        found = False
+        for drv in enumerate(self.node.drivers):
+            logging.debug('check_name_in_drivers: {}'.format(drv))
+            if drv['driver'] == name:
+                found = True
+        return(found)
+
+
+    def update_schedule_data(self, sch_info, selected_schedule):
+        logging.info('update_schedule_data {}'.format(sch_info)) 
+
+        def check_name_in_drivers( name):
+            found = False
+            for indx, drv in enumerate(self.node.drivers):
+                if drv['driver'] == name:
+                    found = True
+                    return(found)
+            return(found)
+        if sch_info:
+            if 'ch' in sch_info:
+                self.my_setDriver('GV12', int(sch_info['ch']))
+
+            self.my_setDriver('GV13', selected_schedule)
+            if sch_info['isValid']:
+                self.my_setDriver('GV14', 1)
+            else:
+                self.my_setDriver('GV14', 0)
+            timestr = sch_info['on']
+            timelist =  timestr.split(':')
+            if len(timelist) == 2:
+                hour = int(timelist[0])
+                minute = int(timelist[1])
+                if hour == 25:
+                    self.my_setDriver('GV15', 98, 25)
+                    self.my_setDriver('GV16', 98, 25)
+                else:
+                    self.my_setDriver('GV15', int(hour),19)
+                    self.my_setDriver('GV16', int(minute), 44)
+            elif len(timelist) == 3:
+                hour = int(timelist[0])
+                minute = int(timelist[1])
+                second = int(timelist[2])
+                if hour == 25:
+                    self.my_setDriver('GV15', 98, 25)
+                    self.my_setDriver('GV16', 98, 25)
+                    self.my_setDriver('GV21', 98, 25)
+                else:
+                    self.my_setDriver('GV15', hour, 19)
+                    self.my_setDriver('GV16', minute, 44)
+                    self.my_setDriver('GV21', second, 57)
+
+            timestr = sch_info['off']
+            logging.debug('timestr : {}'.format(timestr))
+            timelist =  timestr.split(':')
+            if len(timelist) == 2:
+                hour = int(timelist[0])
+                minute = int(timelist[1])
+                if hour == 25:
+                    self.my_setDriver('GV17', 98, 25)
+                    self.my_setDriver('GV18', 98, 25)
+                else:
+                    self.my_setDriver('GV17', int(hour), 19)
+                    self.my_setDriver('GV18', int(minute), 44)
+            elif len(timelist) == 3:
+                hour = int(timelist[0])
+                minute = int(timelist[1])
+                second = int(timelist[2])     
+                if hour == 25:
+                    self.my_setDriver('GV17', 98, 25)
+                    self.my_setDriver('GV18', 98, 25)
+                    self.my_setDriver('GV22', 98, 25)
+                else:
+                    self.my_setDriver('GV17', hour, 19)
+                    self.my_setDriver('GV18', minute, 44)
+                    self.my_setDriver('GV22', second, 57)
+            self.my_setDriver('GV19',  int(sch_info['week']))
+
+        else:
+            logging.debug('No schdule exist for the selected index')
+            if check_name_in_drivers('GV12'):
+                self.my_setDriver('GV12', 99, 25)
+            self.my_setDriver('GV13', selected_schedule) 
+            self.my_setDriver('GV14', 99)
+            self.my_setDriver('GV15', 99, 25)
+            self.my_setDriver('GV16', 99, 25)
+            self.my_setDriver('GV17', 99, 25)
+            self.my_setDriver('GV18', 99, 25)
+            self.my_setDriver('GV19', 0)
+            if check_name_in_drivers('GV10'):
+                self.my_setDriver('GV10', 99, 25)
+                self.my_setDriver('GV11', 99, 25)
+
+
+
 
     def updateData(self):
         logging.info('udiyoScheduleupdateData -  {}'.format(self.schedule_selected))
         if self.node is not None:
+            
+            '''
             message_type = self.yoSchedule.get_last_message_type()
             unix_time = self.yoSchedule.get_report_time('time')
             logging.debug(f'unix time {unix_time}')
@@ -155,6 +315,7 @@ class udiYoSchedule(udi_interface.Node):
 
                 self.my_setDriver('GV30',0)
                 self.my_setDriver('GV20', 2)
+                '''
   
 
         sch_info = self.yoSchedule.getScheduleInfo(self.schedule_selected)
