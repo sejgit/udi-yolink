@@ -84,9 +84,9 @@ class udiYoOutlet(udi_interface.Node):
         self.onDelay = 0
         self.offDelay = 0
         self.schedule_selected = None
-  
-        polyglot.subscribe(polyglot.START, self.start, self.address)
-        polyglot.subscribe(polyglot.STOP, self.stop)
+        self.poly = polyglot
+        self.poly.subscribe(polyglot.START, self.start, self.address)
+        self.poly.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
                
 
@@ -107,6 +107,7 @@ class udiYoOutlet(udi_interface.Node):
         
         self.yoOutlet = YoLinkOutlet(self.yoAccess, self.devInfo, self.updateStatus)
         self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedule' , self.yoAccess, self.devInfo)
+        self.adr_list.append(sch_address)
         time.sleep(2)
         self.yoOutlet.initNode()
         time.sleep(2)

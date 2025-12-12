@@ -41,7 +41,7 @@ class udiYoSchedule(udi_interface.Node):
     def  __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
         super().__init__( polyglot, primary, address, name)   
 
-        logging.debug('udiYoOutletPwr INIT- {}'.format(deviceInfo['name']))
+        logging.debug('udiYoSchedule INIT- {}'.format(deviceInfo['name']))
         self.n_queue = []
      
         self.yoAccess = yoAccess
