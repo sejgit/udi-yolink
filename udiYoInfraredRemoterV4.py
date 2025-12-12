@@ -16,7 +16,7 @@ from os import truncate
 #import udi_interface
 #import sys
 import time
-from yolinkInfraredRemoterV2 import YoLinkInfraredRem
+from yolinkInfraredRemoterV3 import YoLinkInfraredRem
 
 class udiYoInfraredCode(udi_interface.Node):
     from  udiYolinkLib import my_setDriver, node_queue, wait_for_node_done
@@ -184,7 +184,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
 
 
     def start(self):
-        logging.info('start - YoLinkOutlet')
+        logging.info('start - udiIRremote')
         self.my_setDriver('ST', 0)
         self.yoIRrem  = YoLinkInfraredRem(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
@@ -275,11 +275,11 @@ class udiYoInfraredRemoter(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('udiIRremote updateStatus')
-        self.yoIRrem.updateStatus(data)
+        #self.yoIRrem.updateStatus(data)
         self.updateData()
-        res = self.yoIRrem.getIRstatus_info()
-        logging.debug(f'IR status info: {res}')
-        logging.debug(f'Code nodes: {self.code_nodes}')
+        #res = self.yoIRrem.getIRstatus_info()
+        #logging.debug(f'IR status info: {res}')
+        #logging.debug(f'Code nodes: {self.code_nodes}')
         for code in self.code_nodes:
             logging.debug(f'Checking code node {code}')
             if self.code_nodes[code] is not None:
