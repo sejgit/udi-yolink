@@ -34,7 +34,8 @@ class udiYoSchedule(udi_interface.Node):
             {'driver': 'GV21', 'value': 99, 'uom': 25}, #start Sec            
             {'driver': 'GV17', 'value': 99, 'uom': 25}, #stop Hour                                              
             {'driver': 'GV18', 'value': 99, 'uom': 25}, #stop Min                                        
-            {'driver': 'GV22', 'value': 99, 'uom': 25}, #stop Sec            
+            {'driver': 'GV22', 'value': 99, 'uom': 25}, #stop Sec   
+            {'driver': 'GV19', 'value': 0, 'uom': 25}, #days         
             ]
 
 
@@ -50,8 +51,9 @@ class udiYoSchedule(udi_interface.Node):
         self.node_ready = False
         self.schedule_selected = None
   
-        polyglot.subscribe(polyglot.START, self.start, self.address)
-        polyglot.subscribe(polyglot.STOP, self.stop)
+        self.poly = polyglot
+        self.poly.subscribe(self.poly.START, self.start, self.address)
+        self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
                
 
@@ -90,6 +92,9 @@ class udiYoSchedule(udi_interface.Node):
         #    self.my_setDriver('GV1', 0, True, False)
         #    self.my_setDriver('GV2', 0, True, False)     
 
+    def updateStatus(self, deviceInfo):
+        logging.info('Schedule updateStatus called')
+        self.updateData()   
 
     def prep_schedule(self, query):
         logging.debug('prep_schedule {} '.format(query))
@@ -253,7 +258,7 @@ class udiYoSchedule(udi_interface.Node):
     def updateData(self):
         logging.info('udiyoScheduleupdateData -  {}'.format(self.schedule_selected))
         if self.node is not None:
-            
+            logging.debug('Schedule updateData called')
             '''
             message_type = self.yoSchedule.get_last_message_type()
             unix_time = self.yoSchedule.get_report_time('time')
