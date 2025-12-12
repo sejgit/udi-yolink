@@ -17,7 +17,7 @@ from os import truncate
 #import sys
 import time
 from yolinkOutletV2 import YoLinkOutlet
-from udiYoSchedule import YoLinkSchedule
+from udiYoSchedule import udiYoSchedule
 
 
 class udiYoOutlet(udi_interface.Node):
