@@ -1738,7 +1738,7 @@ class YoLinkMQTTDevice(object):
                 yolink.data['type'] = 'method'
                 yolink.data['action'] = data['method'].split('.')[-1]  
 
-            yolink.schedules'] = data[yolink.dData]
+            yolink.schedules = data[yolink.dData]
             #yolink.setOnline(data)
             #yolink.setNbrPorts(data)
             #yolink.updateLoraInfo(data)
