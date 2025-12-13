@@ -103,9 +103,9 @@ class udiYoOutlet(udi_interface.Node):
     def start(self):
         logging.info('start - YoOutlet')
         self.my_setDriver('GV30', 0)
-        sch_address = self.address[4:14] + '_SCH'
-        
         self.yoOutlet = YoLinkOutlet(self.yoAccess, self.devInfo, self.updateStatus)
+        sch_address = self.address[4:14] + '_SCH'
+        sch_address = self.poly.getValidAddress(sch_address)
         self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedule' , self.yoAccess, self.devInfo)
         self.adr_list.append(sch_address)
         time.sleep(2)
