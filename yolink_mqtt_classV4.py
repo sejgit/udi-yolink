@@ -981,45 +981,47 @@ class YoLinkMQTTDevice(object):
         logging.debug(yolink.type + '- refreshSchedules')
         attempt = 1
         maxAttempts = 3
-        if 'getSchedules' in yolink.methodList:
-            methodStr = yolink.type+'.getSchedules'
-            #logging.debug(methodStr)  
-            data = {}
-            #data['time'] = str(int(time.time_ns()//1e6))
-            data['method'] = methodStr
-            data["targetDevice"] =  yolink.deviceInfo['deviceId']
-            data["token"]= yolink.deviceInfo['token']
-            yolink.yoAccess.publish_data(data) 
+        #if 'getSchedules' in yolink.methodList:
+        methodStr = yolink.type+'.getSchedules'
+        #logging.debug(methodStr)  
+        data = {}
+        #data['time'] = str(int(time.time_ns()//1e6))
+        data['method'] = methodStr
+        data["targetDevice"] =  yolink.deviceInfo['deviceId']
+        data["token"]= yolink.deviceInfo['token']
+        yolink.yoAccess.publish_data(data) 
             
     
     def getSchedules(yolink):
         logging.debug('{}- getSchedules: {}'.format(yolink.type, yolink.deviceInfo['name'] ))
-
+        
         yolink.refreshSchedules()
-        while 'schedules' not in yolink.dataAPI[yolink.dData]:
-            time.sleep(1)
-            logging.debug('Waiting for schedules to be retrieved')
+        time.sleep(2)
+        #while 'schedules' not in yolink.dataAPI[yolink.dData]:
+        #    time.sleep(1)
+        #    logging.debug('Waiting for schedules to be retrieved')
             
         #nbrSchedules  = len(yolink.dataAPI[yolink.dData])
-        if 'supportSeconds' in yolink.dataAPI[yolink.dData][yolink.dSchedule]:
-            yolink.scheduleSec = yolink.dataAPI[yolink.dData][yolink.dSchedule]['supportSeconds']
-        else:
-            yolink.scheduleSec = False
+        #f 'supportSeconds' in yolink.dataAPI[yolink.dData][yolink.dSchedule]:
+        #   yolink.scheduleSec = yolink.dataAPI[yolink.dData][yolink.dSchedule]['supportSeconds']
+        #else:
+        #    yolink.scheduleSec = False
+        yolink.scheduleSec = yolink.get_data('supportSeconds')
 
         temp = {}
         yolink.scheduleList = []
-
-        for scheduleNbr in yolink.dataAPI[yolink.dData][yolink.dSchedule]:
+        logging.debug('getSchedules - schedules  {}'.format(yolink.schedules))
+        for scheduleNbr in yolink.schedules:
             temp[scheduleNbr] = {}
-            for key in yolink.dataAPI[yolink.dData][yolink.dSchedule][scheduleNbr]:
+            for key in yolink.schedules[scheduleNbr]:
                 if key == 'week':
-                    days = yolink.maskToDays(yolink.dataAPI[yolink.dData][yolink.dSchedule][scheduleNbr][key])
+                    days = yolink.maskToDays(yolink.schedules[scheduleNbr][key])
                     temp[scheduleNbr][key]= days
-                elif yolink.dataAPI[yolink.dData][yolink.dSchedule][scheduleNbr][key] == '25:0':
+                elif yolink.schedules[scheduleNbr][key] == '25:0':
                     #temp[schedule].pop(key)
                     pass
                 else:
-                    temp[scheduleNbr][key] = yolink.dataAPI[yolink.dData][yolink.dSchedule][scheduleNbr][key]
+                    temp[scheduleNbr][key] = yolink.schedules[scheduleNbr][key]
             #temp[scheduleNbr]['index'] = scheduleNbr   
             yolink.scheduleList.append(temp[scheduleNbr])
         logging.debug('getSchedules - schedules : {}'.format(temp))
@@ -1027,11 +1029,11 @@ class YoLinkMQTTDevice(object):
     
     def activateSchedule(yolink, index, active):
         logging.debug(yolink.type + '- activateSchedule {} {} '.format(index, active))
-        logging.debug('dataAPI {}'.format(yolink.dataAPI[yolink.dData]))
-        logging.debug('dataAPI-schedules {}'.format( yolink.dataAPI[yolink.dData][yolink.dSchedule]))
+        #logging.debug('dataAPI {}'.format(yolink.dataAPI[yolink.dData]))
+        logging.debug('dataAPI-schedules {}'.format( yolink.schedules))
         indexS = str(index)
-        if indexS in yolink.dataAPI[yolink.dData][yolink.dSchedule]:
-            schedule = yolink.dataAPI[yolink.dData][yolink.dSchedule][indexS]
+        if indexS in yolink.schedules:
+            schedule = yolink.schedules[indexS]
             schedule['isValid'] = active
             schedule[indexS] = index
             yolink.setSchedule( index, schedule)
@@ -1046,15 +1048,15 @@ class YoLinkMQTTDevice(object):
         data["targetDevice"] =  yolink.deviceInfo['deviceId']
         data["token"]= yolink.deviceInfo['token']
         data['params'] = {}
-        if yolink.dSchedule in yolink.dataAPI[yolink.dData]:
-            data['params']['sches'] = yolink.dataAPI[yolink.dData][yolink.dSchedule]
+        if isinstance (yolink.schedules, dict) and len(yolink.schedules != 0):
+            data['params']['sches'] = yolink.schedules
         else:
             yolink.getSchedules()
-            while yolink.dSchedule not in yolink.dataAPI[yolink.dData]:
+            while yolink.dSchedule not in yolink.schedules:
                 time.sleep(1)
                 logging.info('Waiting for schedules to be updated')
 
-        data['params']['sches'] = yolink.dataAPI[yolink.dData][yolink.dSchedule]
+        data['params']['sches'] = yolink.schedules
         logging.debug('setSchedule1 : {}'.format(data))
         data['params']['sches'][indexS] = params
         logging.debug('setSchedule1 : {}'.format(data))
