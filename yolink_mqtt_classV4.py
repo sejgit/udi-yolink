@@ -1388,7 +1388,7 @@ class YoLinkMQTTDevice(object):
         try:
            return(yolink.data['emptyData'])
         except KeyError as e:
-            logging.error(f'EXCEPTION - no_data {e}')    
+            logging.debug(f'EXCEPTION - no_data {e}')    
             return(False)
 
     def updatePacketData(yolink, data):

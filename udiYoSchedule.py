@@ -84,16 +84,16 @@ class udiYoSchedule(udi_interface.Node):
             self.drivers.append({'driver': 'GV12', 'value': 99, 'uom': 25}) #outport/channel
         elif dev_type in ['Switch', 'Outlet']:
             if self.support_seconds:    
-                self.id = 'yooutletScheduleSec'    
+                self.id = 'yoScheduleSec'    
             else:    
-                self.id = 'yooutletSchedule'  
+                self.id = 'yoSchedule'  
             self.scheduleType = 'OnOff'
 
         elif dev_type in ['MultiOutlet']:
             if self.support_seconds:    
-                self.id = 'yooutletScheduleSec'    
+                self.id = 'yoMScheduleSec'    
             else:    
-                self.id = 'yooutletSchedule'  
+                self.id = 'yoMSchedule'  
             self.scheduleType = 'MOnOff'
             self.drivers.append({'driver': 'GV12', 'value': 99, 'uom': 25}) 
 
@@ -316,11 +316,8 @@ class udiYoSchedule(udi_interface.Node):
         logging.info('udiyoScheduleupdateData -  {}'.format(self.schedule_selected))
         if self.node is not None:
             logging.debug('Schedule updateData called')
-
-  
-
-        sch_info = self.yoSchedule.getScheduleInfo(self.schedule_selected)
-        self.update_schedule_data(sch_info, self.schedule_selected)
+            sch_info = self.yoSchedule.getScheduleInfo(self.schedule_selected)
+            self.update_schedule_data(sch_info, self.schedule_selected)
  
 
     def update(self, command = None):

@@ -18,7 +18,7 @@
       </cmds>
    </nodeDef> 
 
-   <nodeDef id="yoscheduleSec" nls="nlsschedule">
+   <nodeDef id="yoScheduleSec" nls="nlsschedule">
       <editors />
       <sts>
          <st id="GV13" editor="schIndex" />      
@@ -59,7 +59,254 @@
       </cmds>
    </nodeDef> 
 
-   <nodeDef id="yoschedule" nls="nlsschedule">
+   <nodeDef id="yoMScheduleSec" nls="nlsschedule">
+      <editors />
+      <sts>
+         <st id="GV12" editor="nbrcodes" />
+         <st id="GV13" editor="schIndex" />      
+         <st id="GV14" editor="schActive" />    
+         <st id="GV15" editor="stHour" />      
+         <st id="GV16" editor="stMin" />    
+         <st id="GV21" editor="stSec" />              
+         <st id="GV17" editor="stHour" />      
+         <st id="GV18" editor="stMin" />    
+         <st id="GV22" editor="stSec" />              
+         <st id="GV19" editor="binDays" />                     
+      </sts>
+      <cmds>
+         <sends>
+         </sends>
+         <accepts>
+            <cmd id="UPDATE" /> 
+
+            <cmd id="LOOKUPSCH" > 
+               <p id="" editor="schIndexS" init="GV13" /> 
+             </cmd >
+            <cmd id="DEFINESCH" > 
+               <p id="ch" editor="schIndexS" init="GV12" /> 
+               <p id="index" editor="schIndexS" init="GV13" /> 
+               <p id="active" editor="schActiveI" init="GV14" /> 
+               <p id="onH" editor="stHourI" init="GV15" /> 
+               <p id="onM" editor="stMinI" init="GV16" /> 
+               <p id="onS" editor="stSecI" init="GV21"/>   
+               <p id="offH" editor="stHourI" init="GV17" /> 
+               <p id="offM" editor="stMinI" init="GV18" />   
+               <p id="offS" editor="stSecI" init="GV22" />   
+               <p id="bindays" editor="binDays" init="GV19" />                                          
+             </cmd >
+            <cmd id="CTRLSCH" > 
+               <p id="index" editor="schIndexS" init="GV13" /> 
+               <p id="active" editor="schActiveI" init="GV14" />                                     
+             </cmd >                
+         </accepts>
+      </cmds>
+   </nodeDef> 
+
+   <nodeDef id="yoirScheduleSec" nls="nlsschedule">
+      <editors />
+      <sts>
+         <st id="GV12" editor="nbrcodes" />      
+         <st id="GV13" editor="schIndex" />      
+         <st id="GV14" editor="schActive" />    
+         <st id="GV15" editor="stHour" />      
+         <st id="GV16" editor="stMin" />    
+         <st id="GV21" editor="stSec" />              
+         <st id="GV17" editor="stHour" />      
+         <st id="GV18" editor="stMin" />    
+         <st id="GV22" editor="stSec" />              
+         <st id="GV19" editor="binDays" />                     
+      </sts>
+      <cmds>
+         <sends>
+         </sends>
+         <accepts>
+            <cmd id="UPDATE" /> 
+
+            <cmd id="LOOKUPSCH" > 
+               <p id="" editor="schIndexS" init="GV13" /> 
+             </cmd >
+            <cmd id="DEFINESCH" > 
+               <p id="key" editor="nbrcodes" init="GV12" />             
+               <p id="index" editor="schIndexS" init="GV13" /> 
+               <p id="active" editor="schActiveI" init="GV14" /> 
+               <p id="onH" editor="stHourI" init="GV15" /> 
+               <p id="onM" editor="stMinI" init="GV16" /> 
+               <p id="onS" editor="stSecI" init="GV21"/>   
+               <p id="offH" editor="stHourI" init="GV17" /> 
+               <p id="offM" editor="stMinI" init="GV18" />   
+               <p id="offS" editor="stSecI" init="GV22" />   
+               <p id="bindays" editor="binDays" init="GV19" />                                          
+             </cmd >
+            <cmd id="CTRLSCH" > 
+               <p id="index" editor="schIndexS" init="GV13" /> 
+               <p id="active" editor="schActiveI" init="GV14" />                                     
+             </cmd >                
+         </accepts>
+      </cmds>
+   </nodeDef> 
+  <nodeDef id="yoMoutletSchSec" nls="nlsschedule">
+      <editors />
+      <sts>
+         <st id="GV12" editor="outport" />      
+         <st id="GV13" editor="schIndex" />      
+         <st id="GV14" editor="schActive" />    
+         <st id="GV15" editor="stHour" />      
+         <st id="GV16" editor="stMin" />    
+         <st id="GV21" editor="stSec" />              
+         <st id="GV17" editor="stHour" />      
+         <st id="GV18" editor="stMin" />    
+         <st id="GV22" editor="stSec" />              
+         <st id="GV19" editor="binDays" />                     
+      </sts>
+      <cmds>
+         <sends>
+         </sends>
+         <accepts>
+            <cmd id="UPDATE" /> 
+
+            <cmd id="LOOKUPSCH" > 
+               <p id="" editor="schIndexS" init="GV13" /> 
+             </cmd >
+            <cmd id="DEFINESCH" > 
+               <p id="key" editor="outport" init="GV12" />             
+               <p id="index" editor="schIndexS" init="GV13" /> 
+               <p id="active" editor="schActiveI" init="GV14" /> 
+               <p id="onH" editor="stHourI" init="GV15" /> 
+               <p id="onM" editor="stMinI" init="GV16" /> 
+               <p id="onS" editor="stSecI" init="GV21"/>   
+               <p id="offH" editor="stHourI" init="GV17" /> 
+               <p id="offM" editor="stMinI" init="GV18" />   
+               <p id="offS" editor="stSecI" init="GV22" />   
+               <p id="bindays" editor="binDays" init="GV19" />                                          
+             </cmd >
+            <cmd id="CTRLSCH" > 
+               <p id="index" editor="schIndexS" init="GV13" /> 
+               <p id="active" editor="schActiveI" init="GV14" />                                     
+             </cmd >                
+         </accepts>
+      </cmds>
+   </nodeDef> 
+  <nodeDef id="yoScheduleSec" nls="nlsschedule">
+      <editors />
+      <sts>
+         <st id="GV13" editor="schIndex" />      
+         <st id="GV14" editor="schActive" />    
+         <st id="GV15" editor="stHour" />      
+         <st id="GV16" editor="stMin" />    
+         <st id="GV21" editor="stSec" />              
+         <st id="GV17" editor="stHour" />      
+         <st id="GV18" editor="stMin" />    
+         <st id="GV22" editor="stSec" />              
+         <st id="GV19" editor="binDays" />                     
+      </sts>
+      <cmds>
+         <sends>
+         </sends>
+         <accepts>
+            <cmd id="UPDATE" /> 
+
+            <cmd id="LOOKUPSCH" > 
+               <p id="" editor="schIndexS" init="GV13" /> 
+             </cmd >
+            <cmd id="DEFINESCH" >      
+               <p id="index" editor="schIndexS" init="GV13" /> 
+               <p id="active" editor="schActiveI" init="GV14" /> 
+               <p id="onH" editor="stHourI" init="GV15" /> 
+               <p id="onM" editor="stMinI" init="GV16" /> 
+               <p id="onS" editor="stSecI" init="GV21"/>   
+               <p id="offH" editor="stHourI" init="GV17" /> 
+               <p id="offM" editor="stMinI" init="GV18" />   
+               <p id="offS" editor="stSecI" init="GV22" />   
+               <p id="bindays" editor="binDays" init="GV19" />                                          
+             </cmd >
+            <cmd id="CTRLSCH" > 
+               <p id="index" editor="schIndexS" init="GV13" /> 
+               <p id="active" editor="schActiveI" init="GV14" />                                     
+             </cmd >                
+         </accepts>
+      </cmds>
+   </nodeDef> 
+
+   <nodeDef id="yoirSchedule" nls="nlsschedule">
+      <editors />
+      <sts>
+         <st id="GV12" editor="nbrcodes" />
+         <st id="GV13" editor="schIndex" />      
+         <st id="GV14" editor="schActive" />    
+         <st id="GV15" editor="stHour" />      
+         <st id="GV16" editor="stMin" />              
+         <st id="GV17" editor="stHour" />      
+         <st id="GV18" editor="stMin" />    
+              
+         <st id="GV19" editor="binDays" />                     
+      </sts>
+      <cmds>
+         <sends>
+         </sends>
+         <accepts>
+            <cmd id="UPDATE" /> 
+
+            <cmd id="LOOKUPSCH" > 
+               <p id="" editor="schIndexS" init="GV13" /> 
+             </cmd >
+            <cmd id="DEFINESCH" > 
+
+               <p id="index" editor="schIndexS" init="GV13" /> 
+               <p id="active" editor="schActiveI" init="GV14" /> 
+               <p id="onH" editor="stHourI" init="GV15" /> 
+               <p id="onM" editor="stMinI" init="GV16" /> 
+               <p id="offH" editor="stHourI" init="GV17" /> 
+               <p id="offM" editor="stMinI" init="GV18" />   
+               <p id="bindays" editor="binDays" init="GV19" />                                          
+             </cmd >
+            <cmd id="CTRLSCH" > 
+               <p id="index" editor="schIndexS" init="GV13" /> 
+               <p id="active" editor="schActiveI" init="GV14" />                                     
+             </cmd >                
+         </accepts>
+      </cmds>
+   </nodeDef> 
+      <nodeDef id="yoMSchedule" nls="nlsschedule">
+      <editors />
+      <sts> 
+         <st id="GV12" editor="outport" />
+         <st id="GV13" editor="schIndex" />      
+         <st id="GV14" editor="schActive" />    
+         <st id="GV15" editor="stHour" />      
+         <st id="GV16" editor="stMin" />              
+         <st id="GV17" editor="stHour" />      
+         <st id="GV18" editor="stMin" />    
+              
+         <st id="GV19" editor="binDays" />                     
+      </sts>
+      <cmds>
+         <sends>
+         </sends>
+         <accepts>
+            <cmd id="UPDATE" /> 
+
+            <cmd id="LOOKUPSCH" > 
+               <p id="" editor="schIndexS" init="GV13" /> 
+             </cmd >
+            <cmd id="DEFINESCH" > 
+
+               <p id="index" editor="schIndexS" init="GV13" /> 
+               <p id="active" editor="schActiveI" init="GV14" /> 
+               <p id="onH" editor="stHourI" init="GV15" /> 
+               <p id="onM" editor="stMinI" init="GV16" /> 
+               <p id="offH" editor="stHourI" init="GV17" /> 
+               <p id="offM" editor="stMinI" init="GV18" />   
+               <p id="bindays" editor="binDays" init="GV19" />                                          
+             </cmd >
+            <cmd id="CTRLSCH" > 
+               <p id="index" editor="schIndexS" init="GV13" /> 
+               <p id="active" editor="schActiveI" init="GV14" />                                     
+             </cmd >                
+         </accepts>
+      </cmds>
+   </nodeDef> 
+
+   <nodeDef id="yoSchedule" nls="nlsschedule">
       <editors />
       <sts>
          <st id="GV13" editor="schIndex" />      
