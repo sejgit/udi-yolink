@@ -1384,12 +1384,22 @@ class YoLinkMQTTDevice(object):
             logging.error(f'EXCEPTION - get_last_message_type {e}')
             return(None)
 
+    def no_data(yolink):
+        try:
+           return(yolink.data['emptyData'])
+        except KeyError as e:
+            logging.error(f'EXCEPTION - no_data {e}')    
+            return(False)
+
     def updatePacketData(yolink, data):
         try:
             logging.debug('{} - updatePacketData - start: '.format(yolink.type ))
             yolink.data = data
             yolink.online = yolink.Status(data)
-
+            if 'data' in yolink.data and yolink.data['data'] == {}: 
+                logging.debug('Empty data received - do not update data to blank data')
+                yolink.data['emptyData'] = True
+                
             if 'event' in data: 
                 yolink.data['type'] = 'event'
                 yolink.data['action'] = data['event'].split('.')[-1]
@@ -1411,7 +1421,14 @@ class YoLinkMQTTDevice(object):
                 yolink.data['lastStateTime'] = data['data']['stateChangedAt' ]
             else:
                 yolink.data['lastStateTime'] = data[yolink.messageTime]
-            logging.debug('After parsing {}'.format(json.dumps(yolink.data, indent=4)))
+            if 'data' in yolink.data and yolink.data['data'] == {}: 
+                logging.debug('Empty data received - do not update data to blank data')
+                yolink.data['emptyData'] = True
+            else:
+                yolink.data['emptyData'] = False    
+                
+
+            logging.debug('After parsing NEW {}'.format(json.dumps(yolink.data, indent=4)))
 
         except Exception as e:
             logging.error('Exception updateStatusData - {}'.format(e))

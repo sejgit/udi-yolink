@@ -96,6 +96,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                 logging.info('waiting for watermeter to be online')
                 time.sleep(5)
             self.meter_count = self.yoWaterCtrl.getMeterCount()
+            self.meter_unit = self.yoWaterCtrl.getMeterUnit()
             logging.debug(f'Meter count: {self.meter_count}')
             if self.meter_count is None:
                 logging.error('Water meter count not found')
@@ -159,6 +160,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                         self.my_setDriver('GV20', 6)
                         return
                     if self.ISYmeter_uom is None:
+                        self.meter_unit = self.yoWaterCtrl.getMeterUnit()
                         logging.debug(f'meter unit : { self.meter_unit}')
                         #self.my_setDriver('GV4',  self.meter_unit, 25)          
                         self.ISYmeter_uom= self.water_meter_unit2uom( self.meter_unit)            

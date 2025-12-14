@@ -27,6 +27,7 @@ class udiYoSchedule(udi_interface.Node):
     id = 'yoschedule'
 
     drivers = [
+            #{'driver': 'GV12', 'value': 0, 'uom': 56},
             {'driver': 'GV13', 'value': 0, 'uom': 25}, #Schedule index/no
             {'driver': 'GV14', 'value': 99, 'uom': 25}, # Active
             {'driver': 'GV15', 'value': 99, 'uom': 25}, #start Hour
@@ -53,18 +54,49 @@ class udiYoSchedule(udi_interface.Node):
         self.yoSchedule= None
         self.node_ready = False
         self.schedule_selected = None
-        if dev_type == 'InfraredRemoter':
-            self.id = 'yoirSchedule'
-            self.scheduleType = 'IR'
-        if dev_type in ['Switch', 'Outlet'] and model in ['YS5708', 'YS5709']:
-            self.id = 'yooutletSchedule'
-            self.scheduleType = 'OUTLET'
+
 
         self.poly = polyglot
         self.poly.subscribe(self.poly.START, self.start, self.address)
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-               
+
+        self.yoSchedule = YoLinkSchedule(self.yoAccess, self.devInfo, self.updateStatus)               
+        time.sleep(2)
+        self.yoSchedule.refreshSchedules()
+        time.sleep(1)
+
+
+        if self.yoSchedule.no_data():
+            logging.debug('Schedule support_seconds not found, default to False - device likely off line')
+            
+            self.support_seconds = False
+        else:
+            self.support_seconds = self.yoSchedule.get_data('supports_seconds')
+            logging.debug('Schedule support_seconds {}not found, device likely off line')
+        logging.debug('Schedule support_seconds: {}'.format(self.support_seconds))
+        if dev_type == 'InfraredRemoter':
+            if self.support_seconds:    
+                self.id = 'yoirScheduleSec'    
+            else:    
+                self.id = 'yoirSchedule'    
+            self.scheduleType = 'Key'
+            self.drivers.append({'driver': 'GV12', 'value': 99, 'uom': 25}) #outport/channel
+        elif dev_type in ['Switch', 'Outlet']:
+            if self.support_seconds:    
+                self.id = 'yooutletScheduleSec'    
+            else:    
+                self.id = 'yooutletSchedule'  
+            self.scheduleType = 'OnOff'
+
+        elif dev_type in ['MultiOutlet']:
+            if self.support_seconds:    
+                self.id = 'yooutletScheduleSec'    
+            else:    
+                self.id = 'yooutletSchedule'  
+            self.scheduleType = 'MOnOff'
+            self.drivers.append({'driver': 'GV12', 'value': 99, 'uom': 25}) 
+
 
         # start processing events and create add our controller node
         polyglot.ready()
@@ -79,11 +111,9 @@ class udiYoSchedule(udi_interface.Node):
     def start(self):
         logging.info('start - Schedule subnode')
         self.my_setDriver('GV30', 0)
-        self.yoSchedule = YoLinkSchedule(self.yoAccess, self.devInfo, self.updateStatus)
+       
         #time.sleep(2)
         #self.yoSchedule.initNode()
-        time.sleep(2)
-        self.yoSchedule.refreshSchedules()
         self.node_ready = True
         
     
@@ -106,64 +136,78 @@ class udiYoSchedule(udi_interface.Node):
         self.updateData()   
 
     def prep_schedule(self, query):
-        logging.debug('prep_schedule {} '.format(query))
-        params = {}
-        onH = 25
-        onM = 0     
-        onS = 0
-        offH = 25
-        offM = 0   
-        offS = 0
-        include_sec = False
-        #query = command.get("query")
-        if 'port.uom25' in query:
-            port = int(query.get('port.uom25'))-1
-            params['ch'] = port
-        schedule_selected = int(query.get('index.uom25'))
-        tmp = int(query.get('active.uom25'))
-        activated = (tmp == 1)
-        if 'onH.uom19' in query:
-            onH = int(query.get('onH.uom19'))
-        if 'onM.uom44' in query:    
-            onM = int(query.get('onM.uom44'))
-        if 'offH.uom19' in query:
-            offH = int(query.get('offH.uom19'))
-        if 'offM.uom44' in query:    
-            offM = int(query.get('offM.uom44'))  
-        if 'onS.' in query:
-            include_sec = True
-            if 'onS.uom57' in query:            
-                onS = int(query.get('onS.uom57'))
-            else:
-                onS = 0
-        if 'offS.' in query:            
-            include_sec = True  
-            if 'offS.uom57' in query:            
-                offS = int(query.get('onS.uom57'))
-            else:
-                offS = 0
+        try:
+            logging.debug('prep_schedule {} '.format(query))
+            params = {}
+            onH = 25
+            onM = 0     
+            onS = 0
+            offH = 25
+            offM = 0   
+            offS = 0
+            key = -1
+
+            #query = command.get("query")  
+            if self.scheduleType == 'MOnOff':     
+                port = query.get('outport.uom25')
+                if isinstance(port, str):
+                    params['ch'] = int(port)-1
+            elif self.scheduleType == 'Key':     
+                key = query.get('outport.uom25')
+                if isinstance(key, str):
+                    params['key'] = int(key)-1
+
+
+            schedule_selected = query.get('index.uom25')
+            if isinstance(schedule_selected, str):
+                schedule_selected = int(schedule_selected)  
+                params['index'] = str(schedule_selected )
+           
+            tmp = query.get('active.uom25') 
+            if isinstance(tmp, str): 
+                activated = (int(tmp) == 1)
+                params['isValid'] = activated 
             
-        binDays = int(query.get('bindays.uom25'))
+            onH = query.get('onH.uom19')
+            onM = query.get('onM.uom44')
+            if isinstance(onH, int) and isinstance(onM, int):
+                on_str = str(onH)+':'+str(onM)
+                if self.support_seconds:
+                    onS = query.get('onS.uom57')
+                    if isinstance(onS, int):
+                        on_str = on_str + ':' + str(onS)
+                params['on'] = on_str
 
-        
-        params['index'] = str(schedule_selected )
-        params['isValid'] = activated 
-        params['on'] = str(onH)+':'+str(onM)
-        params['off'] = str(offH)+':'+str(offM)
-        if include_sec:
-            params['on'] = params['on'] + ':' + str(onS)
-            params['off'] =  params['off'] + ':' + str(offS)
+            offH = query.get('offH.uom19')
+            offM = query.get('offM.uom44')  
+            if isinstance(offH, int) and isinstance(offM, int):
+                off_str = str(offH)+':'+str(offM)
+                if self.support_seconds:
+                    offS = query.get('offS.uom57')
+                    if isinstance(offS, int):
+                        off_str = off_str + ':' + str(offS)
+                params['off'] = off_str 
 
-        params['week'] = binDays
-        #self.yolink.setSchedule(self.schedule_selected, params)
-        return(schedule_selected, params)
+            binDays = query.get('bindays.uom25')                    
+            if isinstance('bindays.uom25', str):
+                binDays = int(binDays)
+                params['week'] = binDays
+
+            return(schedule_selected, params)
+        except Exception as e:
+            logging.error('Exception in prep_schedule: {}'.format(e))
+            return(None, None)  
 
     def activate_schedule(self, query):
         logging.info('activate_schedule {}'.format(query))       
         #query = command.get("query")
-        schedule_selected = int(query.get('index.uom25'))
-        tmp = int(query.get('active.uom25'))
-        activated = (tmp == 1)
+
+        schedule_selected = query.get('index.uom25')
+        if isinstance(schedule_selected, str):  
+            schedule_selected = int(schedule_selected)
+        tmp = query.get('active.uom25')
+        if isinstance(tmp, str):
+            activated = (int(tmp)  == 1)    
         #self.yolink.activateSchedule(schedule_selected, activated)
         return(activated, schedule_selected)
 
@@ -187,9 +231,15 @@ class udiYoSchedule(udi_interface.Node):
                     found = True
                     return(found)
             return(found)
+        
         if sch_info:
-            if 'ch' in sch_info:
-                self.my_setDriver('GV12', int(sch_info['ch']))
+            logging.debug('Schedule exist for the selected index')
+            if self.scheduleType in ['MOnOff']:
+                if 'ch' in sch_info:
+                    self.my_setDriver('GV12', int(sch_info['ch']))
+            elif self.scheduleType in ['Key']:
+                if 'key' in sch_info:
+                    self.my_setDriver('GV12', int(sch_info['key'])) 
 
             self.my_setDriver('GV13', selected_schedule)
             if sch_info['isValid']:
@@ -207,7 +257,7 @@ class udiYoSchedule(udi_interface.Node):
                 else:
                     self.my_setDriver('GV15', int(hour),19)
                     self.my_setDriver('GV16', int(minute), 44)
-            elif len(timelist) == 3:
+            elif len(timelist) == 3 and self.support_seconds:
                 hour = int(timelist[0])
                 minute = int(timelist[1])
                 second = int(timelist[2])
@@ -232,7 +282,7 @@ class udiYoSchedule(udi_interface.Node):
                 else:
                     self.my_setDriver('GV17', int(hour), 19)
                     self.my_setDriver('GV18', int(minute), 44)
-            elif len(timelist) == 3:
+            elif len(timelist) == 3 and self.support_seconds:
                 hour = int(timelist[0])
                 minute = int(timelist[1])
                 second = int(timelist[2])     
@@ -262,8 +312,6 @@ class udiYoSchedule(udi_interface.Node):
                 self.my_setDriver('GV11', 99, 25)
 
 
-
-
     def updateData(self):
         logging.info('udiyoScheduleupdateData -  {}'.format(self.schedule_selected))
         if self.node is not None:
@@ -282,7 +330,10 @@ class udiYoSchedule(udi_interface.Node):
 
     def lookup_schedule(self, command):
         logging.info('udiYoOutlet lookup_schedule {}'.format(command))
-        self.schedule_selected = int(command.get('value'))
+
+        self.schedule_selected = command.get('value')
+        if isinstance(self.schedule_selected, str):
+            self.schedule_selected = int(self.schedule_selected)
         self.yoSchedule.refreshSchedules()
 
     def define_schedule(self, command):
