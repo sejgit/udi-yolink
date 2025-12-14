@@ -674,8 +674,8 @@ class YoLinkMQTTDevice(object):
     #@measure_time
     def updateCallbackStatus(yolink, data, eventSupport = False):
         try:
-            logging.debug('{} - updateCallbackStatus : {}'.format(yolink.type, data))
-            
+            logging.debug('{} - updateCallbackStatus : {}'.format(yolink.type, json.dumps(data, indent=4)))
+            yolink.updatePacketData(data)
             if 'method' in  data and 'event' not in data:
                 logging.debug('Method detected')
                 yolink.online = yolink.Status(data)
@@ -1384,12 +1384,45 @@ class YoLinkMQTTDevice(object):
             logging.error(f'EXCEPTION - get_last_message_type {e}')
             return(None)
 
+    def updatePacketData(yolink, data):
+        try:
+            logging.debug('{} - updatePacketData - start: '.format(yolink.type ))
+            yolink.data = data
+            yolink.online = yolink.Status(data)
+
+            if 'event' in data: 
+                yolink.data['type'] = 'event'
+                yolink.data['action'] = data['event'].split('.')[-1]
+            if 'method' in data:
+                yolink.data['type'] = 'method'
+                yolink.data['action'] = data['method'].split('.')[-1]  
+            if 'time' in data:
+                yolink.data['report_time'] = int(data['time']/1000)
+            else:
+                yolink.data['report_time'] = None
+            if 'delays' in data['data']:
+                yolink.nbrOutlets = len(data['data']['delays'])
+                yolink.nbrUsb = data['data']['delays'][0]['ch']
+                yolink.nbrPorts = yolink.nbrOutlets + yolink.nbrUsb                
+            if 'reportAt' in data['data'] :
+                reportAt = datetime.strptime(data['data']['reportAt'], '%Y-%m-%dT%H:%M:%S.%fZ')
+                yolink.data['lastStateTime'] = (reportAt.timestamp() -  yolink.timezoneOffsetSec)*1000
+            elif 'stateChangedAt' in data['data']:
+                yolink.data['lastStateTime'] = data['data']['stateChangedAt' ]
+            else:
+                yolink.data['lastStateTime'] = data[yolink.messageTime]
+            logging.debug('After parsing {}'.format(json.dumps(yolink.data, indent=4)))
+
+        except Exception as e:
+            logging.error('Exception updateStatusData - {}'.format(e))
+            logging.error('Exception Data - {}'.format(json.dumps(data, indent=4)))
+
 
     #@measure_time
     def updateStatusData  (yolink, data):
         try:
             logging.debug('{} - updateStatusData - start: '.format(yolink.type ))
-            
+            '''
             yolink.data = data
             yolink.online = yolink.Status(data)
 
@@ -1416,7 +1449,7 @@ class YoLinkMQTTDevice(object):
                 yolink.schdeule = data['data']
 
 
-
+            '''
             temp = yolink.dataAPI['lastMessage']
             yolink.reset_structure() #do not let old data persist
             yolink.dataAPI['lastMessage'] = temp    
@@ -1424,11 +1457,6 @@ class YoLinkMQTTDevice(object):
                     yolink.nbrOutlets = len(data['data']['delays'])
                     yolink.nbrUsb = data['data']['delays'][0]['ch']
                     yolink.nbrPorts = yolink.nbrOutlets + yolink.nbrUsb
-
-
-                
-    
-    
             if 'reportAt' in data[yolink.dData] :
                 reportAt = datetime.strptime(data[yolink.dData]['reportAt'], '%Y-%m-%dT%H:%M:%S.%fZ')
                 yolink.dataAPI['lastStateTime'] = (reportAt.timestamp() -  yolink.timezoneOffsetSec)*1000
