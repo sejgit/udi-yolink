@@ -37,6 +37,38 @@ CMD-nlssetup-EPOCHTIME-NAME=Update Time
 
 CMDP-ondelay-NAME=On delay (0 if no delay)
 CMDP-offdelay-NAME=Off delay (0 if no delay)
+
+# common commands #############
+
+# Schedules
+ND-yoScheduleSec-NAME=Schedules
+ND-yoScheduleSec-ICON=GenericCtl
+ND-yoMScheduleSec-NAME=Schedules
+ND-yoMScheduleSec-ICON=GenericCtl
+ND-yoirScheduleSec-NAME=Schedules
+ND-yoirScheduleSec-ICON=GenericCtl
+ND-yoSchedule-NAME=Schedules
+ND-yoSchedule-ICON=GenericCtl
+ND-yoMSchedule-NAME=Schedules
+ND-yoMSchedule-ICON=GenericCtl
+ND-yoirSchedule-NAME=Schedules
+ND-yoirSchedule-ICON=GenericCtl
+ST-nlsschedule-GV12-NAME=Selected code/port
+ST-nlsschedule-GV13-NAME=Schedule Index
+ST-nlsschedule-GV14-NAME=Activated
+ST-nlsschedule-GV15-NAME=On Hour
+ST-nlsschedule-GV16-NAME=On Minute
+ST-nlsschedule-GV21-NAME=On Sec
+ST-nlsschedule-GV17-NAME=Off Hour
+ST-nlsschedule-GV18-NAME=Off Minute
+ST-nlsschedule-GV22-NAME=Off Sec
+ST-nlsschedule-GV19-NAME=Active Days
+CMD-nlsschedule-CTRLSCH-NAME=Set Schedule
+CMD-nlsschedule-LOOKUPSCH-NAME=Lookup Schedule
+CMD-nlsschedule-DELAYCTRL-NAME=Program Delays
+CMD-nlsschedule-UPDATE-NAME=Update Status
+CMDP-key-NAME=Ir code Number (1-64)
+CMDP-ch-NAME=Output port(0-3)
 CMDP-index-NAME=Schedule Index
 CMDP-active-NAME=Schedule Active
 CMDP-onH-NAME=On Hour
@@ -46,7 +78,6 @@ CMDP-offH-NAME=Off Hour
 CMDP-offM-NAME=Off Min
 CMDP-offS-NAME=Off Seconds
 CMDP-bindays-NAME=Active Days (Su|Mo|Tu|We|Th|Fr|Sa)
-# common commands #############
 
 
 # YoLink Switch
@@ -111,10 +142,10 @@ ST-nlsoutlet-GV6-NAME=High Load Alert
 ST-nlsoutlet-GV7-NAME=Low Load Alert
 ST-nlsoutlet-GV8-NAME=High Temperature Alert
 
-ST-nlsoutlet-GV13-NAME=Schedule Index
-ST-nlsoutlet-GV14-NAME=Activated
-ST-nlsoutlet-GV15-NAME=On Hour
-ST-nlsoutlet-GV16-NAME=On Minute
+#ST-nlsoutlet-GV13-NAME=Schedule Index
+#ST-nlsoutlet-GV14-NAME=Activated
+#ST-nlsoutlet-GV15-NAME=On Hour
+#ST-nlsoutlet-GV16-NAME=On Minute
 ST-nlsoutlet-GV21-NAME=On Sec
 ST-nlsoutlet-GV17-NAME=Off Hour
 ST-nlsoutlet-GV18-NAME=Off Minute
@@ -129,9 +160,9 @@ ST-nlsoutlet-CLIHUM-NAME=Current Rel Humidity (%)
 CMD-nlsoutlet-DON-NAME=Switch On
 CMD-nlsoutlet-DOF-NAME=Switch Off
 CMD-nlsoutlet-DELAYCTRL-NAME=Program Delays
-CMD-nlsoutlet-DEFINESCH-NAME=Define Schedule
-CMD-nlsoutlet-CTRLSCH-NAME=Set Schedule
-CMD-nlsoutlet-LOOKUPSCH-NAME=Lookup Schedule
+#CMD-nlsoutlet-DEFINESCH-NAME=Define Schedule
+#CMD-nlsoutlet-CTRLSCH-NAME=Set Schedule
+#CMD-nlsoutlet-LOOKUPSCH-NAME=Lookup Schedule
 
 CMD-nlsoutlet-UPDATE-NAME=Update Status
 CMD-nlsoutlet-ONDELAY-NAME=Set On Delay
