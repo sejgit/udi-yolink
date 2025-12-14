@@ -106,7 +106,7 @@ class udiYoOutlet(udi_interface.Node):
         self.yoOutlet = YoLinkOutlet(self.yoAccess, self.devInfo, self.updateStatus)
         sch_address = self.address[4:14] + '_SCH'
         sch_address = self.poly.getValidAddress(sch_address)
-        self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedule' , self.yoAccess, self.devInfo)
+        self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
         self.adr_list.append(sch_address)
         time.sleep(2)
         self.yoOutlet.initNode()

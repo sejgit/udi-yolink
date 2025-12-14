@@ -17,6 +17,7 @@ from os import truncate
 #import sys
 import time
 from yolinkInfraredRemoterV3 import YoLinkInfraredRem
+from udiYoSchedule import udiYoSchedule
 
 class udiYoInfraredCode(udi_interface.Node):
     from  udiYolinkLib import my_setDriver, node_queue, wait_for_node_done
@@ -201,6 +202,11 @@ class udiYoInfraredRemoter(udi_interface.Node):
             #time.sleep(2)  
         code_dict_temp = self.yoIRrem.get_code_dict()
         logging.debug(f'Code dict temp: {code_dict_temp}')
+        sch_address = self.address[4:14] + '_SCH'
+        sch_address = self.poly.getValidAddress(sch_address)
+        self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
+        self.adr_list.append(sch_address)
+        time.sleep(2)
 
         for code in range(0, len(code_dict_temp)):
             if code_dict_temp[code]:

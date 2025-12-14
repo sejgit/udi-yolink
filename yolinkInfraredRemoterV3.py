@@ -16,7 +16,7 @@ class YoLinkInfraredRem(YoLinkMQTTDevice):
         super().__init__(yoAccess,  deviceInfo, callback)
         
         #yolink.methodList = ['getState', 'learn', 'send'   ]
-        yolink.methodList = ['getState', 'send' , 'learn']
+        yolink.methodList = ['getState', 'send' , 'learn', 'getSchedule', 'setSchedule']
         yolink.eventList = ['StatusChange', 'Report', 'getState']
         yolink.stateList = []#['open', 'closed', 'on', 'off']
         yolink.ManipulatorName = 'IREvent'
