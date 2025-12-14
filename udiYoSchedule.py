@@ -24,7 +24,7 @@ from yolink_mqtt_classV4 import YoLinkMQTTDevice
 
 class udiYoSchedule(udi_interface.Node):
     from  udiYolinkLib import my_setDriver, prep_schedule, convert_timestr_to_epoch, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, bool2ISY, mask2key
-    id = 'yoscheduleSec'
+    id = 'yoschedule'
 
     drivers = [
             {'driver': 'GV13', 'value': 0, 'uom': 25}, #Schedule index/no
@@ -44,13 +44,22 @@ class udiYoSchedule(udi_interface.Node):
 
         logging.debug('udiYoSchedule INIT- {}'.format(deviceInfo['name']))
         self.n_queue = []
-     
+        model = str(deviceInfo['modelName'][:6])
+        dev_type = deviceInfo['type']
+        self.scheduleType = 'SEC'
+
         self.yoAccess = yoAccess
         self.devInfo =  deviceInfo   
         self.yoSchedule= None
         self.node_ready = False
         self.schedule_selected = None
-  
+        if dev_type == 'InfraredRemoter':
+            self.id = 'yoirSchedule'
+            self.scheduleType = 'IR'
+        if dev_type in ['Switch', 'Outlet'] and model in ['YS5708', 'YS5709']:
+            self.id = 'yooutletSchedule'
+            self.scheduleType = 'OUTLET'
+
         self.poly = polyglot
         self.poly.subscribe(self.poly.START, self.start, self.address)
         self.poly.subscribe(self.poly.STOP, self.stop)
@@ -259,68 +268,7 @@ class udiYoSchedule(udi_interface.Node):
         logging.info('udiyoScheduleupdateData -  {}'.format(self.schedule_selected))
         if self.node is not None:
             logging.debug('Schedule updateData called')
-            '''
-            message_type = self.yoSchedule.get_last_message_type()
-            unix_time = self.yoSchedule.get_report_time('time')
-            logging.debug(f'unix time {unix_time}')
-            self.my_setDriver('TIME', unix_time, 151)
-            if self.yoSchedule.online: 
-                logging.debug('Outlet is online')
-                #if  self.yoSchedule.online:
-                self.my_setDriver('GV30',1)
-                #state = str(self.yoSchedule.getState()).upper()
-                state = str(self.yoSchedule.get_data('state'))
-                logging.debug('Outlet Online State : {} '. format(state))
-                logging.debug('Outlet State : {} '. format(state))
-                if state in ['on', 'open']:
-                    self.my_setDriver('GV0',1, type=message_type)
-                    self.my_setDriver('ST',1, type=message_type)
-                    state =  'open'
-                    #if self.last_state != state:
-                    #    self.node.reportCmd('DON')  
-                elif state in [ 'off', 'closed']:
-                    self.my_setDriver('GV0', 0, type=message_type)
-                    self.my_setDriver('ST', 0, type=message_type)
-                    state = 'closed'
-                    #if self.last_state != state:
-                    #    self.node.reportCmd('DOF')  
-                #else:
-                #    self.my_setDriver('GV0', 99)
-                self.last_state = state           
-                      
 
-                #tmp =  self.yoSchedule.getEnergy()
-                #logging.debug('Power/Energy info : {} '. format(tmp))
-                
-                if self.powerSupported: 
-                    powerW = self.yoSchedule.get_data('power')
-                    if isinstance(powerW, (int, float)):
-                        powerW = round(powerW/10,3) # reports 1/10W
-                        self.my_setDriver('GV3', powerW, 73, type=message_type)
-
-                    energyWh = self.yoSchedule.get_data('watt')  
-                    if isinstance(energyWh, (int, float)):            
-                        energyWh = round(energyWh/10,3) # reports 1/10Wh                    
-                    self.my_setDriver('GV4', energyWh, 119, type=message_type)
-
-                    self.my_setDriver('GV5', self.bool2ISY(self.yoSchedule.get_data('overload', 'alertType')), type=message_type)
-                    self.my_setDriver('GV6', self.bool2ISY(self.yoSchedule.get_data('highLoad', 'alertType')), type=message_type)   
-                    self.my_setDriver('GV7', self.bool2ISY(self.yoSchedule.get_data('lowLoad', 'alertType')), type=message_type)
-                    self.my_setDriver('GV8', self.bool2ISY(self.yoSchedule.get_data('highTemperature', 'alertType')), type=message_type)
-                    
-                #logging.debug('Timer info : {} '. format(time.time() - self.timer_expires))
-                if time.time() >= self.timer_expires - self.timer_update and self.timer_expires != 0:
-                    self.my_setDriver('GV1', 0)
-                    self.my_setDriver('GV2', 0)
-                if self.yoSchedule.suspended:
-                    self.my_setDriver('GV20', 1)
-                else:
-                    self.my_setDriver('GV20', 0)
-            else:
-
-                self.my_setDriver('GV30',0)
-                self.my_setDriver('GV20', 2)
-                '''
   
 
         sch_info = self.yoSchedule.getScheduleInfo(self.schedule_selected)
