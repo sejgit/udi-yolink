@@ -30,7 +30,7 @@ from udiYoOutletV4 import udiYoOutlet
 from udiYoMultiOutletV2 import udiYoMultiOutlet
 from udiYoManipulatorV2 import udiYoManipulator
 from udiYoSpeakerHubV2 import udiYoSpeakerHub
-from udiYoLockV4 import udiYoLock
+from udiYoLock_V4 import udiYoLock, udiYoLockV2
 from udiYoInfraredRemoterV4 import udiYoInfraredRemoter
 from udiYoDimmerV2 import udiYoDimmer
 from udiYoVibrationSensorV4 import udiYoVibrationSensor
@@ -150,7 +150,7 @@ def addNodes (self, deviceList) -> list:
     #                    'PowerFailureAlarm', 'SmartRemoter', 'COSmokeSensor', 'Siren', 'WaterMeterController',
     #                    'WaterDepthSensor', ]    'WaterMeterController', 
     
-    supportedYoTypes = [ 'Outlet','VibrationSensor', 'InfraredRemoter'  ]     
+    #supportedYoTypes = [ 'Outlet','VibrationSensor', 'InfraredRemoter'  ]     
 
     
     remove_list= []
@@ -338,7 +338,7 @@ def addNodes (self, deviceList) -> list:
                 for adr in temp.adr_list:
                     self.assigned_addresses.append(adr)                                                       
 
-            elif dev['type'] in ['Lock', 'LockV2']:        
+            elif dev['type'] in ['Lock' ]:        
                 logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                     
                 temp = udiYoLock(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
@@ -346,6 +346,15 @@ def addNodes (self, deviceList) -> list:
                     time.sleep(4)
                 for adr in temp.adr_list:
                     self.assigned_addresses.append(adr)                        
+
+            elif dev['type'] in ['LockV2']:        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                     
+                temp = udiYoLockV2(self.poly, address, address, name, dev_access, dev )
+                while not temp.node_ready:
+                    logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
+                    time.sleep(4)
+                for adr in temp.adr_list:
+                    self.assigned_addresses.append(adr)    
 
             elif dev['type'] == 'InfraredRemoter':           
                 logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        

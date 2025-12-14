@@ -1687,7 +1687,7 @@
       </cmds>
    </nodeDef> 
 
-   <nodeDef id="yolock" nls="nlslock">
+   <nodeDef id="yolockv2" nls="nlslock">
       <editors />
       <sts>
          <st id="GV0" editor="lockstate" />
@@ -1696,6 +1696,38 @@
          <st id="GV3" editor="doorstate" /> 
          <st id="GV4" editor="lockaction" />
          <st id="GV5" editor="locksource" />
+         <st id="ST"  editor="lockstate" />
+         <st id="GV20" editor="suspendstate" />  
+         <st id="GV30"  editor="status" />         
+         <st id="TIME" editor="unixtime" />                      
+      </sts>
+      <cmds>
+         <sends>
+            <cmd id="DON"  />               
+            <cmd id="DOF"  />
+            <!--<cmd id="DON" editor="lock"  />               
+            <cmd id="DOF" editor="lock"  />    -->
+         </sends>
+         <accepts>
+            <!-- <cmd id="DON" />
+            <cmd id="DOF" />    -->
+            <cmd id="LOCK" /> 
+            <cmd id="UNLOCK" /> 
+            <cmd id="LOCKCTRL" >   
+               <p id="" editor="lock" init="GV0" />
+            </cmd > 
+            <cmd id="UPDATE" /> 
+         </accepts>
+      </cmds>
+   </nodeDef> 
+
+
+   <nodeDef id="yolock" nls="nlslock">
+      <editors />
+      <sts>
+         <st id="GV0" editor="lockstate" />
+         <st id="GV1" editor="batlevel" />
+         <st id="GV3" editor="doorstate" /> 
          <st id="ST"  editor="lockstate" />
          <st id="GV20" editor="suspendstate" />  
          <st id="GV30"  editor="status" />         

@@ -20,10 +20,10 @@ from yolinkLockV3 import YoLinkLock
 
 
 
-class udiYoLock(udi_interface.Node):
+class udiYoLockV2(udi_interface.Node):
     from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, bool2ISY, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
 
-    id = 'yolock'
+    id = 'yolockv2'
     '''
        drivers = [
             'GV0' = LockState
@@ -58,14 +58,19 @@ class udiYoLock(udi_interface.Node):
         self.node_ready = False
         self.last_state = ''
         self.powerSupported = True # assume
+        if deviceInfo.get('type') in ['LockV2']:
+            self.isLockV2 = True
+        
+        self.poly = polyglot
 
-        polyglot.subscribe(polyglot.START, self.start, self.address)
-        polyglot.subscribe(polyglot.STOP, self.stop)
+
+        self.poly.subscribe(self.poly.START, self.start, self.address)
+        self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
              
 
         # start processing events and create add our controller node
-        polyglot.ready()
+        self.poly.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
@@ -125,7 +130,7 @@ class udiYoLock(udi_interface.Node):
 
             if  self.yoLock.online:
                 state = str(self.yoLock.get_data('lock','state'))
-                logging.debug('Lock state: {}'.format(state))
+                logging.debug('LockV2 state: {}'.format(state))
                 if state in ['lock','locked'] :
                     self.my_setDriver('GV0', 1, type=message_type)
                     self.my_setDriver('ST', 1, type=message_type)
@@ -140,6 +145,7 @@ class udiYoLock(udi_interface.Node):
                 else:
                     self.my_setDriver('GV0', 99)
                     self.my_setDriver('ST', 99)
+
                 self.last_state = state
                 battery = self.yoLock.get_data('battery')
                 self.my_setDriver('GV1', battery, type=message_type)
@@ -245,5 +251,161 @@ class udiYoLock(udi_interface.Node):
                 }
 
 
+class udiYoLock(udi_interface.Node):
+    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, bool2ISY, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+
+    id = 'yolock'
+    '''
+       drivers = [
+            'GV0' = LockState
+            'GV1' = Battery
+            'GV2' = DoorBell
+            'ST' = Online
+            ]
+    ''' 
+    drivers = [
+            {'driver': 'GV0', 'value': 99, 'uom': 25},
+            {'driver': 'GV1', 'value': 0, 'uom': 25}, 
+            #{'driver': 'GV2', 'value': 0, 'uom': 25}, 
+            {'driver': 'GV3', 'value': 98, 'uom': 25},
+            #{'driver': 'GV4', 'value': 0, 'uom': 25}, 
+            #{'driver': 'GV5', 'value': 98, 'uom': 25},            
+            {'driver': 'ST', 'value': 0, 'uom': 25},
+            {'driver': 'GV30', 'value': 0, 'uom': 25},
+            {'driver': 'GV20', 'value': 99, 'uom': 25},
+             {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},            
+            ]
+
+
+    def  __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
+        super().__init__( polyglot, primary, address, name)   
+
+        logging.debug('udiYoLock INIT- {}'.format(deviceInfo['name']))
+        self.n_queue = []   
+        
+        self.yoAccess = yoAccess
+        self.devInfo =  deviceInfo
+        self.yoLock = None
+        self.node_ready = False
+        self.last_state = ''
+        self.powerSupported = True # assume
+        if deviceInfo.get('type') in ['LockV2']:
+            self.isLockV2 = True
+        
+        self.poly = polyglot
+
+
+        self.poly.subscribe(self.poly.START, self.start, self.address)
+        self.poly.subscribe(self.poly.STOP, self.stop)
+        self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+             
+
+        # start processing events and create add our controller node
+        self.poly.ready()
+        self.poly.addNode(self, conn_status = None, rename = True)
+        self.wait_for_node_done()
+        self.node = self.poly.getNode(address)
+        self.adr_list = []
+        self.adr_list.append(address)        
+
+
+
+    def start(self):
+        logging.info('start - YoLinkLock')
+        self.yoLock  = YoLinkLock(self.yoAccess, self.devInfo, self.updateStatus)
+        time.sleep(2)
+        self.yoLock.initNode()
+        self.node_ready = True
+        self.my_setDriver('GV30', 1)
+
+
+    def stop (self):
+        logging.info('Stop udiYoLock')
+        self.my_setDriver('GV30', 0)
+        self.yoLock.shut_down()
+
+
+    def checkDataUpdate(self):
+        if self.yoLock.data_updated():
+            self.updateData()
+
+ 
+
+    def updateData(self):
+        if self.node is not None:
+            message_type = self.yoLock.get_last_message_type() # if event some data may not be updated 
+            unix_time = self.yoLock.get_report_time('reportAt')
+            self.my_setDriver('TIME', unix_time, 151)
+
+            if  self.yoLock.online:
+                state = str(self.yoLock.get_data('state','state'))
+                logging.debug('Lock state: {}'.format(state))
+                if state in ['lock','locked'] :
+                    self.my_setDriver('GV0', 1, type=message_type)
+                    self.my_setDriver('ST', 1, type=message_type)
+
+                    if self.last_state != state:
+                        self.node.reportCmd('DON')
+                elif state in ['unlock', 'unlocked']: 
+                    self.my_setDriver('GV0', 0, type=message_type)
+                    self.my_setDriver('ST', 0, type=message_type    )
+                    if self.last_state != state:
+                        self.node.reportCmd('DOF')
+                else:
+                    self.my_setDriver('GV0', 99)
+                    self.my_setDriver('ST', 99)
+
+                self.last_state = state
+                battery = self.yoLock.get_data('battery', 'state')
+                self.my_setDriver('GV1', battery, type=message_type)
+                #bell = self.yoLock.getDoorBellRing()
+                door_state = self.yoLock.get_data('door', 'state')
+                if door_state in ['closed']:
+                    self.my_setDriver('GV3', 0)
+                elif  door_state in ['open']:
+                    self.my_setDriver('GV3', 1)
+                else:
+                    self.my_setDriver('GV3', 99, type=message_type)
+                self.my_setDriver('GV30', 1)                
+  
+
+
+                if self.yoLock.suspended:
+                    self.my_setDriver('GV20', 1)
+                else:
+                    self.my_setDriver('GV20', 0)
+            else:
+                self.my_setDriver('GV30', 0)
+                self.my_setDriver('GV20', 2)
+            
+
+
+
+    def updateStatus(self, data):
+        logging.info('udiYoLock updateStatus')
+        self.yoLock.updateStatus(data)
+        self.updateData()
+
+
+
+    
+    def checkOnline(self):
+        self.yoLock.refreshDevice()
+
+
+        
+        
+    def update(self, command = None):
+        logging.info('Update Status Executed')
+        self.yoLock.refreshDevice()
+        
+ 
+
+
+    commands = {
+                'UPDATE' : update,
+
+
+                }
 
 
