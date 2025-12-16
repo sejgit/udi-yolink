@@ -20,6 +20,7 @@ from os import truncate
 #import sys
 import time
 from yolinkDimmerV3 import YoLinkDim
+from udiYoSchedule import udiYoSchedule
 
 class udiYoDimmer(udi_interface.Node):
     from  udiYolinkLib import  my_setDriver, save_cmd_struct, retrieve_cmd_struct, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
@@ -111,6 +112,11 @@ class udiYoDimmer(udi_interface.Node):
         time.sleep(2)
         self.yoDimmer.initNode()
         time.sleep(2)
+        sch_address = self.address[4:14] + '_SCH'
+        sch_address = self.poly.getValidAddress(sch_address)
+        self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
+        self.adr_list.append(sch_address)
+
         self.yoDimmer.setBrightness(self.dim_setting['dim'])
         self.dim_setting['previous'] = self.yoDimmer.brightness
         #self.my_setDriver('ST', 1)

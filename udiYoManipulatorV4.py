@@ -15,7 +15,8 @@ from os import truncate
 #import udi_interface
 #import sys
 import time
-from yolinkManipulatorV2 import YoLinkManipul
+from yolinkManipulatorV2 import YoLinkManipulator
+from udiYoSchedule import udiYoSchedule
 
 
 
@@ -72,9 +73,9 @@ class udiYoManipulator(udi_interface.Node):
         self.schedule_selected = 0
         self.valveState = 99 # needed as class c device - keep value until online again 
         #polyglot.subscribe(polyglot.POLL, self.poll)
-        self.poly
-        polyglot.subscribe(polyglot.START, self.start, self.address)
-        polyglot.subscribe(polyglot.STOP, self.stop)
+        self.poly = polyglot
+        self.poly.subscribe(polyglot.START, self.start, self.address)
+        self.poly.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
 
         # start processing events and create add our controller node
@@ -91,16 +92,17 @@ class udiYoManipulator(udi_interface.Node):
     def start(self):
         logging.info('Start - udiYoManipulator')
         self.my_setDriver('GV30', 0)
-        self.yoManipulator = YoLinkManipul(self.yoAccess, self.devInfo, self.updateStatus)
+        self.yoManipulator = YoLinkManipulator(self.yoAccess, self.devInfo, self.updateStatus)
         
         time.sleep(4)
         self.yoManipulator.initNode()
-        time.sleep(2)
+
         sch_address = self.address[4:14] + '_SCH'
         sch_address = self.poly.getValidAddress(sch_address)
         self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
-
+        self.adr_list.append(sch_address)
         #self.my_setDriver('GV30', 1)
+        time.sleep(2)
         self.yoManipulator.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
         self.yoManipulator.refreshSchedules()
         self.node_ready = True
@@ -126,17 +128,20 @@ class udiYoManipulator(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            self.my_setDriver('TIME', self.yoManipulator.getLastUpdateTime(), 151)
-            state =  self.yoManipulator.getState()
+            message_type = self.yoMotionsSensor.get_last_message_type()
+            unix_time = self.yoMotionsSensor.get_report_time('reportAt')
+            self.my_setDriver('TIME', unix_time, 151)
             if self.yoManipulator.online:
+                state =  self.yoManipulator.get_data('state')
+
                 if state.upper() == 'OPEN':
                     self.valveState = 1
-                    self.my_setDriver('GV0', self.valveState )
+                    self.my_setDriver('GV0', self.valveState, type = message_type )
                     if self.last_state != state:
                         self.node.reportCmd('DON')
                 elif state.upper() == 'CLOSED':
                     self.valveState = 0
-                    self.my_setDriver('GV0', self.valveState )
+                    self.my_setDriver('GV0', self.valveState, type=message_type )
                     if self.last_state != state:
                         self.node.reportCmd('DOF')
                 else:
@@ -149,7 +154,7 @@ class udiYoManipulator(udi_interface.Node):
                     self.my_setDriver('GV1', 0)
                     self.my_setDriver('GV2', 0)  
                 #logging.debug('udiYoManipulator - getBattery: {}'.format(self.yoManipulator.getBattery()))    
-                self.my_setDriver('BATLVL', self.yoManipulator.getBattery())          
+                self.my_setDriver('BATLVL', self.yoManipulator.get_data('battery'), type=message_type)      
                 if self.yoManipulator.suspended:
                     self.my_setDriver('GV20', 1)
                 else:

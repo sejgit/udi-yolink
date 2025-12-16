@@ -356,7 +356,7 @@
          <st id="GV6" editor="poweralert" />
          <st id="GV7" editor="poweralert" />
          <st id="GV8" editor="poweralert" />
-         <st id="GV13" editor="schIndex" />      
+         <!--<st id="GV13" editor="schIndex" />      
          <st id="GV14" editor="schActive" />    
          <st id="GV15" editor="stHour" />      
          <st id="GV16" editor="stMin" />    
@@ -364,7 +364,7 @@
          <st id="GV17" editor="stHour" />      
          <st id="GV18" editor="stMin" />    
          <st id="GV22" editor="stSec" />               
-         <st id="GV19" editor="binDays" />            
+         <st id="GV19" editor="binDays" />  -->          
          <st id="ST"  editor="swstate" />
          <st id="GV30"  editor="status" />
          <st id="GV20" editor="suspendstate" />   
@@ -430,7 +430,7 @@
          <st id="GV1" editor="delay" />
          <st id="GV2" editor="delay" />
 
-         <st id="GV13" editor="schIndex" />      
+        <!-- <st id="GV13" editor="schIndex" />      
          <st id="GV14" editor="schActive" />    
          <st id="GV15" editor="stHour" />      
          <st id="GV16" editor="stMin" />    
@@ -438,7 +438,7 @@
          <st id="GV17" editor="stHour" />      
          <st id="GV18" editor="stMin" />    
          <st id="GV22" editor="stSec" />               
-         <st id="GV19" editor="binDays" />            
+         <st id="GV19" editor="binDays" />  -->          
          <st id="ST"  editor="swstate" />
          <st id="GV30"  editor="status" />
          <st id="GV20" editor="suspendstate" />   
@@ -504,7 +504,7 @@
          <st id="GV1" editor="delay" />
          <st id="GV2" editor="delay" />
 
-         <st id="GV13" editor="schIndex" />      
+         <!--<st id="GV13" editor="schIndex" />      
          <st id="GV14" editor="schActive" />    
          <st id="GV15" editor="stHour" />      
          <st id="GV16" editor="stMin" />    
@@ -512,7 +512,7 @@
          <st id="GV17" editor="stHour" />      
          <st id="GV18" editor="stMin" />    
          <st id="GV22" editor="stSec" />              
-         <st id="GV19" editor="binDays" />            
+         <st id="GV19" editor="binDays" />  -->          
          <st id="ST"  editor="swstate" />
          <st id="GV30"  editor="status" />         
          <st id="GV20" editor="suspendstate" />         
@@ -929,7 +929,7 @@
          <st id="GV1" editor="delay" />
          <st id="GV2" editor="delay" />
          <st id="BATLVL" editor="batlevel" />
-         <st id="GV13" editor="schIndex" />      
+         <!--<st id="GV13" editor="schIndex" />      
          <st id="GV14" editor="schActive" />    
          <st id="GV15" editor="stHour" />      
          <st id="GV16" editor="stMin" />    
@@ -937,7 +937,7 @@
          <st id="GV17" editor="stHour" />      
          <st id="GV18" editor="stMin" />    
          <st id="GV22" editor="stSec" />              
-         <st id="GV19" editor="binDays" />            
+         <st id="GV19" editor="binDays" />  -->          
          <st id="ST"  editor="manstate" />
          <st id="GV30"  editor="status" />
          <st id="GV20" editor="suspendstate" />
@@ -971,7 +971,7 @@
                <p id="offdelay" editor="delaymin" init="GV2" />                                     
              </cmd >   
 
-            <cmd id="LOOKUPSCH" > 
+            <!--<cmd id="LOOKUPSCH" > 
                <p id="" editor="schIndexS" init="GV13" /> 
              </cmd >
             <cmd id="DEFINESCH" > 
@@ -988,7 +988,7 @@
             <cmd id="CTRLSCH" > 
                <p id="index" editor="schIndexS" init="GV13" /> 
                <p id="active" editor="schActiveI" init="GV14" />                                     
-             </cmd >                
+             </cmd >   -->             
          </accepts>
       </cmds>
    </nodeDef> 

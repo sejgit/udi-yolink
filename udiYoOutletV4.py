@@ -104,13 +104,15 @@ class udiYoOutlet(udi_interface.Node):
         logging.info('start - YoOutlet')
         self.my_setDriver('GV30', 0)
         self.yoOutlet = YoLinkOutlet(self.yoAccess, self.devInfo, self.updateStatus)
+        time.sleep(2)
+        self.yoOutlet.initNode()
+        #time.sleep(2)
         sch_address = self.address[4:14] + '_SCH'
         sch_address = self.poly.getValidAddress(sch_address)
         self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
         self.adr_list.append(sch_address)
         time.sleep(2)
-        self.yoOutlet.initNode()
-        time.sleep(2)
+
 
         self.yoOutlet.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
         self.yoOutlet.refreshSchedules()
@@ -171,12 +173,12 @@ class udiYoOutlet(udi_interface.Node):
                 if self.powerSupported: 
                     powerW = self.yoOutlet.get_data('power')
                     if isinstance(powerW, (int, float)):
-                        powerW = round(powerW/10,3) # reports 1/10W
+                        powerW = round(powerW/10,1) # reports 1/10W
                         self.my_setDriver('GV3', powerW, 73, type=message_type)
 
                     energyWh = self.yoOutlet.get_data('watt')  
                     if isinstance(energyWh, (int, float)):            
-                        energyWh = round(energyWh/10,3) # reports 1/10Wh                    
+                        energyWh = round(energyWh/10,1) # reports 1/10Wh                    
                     self.my_setDriver('GV4', energyWh, 119, type=message_type)
 
                     self.my_setDriver('GV5', self.bool2ISY(self.yoOutlet.get_data('overload', 'alertType')), type=message_type)
