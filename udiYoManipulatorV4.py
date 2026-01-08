@@ -137,16 +137,18 @@ class udiYoManipulator(udi_interface.Node):
                 if state.upper() == 'OPEN':
                     self.valveState = 1
                     self.my_setDriver('GV0', self.valveState, type = message_type )
+                    self.my_setDriver('ST', self.valveState, type = message_type )
                     if self.last_state != state:
                         self.node.reportCmd('DON')
                 elif state.upper() == 'CLOSED':
                     self.valveState = 0
                     self.my_setDriver('GV0', self.valveState, type=message_type )
-                    if self.last_state != state:
+                    self.my_setDriver('ST', self.valveState, type=message_type )
+                    if self.last_state != state:    
                         self.node.reportCmd('DOF')
                 else:
                     self.my_setDriver('GV0', 99)
-                    
+                    self.my_setDriver('ST',99)
                 self.last_state = state
                 self.my_setDriver('GV30', 1)
                 #logging.debug('Timer info : {} '. format(time.time() - self.timer_expires))
