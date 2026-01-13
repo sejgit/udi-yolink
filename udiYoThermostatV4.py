@@ -16,14 +16,14 @@ except ImportError:
 #import sys
 import time
 
-from yolinkTHsensorV2 import YoLinkTHSensor
+from yolinkThermostatV2 import YoLinkThermostat
 
 
 
-class udiYoTHsensor(udi_interface.Node):
+class udiYoThermostat(udi_interface.Node):
     from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, state2Nbr, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
 
-    id = 'yothsens'
+    id = 'yothermostat'
     
     '''
        drivers = [
@@ -69,19 +69,18 @@ class udiYoTHsensor(udi_interface.Node):
         super().__init__( polyglot, primary, address, name)   
         #super(YoLinkSW, self).__init__( csName, csid, csseckey, devInfo,  self.updateStatus, )
         #  
-        logging.debug('udiYoTHsensor INIT- {}'.format(deviceInfo['name']))
+        logging.debug('udiYoThermostat INIT- {}'.format(deviceInfo['name']))
         self.n_queue = []  
         self.yoAccess = yoAccess
         self.devInfo =  deviceInfo
         self.yoTHsensor  = None
         self.node_ready = False
-
         self.temp_unit = self.yoAccess.get_temp_unit()   
-
 
         self.cmd_state = self.retrieve_cmd_state()
         model = str(self.devInfo['modelName'][:6])
-        if model in ['YS8017', 'YS8014', 'YS8004', 'YS8008', 'YS8003']:
+        
+        '''        if model in ['YS8017', 'YS8014', 'YS8004', 'YS8008', 'YS8003']:
             self.meas_support = ['temp']
         else:
             self.meas_support = ['temp', 'hum']
@@ -93,7 +92,7 @@ class udiYoTHsensor(udi_interface.Node):
         else:
             if 'hum' not in self.meas_support:
                 self.id = 'yotsens'  
-
+        '''
         self.alarm_state = False
         self.sensordata_24_hours = {}
         #self.address = address
@@ -120,9 +119,9 @@ class udiYoTHsensor(udi_interface.Node):
   
 
     def start(self):
-        logging.info('Start udiYoTHsensor')
+        logging.info('Start udiYoThermostat')
         self.my_setDriver('GV30', 0)
-        self.yoTHsensor  = YoLinkTHSensor(self.yoAccess, self.devInfo, self.updateStatus)
+        self.yoTHsensor  = YoLinkThermostat(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(1)
         self.yoTHsensor.initNode()
         time.sleep(1)
@@ -139,7 +138,7 @@ class udiYoTHsensor(udi_interface.Node):
 
     
     def stop (self):
-        logging.info('Stop udiYoTHsensor')
+        logging.info('Stop udiYoThermostat')
         self.my_setDriver('GV30', 0)
         self.yoTHsensor.shut_down()
         #if self.node:
@@ -284,13 +283,13 @@ class udiYoTHsensor(udi_interface.Node):
 
 
     def updateStatus(self, data):
-        logging.debug('udiYoTHsensor - updateStatus')
+        logging.debug('udiYoThermostat - updateStatus')
         self.yoTHsensor.updateStatus(data)
         self.updateData()
 
     def set_cmd(self, command):
         ctrl = int(command.get('value'))   
-        logging.info('udiYoTHsensor  set_cmd - {}'.format(ctrl))
+        logging.info('udiYoThermostat  set_cmd - {}'.format(ctrl))
         self.cmd_state = ctrl
         self.my_setDriver('GV9', self.cmd_state)
         self.save_cmd_state(self.cmd_state)

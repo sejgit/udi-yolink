@@ -11,7 +11,7 @@ except ImportError:
     import logging
     logging.basicConfig(level=logging.DEBUG)
 
-class YoLinkTHSensor(YoLinkMQTTDevice):
+class YoLinkThermostat(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__( yoAccess,  deviceInfo, callback)    
         yolink.methodList = ['getState' ]
