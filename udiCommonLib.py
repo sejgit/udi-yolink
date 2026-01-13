@@ -14,9 +14,9 @@ import xml.etree.ElementTree as ET
 
 
 #from yoLink_init_V4 import YoLinkInitPAC
-from udiYoSwitchV2 import udiYoSwitch
-from udiYoSwitchSecV2 import udiYoSwitchSec
-from udiYoSwitchPwrSecV2 import udiYoSwitchPwrSec
+from udiYoSwitchV4 import udiYoSwitch
+#from udiYoSwitchSecV2 import udiYoSwitchSec
+#from udiYoSwitchPwrSecV2 import udiYoSwitchPwrSec
 from udiYoTHsensorV4 import udiYoTHsensor 
 from udiYoWaterDeptV4 import udiYoWaterDept 
 from udiYoGarageDoorCtrlV2 import udiYoGarageDoor
@@ -231,10 +231,10 @@ def addNodes (self, deviceList) -> list:
             elif dev['type'] in ['Switch']:
                 if  model in ['YS5708', 'YS5709']:
                     logging.info('Adding swithSec device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
-                    temp = udiYoSwitchSec(self.poly, address, address, name,  dev_access, dev )
+                    temp = udiYoSwitch(self.poly, address, address, name,  dev_access, dev )
                 elif  model in ['YS5716']:
                     logging.info('Adding swithPwr device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
-                    temp = udiYoSwitchPwrSec(self.poly, address, address, name,  dev_access, dev )
+                    temp = udiYoSwitch(self.poly, address, address, name,  dev_access, dev )
                 else:
                     logging.info('Adding switch device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
                     temp = udiYoSwitch(self.poly, address, address, name,  dev_access, dev )

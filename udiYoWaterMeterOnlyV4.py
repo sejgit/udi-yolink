@@ -183,12 +183,14 @@ class udiYoWaterMeterOnly(udi_interface.Node):
                     #meter != None:
    
                     self.my_setDriver('ST', self.bool2ISY(self.yoWaterCtrl.get_data('waterFlowing', 'state')), type=message_type)
-                    meter = self.yoWaterCtrl.get_data('meter', 'state')
+                    #meter_total = self.yoWaterCtrl.get_data('meter', 'state')
+                    total_meter = self.yoWaterCtrl.get_data('meter', 'state')
+                    if isinstance(total_meter, (int,float)):
+                        total_meter =round(float(self.calculate_water_volume(total_meter,  self.meter_unit,  self.ISYwater_unit)), 1)
+                    logging.debug(f'total meter : {total_meter}')
+                    self.my_setDriver('GV1', total_meter,  self.ISYmeter_uom, type=message_type)
 
-                    if 'total' in meter:
-                        self.my_setDriver('GV1', meter['total'],   self.meter_ISYuom )
-                    else:
-                        self.my_setDriver('GV1', None)
+                    
                     if 'daily_usage' in meter:
                         self.my_setDriver('GV10', meter['daily_usage'],   self.meter_ISYuom )
                     else:

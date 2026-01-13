@@ -19,8 +19,9 @@ except ImportError:
 import time
 from yolinkSwitchV2 import YoLinkSW
 from udiYoSmartRemoterV3 import udiRemoteKey
+from udiYoSchedule import udiYoSchedule
 
-class udiYoSwitchPwrSec(udi_interface.Node):
+class udiYoSwitch(udi_interface.Node):
     from  udiYolinkLib import my_setDriver, prep_schedule, state2ISY, bool2ISY, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
     id = 'yoswitchPwrsec'
 
@@ -124,6 +125,10 @@ class udiYoSwitchPwrSec(udi_interface.Node):
             self.adr_list.append(k_address)
             logging.debug('Waiting for node to complete{}'.format(self.adr_list))
             self.wait_for_node_done()
+        sch_address = self.address[4:14] + '_SCH'
+        sch_address = self.poly.getValidAddress(sch_address)
+        self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
+        self.adr_list.append(sch_address)
 
 
 
@@ -434,10 +439,10 @@ class udiYoSwitchPwrSec(udi_interface.Node):
                 'DFON'          : set_switch_fon,
                 'DFOF'          : set_switch_foff,                         
                 'SWCTRL'        : switchControl, 
-                'DELAYCTRL'    : program_delays, 
-                'LOOKUPSCH'    : lookup_schedule,
-                'DEFINESCH'    : define_schedule,
-                'CTRLSCH'      : control_schedule,                
+                'DELAYCTRL'     : program_delays, 
+                #'LOOKUPSCH'    : lookup_schedule,
+                #'DEFINESCH'    : define_schedule,
+                #'CTRLSCH'      : control_schedule,                
                 }
 
 
