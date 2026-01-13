@@ -28,18 +28,18 @@ from udiYoDoorSensorV4 import udiYoDoorSensor
 from udiYoOutletV4 import udiYoOutlet
 #from udiYoOutletPwrV2 import udiYoOutletPwr
 from udiYoMultiOutletV2 import udiYoMultiOutlet
-from udiYoManipulatorV2 import udiYoManipulator
+from udiYoManipulatorV4 import udiYoManipulator
 from udiYoSpeakerHubV2 import udiYoSpeakerHub
 from udiYoLock_V4 import udiYoLock, udiYoLockV2
 from udiYoInfraredRemoterV4 import udiYoInfraredRemoter
-from udiYoDimmerV2 import udiYoDimmer
+from udiYoDimmerV4 import udiYoDimmer
 from udiYoVibrationSensorV4 import udiYoVibrationSensor
 from udiYoSmartRemoterV3 import udiYoSmartRemoter
 from udiYoPowerFailV4 import udiYoPowerFailSenor
 from udiYoSirenV4 import udiYoSiren
 from udiYoWaterMeterControllerV4 import udiYoWaterMeterController
 from udiYoWaterMeterMultiControllerV4 import udiYoWaterMeterMulti 
-from udiYoWaterMeterOnlyV3 import udiYoWaterMeterOnly 
+#from udiYoWaterMeterOnlyV3 import udiYoWaterMeterOnly 
 from udiYoHubV4 import udiYoHub, udiYoBatteryHub
 #import udiProfileHandler
 
