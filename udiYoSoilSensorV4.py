@@ -20,10 +20,10 @@ from yolinkSoilSensorV2 import YoLinkSoilSensor
 
 
 
-class udiYoSprinkler(udi_interface.Node):
+class udiYoSoilSensor(udi_interface.Node):
     from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, state2Nbr, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
 
-    id = 'yosprinkler'
+    id = 'yosoilsensor'
     
     '''
        drivers = [
@@ -69,7 +69,7 @@ class udiYoSprinkler(udi_interface.Node):
         super().__init__( polyglot, primary, address, name)   
         #super(YoLinkSW, self).__init__( csName, csid, csseckey, devInfo,  self.updateStatus, )
         #  
-        logging.debug('udiYoSprinkler INIT- {}'.format(deviceInfo['name']))
+        logging.debug('udiYoSoilSensor INIT- {}'.format(deviceInfo['name']))
         self.n_queue = []  
         self.yoAccess = yoAccess
         self.devInfo =  deviceInfo
@@ -120,7 +120,7 @@ class udiYoSprinkler(udi_interface.Node):
   
 
     def start(self):
-        logging.info('Start udiYoSprinkler')
+        logging.info('Start udiYoSoilSensor')
         self.my_setDriver('GV30', 0)
         self.yoTHsensor  = YoLinkSoilSensor(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(1)
@@ -139,7 +139,7 @@ class udiYoSprinkler(udi_interface.Node):
 
     
     def stop (self):
-        logging.info('Stop udiYoSprinkler')
+        logging.info('Stop udiYoSoilSensor')
         self.my_setDriver('GV30', 0)
         self.yoTHsensor.shut_down()
         #if self.node:
