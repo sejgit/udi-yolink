@@ -146,14 +146,15 @@ def addNodes (self, deviceList) -> list:
                         'MotionSensor', 'Outlet', 'GarageDoor', 'LeakSensor', 'Hub', 
                         'SpeakerHub', 'VibrationSensor', 'Finger', 'Lock' , 'LockV2', 'Dimmer', 'InfraredRemoter',
                         'PowerFailureAlarm', 'SmartRemoter', 'COSmokeSensor', 'Siren', 'WaterMeterController',
-                        'WaterDepthSensor', 'WaterMeterMultiController', 'SprinklerV2', 'Sprinkler', 'Thermostat', 'SoilThcSensor']
+                        'WaterDepthSensor', 'WaterMeterMultiController', 'SprinklerV2', 'Sprinkler', 'Thermostat',
+                        'SoilThcSensor']
     #supportedYoTypes = ['Switch', 'THSensor', 'MultiOutlet', 'DoorSensor','Manipulator', 
     #                    'MotionSensor', 'Outlet', 'GarageDoor', 'LeakSensor', 'Hub', 
     #                    'SpeakerHub', 'VibrationSensor', 'Finger', 'Lock' , 'LockV2', 'Dimmer', 'InfraredRemoter',
     #                    'PowerFailureAlarm', 'SmartRemoter', 'COSmokeSensor', 'Siren', 'WaterMeterController',
     #                    'WaterDepthSensor', ]    'WaterMeterController', 
     
-    #supportedYoTypes = [ 'Outlet','VibrationSensor', 'InfraredRemoter'  ]     
+    supportedYoTypes = ['SprinklerV2', 'Sprinkler', 'Thermostat', 'SoilThcSensor' ]     
 
     
     remove_list= []
@@ -472,7 +473,7 @@ def addNodes (self, deviceList) -> list:
                     time.sleep(4)
                 for adr in temp.adr_list:
                     self.assigned_addresses.append(adr)                            
-                    
+
             elif dev['type'] in ['SoilThcSensor']:
                 logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) )) 
 
