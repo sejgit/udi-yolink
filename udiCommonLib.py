@@ -37,6 +37,7 @@ from udiYoVibrationSensorV4 import udiYoVibrationSensor
 from udiYoSmartRemoterV3 import udiYoSmartRemoter
 from udiYoPowerFailV4 import udiYoPowerFailSenor
 from udiYoSprinklerV4 import udiYoSprinkler
+from udiYoSoilSensorV4 import udiYoSoilSensor
 from udiYoThermostatV4 import udiYoThermostat
 from udiYoSirenV4 import udiYoSiren
 from udiYoWaterMeterControllerV4 import udiYoWaterMeterController
@@ -145,7 +146,7 @@ def addNodes (self, deviceList) -> list:
                         'MotionSensor', 'Outlet', 'GarageDoor', 'LeakSensor', 'Hub', 
                         'SpeakerHub', 'VibrationSensor', 'Finger', 'Lock' , 'LockV2', 'Dimmer', 'InfraredRemoter',
                         'PowerFailureAlarm', 'SmartRemoter', 'COSmokeSensor', 'Siren', 'WaterMeterController',
-                        'WaterDepthSensor', 'WaterMeterMultiController', 'SprinklerV2', 'Sprinkler', 'Thermostat']
+                        'WaterDepthSensor', 'WaterMeterMultiController', 'SprinklerV2', 'Sprinkler', 'Thermostat', 'SoilThcSensor']
     #supportedYoTypes = ['Switch', 'THSensor', 'MultiOutlet', 'DoorSensor','Manipulator', 
     #                    'MotionSensor', 'Outlet', 'GarageDoor', 'LeakSensor', 'Hub', 
     #                    'SpeakerHub', 'VibrationSensor', 'Finger', 'Lock' , 'LockV2', 'Dimmer', 'InfraredRemoter',
@@ -460,7 +461,8 @@ def addNodes (self, deviceList) -> list:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
                     time.sleep(4)
                 for adr in temp.adr_list:
-                    self.assigned_addresses.append(adr)        
+                    self.assigned_addresses.append(adr)   
+
             elif dev['type'] in ['Thermostat']:
                 logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) )) 
 
@@ -470,7 +472,16 @@ def addNodes (self, deviceList) -> list:
                     time.sleep(4)
                 for adr in temp.adr_list:
                     self.assigned_addresses.append(adr)                            
+                    
+            elif dev['type'] in ['SoilThcSensor']:
+                logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) )) 
 
+                temp = udiYoSoilSensor(self.poly, address, address, name, dev_access, dev )
+                while not temp.node_ready:
+                    logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
+                    time.sleep(4)
+                for adr in temp.adr_list:
+                    self.assigned_addresses.append(adr)    
 
     time.sleep(1)
     # need to go through nodes to see if there are nodes that no longer exist in device list                
