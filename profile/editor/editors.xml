@@ -370,5 +370,8 @@
     <range uom="70" min="0" max="1440" />
     <range uom="25" subset="0,99" nls="error" />
   </editor>  
-
+  <editor id="conductivity">
+    <range uom="70" min="0" max="20" />
+    <range uom="25" subset="0,99" nls="error" />
+  </editor>  
 </editors>

@@ -43,22 +43,26 @@ class udiYoSoilSensor(udi_interface.Node):
     ''' 
         
     drivers = [
-
+            {'driver': 'ST', 'value': 0, 'uom': 70},
             {'driver': 'CLITEMP', 'value': 0, 'uom': 4},
+            {'driver': 'CLIHUM', 'value': 0, 'uom': 51},
             {'driver': 'GV1', 'value': 2, 'uom': 25}, 
             {'driver': 'GV2', 'value': 2, 'uom': 25},           
-            {'driver': 'CLIHUM', 'value': 0, 'uom': 51},
+            {'driver': 'GV3', 'value': 2, 'uom': 25}, 
             {'driver': 'GV4', 'value': 2, 'uom': 25},
             {'driver': 'GV5', 'value': 2, 'uom': 25},
-            {'driver': 'BATLVL', 'value': 99, 'uom': 25},
+            {'driver': 'GV6', 'value': 2, 'uom': 25},             
             {'driver': 'GV7', 'value': 2, 'uom': 25},
-            {'driver': 'GV8', 'value': 2, 'uom': 25},
+            {'driver': 'GV8', 'value': 2, 'uom': 25},            
+            {'driver': 'BATLVL', 'value': 99, 'uom': 25},
+
             {'driver': 'GV9', 'value': 99, 'uom': 25},
             {'driver': 'GV10', 'value': 0, 'uom': 4},
             {'driver': 'GV11', 'value': 0, 'uom': 4},
             {'driver': 'GV12', 'value': 0, 'uom': 51},
             {'driver': 'GV13', 'value': 0, 'uom': 51},
-            {'driver': 'ST', 'value': 0, 'uom': 25},
+            {'driver': 'GV14', 'value': 0, 'uom': 70},
+            {'driver': 'GV15', 'value': 0, 'uom': 70},
             {'driver': 'GV30', 'value': 0, 'uom': 25},            
             {'driver': 'GV20', 'value': 99, 'uom': 25},            
              {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},    
@@ -77,23 +81,13 @@ class udiYoSoilSensor(udi_interface.Node):
         self.node_ready = False
 
         self.temp_unit = self.yoAccess.get_temp_unit()   
+        if self.temp_unit == 1:
+            self.id = 'yosoilsensorF'
 
 
         self.cmd_state = self.retrieve_cmd_state()
+        self.meas_support = []
         model = str(self.devInfo['modelName'][:6])
-        '''        if model in ['YS8017', 'YS8014', 'YS8004', 'YS8008', 'YS8003']:
-            self.meas_support = ['temp']
-        else:
-            self.meas_support = ['temp', 'hum']
-        if self.temp_unit == 1:
-            if 'hum' not in self.meas_support:
-                self.id = 'yotsensF'
-            else:
-                self.id = 'yothsensF'   
-        else:
-            if 'hum' not in self.meas_support:
-                self.id = 'yotsens'  
-        '''
         self.alarm_state = False
         self.sensordata_24_hours = {}
         #self.address = address

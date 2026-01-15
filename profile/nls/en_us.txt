@@ -303,6 +303,38 @@ ST-nlsthsens-CLIHUM-NAME=Current Rel Humidity (%)
 CMD-nlsthsens-SETCMD-NAME=Select Command Action
 CMD-nlsthsens-UPDATE-NAME=Update Status
 
+ND-yosoilsensor-NAME=YoLink Soil Sensor
+ND-yosoilsensor-ICON=TempSensor
+ND-yosoilsensorF-NAME=YoLink Soil Sensor
+ND-yosoilsensorF-ICON=TempSensor
+
+ST-nlssoilsensor-ST-NAME=Soil Conductuivity
+ST-nlssoilsensor-CLITEMP-NAME=Sensor Temperature
+ST-nlssoilsensor-CLIHUM-NAME=Current Rel Humidity (%)
+ST-nlssoilsensor-GV1-NAME=Low Conductivity Alarm
+ST-nlssoilsensor-GV2-NAME=High Conductivity Alarm
+ST-nlssoilsensor-GV3-NAME=Low Temp Alarm
+ST-nlssoilsensor-GV4-NAME=High Temp Alarm
+ST-nlssoilsensor-GV5-NAME=Low Humidity Alarm
+ST-nlssoilsensor-GV5-NAME=High Humidity Alarm
+ST-nlssoilsensor-GV7-NAME=Period Alarm
+ST-nlssoilsensor-GV8-NAME=Alarm triggered
+ST-nlssoilsensor-BATLVL-NAME=Battery Level
+ST-nlssoilsensor-GV9-NAME=Command Setting
+
+ST-nlssoilsensor-GV10-NAME=Low Temp Alarm Limit
+ST-nlssoilsensor-GV11-NAME=High Temp Alarm Limit
+ST-nlssoilsensor-GV12-NAME=Low Humidity Alarm Limit
+ST-nlssoilsensor-GV13-NAME=High Humidity Alarm Limit
+ST-nlssoilsensor-GV14-NAME=High Conductivity Alarm Limit
+ST-nlssoilsensor-GV15-NAME=High Conductivity Alarm Limit
+ST-nlssoilsensor-GV20-NAME=Connection State
+ST-nlssoilsensor-GV30-NAME=Online State
+ST-nlssoilsensor-TIME-NAME=Last device update
+CMD-nlssoilsensor-SETCMD-NAME=Select Command Action
+CMD-nlssoilsensor-UPDATE-NAME=Update Status
+
+
 ND-yogarage-NAME=YoLink Garage Controller
 ND-yogarage-ICON=Switch
 ST-nlsgarage-ST-NAME=Nodeserver Status

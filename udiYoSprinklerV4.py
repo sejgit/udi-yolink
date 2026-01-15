@@ -78,9 +78,10 @@ class udiYoSprinkler(udi_interface.Node):
 
         self.temp_unit = self.yoAccess.get_temp_unit()   
 
-
+        self.meas_support = []
         self.cmd_state = self.retrieve_cmd_state()
         model = str(self.devInfo['modelName'][:6])
+
         '''        if model in ['YS8017', 'YS8014', 'YS8004', 'YS8008', 'YS8003']:
             self.meas_support = ['temp']
         else:
