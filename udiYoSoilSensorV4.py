@@ -173,7 +173,7 @@ class udiYoSoilSensor(udi_interface.Node):
                 highCondAlarm = self.yoSoilSensor.get_data('highConductivity', 'alarm')
                 alarm_det = alarm_det or lowCondAlarm or highCondAlarm
                 if isinstance(conductivity, (int, float)):
-                    self.my_setDriver('ST', round(conductivity,1),  70, type=message_type)
+                    self.my_setDriver('ST', round(conductivity/1000, 1),  70, type=message_type)
                 self.my_setDriver('GV1', self.yoSoilSensor.bool2Nbr(lowCondAlarm), type=message_type)
                 self.my_setDriver('GV2', self.yoSoilSensor.bool2Nbr(highCondAlarm), type=message_type)                                
                 self.my_setDriver('GV14', self.yoSoilSensor.get_data('min', 'conductivityLimit'),  70, type=message_type)

@@ -308,7 +308,7 @@ ND-yosoilsensor-ICON=TempSensor
 ND-yosoilsensorF-NAME=YoLink Soil Sensor
 ND-yosoilsensorF-ICON=TempSensor
 
-ST-nlssoilsensor-ST-NAME=Soil Conductuivity
+ST-nlssoilsensor-ST-NAME=Soil Conductuivity (mS/cm)
 ST-nlssoilsensor-CLITEMP-NAME=Sensor Temperature
 ST-nlssoilsensor-CLIHUM-NAME=Current Rel Humidity (%)
 ST-nlssoilsensor-GV1-NAME=Low Conductivity Alarm
