@@ -77,7 +77,7 @@ class udiYoSoilSensor(udi_interface.Node):
         self.n_queue = []  
         self.yoAccess = yoAccess
         self.devInfo =  deviceInfo
-        self.yoTHsensor  = None
+        self.yoSoilSensor  = None
         self.node_ready = False
 
         self.temp_unit = self.yoAccess.get_temp_unit()   
@@ -116,11 +116,11 @@ class udiYoSoilSensor(udi_interface.Node):
     def start(self):
         logging.info('Start udiYoSoilSensor')
         self.my_setDriver('GV30', 0)
-        self.yoTHsensor  = YoLinkSoilSensor(self.yoAccess, self.devInfo, self.updateStatus)
+        self.yoSoilSensor  = YoLinkSoilSensor(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(1)
-        self.yoTHsensor.initNode()
+        self.yoSoilSensor.initNode()
         time.sleep(1)
-        while not self.yoTHsensor.online:
+        while not self.yoSoilSensor.online:
             logging.info('Waiting for TH sensor to come online...')
             time.sleep(2)
 
@@ -129,27 +129,27 @@ class udiYoSoilSensor(udi_interface.Node):
         #self.my_setDriver('GV30', 1)
 
     def initNode(self):
-        self.yoTHsensor.refreshSensor()
+        self.yoSoilSensor.refreshSensor()
 
     
     def stop (self):
         logging.info('Stop udiYoSoilSensor')
         self.my_setDriver('GV30', 0)
-        self.yoTHsensor.shut_down()
+        self.yoSoilSensor.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 
     def checkOnline(self):
-        self.yoTHsensor.refreshDevice()
+        self.yoSoilSensor.refreshDevice()
 
     def checkDataUpdate(self):
-        if self.yoTHsensor.data_updated():
+        if self.yoSoilSensor.data_updated():
             self.updateData()
 
 
     def get_alarms_state (self):
         alarm_on = False
-        alarms = self.yoTHsensor.getAlarms()
+        alarms = self.yoSoilSensor.getAlarms()
         logging.debug(f'Alarms: {alarms}')
         if alarms:
             for a_type in alarms:
@@ -159,51 +159,39 @@ class udiYoSoilSensor(udi_interface.Node):
 
 
     def updateData(self):
-        #alarms = self.yoTHsensor.getAlarms()
-        #limits = self.yoTHsensor.getLimits()
-        logging.info('yoTHsensor -  updateData')
+        #alarms = self.yoSoilSensor.getAlarms()
+        #limits = self.yoSoilSensor.getLimits()
+        logging.info('yoSoilSensor -  updateData')
         alarm_det = False 
         if self.node is not None:
-            message_type = self.yoTHsensor.get_last_message_type() # if event some data may not be updated 
-            unix_time = self.yoTHsensor.get_report_time('reportAt')
+            message_type = self.yoSoilSensor.get_last_message_type() # if event some data may not be updated 
+            unix_time = self.yoSoilSensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
-            if self.yoTHsensor.online:
-                tempC = self.yoTHsensor.get_data('temperature', 'state')
-                tempLimMin = self.yoTHsensor.get_data('min', 'tempLimit')
-                tempLimMax = self.yoTHsensor.get_data('max', 'tempLimit')    
-                lowTempAlarm = self.yoTHsensor.get_data('lowTemp', 'alarms')
-                highTempAlarm = self.yoTHsensor.get_data('highTemp', 'alarms')     
-                alarm_det = alarm_det or lowTempAlarm or highTempAlarm        
-                hum = None
-                if 'hum' in self.meas_support:
-                    hum = self.yoTHsensor.get_data('humidity', 'state')
-                    humLimMin = self.yoTHsensor.get_data('min', 'humidityLimit')
-                    humLimMax = self.yoTHsensor.get_data('max', 'humidityLimit') 
-                    lowHumAlarm = self.yoTHsensor.get_data('lowHumidity', 'alarms')
-                    highHumAlarm = self.yoTHsensor.get_data('highHumidity', 'alarms')  
-                    alarm_det = alarm_det or lowHumAlarm or highHumAlarm
-                tempMeasMin, tempMeasMax, humMeasMin, humMeasMax = self.yoTHsensor.update_data_24_hours(unix_time, tempC, hum)
-                bat_lvl = self.yoTHsensor.get_data('battery', 'state')
-                bat_alarm = self.yoTHsensor.get_data('batteryLow', 'alarms')
-                #tempMeas = self.yoTHsensor.get_data('temperature', 'statistics')
-                #if isinstance(tempMeas, dict):
-                #    tempMeasMin = tempMeas.get('min', None)
-                ##    tempMeasMax = tempMeas.get('max', None)
-                #else:
-
-                #    tempMeasMin = None
-                #    tempMeasMax = None
+            if self.yoSoilSensor.online:
+                conductivity = self.yoSoilSensor.get_data('conductivity', 'state')
+                lowCondAlarm = self.yoSoilSensor.get_data('lowConductivity', 'alarm')
+                highCondAlarm = self.yoSoilSensor.get_data('highConductivity', 'alarm')
+                alarm_det = alarm_det or lowCondAlarm or highCondAlarm
+                if isinstance(conductivity, (int, float)):
+                    self.my_setDriver('ST', round(conductivity,1),  70, type=message_type)
+                self.my_setDriver('GV1', self.yoSoilSensor.bool2Nbr(lowCondAlarm), type=message_type)
+                self.my_setDriver('GV2', self.yoSoilSensor.bool2Nbr(highCondAlarm), type=message_type)                                
+                self.my_setDriver('GV14', self.yoSoilSensor.get_data('min', 'conductivityLimit'),  70, type=message_type)
+                self.my_setDriver('GV15', self.yoSoilSensor.get_data('max', 'conductivityLimit'),  70, type=message_type)
                 
+                tempC = self.yoSoilSensor.get_data('temperature', 'state')
+                tempLimMin = self.yoSoilSensor.get_data('min', 'tempLimit')
+                tempLimMax = self.yoSoilSensor.get_data('max', 'tempLimit')    
+                lowTempAlarm = self.yoSoilSensor.get_data('lowTemp', 'alarm')
+                highTempAlarm = self.yoSoilSensor.get_data('highTemp', 'alarm')     
                 if isinstance(tempC, (int, float)):
                     if self.temp_unit == 0:
                         self.my_setDriver('CLITEMP', round(tempC,1),  4, type=message_type)
-                        self.my_setDriver('ST', round(tempC,1),  4)
+
                         #if 'tempLimit' in limits:
                         self.my_setDriver('GV10', tempLimMin,  4, type=message_type)
                         self.my_setDriver('GV11', tempLimMax,  4, type=message_type)
-                        self.my_setDriver('GV14', tempMeasMin,  4, type=message_type)
-                        self.my_setDriver('GV15', tempMeasMax,  4, type=message_type)                        
-
+                
                     elif self.temp_unit == 1:
                         self.my_setDriver('CLITEMP', round(tempC*9/5+32,1),  17, type=message_type)
                         self.my_setDriver('ST', round(tempC*9/5+32,1),  17, type=message_type)
@@ -211,63 +199,58 @@ class udiYoSoilSensor(udi_interface.Node):
                             self.my_setDriver('GV10', round(tempLimMin*9/5+32,1),  17, type=message_type)
                         if isinstance(tempLimMax, (int, float)):
                             self.my_setDriver('GV11', round(tempLimMax*9/5+32,1),  17, type=message_type) 
-                        if isinstance(tempMeasMin, (int, float)):   
-                            self.my_setDriver('GV14', round(tempMeasMin*9/5+32,1),  17, type=message_type)
-                        if isinstance(tempMeasMax, (int, float)):   
-                            self.my_setDriver('GV15', round(tempMeasMax*9/5+32,1),  17, type=message_type)      
+          
                 else:
                     self.my_setDriver('CLITEMP', 99,  25)
                     self.my_setDriver('ST', 99,  25)
                     self.my_setDriver('GV10', 99, 25)
-                    self.my_setDriver('GV11', 99, 25)
-                    self.my_setDriver('GV14', 99, 25)
-                    self.my_setDriver('GV15', 99, 25)
-   
-                
-            
-                self.my_setDriver('GV1', self.yoTHsensor.bool2Nbr(lowTempAlarm), type=message_type)
-                self.my_setDriver('GV2', self.yoTHsensor.bool2Nbr(highTempAlarm), type=message_type)
+                    self.my_setDriver('GV11', 99, 25)            
+                self.my_setDriver('GV3', self.yoSoilSensor.bool2Nbr(lowTempAlarm), type=message_type)
+                self.my_setDriver('GV4', self.yoSoilSensor.bool2Nbr(highTempAlarm), type=message_type)
 
-                if 'hum' in self.meas_support:
-                    if isinstance(hum,(int,float)):
-                        self.my_setDriver('CLIHUM', hum, 51, type=message_type )
-        
-                        self.my_setDriver('GV12', humLimMin, 51, type=message_type)
-                        self.my_setDriver('GV13', humLimMax, 51, type=message_type)
-                        self.my_setDriver('GV16', humMeasMin, 51, type=message_type)
-                        self.my_setDriver('GV17', humMeasMax, 51, type=message_type)
-                    self.my_setDriver('GV4', self.yoTHsensor.bool2Nbr(lowHumAlarm), type=message_type)
-                    self.my_setDriver('GV5', self.yoTHsensor.bool2Nbr(highHumAlarm), type=message_type)
-                    if alarm_det or lowHumAlarm or highHumAlarm:
-                        alarm_det = True
-                else:
-                    self.my_setDriver('CLIHUM', 98, 25)
-                    self.my_setDriver('GV12', 98, 25)
-                    self.my_setDriver('GV13', 98, 25)
-                    self.my_setDriver('GV16', 98, 25)
-                    self.my_setDriver('GV17', 98, 25)   
-                    self.my_setDriver('GV4', 98, 25)
-                    self.my_setDriver('GV5', 98, 25)
+                hum = self.yoSoilSensor.get_data('humidity', 'state')
+                humLimMin = self.yoSoilSensor.get_data('min', 'humidityLimit')
+                humLimMax = self.yoSoilSensor.get_data('max', 'humidityLimit') 
+                lowHumAlarm = self.yoSoilSensor.get_data('lowHumidity', 'alarm')
+                highHumAlarm = self.yoSoilSensor.get_data('highHumidity', 'alarm')  
+                alarm_det = alarm_det or lowHumAlarm or highHumAlarm
+
+                if isinstance(hum,(int,float)):
+                    self.my_setDriver('CLIHUM', hum, 51, type=message_type )
+    
+                    self.my_setDriver('GV12', humLimMin, 51, type=message_type)
+                    self.my_setDriver('GV13', humLimMax, 51, type=message_type)
+
+                else:   
+                    self.my_setDriver('CLIHUM', 99, 25)
+                    self.my_setDriver('GV12', 99, 25)
+                    self.my_setDriver('GV13', 99, 25)      
+
+                self.my_setDriver('GV5', self.yoSoilSensor.bool2Nbr(lowHumAlarm), type=message_type)
+                self.my_setDriver('GV6', self.yoSoilSensor.bool2Nbr(highHumAlarm), type=message_type)
 
 
+
+
+                periodAlarm = self.yoSoilSensor.get_data('period', 'alarm')
+                alarm_det = alarm_det or periodAlarm
+                self.my_setDriver('GV7', self.yoSoilSensor.bool2Nbr(periodAlarm), type=message_type)
+                self.my_setDriver('GV8', self.yoSoilSensor.bool2Nbr(alarm_det), type=message_type)                
+                bat_lvl = self.yoSoilSensor.get_data('battery')
                 self.my_setDriver('BATLVL', bat_lvl, 25, type=message_type)
-                self.my_setDriver('GV7', self.yoTHsensor.bool2Nbr(bat_alarm))
-                alarm_det = alarm_det or bat_alarm
+
 
                 if alarm_det != self.alarm_state:
                     if alarm_det and self.cmd_state in [0,1]:
                         self.node.reportCmd('DON')
                     if not alarm_det and self.cmd_state in [0,2]:  
                         self.node.reportCmd('DOF')
-                    self.alarm_state = alarm_det                
-
-
-                    self.my_setDriver('GV8', self.yoTHsensor.bool2Nbr(self.alarm_state))
+                    self.alarm_state = alarm_det                               
                     self.my_setDriver('GV9', self.cmd_state)
 
                 self.my_setDriver('GV30', 1)
 
-                if self.yoTHsensor.suspended:
+                if self.yoSoilSensor.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
                     self.my_setDriver('GV20', 0)                
@@ -279,7 +262,7 @@ class udiYoSoilSensor(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.debug('udiYoSprinkler - updateStatus')
-        self.yoTHsensor.updateStatus(data)
+        self.yoSoilSensor.updateStatus(data)
         self.updateData()
 
     def set_cmd(self, command):
@@ -291,7 +274,7 @@ class udiYoSoilSensor(udi_interface.Node):
 
     def update(self, command = None):
         logging.info('THsensor Update')
-        self.yoTHsensor.refreshDevice()
+        self.yoSoilSensor.refreshDevice()
        
     commands = {
                 'SETCMD': set_cmd,             
