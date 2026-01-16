@@ -173,12 +173,21 @@ class udiYoSoilSensor(udi_interface.Node):
                 highCondAlarm = self.yoSoilSensor.get_data('highConductivity', 'alarm')
                 alarm_det = alarm_det or lowCondAlarm or highCondAlarm
                 if isinstance(conductivity, (int, float)):
-                    self.my_setDriver('ST', round(conductivity,1),  70, type=message_type)
+                    self.my_setDriver('ST', round(conductivity/1000,1),  70, type=message_type)
+                else:
+                    self.my_setDriver('ST', 99,  25)
                 self.my_setDriver('GV1', self.yoSoilSensor.bool2Nbr(lowCondAlarm), type=message_type)
-                self.my_setDriver('GV2', self.yoSoilSensor.bool2Nbr(highCondAlarm), type=message_type)                                
-                self.my_setDriver('GV14', self.yoSoilSensor.get_data('min', 'conductivityLimit'),  70, type=message_type)
-                self.my_setDriver('GV15', self.yoSoilSensor.get_data('max', 'conductivityLimit'),  70, type=message_type)
-                
+                self.my_setDriver('GV2', self.yoSoilSensor.bool2Nbr(highCondAlarm), type=message_type) 
+                min_conduct = self.yoSoilSensor.get_data('min', 'conductivityLimit')
+                max_conduct = self.yoSoilSensor.get_data('max', 'conductivityLimit')
+                if isinstance(min_conduct, (int, float)):
+                    self.my_setDriver('GV14', round(min_conduct/1000,1),  70, type=message_type)
+                else:
+                    self.my_setDriver('GV14', 99,  25)
+                if isinstance(max_conduct, (int, float)):
+                    self.my_setDriver('GV15', round(max_conduct/1000,1),  70, type=message_type)    
+                else:
+                    self.my_setDriver('GV15', 99,  25)
                 tempC = self.yoSoilSensor.get_data('temperature', 'state')
                 tempLimMin = self.yoSoilSensor.get_data('min', 'tempLimit')
                 tempLimMax = self.yoSoilSensor.get_data('max', 'tempLimit')    
