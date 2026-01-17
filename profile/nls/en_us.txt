@@ -304,9 +304,9 @@ CMD-nlsthsens-SETCMD-NAME=Select Command Action
 CMD-nlsthsens-UPDATE-NAME=Update Status
 
 ND-yosoilsensor-NAME=YoLink Soil Sensor
-ND-yosoilsensor-ICON=TempSensor
+ND-yosoilsensor-ICON=Sensor
 ND-yosoilsensorF-NAME=YoLink Soil Sensor
-ND-yosoilsensorF-ICON=TempSensor
+ND-yosoilsensorF-ICON=Sensor
 
 ST-nlssoilsensor-ST-NAME=Soil Conductuivity (mS/cm)
 ST-nlssoilsensor-CLITEMP-NAME=Sensor Temperature
@@ -565,9 +565,9 @@ CMD-nlsircode-UPDATE-NAME=Update Status
 
 
 ND-yoCOSmokesens-NAME=YoLink COSmokeSensor
-ND-yoCOSmokesens-ICON=Input
+ND-yoCOSmokesens-ICON=SmokeSensor
 ND-yoCOSmokesensF-NAME=YoLink COSmokeSensor
-ND-yoCOSmokesensF-ICON=Input
+ND-yoCOSmokesensF-ICON=SmokeSensor
 ST-nlssmokesens-ST-NAME=Alarm
 ST-nlssmokesens-ALARM-NAME=Alert Detected
 ST-nlssmokesens-GV0-NAME=Smoke Detection

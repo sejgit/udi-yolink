@@ -1037,6 +1037,14 @@
       </cmds>
    </nodeDef>    
 
+
+
+
+
+
+
+
+
   <nodeDef id="yowatermeterMulti" nls="nlswatermeter">
       <editors />
       <sts>
@@ -1122,11 +1130,13 @@
       </cmds>
    </nodeDef> 
 
+
+
+
   <nodeDef id="yowatermeterSubL" nls="nlswatermeter">
       <editors />
       <sts>
          <st id="ST" editor="waterrun" /> <!-- water runing-->
-
          <st id="GV0" editor="manstate" />
          <st id="GV1" editor="liter" />
          <st id="GV10" editor="liter" />     
@@ -1304,6 +1314,48 @@
       </cmds>
    </nodeDef> 
 
+
+ <nodeDef id="yosprinklerv2" nls="nlssprinkler">
+      <editors />
+      <sts>
+         <st id="ST" editor="waterrun" /> <!-- water runing-->
+
+         <st id="GV0" editor="sprinklerstate" />
+         <st id="GV1" editor="nowateralarm" />
+         <st id="GV2" editor="watermode" /> <!-- recent use -->
+
+         <st id="GV3" editor="runningmode" /> <!-- Recent duration --> 
+         <st id="GV4" editor="runningvalue" /> <!-- Recent duration --> 
+         <st id="GV5" editor="wateruse" /> <!-- overrunAmount 24H-->
+         <st id="GV6" editor="progress" /> <!--overrun-->
+
+         <st id="GV7" editor="watermode" /> <!--Overrun duration-->
+         <st id="GV8" editor="runningvalue" /> <!--overrun time 24H-->
+         <st id="GV9" editor="watermode" />  <!-- open reminder-->       
+         <st id="GV10" editor="minutes" /> <!-- open reminder -->
+      
+         <st id="BATLVL" editor="batlevel" />
+         <st id="GV20" editor="suspendstate" />
+         <st id="GV30"  editor="status" />         
+         <st id="TIME" editor="unixtime" />                  
+      </sts>
+      <cmds>
+         <sends>
+            <!--<cmd id="DON" editor="manstate"  />               
+            <cmd id="DOF" editor="manstate"  />   -->
+            <cmd id="DON"  />               
+            <cmd id="DOF"  />    
+         </sends>
+         <accepts>
+            <cmd id="UPDATE" /> 
+            <cmd id="STARTSTOP" />
+            <cmd id="WATERMODE">
+               <p id="watermode" editor="watermode"  /> 
+            </cmd >
+
+         </accepts>
+      </cmds>
+   </nodeDef>    
 
    <nodeDef id="yothsens" nls="nlsthsens">
       <editors />
