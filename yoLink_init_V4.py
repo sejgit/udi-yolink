@@ -318,7 +318,7 @@ class YoLinkInitPAC(object):
             headers1['Authorization'] = 'Bearer '+ yoAccess.token['access_token']
             r = requests.post(yoAccess.apiv2URL, data=json.dumps(data), headers=headers1, timeout=5) 
             info = r.json()
-            logging.debug('info : {}'.format(format(json.dumps(info, indent=4, separators=(',', ': ') ))))
+            logging.debug('info : {}'.format(json.dumps(info, indent=4, separators=(',', ': ') )))
             
             if 'cloud' in yoAccess.access_mode:
                 yoAccess.deviceList = info['data']['devices']

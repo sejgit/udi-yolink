@@ -304,9 +304,9 @@ CMD-nlsthsens-SETCMD-NAME=Select Command Action
 CMD-nlsthsens-UPDATE-NAME=Update Status
 
 ND-yosoilsensor-NAME=YoLink Soil Sensor
-ND-yosoilsensor-ICON=TempSensor
+ND-yosoilsensor-ICON=Sensor
 ND-yosoilsensorF-NAME=YoLink Soil Sensor
-ND-yosoilsensorF-ICON=TempSensor
+ND-yosoilsensorF-ICON=Sensor
 
 ST-nlssoilsensor-ST-NAME=Soil Conductuivity (mS/cm)
 ST-nlssoilsensor-CLITEMP-NAME=Sensor Temperature
@@ -326,8 +326,8 @@ ST-nlssoilsensor-GV10-NAME=Low Temp Alarm Limit
 ST-nlssoilsensor-GV11-NAME=High Temp Alarm Limit
 ST-nlssoilsensor-GV12-NAME=Low Humidity Alarm Limit
 ST-nlssoilsensor-GV13-NAME=High Humidity Alarm Limit
-ST-nlssoilsensor-GV14-NAME=High Conductivity Alarm Limit
-ST-nlssoilsensor-GV15-NAME=High Conductivity Alarm Limit
+ST-nlssoilsensor-GV14-NAME=Low Conductivity Alarm Limit (mS/cm)
+ST-nlssoilsensor-GV15-NAME=High Conductivity Alarm Limit (mS/cm))
 ST-nlssoilsensor-GV20-NAME=Connection State
 ST-nlssoilsensor-GV30-NAME=Online State
 ST-nlssoilsensor-TIME-NAME=Last device update
@@ -565,9 +565,9 @@ CMD-nlsircode-UPDATE-NAME=Update Status
 
 
 ND-yoCOSmokesens-NAME=YoLink COSmokeSensor
-ND-yoCOSmokesens-ICON=Input
+ND-yoCOSmokesens-ICON=SmokeSensor
 ND-yoCOSmokesensF-NAME=YoLink COSmokeSensor
-ND-yoCOSmokesensF-ICON=Input
+ND-yoCOSmokesensF-ICON=SmokeSensor
 ST-nlssmokesens-ST-NAME=Alarm
 ST-nlssmokesens-ALARM-NAME=Alert Detected
 ST-nlssmokesens-GV0-NAME=Smoke Detection

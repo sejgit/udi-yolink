@@ -37,6 +37,7 @@ from udiYoVibrationSensorV4 import udiYoVibrationSensor
 from udiYoSmartRemoterV3 import udiYoSmartRemoter
 from udiYoPowerFailV4 import udiYoPowerFailSenor
 from udiYoSprinklerV4 import udiYoSprinkler
+from udiYoSprinkler2V4 import udiYoSprinkler2
 from udiYoSoilSensorV4 import udiYoSoilSensor
 from udiYoThermostatV4 import udiYoThermostat
 from udiYoSirenV4 import udiYoSiren
