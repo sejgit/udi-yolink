@@ -281,8 +281,17 @@ class udiYoSprinkler2(udi_interface.Node):
         self.updateData()
 
 
-    def startstop(self, command = None):
+    def start_stop(self, command):
         logging.info('udiYoSprinkler2 - set_open')
+        query = command.get("query")
+        action = query.get('ACTION.uom25')
+        mode = query.get('MODE.uom25')
+        logging.debug(f'start_stop action: {action} mode: {mode}')
+        if action == 0:  # stop
+            self.yoSprinkler.setValveState('close')
+            self.valveState  = 0
+            self.my_setDriver('GV0',self.valveState )
+            #self.node.reportCmd('DOF')
         self.yoSprinkler.setValveState('open')
         self.valveState  = 1
         self.my_setDriver('GV0',self.valveState )
@@ -347,7 +356,7 @@ class udiYoSprinkler2(udi_interface.Node):
 
     commands = {
                 'UPDATE': update,
-                'STARTSTOP'   : startStop,
+                'STARTSTOP'   : start_stop,
                 'WATERMODE' : set_watermode,
                 #'VALVECTRL': waterCtrlControl, 
                 #'DELAYCTRL' : program_delays,
