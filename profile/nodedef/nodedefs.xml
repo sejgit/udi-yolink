@@ -1320,19 +1320,19 @@
       <sts>
          <st id="ST" editor="waterrun" /> <!-- water runing-->
 
-         <st id="GV0" editor="sprinklerstate" />
+         <!--<st id="GV0" editor="sprinklerstate" />-->
          <st id="GV1" editor="nowateralarm" />
-         <st id="GV2" editor="watermode" /> <!-- recent use -->
+         <st id="GV2" editor="watermode" /> <!-- -->
 
-         <st id="GV3" editor="runningmode" /> <!-- Recent duration --> 
-         <st id="GV4" editor="runningvalue" /> <!-- Recent duration --> 
-         <st id="GV5" editor="wateruse" /> <!-- overrunAmount 24H-->
-         <st id="GV6" editor="progress" /> <!--overrun-->
+         <st id="GV3" editor="runningmode" /> <!--  --> 
+         <st id="GV4" editor="runningvalue" /> <!--  --> 
+         <st id="GV5" editor="wateruse" /> <!-- -->
+         <st id="GV6" editor="progress" /> <!-- -->
 
-         <st id="GV7" editor="watermode" /> <!--Overrun duration-->
-         <st id="GV8" editor="runningvalue" /> <!--overrun time 24H-->
-         <st id="GV9" editor="watermode" />  <!-- open reminder-->       
-         <st id="GV10" editor="minutes" /> <!-- open reminder -->
+         <st id="GV7" editor="watermode" /> <!-- -->
+         <st id="GV8" editor="runningvalue" /> <!-- -->
+         <st id="GV9" editor="watermode" />  <!--  r-->       
+         <st id="GV10" editor="minutes" /> <!--  -->
       
          <st id="BATLVL" editor="batlevel" />
          <st id="GV20" editor="suspendstate" />
@@ -1349,10 +1349,16 @@
          <accepts>
             <cmd id="UPDATE" /> 
             <cmd id="STARTSTOP" />
-            <cmd id="WATERMODE">
-               <p id="watermode" editor="watermode"  /> 
+               <p id="w_startstop" editor="startstop" />
+               <p id="w_mode" editor="sprinklerstate"  /> 
             </cmd >
-
+            <cmd id="W_ATTRIB" />
+               <p id="w_startstop" editor="startstop" />
+               <p id="w_method" editor="sprinklerstate"/>
+               <p id="w_amount" editor="w_amount"/>
+               <!--<p id="w_delay" editor="w_delay"  />`-->
+               <p id="w_del_time" editor="minutes"  /> 
+            </cmd >
          </accepts>
       </cmds>
    </nodeDef>    
