@@ -205,6 +205,8 @@ class udiYoSprinkler2(udi_interface.Node):
                         self.my_setDriver('GV4', method_amount, type=message_type)
             
 
+                    
+
                     '''
                     total_meter = self.yoSprinkler.get_data('meter', 'state')
                     if isinstance(total_meter, (int,float)):
@@ -361,14 +363,31 @@ class udiYoSprinkler2(udi_interface.Node):
         logging.info('Update Status Executed')
         self.yoSprinkler.refreshDevice()
         
+    def set_attributes(self, command):
+        logging.info(f'set_attributes {command}')
+        query = command.get("query")
+        data={}
+        data['attributes'] = {}
+        if 'M_UNIT.uom25' in query:
+            data['attributes'] ['meterUnit'] = int(query.get('M_UNIT.uom25'))
+        if 'S_TYPE.uom25' in query:
+            data['attributes'] ['supplyType'] = self.key2w_unit(int(query.get('S_TYPE.uom25')))
+        self.yoSprinkler.setAttributes(data)
+
+
+    def set_delay(self, command):
+        logging.info(f'set_delay {command}')
+        query = command.get("query")
+        delay_time = int(query.get('w_del_time.uom44'))
+        self.yoSprinkler.setDelayTime(delay_time)   
 
     commands = {
                 'UPDATE': update,
                 'STARTSTOP'   : start_stop,
                 'WATERMODE' : set_watermode,
-                #'VALVECTRL': waterCtrlControl, 
-                #'DELAYCTRL' : program_delays,
-                #'OFFDELAY' : prepOffDelay 
+                'W_ATTRIB' : set_attributes,
+                'W_DELAY' : set_delay,
+
                 }
 
 
