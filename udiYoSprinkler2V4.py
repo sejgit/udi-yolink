@@ -45,8 +45,8 @@ class udiYoSprinkler2(udi_interface.Node):
 
             {'driver': 'GV3', 'value': 99, 'uom': 25},  #running mode 
             {'driver': 'GV4', 'value': 99, 'uom': 25},  #running total mode 
-            {'driver': 'GV5', 'value': 99, 'uom': 70},  #Wateruse 
-            {'driver': 'GV6', 'value': 99, 'uom': 70},  # progress
+            #{'driver': 'GV5', 'value': 99, 'uom': 70},  #Wateruse 
+            #{'driver': 'GV6', 'value': 99, 'uom': 70},  # progress
 
 
             {'driver': 'GV7', 'value': 99, 'uom': 25}, #manualwatering type
@@ -182,9 +182,8 @@ class udiYoSprinkler2(udi_interface.Node):
                     water_amount = self.yoSprinkler.get_data('waterFlowing')
                     logging.debug(f'water manualWater value: {water_amount}')
                     if isinstance(water_amount, (int,float)):
-
                         water_amount = round(float(self.calculate_water_volume(water_amount/self.step_factor,  self.meter_unit,  self.ISYwater_unit)), 1)
-                        self.my_setDriver('GV4', water_amount, type=message_type)
+                        self.my_setDriver('ST', water_amount, type=message_type, Unit =self.ISYmeter_uom)
                 
                     water_running = self.yoSprinkler.get_data('running', 'state')
                     logging.debug(f'water running : {water_running}')       

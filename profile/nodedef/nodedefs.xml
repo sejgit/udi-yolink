@@ -1326,9 +1326,8 @@
 
          <st id="GV3" editor="runningmode" /> <!--  --> 
          <st id="GV4" editor="runningvalue" /> <!--  --> 
-         <st id="GV5" editor="wateruse" /> <!-- -->
+         <!--<st id="GV5" editor="wateruse" /> -->  
    
-
          <st id="GV7" editor="watermode" /> <!-- -->
          <st id="GV8" editor="watermethod" /> <!-- -->
          <st id="GV9" editor="runningvalue" />  <!--  r-->  
