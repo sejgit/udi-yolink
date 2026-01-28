@@ -1329,7 +1329,7 @@
          <!--<st id="GV5" editor="wateruse" /> -->  
    
          <st id="GV7" editor="watermode" /> <!-- -->
-         <st id="GV8" editor="watermethod" /> <!-- -->
+         <st id="GV8" editor="runningmode" /> <!-- -->
          <st id="GV9" editor="runningvalue" />  <!--  r-->  
          <st id="GV10" editor="runningvalue" /> <!-- -->     
 
