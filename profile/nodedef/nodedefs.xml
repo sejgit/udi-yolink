@@ -1350,17 +1350,17 @@
          </sends>
          <accepts>
             <cmd id="UPDATE" /> 
-            <cmd id="STARTSTOP" />
+            <cmd id="STARTSTOP" >
                <p id="" editor="startstop" />
             </cmd >
-            <cmd id="WATERMODE" />
+            <cmd id="WATERMODE" >
                <p id="w_mode" editor="sprinklerstate"  /> 
             </cmd >
-            <cmd id="W_ATTRIB" />
+            <cmd id="W_ATTRIB" >
                <p id="w_method" editor="sprinklerstate"/>
                <p id="w_amount" editor="w_amount"/>
             </cmd >
-            <cmd id="W_DELAY" />               
+            <cmd id="W_DELAY" >               
                <!--<p id="w_delay" editor="w_delay"  />`-->
                <p id="w_del_time" editor="minutes"  /> 
             </cmd >
