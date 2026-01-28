@@ -823,7 +823,7 @@ CMDP-wdeltime-NAME=Set Delay
 
 running-0=Stop
 running-1=Start
-sprinklerstate-0=Manunal
+sprinklerstate-0=Manual
 sprinklerstate-1=Schedule
 sprinklermethod-0=Water Volume
 sprinklermethod-1=Time
