@@ -85,7 +85,7 @@ class udiYoSprinkler2(udi_interface.Node):
         self.timer_update = 5
         self.timer_expires = 0
         self.mode = ''
-        
+
         self.step_factor = 1
         self.ISYmeter_uom = None
         self.ISYwater_unit = None
@@ -263,7 +263,7 @@ class udiYoSprinkler2(udi_interface.Node):
                     water_delay = self.yoSprinkler.get_data('duration', 'waterDelay')
                     logging.debug(f'water delay value: {water_delay}')
                     if isinstance(water_delay, (int,float)):
-                        self.my_setDriver('GV12', water_delay, type=message_type)
+                        self.my_setDriver('GV12', water_delay, type=message_type, Unit=44)
 
    
                     pwr_mode = self.yoSprinkler.get_data('powerMode')
@@ -316,7 +316,7 @@ class udiYoSprinkler2(udi_interface.Node):
         data={}
         data['params'] = {}
         query = command.get("query")
-        if 'w_mode.uom25' in query:
+        if 'wmode.uom25' in query:
             mode = int (query.get('w_mode.uom25'))
             if mode == 0:
                 data['params']['waterMode'] = 'manual'
@@ -331,7 +331,7 @@ class udiYoSprinkler2(udi_interface.Node):
         data['params'] = {}
         leak_lim = None
         or_lim = None
-        if 'w_method.uom25' in query:
+        if 'wmethod.uom25' in query:
             method = int (query.get('w_method.uom25'))
             if method == 0:
                 self.mode = 'amount'
@@ -342,7 +342,7 @@ class udiYoSprinkler2(udi_interface.Node):
             #self.my_setDriver('GV8', method)
 
 
-        if 'w_amount.uom70' in query:
+        if 'wamount.uom70' in query:
             amount = float (query.get('w_amount.uom70'))
             self.my_setDriver('GV9', amount)
             if self.mode == 'amount':
@@ -364,15 +364,15 @@ class udiYoSprinkler2(udi_interface.Node):
     def set_delay(self, command):
         logging.info(f'set_delay {command}')
         query = command.get("query")
-        delay_time = int(query.get('w_del_time.uom44'))
+        delay_time = int(query.get('wdeltime.uom44'))
         self.yoSprinkler.setDelayTime(delay_time)   
 
     commands = {
                 'UPDATE': update,
                 'STARTSTOP'   : start_stop,
                 'WATERMODE' : set_watermode,
-                'W_ATTRIB' : set_attributes,
-                'W_DELAY' : set_delay,
+                'WATTRIB' : set_attributes,
+                'WDELAY' : set_delay,
 
                 }
 

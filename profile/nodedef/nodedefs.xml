@@ -1354,15 +1354,15 @@
                <p id="" editor="startstop" />
             </cmd >
             <cmd id="WATERMODE" >
-               <p id="w_mode" editor="sprinklerstate"  /> 
+               <p id="wmode" editor="sprinklerstate"  /> 
             </cmd >
-            <cmd id="W_ATTRIB" >
-               <p id="w_method" editor="sprinklerstate"/>
-               <p id="w_amount" editor="w_amount"/>
+            <cmd id="WATTRIB" >
+               <p id="wmethod" editor="sprinklerstate"/>
+               <p id="wamount" editor="wamount"/>
             </cmd >
-            <cmd id="W_DELAY" >               
+            <cmd id="WDELAY" >               
                <!--<p id="w_delay" editor="w_delay"  />`-->
-               <p id="w_del_time" editor="minutes"  /> 
+               <p id="wdeltime" editor="minutesSet"  /> 
             </cmd >
          </accepts>
       </cmds>

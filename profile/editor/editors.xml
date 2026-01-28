@@ -380,9 +380,11 @@
   <editor id="sprinklerstate">
     <range uom="25" subset="0,1,99" nls="sprinklerstate" />
   </editor>
-  <editor id="w_amount">
+  
+  <editor id="wamount">
     <range uom="70" min="0" max="1440" />
-    </editor>
+  </editor>
+
    <editor id="runningvalue">
       <range uom="44" min="0" max="1440" />
       <range uom="35" min="0" max="2000" />
