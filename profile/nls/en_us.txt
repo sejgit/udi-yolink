@@ -316,7 +316,7 @@ ST-nlssoilsensor-GV2-NAME=High Conductivity Alarm
 ST-nlssoilsensor-GV3-NAME=Low Temp Alarm
 ST-nlssoilsensor-GV4-NAME=High Temp Alarm
 ST-nlssoilsensor-GV5-NAME=Low Humidity Alarm
-ST-nlssoilsensor-GV5-NAME=High Humidity Alarm
+ST-nlssoilsensor-GV6-NAME=High Humidity Alarm
 ST-nlssoilsensor-GV7-NAME=Period Alarm
 ST-nlssoilsensor-GV8-NAME=Alarm triggered
 ST-nlssoilsensor-BATLVL-NAME=Battery Level
@@ -781,6 +781,44 @@ CMD-nlswaterdept-SETATTR-NAME=Set water level alarms
 CMD-nlswaterdept-NAME=Update Status
 CMDP-waterLowAlarm-NAME=Low Water Alarm (0-1000)
 CMDP-waterHighAlarm-NAME=High Water Alarm (0-1000)
+
+
+ND-yosprinklerv2-NAME=YoLink Smart Sprinkler V2
+ND-yosprinklerv2-ICON=Irrigation
+#ND-yosprinklerv2G-NAME=YoLink Water Level Sensor
+#ND-yosprinklerv2G-ICON=Irrigation
+ST-nlssprinkler-NAME=Nodeserver Status
+ST-nlssprinkler-ST-NAME=Water Use (running)
+ST-nlssprinkler-GV0-NAME=Water Running
+ST-nlssprinkler-GV1-NAME=No Water Alarm
+ST-nlssprinkler-GV2-NAME=Water Mode (schedule/Manual)
+ST-nlssprinkler-GV3-NAME=Water Amount Mode (Volume/Time)
+ST-nlssprinkler-GV4-NAME=Water Amount
+ST-nlssprinkler-GV5-NAME=Water Use
+#ST-nlssprinkler-GV6-NAME=Water Running
+ST-nlssprinkler-GV7-NAME=Water Mode
+ST-nlssprinkler-GV8-NAME=Water Amount Mode (Volume/Time)
+ST-nlssprinkler-GV9-NAME=Water Amount
+ST-nlssprinkler-GV10-NAME=Water Use
+ST-nlssprinkler-GV12-NAME=Time Delay
+
+
+
+ST-nlssprinkler-GV20-NAME=Connection State
+ST-nlssprinkler-GV30-NAME=Online State
+ST-nlssprinkler-BATLVL-NAME=Battery Level
+ST-nlssprinkler-TIME-NAME=Last Data Update
+ST-nlssprinkler-CLITEMP-NAME=Sensor Temperature
+ST-nlssprinkler-CLIHUM-NAME=Current Rel Humidity (%)
+
+CMD-nlssprinkler-UJPDATE-NAME=Update Status
+CMD-nlssprinkler-STARTSTOP-NAME=Start/Stop 
+CMD-nlssprinkler-W_ATTRIB-NAME=Set watering Attributes
+CMD-nlssprinkler-W_DELAY-NAME=Set water delay
+CMDP-nlssprinkler-w_method-NAME=Watering Method
+CMDP-nlssprinkler-w_amount-NAME=Set Amount
+CMDP-nlssprinkler-w_del_time-NAME=Set Delay
+
 
 wl_state-99=Unknown
 wl_state-98=Updating (may take up to 1 hour)

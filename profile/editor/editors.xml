@@ -382,5 +382,23 @@
   </editor>
   <editor id="w_amount">
     <range uom="70" min="0" max="1440" />
-  
+    </editor>
+   <editor id="runningvalue">
+      <range uom="44" min="0" max="1440" />
+      <range uom="35" min="0" max="2000" />
+      <range uom="69" min="0" max="600" />
+      <range uom="25" subset="0,99" nls="error" />  
+    </editor>   
+
+
+    <editor id="watermode">
+    <range uom="25" subset="0,1,99" nls="watermode" />
+  </editor>
+    <editor id="watermethod"> 
+    <range uom="25" subset="0,1,99" nls="watermethod" />
+  </editor>
+    <editor id="nowateralarm"> 
+    <range uom="25" subset="0,1,99" nls="nowateralarm" />
+  </editor>
+
 </editors>

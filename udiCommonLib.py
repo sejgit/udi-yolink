@@ -3,7 +3,7 @@
 Yolink Control Main Node  program 
 MIT License
 """
-version = '1.7.3'
+version = '1.7.4'
 import sys
 import re
 import time
