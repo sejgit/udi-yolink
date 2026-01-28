@@ -1318,8 +1318,8 @@
  <nodeDef id="yosprinklerv2" nls="nlssprinkler">
       <editors />
       <sts>
-         <st id="ST" editor="waterrun" /> <!-- water runing-->
-
+         <st id="ST" editor="wateruse" /> <!-- water runing-->
+         <st id="GV0" editor="waterrun" /> 
          <!--<st id="GV0" editor="sprinklerstate" />-->
          <st id="GV1" editor="nowateralarm" />
          <st id="GV2" editor="watermode" /> <!-- -->
@@ -1327,12 +1327,14 @@
          <st id="GV3" editor="runningmode" /> <!--  --> 
          <st id="GV4" editor="runningvalue" /> <!--  --> 
          <st id="GV5" editor="wateruse" /> <!-- -->
-         <st id="GV6" editor="progress" /> <!-- -->
+   
 
          <st id="GV7" editor="watermode" /> <!-- -->
          <st id="GV8" editor="runningvalue" /> <!-- -->
-         <st id="GV9" editor="watermode" />  <!--  r-->       
-         <st id="GV10" editor="minutes" /> <!--  -->
+         <st id="GV9" editor="watermode" />  <!--  r-->  
+         <st id="GV10" editor="progress" /> <!-- -->     
+
+         <st id="GV12" editor="minutes" /> <!--  -->
       
          <st id="BATLVL" editor="batlevel" />
          <st id="GV20" editor="suspendstate" />
@@ -1349,7 +1351,7 @@
          <accepts>
             <cmd id="UPDATE" /> 
             <cmd id="STARTSTOP" />
-               <p id="w_startstop" editor="startstop" />
+               <p id="" editor="startstop" />
             </cmd >
             <cmd id="WATERMODE" />
                <p id="w_mode" editor="sprinklerstate"  /> 
