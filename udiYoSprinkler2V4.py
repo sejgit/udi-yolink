@@ -217,9 +217,9 @@ class udiYoSprinkler2(udi_interface.Node):
                     if isinstance(method_amount, (int,float)):
                         if self.mode == 'amount':
                             method_amount = round(float(self.calculate_water_volume(method_amount/self.step_factor,  self.meter_unit,  self.ISYwater_unit)), 1)
-                            self.my_setDriver('GV4', method_amount, type=message_type, uom=self.ISYmeter_uom)
+                            self.my_setDriver('GV4', method_amount, type=message_type, Unit=self.ISYmeter_uom)
                         else:
-                            self.my_setDriver('GV4', method_amount, type=message_type, uom=44)
+                            self.my_setDriver('GV4', method_amount, type=message_type, Unit=44)
 
                     sprinkler_mode = self.yoSprinkler.get_data('mode', 'running')
                     logging.debug(f'water Mode: {sprinkler_mode}')       
@@ -243,18 +243,18 @@ class udiYoSprinkler2(udi_interface.Node):
                     if isinstance(method_amount, (int,float)):
                         if water_method == 'amount':
                             method_amount = round(float(self.calculate_water_volume(method_amount/self.step_factor,  self.meter_unit,  self.ISYwater_unit)), 1)
-                            self.my_setDriver('GV9', method_amount, type=message_type, uom=self.ISYmeter_uom)
+                            self.my_setDriver('GV9', method_amount, type=message_type, Unit=self.ISYmeter_uom)
                         else:
-                            self.my_setDriver('GV9', method_amount, type=message_type, uom=44)
+                            self.my_setDriver('GV9', method_amount, type=message_type, Unit=44)
                     
                     method_amount = self.yoSprinkler.get_data('progress', 'running')
                     logging.debug(f'water progress: {method_amount}')
                     if isinstance(method_amount, (int,float)):
                         if water_method == 'amount':
                             method_amount = round(float(self.calculate_water_volume(method_amount/self.step_factor,  self.meter_unit,  self.ISYwater_unit)), 1)
-                            self.my_setDriver('GV10', method_amount, type=message_type, uom=self.ISYmeter_uom)
+                            self.my_setDriver('GV10', method_amount, type=message_type, Unit=self.ISYmeter_uom)
                         else:
-                            self.my_setDriver('GV10', method_amount, type=message_type, uom=44)
+                            self.my_setDriver('GV10', method_amount, type=message_type, Unit=44)
 
                     water_delay = self.yoSprinkler.get_data('duration', 'waterDelay')
                     logging.debug(f'water delay value: {water_delay}')
