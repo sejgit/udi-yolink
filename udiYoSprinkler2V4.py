@@ -85,7 +85,11 @@ class udiYoSprinkler2(udi_interface.Node):
         self.timer_update = 5
         self.timer_expires = 0
         self.mode = ''
+        
         self.step_factor = 1
+        self.ISYmeter_uom = None
+        self.ISYwater_unit = None
+        self.meter_unit = None
 
         self.valveState = 99 # needed as class c device - keep value until online again 
         #polyglot.subscribe(polyglot.POLL, self.poll)
