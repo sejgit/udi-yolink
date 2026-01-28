@@ -455,10 +455,10 @@ def addNodes (self, deviceList) -> list:
                 for adr in temp.adr_list:
                     self.assigned_addresses.append(adr)                                                 
 
-            elif dev['type'] in ['Sprinkler', 'SprinklerV2']:
+            elif dev['type'] in [ 'SprinklerV2']: #'Sprinkler',
                 logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) )) 
 
-                temp = udiYoSprinkler(self.poly, address, address, name, dev_access, dev )
+                temp = udiYoSprinkler2(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
                     time.sleep(4)
