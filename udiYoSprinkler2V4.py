@@ -15,7 +15,7 @@ from os import truncate
 #import udi_interface
 #import sys
 import time
-from yolinkWaterMeterControllerV3 import YoLinkWaterMeter
+from yolinkSprinklerV2 import YoLinkSprinkler
 
 
 
@@ -53,7 +53,7 @@ class udiYoSprinkler2(udi_interface.Node):
             {'driver': 'GV8', 'value': 99, 'uom': 70}, #manualwatering type values                                             
             {'driver': 'GV9', 'value': 99, 'uom': 25}, #waterdelay type
             {'driver': 'GV10', 'value': 99, 'uom': 70}, #waterdelay type values
-            
+
             {'driver': 'GV12', 'value': 99, 'uom' : 44}, # delay valuetype
      
             {'driver': 'GV20', 'value': 99, 'uom': 25},
@@ -105,7 +105,7 @@ class udiYoSprinkler2(udi_interface.Node):
         logging.info('Start - udiYoSprinkler2')
         self.my_setDriver('GV30', 1)
         self.my_setDriver('GV20', 0)
-        self.yoSprinkler= udiYoSprinkler2(self.yoAccess, self.devInfo, self.updateStatus)
+        self.yoSprinkler= YoLinkSprinkler(self.yoAccess, self.devInfo, self.updateStatus)
         self.yoSprinkler.initNode()
         while not self.yoSprinkler.online:
             logging.info('waiting for watermeter to be online')
