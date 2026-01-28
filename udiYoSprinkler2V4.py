@@ -52,7 +52,9 @@ class udiYoSprinkler2(udi_interface.Node):
             {'driver': 'GV7', 'value': 99, 'uom': 25}, #manualwatering type
             {'driver': 'GV8', 'value': 99, 'uom': 70}, #manualwatering type values                                             
             {'driver': 'GV9', 'value': 99, 'uom': 25}, #waterdelay type
-            {'driver': 'GV10', 'value': 99, 'uom' : 44}, # delay valuetype
+            {'driver': 'GV10', 'value': 99, 'uom': 70}, #waterdelay type values
+            
+            {'driver': 'GV12', 'value': 99, 'uom' : 44}, # delay valuetype
      
             {'driver': 'GV20', 'value': 99, 'uom': 25},
             {'driver': 'GV30', 'value': 99, 'uom': 25},

@@ -811,8 +811,9 @@ ST-nlssprinkler-TIME-NAME=Last Data Update
 ST-nlssprinkler-CLITEMP-NAME=Sensor Temperature
 ST-nlssprinkler-CLIHUM-NAME=Current Rel Humidity (%)
 
-CMD-nlssprinkler-UJPDATE-NAME=Update Status
+CMD-nlssprinkler-UPDATE-NAME=Update Status
 CMD-nlssprinkler-STARTSTOP-NAME=Start/Stop 
+CMD-nlssprinkler-WATERMODE-NAME=Mode (Schedule/Manual)
 CMD-nlssprinkler-W_ATTRIB-NAME=Set watering Attributes
 CMD-nlssprinkler-W_DELAY-NAME=Set water delay
 CMDP-nlssprinkler-w_method-NAME=Watering Method
