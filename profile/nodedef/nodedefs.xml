@@ -1353,10 +1353,10 @@
                <p id="" editor="startstop" />
             </cmd >
             <cmd id="WATERMODE" >
-               <p id="wmode" editor="sprinklerstate"  /> 
+               <p id="wmethod" editor="sprinklerstate"  /> 
             </cmd >
             <cmd id="WATTRIB" >
-               <p id="wmethod" editor="sprinklerstate"/>
+               <p id="wmethod" editor="sprinklermethod"/>
                <p id="wamount" editor="wamount"/>
             </cmd >
             <cmd id="WDELAY" >               

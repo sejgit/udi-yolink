@@ -788,7 +788,7 @@ ND-yosprinklerv2-ICON=Irrigation
 #ND-yosprinklerv2G-NAME=YoLink Water Level Sensor
 #ND-yosprinklerv2G-ICON=Irrigation
 ST-nlssprinkler-NAME=Nodeserver Status
-ST-nlssprinkler-ST-NAME=Water Use (running)
+ST-nlssprinkler-ST-NAME=Current Water Use
 ST-nlssprinkler-GV0-NAME=Water Running
 ST-nlssprinkler-GV1-NAME=No Water Alarm
 ST-nlssprinkler-GV2-NAME=Water Mode (schedule/Manual)
@@ -816,17 +816,29 @@ CMD-nlssprinkler-STARTSTOP-NAME=Start/Stop
 CMD-nlssprinkler-WATERMODE-NAME=Mode (Schedule/Manual)
 CMD-nlssprinkler-WATTRIB-NAME=Set watering Attributes
 CMD-nlssprinkler-WDELAY-NAME=Set water delay
-CMDP-wmethod-NAME=Watering Method
+CMDP-wmode-NAME=Watering Method
+CMDP-wmethod-NAME=Watering Measure Method
 CMDP-wamount-NAME=Set Amount
 CMDP-wdeltime-NAME=Set Delay
 
-waterrun-0=No Water 
+running-0=Stop
+running-1=Start
+sprinklerstate-0=Manunal
+sprinklerstate-1=Schedule
+sprinklermethod-0=Water Volume
+sprinklermethod-1=Time
+
+waterrun-0=Stopped
 waterrun-1=Water Running
 waterrun-99=Unknown
 
 watermode-1=Scheduled
 watermode-0=Manual
 watermode-99=Unknown
+
+runningmode-0=Water Volume
+runningmode-1=Time
+runningmode-99=Unknown
 
 nowateralarm-0=Normal
 nowateralarm-1=No Water

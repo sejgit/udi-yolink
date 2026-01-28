@@ -375,12 +375,14 @@
     <range uom="25" subset="0,99" nls="error" />
   </editor>  
   <editor id="startstop">
-    <range uom="25" subset="0,1,99" nls="running" />
+    <range uom="25" subset="0,1" nls="running" />
   </editor>
   <editor id="sprinklerstate">
-    <range uom="25" subset="0,1,99" nls="sprinklerstate" />
+    <range uom="25" subset="0,1" nls="sprinklerstate" />
   </editor>
-
+  <editor id="sprinklermethod">
+    <range uom="25" subset="0,1" nls="sprinklermethod" />
+  </editor>
   <editor id="wamount">
     <range uom="70" min="0" max="1440" />
   </editor>
@@ -391,7 +393,9 @@
       <range uom="69" min="0" max="600" />
       <range uom="25" subset="0,99" nls="error" />  
     </editor>   
-
+  <editor id="runningmode">
+    <range uom="25" subset="0,1,99" nls="runningmode" />
+  </editor>
 
     <editor id="watermode">
     <range uom="25" subset="0,1,99" nls="watermode" />
@@ -402,5 +406,6 @@
     <editor id="nowateralarm"> 
     <range uom="25" subset="0,1,99" nls="nowateralarm" />
   </editor>
+
 
 </editors>

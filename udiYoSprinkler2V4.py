@@ -334,10 +334,10 @@ class udiYoSprinkler2(udi_interface.Node):
             method = int (query.get('w_method.uom25'))
             if method == 0:
                 self.mode = 'amount'
-                data['params'] ['manualWater']['type'] = 'amount'
+                data['params']['manualWater']['type'] = 'amount'
             elif method == 1:
                 self.mode = 'duration'
-                data['params'] ['manualWater']['type'] = 'duration'
+                data['params']['manualWater']['type'] = 'duration'
             #self.my_setDriver('GV8', method)
 
 
