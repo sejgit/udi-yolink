@@ -381,7 +381,7 @@ class udiYoSprinkler2(udi_interface.Node):
             amount = float (query.get('wamount.uom70'))
             self.my_setDriver('GV9', amount)
             if self.mode == 'amount':
-                if self.ISYmeter_unit == 0:#gallon
+                if self.ISYwater_unit == 0: #gallon
                     amount = amount / 0.264172
                 amount = amount * self.step_factor
             data['params'] ['manualWater']['value'] = int(amount) 
