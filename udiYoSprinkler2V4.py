@@ -295,7 +295,7 @@ class udiYoSprinkler2(udi_interface.Node):
     def start_stop(self, command):
         logging.info('udiYoSprinkler2 - set_open')
         query = command.get("query")
-        action = query.get('wstartstop.uom25')
+        action = query.get('value')
         data={}
         data['params'] = {}
         logging.debug(f'start_stop action: {action}')
@@ -310,17 +310,17 @@ class udiYoSprinkler2(udi_interface.Node):
 
 
     def set_watermode(self, command):
-        logging.info(f'set_attributes {command}')
+        logging.info(f'set_watermode {command}')
 
         data={}
         data['params'] = {}
+
         query = command.get("query")
-        if 'wmode.uom25' in query:
-            mode = int (query.get('value'))
-            if mode == 0:
-                data['params']['waterMode'] = 'manual'
-            elif mode == 1:
-                data['params']['waterMode'] = 'schedule'    
+        mode = int (query.get('value'))
+        if mode == 0:
+            data['params']['waterMode'] = 'manual'
+        elif mode == 1:
+            data['params']['waterMode'] = 'schedule'    
         self.yoSprinkler.setDevice(data)
 
     def set_attributes(self, command):
@@ -328,6 +328,7 @@ class udiYoSprinkler2(udi_interface.Node):
         query = command.get("query")
         data={}
         data['params'] = {}
+        data['params']['manualWater'] = {}
         leak_lim = None
         or_lim = None
         if 'wmethod.uom25' in query:
@@ -363,8 +364,8 @@ class udiYoSprinkler2(udi_interface.Node):
     def set_delay(self, command):
         logging.info(f'set_delay {command}')
         query = command.get("query")
-        delay_time = int(query.get('wdeltime.uom44'))
-        self.yoSprinkler.setDelayTime(delay_time)   
+        delay_time = int(query.get('value'))
+        self.yoSprinkler.setAttributes(delay_time)   
 
     commands = {
                 'UPDATE': update,
