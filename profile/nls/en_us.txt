@@ -788,18 +788,20 @@ ND-yosprinklerv2-ICON=Irrigation
 #ND-yosprinklerv2G-NAME=YoLink Water Level Sensor
 #ND-yosprinklerv2G-ICON=Irrigation
 ST-nlssprinkler-NAME=Nodeserver Status
-ST-nlssprinkler-ST-NAME=Current Water Use
-ST-nlssprinkler-GV0-NAME=Water Running
+ST-nlssprinkler-ST-NAME=Current State
+#ST-nlssprinkler-GV0-NAME=Water Running
 ST-nlssprinkler-GV1-NAME=No Water Alarm
-ST-nlssprinkler-GV2-NAME=Water Mode (schedule/Manual)
-ST-nlssprinkler-GV3-NAME=Water Amount Mode (Volume/Time)
-ST-nlssprinkler-GV4-NAME=Water Amount
-ST-nlssprinkler-GV5-NAME=Water Use
-#ST-nlssprinkler-GV6-NAME=Water Running
-ST-nlssprinkler-GV7-NAME=Water Mode Executing
-ST-nlssprinkler-GV8-NAME=Water Amount Mode Executing (Volume/Time)
-ST-nlssprinkler-GV9-NAME=Water Amount Executing
-ST-nlssprinkler-GV10-NAME=Water Amount Executed
+ST-nlssprinkler-GV2-NAME=Water Mode Attrib (schedule/Manual)
+ST-nlssprinkler-GV3-NAME=Water Amount Mode Attrib (Volume/Time)
+ST-nlssprinkler-GV4-NAME=Water Amount Atttrib
+
+ST-nlssprinkler-GV5-NAME=Latest Operation
+ST-nlssprinkler-GV6-NAME=Latest Mode used
+ST-nlssprinkler-GV7-NAME=Latest Water Method
+ST-nlssprinkler-GV8-NAME=Latest Water Amount target
+ST-nlssprinkler-GV9-NAME=Latest Water Alarm
+ST-nlssprinkler-GV10-NAME=Time for Latest operation Update
+
 ST-nlssprinkler-GV12-NAME=Time Delay
 
 

@@ -160,7 +160,7 @@ def my_setDriver(self, key, value, Unit=None, force=False, type=None):
         try:
             if any(item.get('driver') == key for item in self.drivers):
                 if value is None:
-                    if type is not 'event':
+                    if type not in ['report', 'getState']: #['event', 'setAttributes', 'setState']:
                         logging.debug('None value passed = seting 99, UOM 25')
                         self.node.setDriver(key, 99, True, force, 25)
                 else:                

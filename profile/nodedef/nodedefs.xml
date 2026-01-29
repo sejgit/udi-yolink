@@ -1318,20 +1318,21 @@
  <nodeDef id="yosprinklerv2" nls="nlssprinkler">
       <editors />
       <sts>
-         <st id="ST" editor="runningvalue" /> <!-- water runing-->
-         <st id="GV0" editor="waterrun" /> 
+         <!--<st id="ST" editor="runningvalue" />  water runing-->
+         <st id="ST" editor="waterrun" /> 
          <!--<st id="GV0" editor="sprinklerstate" />-->
          <st id="GV1" editor="nowateralarm" />
          <st id="GV2" editor="watermode" /> <!-- -->
 
          <st id="GV3" editor="runningmode" /> <!--  --> 
          <st id="GV4" editor="runningvalue" /> <!--  --> 
-         <!--<st id="GV5" editor="wateruse" /> -->  
-   
+         <st id="GV5" editor="sprinklerstate" /> 
+         <st id="GV6" editor="wateruse" /> 
          <st id="GV7" editor="watermode" /> <!-- -->
-         <st id="GV8" editor="runningmode" /> <!-- -->
-         <st id="GV9" editor="runningvalue" />  <!--  r-->  
-         <st id="GV10" editor="runningvalue" /> <!-- -->     
+         <st id="GV8" editor="runningvalue" /> <!-- -->
+         <st id="GV9" editor="nowateralarm" />  <!--  r-->  
+         <st id="GV10" editor="unixtime" />   
+         <!--  <st id="GV11" editor="nowateralarm" />-->     
 
          <st id="GV12" editor="minutes" /> <!--  -->
       
