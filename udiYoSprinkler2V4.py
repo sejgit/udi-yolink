@@ -49,7 +49,7 @@ class udiYoSprinkler2(udi_interface.Node):
             #{'driver': 'GV6', 'value': 99, 'uom': 25},  # Latest Mode
             {'driver': 'GV7', 'value': 99, 'uom': 25}, #Latest Method
             {'driver': 'GV8', 'value': 99, 'uom': 25}, #Latest Volume                                             
-            {'driver': 'GV9', 'value': 99, 'uom':25}, #Latest Alert
+            {'driver': 'GV9', 'value': 99, 'uom': 25}, #Latest Alert
             {'driver': 'GV10', 'value': 99, 'uom': 151}, #Time for lateest operatiowaterdelay type
             #{'driver': 'GV10', 'value': 99, 'uom': 25}, #no Water When Last run 
 

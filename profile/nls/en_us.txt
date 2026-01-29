@@ -841,8 +841,8 @@ runningmode-0=Water Volume
 runningmode-1=Time
 runningmode-99=Unknown
 
-nowateralarm-0=Normal
-nowateralarm-1=No Water
+nowateralarm-0=Normal (no alarm)
+nowateralarm-1=Alarm No Water Detected
 nowateralarm-99=Unknown
 
 runningmode-0=Fixed Water Amount
