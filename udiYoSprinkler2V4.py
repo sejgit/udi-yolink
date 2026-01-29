@@ -258,14 +258,15 @@ class udiYoSprinkler2(udi_interface.Node):
                         else:
                             self.my_setDriver('GV4', method_amount, type=message_type, Unit=44)
 
-                    sprinkler_mode = self.yoSprinkler.get_data('mode', 'running')
-                    logging.debug(f'water Mode: {sprinkler_mode}')       
-                    if sprinkler_mode in ['manual']:
-                        self.my_setDriver('GV7', 0, type=message_type)
-                    elif sprinkler_mode in ['schedule']:
-                        self.my_setDriver('GV7', 1, type=message_type)
-                    else:
-                        self.my_setDriver('GV7', 99, type=message_type)
+                    '''
+                    #sprinkler_mode = self.yoSprinkler.get_data('mode', 'running')
+                    #logging.debug(f'water Mode: {sprinkler_mode}')       
+                    #if sprinkler_mode in ['manual']:
+                    #    self.my_setDriver('GV7', 0, type=message_type)
+                    #elif sprinkler_mode in ['schedule']:
+                    #    self.my_setDriver('GV7', 1, type=message_type)
+                    #else:
+                    #    self.my_setDriver('GV7', 99, type=message_type)
 
                     water_method = self.yoSprinkler.get_data('type', 'total')
                     logging.debug(f'water total: {water_method}')
@@ -292,7 +293,7 @@ class udiYoSprinkler2(udi_interface.Node):
                             self.my_setDriver('GV10', method_amount, type=message_type, Unit=self.ISYmeter_uom)
                         else:
                             self.my_setDriver('GV10', method_amount, type=message_type, Unit=44)
-
+                    '''
                     water_delay = self.yoSprinkler.get_data('duration', 'waterDelay')
                     logging.debug(f'water delay value: {water_delay}')
                     if isinstance(water_delay, (int,float)):
