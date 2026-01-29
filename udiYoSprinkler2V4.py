@@ -41,14 +41,14 @@ class udiYoSprinkler2(udi_interface.Node):
            
             {'driver': 'ST', 'value': 99, 'uom': 25}, #Water running 
             {'driver': 'GV1', 'value': 99, 'uom': 25}, #no Water When running 
-            {'driver': 'GV2', 'value': 99, 'uom': 25}, #water mode attrib
-            {'driver': 'GV3', 'value': 99, 'uom': 25},  #Water Method attrib 
-            {'driver': 'GV4', 'value': 99, 'uom': 25},  #Amount attrib 
+            #{'driver': 'GV2', 'value': 99, 'uom': 25}, #water mode attrib
+            #{'driver': 'GV3', 'value': 99, 'uom': 25},  #Water Method attrib 
+            #{'driver': 'GV4', 'value': 99, 'uom': 25},  #Amount attrib 
 
             {'driver': 'GV5', 'value': 99, 'uom': 25},  #Latest operation
-            {'driver': 'GV6', 'value': 99, 'uom': 25},  # Latest Mode
+            #{'driver': 'GV6', 'value': 99, 'uom': 25},  # Latest Mode
             {'driver': 'GV7', 'value': 99, 'uom': 25}, #Latest Method
-            {'driver': 'GV8', 'value': 99, 'uom': 70}, #Latest Volume                                             
+            {'driver': 'GV8', 'value': 99, 'uom': 25}, #Latest Volume                                             
             {'driver': 'GV9', 'value': 99, 'uom':25}, #Latest Alert
             {'driver': 'GV10', 'value': 99, 'uom': 151}, #Time for lateest operatiowaterdelay type
             #{'driver': 'GV10', 'value': 99, 'uom': 25}, #no Water When Last run 
@@ -178,39 +178,53 @@ class udiYoSprinkler2(udi_interface.Node):
                         #self.my_setDriver('GV4',  self.meter_unit, 25)          
                         self.ISYmeter_uom = self.water_meter_unit2uom( self.meter_unit)
 
-                    events = self.yoSprinkler.get_data('events', 'metadata')
-                    logging.debug(f'events: {events}')
-                    if isinstance(events, list) and len(events) > 0:
-                        for event in events:
-                            if event in [ 'WaterStart', 'WaterStop', 'WaterDone']:
-                                if event in ['WaterStart']:
-                                    self.my_setDriver('GV5', self.state2ISY(event in ['WaterStart']), type=message_type)
-                                    self.my_setDriver('ST', self.state2ISY(event in ['WaterStart']), type=message_type)
+                    events_happened = self.yoSprinkler.get_data('metadata')
+                    if isinstance(events_happened, dict) and events_happened['events'] is not {}:
+                        if 'events' in events_happened:
+                            events = events_happened['events']
+                            logging.debug(f'events: {events}')
+                            if isinstance(events, list) and len(events) > 0:
+                                for event in events:
+                                    if event in [ 'WaterStart', 'WaterStop', 'WaterDone']:
+                                        self.my_setDriver('GV5', self.state2ISY(event in ['WaterStart']), type=message_type)
+                                        self.my_setDriver('ST', self.state2ISY(event in ['WaterStart']), type=message_type)
+                            if 'NoWater' in events or 'FlowProtect' in events:
+                                self.my_setDriver('GV9', 1, type=message_type, Unit=25)
+                                type = self.yoSprinkler.get_data('type', 'water')
+                                if type in ['amount']:
+                                    self.my_setDriver('GV8', 0, Unit =self.ISYmeter_uom)
+                                elif type in ['duration']:
+                                    self.my_setDriver('GV8', amount, type=message_type, Unit=44)
+                            else:
+                                self.my_setDriver('GV9', 0, type=message_type, Unit=25)
 
-                                eventsdata = self.yoSprinkler.get_data('data', 'metadata')
-                                if isinstance(eventsdata, dict):
-                                    mode = self.yoSprinkler.get_data('mode', 'data')
-                                    if mode in ['manual']:
-                                        self.my_setDriver('GV6', 0, type=message_type)
-                                    elif mode in ['schedule']:
-                                        self.my_setDriver('GV6', 1, type=message_type)
-                                    type = self.yoSprinkler.get_data('type', 'water')
-                                    if type in ['amount']:
-                                        self.my_setDriver('GV7', 0, type=message_type)
-                                    elif type in ['duration']:
-                                        self.my_setDriver('GV7', 1, type=message_type)
-                                    amount = self.yoSprinkler.get_data('value', 'water')
-                                    if isinstance(amount, (int,float)):
-                                        if type == 'amount':
-                                            amount = round(float(self.calculate_water_volume(amount/self.step_factor,  self.meter_unit,  self.ISYwater_unit)), 1)
-                                            self.my_setDriver('GV8', amount, type=message_type, Unit =self.ISYmeter_uom)
-                                        elif type == 'duration':
-                                            self.my_setDriver('GV8', amount, type=message_type, Unit =44)
+                        if 'data' in events_happened:
+                            eventsdata = events_happened['data']
+                            logging.debug(f'events data: {eventsdata}') 
+                            if isinstance(eventsdata, dict):
+                                '''
+                                mode = self.yoSprinkler.get_data('mode', 'data')
+                                if mode in ['manual']:
+                                    mode =0 
+                                elif mode in ['schedule']:
+                                    mode
+                                self.my_setDriver('GV6', mode, type=message_type)
+                                '''
+                                type = self.yoSprinkler.get_data('type', 'water')
+                                if type in ['amount']:
+                                    method = 0
+                                elif type in ['duration']:
+                                    method
+                                self.my_setDriver('GV7', method, type=message_type)
 
-                        if 'NoWater' in events:
-                            self.my_setDriver('GV9', 1, type=message_type)
-                        else:
-                            self.my_setDriver('GV9', 0, type=message_type)
+                                amount = self.yoSprinkler.get_data('value', 'water')
+                                if isinstance(amount, (int,float)):
+                                    if type == 'amount':
+                                        amount = round(float(self.calculate_water_volume(amount/self.step_factor,  self.meter_unit,  self.ISYwater_unit)), 1)
+                                        self.my_setDriver('GV8', amount, type=message_type, Unit =self.ISYmeter_uom)
+                                    elif type == 'duration':
+                                        self.my_setDriver('GV8', amount, type=message_type, Unit =44)
+
                         self.my_setDriver('GV10', unix_time, type=message_type, Unit=151)
                             
                     water_amount = self.yoSprinkler.get_data('waterFlowing')
@@ -221,33 +235,34 @@ class udiYoSprinkler2(udi_interface.Node):
                 
                     water_running = self.yoSprinkler.get_data('running', 'state')
                     logging.debug(f'water running : {water_running}')       
-                    self.my_setDriver('ST', self.state2ISY(water_running ), type=message_type)
+                    self.my_setDriver('ST', self.state2ISY(water_running), type=message_type)
 
                     water_running = self.yoSprinkler.get_data('noWaterWhenRunning', 'state')
                     logging.debug(f'water noWaterWhenRunning : {water_running}')       
                     self.my_setDriver('GV1', self.state2ISY(water_running ), type=message_type)
 
 
+                    '''
                     sprinkler_mode = self.yoSprinkler.get_data('waterMode')
+                    node = None
                     logging.debug(f'water Mode: {sprinkler_mode}')       
                     if sprinkler_mode in ['manual']:
-                        self.my_setDriver('GV2', 0, type=message_type)
-                    elif sprinkler_mode in ['schedule']:
-                        self.my_setDriver('GV2', 1, type=message_type)
-                    else:
-                        self.my_setDriver('GV2', 99, type=message_type)
-
+                        mode = 0
+                    elif sprinkler_mode in ['schedule']:                       
+                        mode = 1
+                    self.my_setDriver('GV2', mode, type=message_type, Unit=25)
+                    
 
                     water_method = self.yoSprinkler.get_data('type', 'manualWater')
+                    method = None
                     logging.debug(f'water manualWater: {water_method}')       
                     if water_method in ['amount']:
-                        self.my_setDriver('GV3', 0, type=message_type) 
+                        method = 0
                         self.mode = 'amount'
                     elif water_method in ['duration']:
-                        self.my_setDriver('GV3', 1, type=message_type)
+                        method = 1  
                         self.mode = 'duration'
-                    else:
-                        self.my_setDriver('GV3', 99, type=message_type) 
+                    self.my_setDriver('GV3', method, type=message_type, Unit=25 )
                 
                     method_amount = self.yoSprinkler.get_data('value', 'manualWater')
                     logging.debug(f'water manualWater value: {method_amount}')
@@ -258,6 +273,7 @@ class udiYoSprinkler2(udi_interface.Node):
                         else:
                             self.my_setDriver('GV4', method_amount, type=message_type, Unit=44)
 
+                    '''
                     '''
                     #sprinkler_mode = self.yoSprinkler.get_data('mode', 'running')
                     #logging.debug(f'water Mode: {sprinkler_mode}')       

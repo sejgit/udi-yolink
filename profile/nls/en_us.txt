@@ -790,10 +790,10 @@ ND-yosprinklerv2-ICON=Irrigation
 ST-nlssprinkler-NAME=Nodeserver Status
 ST-nlssprinkler-ST-NAME=Current State
 #ST-nlssprinkler-GV0-NAME=Water Running
-ST-nlssprinkler-GV1-NAME=No Water Alarm
-ST-nlssprinkler-GV2-NAME=Water Mode Attrib (schedule/Manual)
-ST-nlssprinkler-GV3-NAME=Water Amount Mode Attrib (Volume/Time)
-ST-nlssprinkler-GV4-NAME=Water Amount Atttrib
+ST-nlssprinkler-GV1-NAME=Curent No Water Alarm
+#ST-nlssprinkler-GV2-NAME=Water Mode Attrib (schedule/Manual)
+#ST-nlssprinkler-GV3-NAME=Water Amount Mode Attrib (Volume/Time)
+#ST-nlssprinkler-GV4-NAME=Water Amount Atttrib
 
 ST-nlssprinkler-GV5-NAME=Latest Operation
 ST-nlssprinkler-GV6-NAME=Latest Mode used
