@@ -293,9 +293,9 @@ class udiYoSprinkler2(udi_interface.Node):
 
 
     def start_stop(self, command):
-        logging.info('udiYoSprinkler2 - set_open')
-        query = command.get("query")
-        action = query.get('value')
+        logging.info(f'udiYoSprinkler2 - start_stop {command}')
+        
+        action = int(command.get('value'))
         data={}
         data['params'] = {}
         logging.debug(f'start_stop action: {action}')
@@ -315,8 +315,8 @@ class udiYoSprinkler2(udi_interface.Node):
         data={}
         data['params'] = {}
 
-        query = command.get("query")
-        mode = int (query.get('value'))
+        mode = int(command.get("value"))
+        logging.debug(f'set_watermode mode: {mode}')      
         if mode == 0:
             data['params']['waterMode'] = 'manual'
         elif mode == 1:
@@ -363,8 +363,7 @@ class udiYoSprinkler2(udi_interface.Node):
 
     def set_delay(self, command):
         logging.info(f'set_delay {command}')
-        query = command.get("query")
-        delay_time = int(query.get('value'))
+        delay_time = int(command.get('value'))
         self.yoSprinkler.setAttributes(delay_time)   
 
     commands = {

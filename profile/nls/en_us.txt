@@ -796,10 +796,10 @@ ST-nlssprinkler-GV3-NAME=Water Amount Mode (Volume/Time)
 ST-nlssprinkler-GV4-NAME=Water Amount
 ST-nlssprinkler-GV5-NAME=Water Use
 #ST-nlssprinkler-GV6-NAME=Water Running
-ST-nlssprinkler-GV7-NAME=Water Mode
-ST-nlssprinkler-GV8-NAME=Water Amount Mode (Volume/Time)
-ST-nlssprinkler-GV9-NAME=Water Amount
-ST-nlssprinkler-GV10-NAME=Water Use
+ST-nlssprinkler-GV7-NAME=Water Mode Executing
+ST-nlssprinkler-GV8-NAME=Water Amount Mode Executing (Volume/Time)
+ST-nlssprinkler-GV9-NAME=Water Amount Executing
+ST-nlssprinkler-GV10-NAME=Water Amount Executed
 ST-nlssprinkler-GV12-NAME=Time Delay
 
 
