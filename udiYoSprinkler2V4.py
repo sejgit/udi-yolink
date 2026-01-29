@@ -295,7 +295,7 @@ class udiYoSprinkler2(udi_interface.Node):
     def start_stop(self, command):
         logging.info('udiYoSprinkler2 - set_open')
         query = command.get("query")
-        action = query.get('w_startstop.uom25')
+        action = query.get('wstartstop.uom25')
         data={}
         data['params'] = {}
         logging.debug(f'start_stop action: {action}')
@@ -316,7 +316,7 @@ class udiYoSprinkler2(udi_interface.Node):
         data['params'] = {}
         query = command.get("query")
         if 'wmode.uom25' in query:
-            mode = int (query.get('w_mode.uom25'))
+            mode = int (query.get('value'))
             if mode == 0:
                 data['params']['waterMode'] = 'manual'
             elif mode == 1:
@@ -331,7 +331,7 @@ class udiYoSprinkler2(udi_interface.Node):
         leak_lim = None
         or_lim = None
         if 'wmethod.uom25' in query:
-            method = int (query.get('w_method.uom25'))
+            method = int (query.get('wmethod.uom25'))
             if method == 0:
                 self.mode = 'amount'
                 data['params']['manualWater']['type'] = 'amount'
@@ -342,7 +342,7 @@ class udiYoSprinkler2(udi_interface.Node):
 
 
         if 'wamount.uom70' in query:
-            amount = float (query.get('w_amount.uom70'))
+            amount = float (query.get('wamount.uom70'))
             self.my_setDriver('GV9', amount)
             if self.mode == 'amount':
                 if self.ISYmeter_unit == 0:#gallon
