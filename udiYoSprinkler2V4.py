@@ -177,9 +177,17 @@ class udiYoSprinkler2(udi_interface.Node):
                         logging.debug(f'meter unit : { self.meter_unit}')
                         #self.my_setDriver('GV4',  self.meter_unit, 25)          
                         self.ISYmeter_uom = self.water_meter_unit2uom( self.meter_unit)
+                    running = self.yoSprinkler.get_data('running', 'state')
+                    if isinstance(running, bool):
+                        logging.debug(f'water running : {running}')
+                        self.my_setDriver('ST', self.state2ISY(running), type=message_type)
+                    no_water = self.yoSprinkler.get_data('noWaterWhenRunning', 'state')
+                    if isinstance(no_water, bool):
+                        logging.debug(f'water noWaterWhenRunning : {no_water}')       
+                        self.my_setDriver('GV1', self.state2ISY(no_water), type=message_type)   
 
                     events_happened = self.yoSprinkler.get_data('metadata')
-                    if isinstance(events_happened, dict) and events_happened['events'] is not {}:
+                    if isinstance(events_happened, dict) and events_happened is not {}:
                         if 'events' in events_happened:
                             events = events_happened['events']
                             logging.debug(f'events: {events}')
@@ -187,7 +195,7 @@ class udiYoSprinkler2(udi_interface.Node):
                                 for event in events:
                                     if event in [ 'WaterStart', 'WaterStop', 'WaterDone']:
                                         self.my_setDriver('GV5', self.state2ISY(event in ['WaterStart']), type=message_type)
-                                        self.my_setDriver('ST', self.state2ISY(event in ['WaterStart']), type=message_type)
+                                        #self.my_setDriver('ST', self.state2ISY(event in ['WaterStart']), type=message_type)
                             if 'NoWater' in events or 'FlowProtect' in events:
                                 self.my_setDriver('GV9', 1, type=message_type, Unit=25)
                                 type = self.yoSprinkler.get_data('type', 'water')
@@ -233,13 +241,6 @@ class udiYoSprinkler2(udi_interface.Node):
                         #round(float(self.calculate_water_volume(water_amount/self.step_factor,  self.meter_unit,  self.ISYwater_unit)), 1)
                         self.my_setDriver('ST', self.state2ISY( water_amount != 0), type=message_type)
                 
-                    water_running = self.yoSprinkler.get_data('running', 'state')
-                    logging.debug(f'water running : {water_running}')       
-                    self.my_setDriver('ST', self.state2ISY(water_running), type=message_type)
-
-                    water_running = self.yoSprinkler.get_data('noWaterWhenRunning', 'state')
-                    logging.debug(f'water noWaterWhenRunning : {water_running}')       
-                    self.my_setDriver('GV1', self.state2ISY(water_running ), type=message_type)
 
 
                     '''
@@ -318,7 +319,6 @@ class udiYoSprinkler2(udi_interface.Node):
    
                     pwr_mode = self.yoSprinkler.get_data('powerMode')
                     bat_lvl =  self.yoSprinkler.get_data('battery')
-
                     logging.debug('udiYoWaterMeterController - getBattery: {},  {}  '.format(pwr_mode, bat_lvl))
                     if pwr_mode in ['PowerLine']:
                         self.my_setDriver('BATLVL', 98, 25, type=message_type)  # AC powered
@@ -420,7 +420,7 @@ class udiYoSprinkler2(udi_interface.Node):
     commands = {
                 'UPDATE': update,
                 'STARTSTOP'   : start_stop,
-                'WATERMODE' : set_watermode,
+                #'WATERMODE' : set_watermode,
                 'WATTRIB' : set_attributes,
                 'WDELAY' : set_delay,
 
