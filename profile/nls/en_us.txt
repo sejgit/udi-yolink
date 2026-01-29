@@ -796,12 +796,11 @@ ST-nlssprinkler-GV1-NAME=Curent No Water Alarm
 #ST-nlssprinkler-GV4-NAME=Water Amount Atttrib
 
 ST-nlssprinkler-GV5-NAME=Latest Operation
-ST-nlssprinkler-GV6-NAME=Latest Mode used
+#ST-nlssprinkler-GV6-NAME=Latest Mode used
 ST-nlssprinkler-GV7-NAME=Latest Water Method
 ST-nlssprinkler-GV8-NAME=Latest Water Amount target
 ST-nlssprinkler-GV9-NAME=Latest Water Alarm
 ST-nlssprinkler-GV10-NAME=Time for Latest operation Update
-
 ST-nlssprinkler-GV12-NAME=Time Delay
 
 
