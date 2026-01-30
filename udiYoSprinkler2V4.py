@@ -203,6 +203,8 @@ class udiYoSprinkler2(udi_interface.Node):
                                 if isinstance(amount, (int,float)):
                                     if type in ['amount']:
                                         self.my_setDriver('GV7', 0, Unit=25)
+                                        if self.ISYwater_unit == 0: #gallon
+                                            amount = amount * 0.264172
                                         amount = round(float(self.calculate_water_volume(amount/self.step_factor,  self.meter_unit,  self.ISYwater_unit)), 1)
                                         self.my_setDriver('GV8', amount, Unit =self.ISYmeter_uom)
                                     elif type in ['duration']:
@@ -221,8 +223,10 @@ class udiYoSprinkler2(udi_interface.Node):
                                 if isinstance(amount, (int,float)):
                                     if type in ['amount']:
                                         self.my_setDriver('GV7', 0, Unit=25)
-                                        amount = round(float(self.calculate_water_volume(amount/self.step_factor,  self.meter_unit,  self.ISYwater_unit)), 1)
-                                        self.my_setDriver('GV8', amount, Unit =self.ISYmeter_uom)
+                                        if self.ISYwater_unit == 0: #gallon
+                                            amount = amount * 0.264172
+                                        #amount = round(float(self.calculate_water_volume(amount/self.step_factor,  self.meter_unit,  self.ISYwater_unit)), 1)
+                                        self.my_setDriver('GV8', round(amount,1), Unit =self.ISYmeter_uom)
                                     elif type in ['duration']:
                                         self.my_setDriver('GV7', 1, Unit=25)
                                         self.my_setDriver('GV8', amount, type=message_type, Unit=44)
