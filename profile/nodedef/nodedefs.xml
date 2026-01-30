@@ -1323,7 +1323,7 @@
          <!--<st id="GV0" editor="sprinklerstate" />-->
          <st id="GV1" editor="nowateralarm" />
          <!--<st id="GV2" editor="watermode" />  -->
-
+         <st id="GV10" editor="unixtime" />   
          <!--<st id="GV3" editor="runningmode" />   --> 
          <!-- <st id="GV4" editor="runningvalue" />  --> 
          <st id="GV5" editor="waterrun" /> 
@@ -1331,7 +1331,7 @@
          <st id="GV7" editor="runningmode" /> <!-- -->
          <st id="GV8" editor="runningvalue" /> <!-- -->
          <st id="GV9" editor="nowateralarm" />  <!--  r-->  
-         <st id="GV10" editor="unixtime" />   
+
          <!--  <st id="GV11" editor="nowateralarm" />-->     
 
          <st id="GV12" editor="minutes" /> <!--  -->

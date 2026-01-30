@@ -41,6 +41,8 @@ class udiYoSprinkler2(udi_interface.Node):
            
             {'driver': 'ST', 'value': 99, 'uom': 25}, #Water running 
             {'driver': 'GV1', 'value': 99, 'uom': 25}, #no Water When running 
+            {'driver': 'GV10', 'value': 99, 'uom': 151}, #Time for lateest operatiowaterdelay type
+
             #{'driver': 'GV2', 'value': 99, 'uom': 25}, #water mode attrib
             #{'driver': 'GV3', 'value': 99, 'uom': 25},  #Water Method attrib 
             #{'driver': 'GV4', 'value': 99, 'uom': 25},  #Amount attrib 
@@ -50,7 +52,6 @@ class udiYoSprinkler2(udi_interface.Node):
             {'driver': 'GV7', 'value': 99, 'uom': 25}, #Latest Method
             {'driver': 'GV8', 'value': 99, 'uom': 25}, #Latest Volume                                             
             {'driver': 'GV9', 'value': 99, 'uom': 25}, #Latest Alert
-            {'driver': 'GV10', 'value': 99, 'uom': 151}, #Time for lateest operatiowaterdelay type
             #{'driver': 'GV10', 'value': 99, 'uom': 25}, #no Water When Last run 
 
             #{'driver': 'GV10', 'value': 99, 'uom': 70}, #waterdelay type values
