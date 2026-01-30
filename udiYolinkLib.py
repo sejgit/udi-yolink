@@ -51,7 +51,7 @@ def convert_water_unit(self, tempStr):
 
 def calculate_water_volume(self, volume, volumeunit, targetunit):
     # Placeholder for actual calculation logic
-
+    logging.debug('calculate_water_volume - volume: {}, volumeunit: {}, targetunit: {}'.format(volume, volumeunit, targetunit)) 
     if volumeunit == 0 and targetunit == 1:  # Gallon to CCF
         temp_volume = volume * 0.133681/100
     elif volumeunit == 0 and targetunit == 2:  # Gallon to m3

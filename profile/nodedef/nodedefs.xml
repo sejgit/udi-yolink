@@ -1353,9 +1353,9 @@
             <cmd id="STARTSTOP" >
                <p id="" editor="startstop" />
             </cmd >
-            <cmd id="WATERMODE" >
+           <!-- <cmd id="WATERMODE" >
                <p id="" editor="sprinklerstate"  /> 
-            </cmd >
+            </cmd >-->
             <cmd id="WATTRIB" >
                <p id="wmethod" editor="sprinklermethod"/>
                <p id="wamount" editor="wamount"/>
