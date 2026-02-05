@@ -1664,7 +1664,7 @@ class YoLinkMQTTDevice(object):
                     #logging.debug('END State is not dict 2 - {}'.format(yolink.dataAPI[yolink.dData]))
             #yolink.dataAPI['nbrPorts'] = yolink.nbrPorts
             #yolink.online = yolink.Status(data)
-            logging.debug('After parsing {}'.format(json.dumps(yolink.data, indent=4)))
+            #logging.debug('After parsing {}'.format(json.dumps(yolink.data, indent=4)))
 
         except Exception as e:
             logging.error('Exception updateStatusData - {}'.format(e))

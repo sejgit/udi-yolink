@@ -7,7 +7,7 @@ except ImportError:
     import logging
     logging.basicConfig(level=logging.DEBUG)
 
-from yolink_mqtt_classV3 import YoLinkMQTTDevice
+from yolink_mqtt_classV4 import YoLinkMQTTDevice
 
 
 class YoLinkSmartRemote(YoLinkMQTTDevice):

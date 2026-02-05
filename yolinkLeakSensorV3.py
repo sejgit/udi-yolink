@@ -1,7 +1,7 @@
 
 
 import time
-from yolink_mqtt_classV3 import YoLinkMQTTDevice
+from yolink_mqtt_classV4 import YoLinkMQTTDevice
 
 try:
     import udi_interface
