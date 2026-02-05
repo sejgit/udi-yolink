@@ -18,7 +18,7 @@ from os import truncate
 #import udi_interface
 #import sys
 import time
-from yolinkHubV2 import YoLinkHu
+from yolinkHubV3 import YoLinkHub
 
 class udiYoBatteryHub(udi_interface.Node):
     from  udiYolinkLib import my_setDriver, wait_for_node_done, node_queue
@@ -73,7 +73,7 @@ class udiYoBatteryHub(udi_interface.Node):
 
     def start(self):
         logging.info('start - udiYoBatteryHub')
-        self.yoHub  = YoLinkHu(self.yoAccess, self.devInfo, self.updateStatus)
+        self.yoHub  = YoLinkHub(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoHub.initNode()
         self.node_ready = True

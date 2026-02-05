@@ -17,7 +17,7 @@ except ImportError:
 #import udi_interface
 #import sys
 import time
-from yolinkSwitchV2 import YoLinkSW
+from yolinkSwitchV3 import YoLinkSwitch
 from udiYoSmartRemoterV3 import udiRemoteKey
 
 class udiYoSwitchPwrSec(udi_interface.Node):
@@ -104,7 +104,7 @@ class udiYoSwitchPwrSec(udi_interface.Node):
     def start(self):
         logging.info('start - udiYoSwitch')
         self.my_setDriver('GV30', 0)
-        self.yoSwitch  = YoLinkSW(self.yoAccess, self.devInfo, self.updateStatus)
+        self.yoSwitch  = YoLinkSwitch(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(3)
         self.yoSwitch.initNode()
         time.sleep(2)
