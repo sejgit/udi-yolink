@@ -3,7 +3,7 @@
 Yolink Control Main Node  program 
 MIT License
 """
-version = '1.7.7'
+version = '1.7.9'
 import sys
 import re
 import time
@@ -156,7 +156,7 @@ def addNodes (self, deviceList) -> list:
     #                    'WaterDepthSensor', ]    'WaterMeterController', 
     
     supportedYoTypes = ['SprinklerV2', 'Sprinkler', 'Thermostat', 'SoilThcSensor' ]     
-
+    supportedYoTypes = ['Switch', 'LeakSensor', 'Thermostat', 'SprinklerV2' ]   
     
     remove_list= []
     for dev in deviceList:
