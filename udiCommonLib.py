@@ -141,7 +141,6 @@ def configDoneHandler(self):
     self.configDone = True
 
 
-
 def addNodes (self, deviceList) -> list:
     supportedYoTypes = ['Switch', 'THSensor', 'MultiOutlet', 'DoorSensor','Manipulator', 
                         'MotionSensor', 'Outlet', 'GarageDoor', 'LeakSensor', 'Hub', 
