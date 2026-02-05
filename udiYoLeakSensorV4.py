@@ -32,17 +32,88 @@ class udiYoLeakSensor(udi_interface.Node):
             'ST' = Online
             ]
 
+[{
+                            "id" : 'ST',
+                            "editor": 'alertstatus',
+                            "name": 'Leak State',
+                            },
+                            {   
+                            "id": "GV0",
+                            "editor": "sensorAlert",
+                            "name": "Sensor Moved State",                            
+                            },
+                            {   
+                            "id": "GV1",
+                            "editor": "sensorAlert",
+                            "name": "Sensor Freeze State",                            
+                            },
+                            {   
+                            "id": "GV2",
+                            "editor": "detectorError",
+                            "name": "Sensor Detector Error",                           
+                            },                            
+                            {   
+                            "id": "GV3",
+                            "editor": "reminder",
+                            "name": "Reminder State",                           
+                            },                            
+                            {   
+                            "id": "GV4",
+                            "editor": "beeping",
+                            "name": "Beeping State",                           
+                            },      
+                            {   
+                            "id": "BATLVL",
+                            "editor": "batlevel",
+                            "name": "Battery Level",                           
+                            },   
+                            {   
+                            "id": "CLITEMP",
+                            "editor": temp_unit,
+                            "name": "Device Temperature",                           
+                            },
+                            {   
+                            "id": "GV5",
+                            "editor": "op_mode",
+                            "name": "Device Operation Mode",                           
+                            },                            
+                            {   
+                            "id": "GV6",
+                            "editor": "sensitivity",
+                            "name": "Device Sensitivity",                           
+                            },
+                            {   
+                            "id": "GV10",
+                            "editor": "unixtime",
+                            "name": "Last Event Time",                           
+                            }
+                            ]
+
+
+
     ''' 
         
     drivers = [
-            {'driver': 'GV0', 'value': 99, 'uom': 25}, 
-            {'driver': 'GV1', 'value': 99, 'uom': 25}, 
-            {'driver': 'GV2', 'value': 0, 'uom': 25}, 
-            {'driver': 'CLITEMP', 'value': 99, 'uom': 25},
-            {'driver': 'GV3', 'value': int(time.time()), 'uom': 151},
-            {'driver': 'ST', 'value': 0, 'uom': 25},
-            {'driver': 'GV30', 'value': 0, 'uom': 25},
+            {'driver': 'ST', 'value': 0, 'uom': 25}, #basic leak
+            {'driver': 'GV0', 'value': 99, 'uom': 25}, # legacy basic leak 
+            {'driver': 'BATLVL', 'value': 99, 'uom': 25}, #batlvl  GV1 - remember to notify
+            {'driver': 'GV2', 'value': 0, 'uom': 25}, #Command state
+            {'driver': 'CLITEMP', 'value': 99, 'uom': 25}, # dev temp
+            {'driver': 'GV3', 'value': int(time.time()), 'uom': 151}, #latest change 
+
+            {'driver': 'GV4', 'value': 99, 'uom': 25}, #Beeping
+            {'driver': 'GV5', 'value': 99, 'uom': 25}, #Operation Mode
+            {'driver': 'GV6', 'value': 99, 'uom': 25}, #Sensitivity
+
+
+            {'driver': 'GV7', 'value': 99, 'uom': 25}, #Sensor Move 
+            {'driver': 'GV8', 'value': 99, 'uom': 25}, #Sensor Freeze Alert
+            {'driver': 'GV9', 'value': 99, 'uom': 25}, #Sensor Detecto Error
+            {'driver': 'GV10', 'value': 99, 'uom': 25}, #Reminder Alert            
+
             {'driver': 'GV20', 'value': 99, 'uom': 25},   
+            {'driver': 'GV30', 'value': 0, 'uom': 25},
+
              {'driver': 'TIME', 'value': int(time.time()), 'uom': 151},
 
             ]

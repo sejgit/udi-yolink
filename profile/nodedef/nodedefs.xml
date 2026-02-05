@@ -1725,12 +1725,22 @@
    <nodeDef id="yoleaksens" nls="nlsleaksens">
       <editors />
       <sts>
+         <st id="ST"  editor="waterstate" />      
          <st id="GV0" editor="waterstate" />
          <st id="GV1" editor="batlevel" />
          <st id="GV2" editor="cmdsetting" />
          <st id="CLITEMP" editor="celsius" />
          <st id="GV3" editor="unixtime" /> 
-         <st id="ST"  editor="waterstate" />
+         <st id="GV4" editor="beeping" /> 
+         <st id="GV5" editor="LeakOpMode" /> 
+         <st id="GV6" editor="sensitivity" /> 
+         <st id="GV7" editor="moveAlert" /> 
+         <st id="GV8" editor="FreezeAlert" /> 
+         <st id="GV9" editor="SensorError" /> 
+         <st id="GV10" editor="reminder" /> 
+
+
+
          <st id="GV30"  editor="status" />  
          <st id="GV20" editor="suspendstate" /> 
          <st id="TIME" editor="unixtime" />                             
