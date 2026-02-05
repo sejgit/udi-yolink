@@ -94,6 +94,7 @@ class udiYoLeakSensor(udi_interface.Node):
     ''' 
         
     drivers = [
+<<<<<<< Updated upstream
             {'driver': 'ST', 'value': 0, 'uom': 25}, #basic leak
             {'driver': 'GV0', 'value': 99, 'uom': 25}, # legacy basic leak 
             {'driver': 'BATLVL', 'value': 99, 'uom': 25}, #batlvl  GV1 - remember to notify
@@ -111,6 +112,18 @@ class udiYoLeakSensor(udi_interface.Node):
             {'driver': 'GV9', 'value': 99, 'uom': 25}, #Sensor Detecto Error
             {'driver': 'GV10', 'value': 99, 'uom': 25}, #Reminder Alert            
 
+=======
+            {'driver': 'ST', 'value': 0, 'uom': 25},        
+            {'driver': 'GV0', 'value': 99, 'uom': 25}, 
+            {'driver': 'GV1', 'value': 99, 'uom': 25}, 
+            {'driver': 'GV2', 'value': 0, 'uom': 25}, 
+            {'driver': 'CLITEMP', 'value': 99, 'uom': 25},
+            {'driver': 'GV3', 'value': int(time.time()), 'uom': 151},
+
+
+
+            {'driver': 'GV30', 'value': 0, 'uom': 25},
+>>>>>>> Stashed changes
             {'driver': 'GV20', 'value': 99, 'uom': 25},   
             {'driver': 'GV30', 'value': 0, 'uom': 25},
 
@@ -179,15 +192,7 @@ class udiYoLeakSensor(udi_interface.Node):
     def checkOnline(self):
         #we only get casched values - but MQTT remains alive
         self.yoLeakSensor.refreshDevice()  
-        
-    def waterState(self):
-        if self.yoLeakSensor.online:
-            if  self.yoLeakSensor.probeState() == 'normal' or self.yoLeakSensor.probeState() == 'dry' :
-                return(0)
-            else:
-                return(1)
-        else:
-            return(99)
+
 
     def checkDataUpdate(self):
         if self.yoLeakSensor.data_updated():
@@ -218,8 +223,10 @@ class udiYoLeakSensor(udi_interface.Node):
                             self.node.reportCmd('DOF')
                 else:
                     self.my_setDriver('GV0', 99, type=message_type)
+                    self.my_setDriver('ST', 99, type=message_type)   
                 self.last_state = waterState
-                self.my_setDriver('GV1', self.yoLeakSensor.get_data('battery', 'state'), type=message_type)
+                self.my_setDriver('' \
+                self.yoLeakSensor.get_data('battery', 'state'), type=message_type)
                 self.my_setDriver('GV2', self.cmd_state, type=message_type)
                 #self.my_setDriver('ST', 1)
                 self.my_setDriver('GV30', 1, type=message_type)
