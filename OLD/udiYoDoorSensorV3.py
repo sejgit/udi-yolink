@@ -6,7 +6,7 @@ Polyglot TEST v3 node server
 MIT License
 """
 import time
-from yolinkDoorSensorV2 import YoLinkDoorSens
+from yolinkDoorSensorV3 import YoLinkDoorSensor
 
 try:
     import udi_interface
@@ -77,7 +77,7 @@ class udiYoDoorSensor(udi_interface.Node):
         logging.info('start - udiYoDoorSensor')
         #self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
-        self.yoDoorSensor  = YoLinkDoorSens(self.yoAccess, self.devInfo, self.updateStatus)   
+        self.yoDoorSensor  = YoLinkDoorSensor(self.yoAccess, self.devInfo, self.updateStatus)   
         time.sleep(2)
         self.yoDoorSensor.initNode()
         self.node_ready = True

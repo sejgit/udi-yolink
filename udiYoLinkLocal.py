@@ -28,7 +28,6 @@ class YoLinkSetup (udi_interface.Node):
         
         self.poly=polyglot
         self.hb = 0
-        
         self.nodeDefineDone = False
         self.handleParamsDone = False
         self.pollStart = False

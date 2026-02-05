@@ -3,7 +3,7 @@
 Yolink Control Main Node  program 
 MIT License
 """
-version = '1.7.1'
+version = '1.7.9'
 import sys
 import re
 import time
@@ -36,7 +36,7 @@ from udiYoDimmerV4 import udiYoDimmer
 from udiYoVibrationSensorV4 import udiYoVibrationSensor
 from udiYoSmartRemoterV3 import udiYoSmartRemoter
 from udiYoPowerFailV4 import udiYoPowerFailSenor
-from udiYoSprinklerV4 import udiYoSprinkler
+#from udiYoSprinklerV4 import udiYoSprinkler
 from udiYoSprinkler2V4 import udiYoSprinkler2
 from udiYoSoilSensorV4 import udiYoSoilSensor
 from udiYoThermostatV4 import udiYoThermostat
@@ -141,7 +141,6 @@ def configDoneHandler(self):
     self.configDone = True
 
 
-
 def addNodes (self, deviceList) -> list:
     supportedYoTypes = ['Switch', 'THSensor', 'MultiOutlet', 'DoorSensor','Manipulator', 
                         'MotionSensor', 'Outlet', 'GarageDoor', 'LeakSensor', 'Hub', 
@@ -156,7 +155,7 @@ def addNodes (self, deviceList) -> list:
     #                    'WaterDepthSensor', ]    'WaterMeterController', 
     
     supportedYoTypes = ['SprinklerV2', 'Sprinkler', 'Thermostat', 'SoilThcSensor' ]     
-
+    supportedYoTypes = ['Switch', 'LeakSensor', 'Thermostat', 'SprinklerV2' ]   
     
     remove_list= []
     for dev in deviceList:
@@ -455,10 +454,10 @@ def addNodes (self, deviceList) -> list:
                 for adr in temp.adr_list:
                     self.assigned_addresses.append(adr)                                                 
 
-            elif dev['type'] in ['Sprinkler', 'SprinklerV2']:
+            elif dev['type'] in [ 'SprinklerV2']: #'Sprinkler',
                 logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) )) 
 
-                temp = udiYoSprinkler(self.poly, address, address, name, dev_access, dev )
+                temp = udiYoSprinkler2(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
                     time.sleep(4)

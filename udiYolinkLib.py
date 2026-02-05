@@ -20,8 +20,11 @@ from os import truncate
 import time
 import json
 import math
+import threading
 #import datetime
 from datetime import datetime
+
+driver_lock = threading.Lock()
 
 def updateEpochTime(self, command=None ):
     logging.info('updateEpochTime ')
@@ -48,7 +51,7 @@ def convert_water_unit(self, tempStr):
 
 def calculate_water_volume(self, volume, volumeunit, targetunit):
     # Placeholder for actual calculation logic
-
+    logging.debug('calculate_water_volume - volume: {}, volumeunit: {}, targetunit: {}'.format(volume, volumeunit, targetunit)) 
     if volumeunit == 0 and targetunit == 1:  # Gallon to CCF
         temp_volume = volume * 0.133681/100
     elif volumeunit == 0 and targetunit == 2:  # Gallon to m3
@@ -152,31 +155,32 @@ def wait_for_node_done(self):
     self.n_queue.pop()
 
 def my_setDriver(self, key, value, Unit=None, force=False, type=None):
-    logging.debug(f'my_setDriver : {key} {value} {Unit} ')
-    try:
-        if any(item.get('driver') == key for item in self.drivers):
-            if value is None:
-                if type is not 'event':
-                    logging.debug('None value passed = seting 99, UOM 25')
-                    self.node.setDriver(key, 99, True, force, 25)
-            else:                
-                if key in ['GV20']: # Connection state o
-                    try:
-                        if self.yoAccess.local:
-                            logging.debug('Local connection - value + 3')
-                            value = value + 3
-                    except Exception as e:
-                        logging.debug('Local connection - yolink class not ready - continue : {}'.format(e))
-                if isinstance(Unit, (int, float)):
-                    self.node.setDriver(key, value, True, force, uom=Unit)
-                else:
-                    self.node.setDriver(key, value,True, force)
-        else:
-            logging.debug(f'Passed driver {key} does not exist in {self.drivers}')
+    with driver_lock:
+        logging.debug(f'my_setDriver : {key} {value} {Unit} ')
+        try:
+            if any(item.get('driver') == key for item in self.drivers):
+                if value is None:
+                    if type not in ['report']: #['event', 'setAttributes', 'setState']:
+                        logging.debug('None value passed = seting 99, UOM 25')
+                        self.node.setDriver(key, 99, True, force, 25)
+                else:                
+                    if key in ['GV20']: # Connection state o
+                        try:
+                            if self.yoAccess.local:
+                                logging.debug('Local connection - value + 3')
+                                value = value + 3
+                        except Exception as e:
+                            logging.debug('Local connection - yolink class not ready - continue : {}'.format(e))
+                    if isinstance(Unit, (int, float)):
+                        self.node.setDriver(key, value, True, force, uom=Unit)
+                    else:
+                        self.node.setDriver(key, value,True, force)
+            else:
+                logging.debug(f'Passed driver {key} does not exist in {self.drivers}')
 
-    except ValueError: #A non number was passed 
-        logging.error('Non numeric value passed to my_setDriver - setting 99 ')
-        self.node.setDriver(key, 99, True, True, 25)
+        except ValueError: #A non number was passed 
+            logging.error('Non numeric value passed to my_setDriver - setting 99 ')
+            self.node.setDriver(key, 99, True, True, 25)
         
 
 def mask2key (self, mask):

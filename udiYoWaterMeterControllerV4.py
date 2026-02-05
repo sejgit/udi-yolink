@@ -111,6 +111,8 @@ class udiYoWaterMeterController(udi_interface.Node):
         self.onDelay = 0
         self.offDelay = 0
         self.valveState = 99 # needed as class c device - keep value until online again 
+        self.ISYmeter_uom = None
+        self.ISYwater_unit = None
         #polyglot.subscribe(polyglot.POLL, self.poll)
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)

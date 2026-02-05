@@ -1318,21 +1318,23 @@
  <nodeDef id="yosprinklerv2" nls="nlssprinkler">
       <editors />
       <sts>
-         <st id="ST" editor="waterrun" /> <!-- water runing-->
-
-         <st id="GV0" editor="sprinklerstate" />
+         <!--<st id="ST" editor="runningvalue" />  water runing-->
+         <st id="ST" editor="waterrun" /> 
+         <!--<st id="GV0" editor="sprinklerstate" />-->
          <st id="GV1" editor="nowateralarm" />
-         <st id="GV2" editor="watermode" /> <!-- recent use -->
+         <!--<st id="GV2" editor="watermode" />  -->
+         <st id="GV10" editor="unixtime" />   
+         <!--<st id="GV3" editor="runningmode" />   --> 
+         <!-- <st id="GV4" editor="runningvalue" />  --> 
+         <st id="GV5" editor="waterrun" /> 
+         <!--<st id="GV6" editor="wateruse" /> -->
+         <st id="GV7" editor="runningmode" /> <!-- -->
+         <st id="GV8" editor="runningvalue" /> <!-- -->
+         <st id="GV9" editor="nowateralarm" />  <!--  r-->  
 
-         <st id="GV3" editor="runningmode" /> <!-- Recent duration --> 
-         <st id="GV4" editor="runningvalue" /> <!-- Recent duration --> 
-         <st id="GV5" editor="wateruse" /> <!-- overrunAmount 24H-->
-         <st id="GV6" editor="progress" /> <!--overrun-->
+         <!--  <st id="GV11" editor="nowateralarm" />-->     
 
-         <st id="GV7" editor="watermode" /> <!--Overrun duration-->
-         <st id="GV8" editor="runningvalue" /> <!--overrun time 24H-->
-         <st id="GV9" editor="watermode" />  <!-- open reminder-->       
-         <st id="GV10" editor="minutes" /> <!-- open reminder -->
+         <st id="GV12" editor="minutes" /> <!--  -->
       
          <st id="BATLVL" editor="batlevel" />
          <st id="GV20" editor="suspendstate" />
@@ -1348,11 +1350,20 @@
          </sends>
          <accepts>
             <cmd id="UPDATE" /> 
-            <cmd id="STARTSTOP" />
-            <cmd id="WATERMODE">
-               <p id="watermode" editor="watermode"  /> 
+            <cmd id="STARTSTOP" >
+               <p id="" editor="startstop" />
             </cmd >
-
+           <!-- <cmd id="WATERMODE" >
+               <p id="" editor="sprinklerstate"  /> 
+            </cmd >-->
+            <cmd id="WATTRIB" >
+               <p id="wmethod" editor="sprinklermethod"/>
+               <p id="wamount" editor="wamount"/>
+            </cmd >
+            <cmd id="WDELAY" >               
+               <!--<p id="w_delay" editor="w_delay"  />`-->
+               <p id="" editor="minutesSet"  /> 
+            </cmd >
          </accepts>
       </cmds>
    </nodeDef>    
@@ -1452,9 +1463,10 @@
          <st id="CLIHUM" editor="humidity" />
          <st id="GV4" editor="alarm" />
          <st id="GV5" editor="alarm" />
-         <st id="BATLVL" editor="batlevel" />
+         <st id="GV6" editor="alarm" />         
          <st id="GV7" editor="alarm" />
          <st id="GV8" editor="alarm" />
+         <st id="BATLVL" editor="batlevel" />         
          <st id="GV9" editor="cmdsetting" />
          <st id="GV10" editor="farenheit" />
          <st id="GV11" editor="farenheit" />

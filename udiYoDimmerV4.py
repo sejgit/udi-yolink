@@ -19,6 +19,8 @@ from os import truncate
 #import udi_interface
 #import sys
 import time
+
+from attr import attributes
 from yolinkDimmerV3 import YoLinkDim
 from udiYoSchedule import udiYoSchedule
 
@@ -111,12 +113,16 @@ class udiYoDimmer(udi_interface.Node):
         self.yoDimmer  = YoLinkDim(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoDimmer.initNode()
+
         time.sleep(2)
+        self.yoDimmer.get_attributes()
+
+
         sch_address = self.address[4:14] + '_SCH'
         sch_address = self.poly.getValidAddress(sch_address)
         self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
         self.adr_list.append(sch_address)
-
+        self.dim_setting['dim'] = self.yoDimmer.get_data('brightness')
         self.yoDimmer.setBrightness(self.dim_setting['dim'])
         self.dim_setting['previous'] = self.yoDimmer.brightness
         #self.my_setDriver('ST', 1)
@@ -164,18 +170,29 @@ class udiYoDimmer(udi_interface.Node):
         logging.info('udiYoDimmer -  updateData{}'.format(self.schedule_selected))
 
         if self.node is not None:
+            message_type = self.yoDimmer.get_last_message_type()
             self.my_setDriver('TIME', self.yoDimmer.getLastUpdateTime(), 151)
-            state =  self.yoDimmer.getState().upper()
-            self.dim_setting['dim'] = self.yoDimmer.brightness
+            #state =  self.yoDimmer.getState().upper()
+            state = self.yoDimmer.get_data('state')
+            if message_type == 'setAttributes':
+                logging.debug('Attributes updated')
+                #attributes = self.yoDimmer.get_attributes()
+                logging.debug(f'Attributes: {attributes}')
+                self.yoDimmer.ramp_up_time = self.yoDimmer.get_data('on', 'gradient')
+                self.yoDimmer.ramp_down_time = self.yoDimmer.get_data('off', 'gradient')
+                self.yoDimmer.min_level = self.yoDimmer.get_data('calibration', 'deviceAttributes')
+                self.yoDimmer.max_level = self.yoDimmer.get_data('calibrationHigh', 'deviceAttributes')
+
+            #self.dim_setting['dim'] = self.yoDimmer.brightness
+            self.dim_setting['dim'] = self.yoDimmer.get_data('brightness')
             if self.yoDimmer.online:
                 #self.my_setDriver('ST', 1)
                 self.my_setDriver('GV30', 1)               
-                if state == 'ON':
-                    
+                if state in[ 'ON', 'open', 'on', 'OPEN']:
                     if self.last_state != state:
                         self.my_setDriver('GV0', 1)
                         self.node.reportCmd('DON')  
-                elif  state == 'OFF':
+                elif  state in ['OFF', 'closed', 'off', 'CLOSED']:
                     #self.my_setDriver('GV0', 0)
                     if self.last_state != state:
                         self.my_setDriver('GV0', 0)

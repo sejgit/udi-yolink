@@ -316,7 +316,7 @@ ST-nlssoilsensor-GV2-NAME=High Conductivity Alarm
 ST-nlssoilsensor-GV3-NAME=Low Temp Alarm
 ST-nlssoilsensor-GV4-NAME=High Temp Alarm
 ST-nlssoilsensor-GV5-NAME=Low Humidity Alarm
-ST-nlssoilsensor-GV5-NAME=High Humidity Alarm
+ST-nlssoilsensor-GV6-NAME=High Humidity Alarm
 ST-nlssoilsensor-GV7-NAME=Period Alarm
 ST-nlssoilsensor-GV8-NAME=Alarm triggered
 ST-nlssoilsensor-BATLVL-NAME=Battery Level
@@ -327,7 +327,7 @@ ST-nlssoilsensor-GV11-NAME=High Temp Alarm Limit
 ST-nlssoilsensor-GV12-NAME=Low Humidity Alarm Limit
 ST-nlssoilsensor-GV13-NAME=High Humidity Alarm Limit
 ST-nlssoilsensor-GV14-NAME=Low Conductivity Alarm Limit (mS/cm)
-ST-nlssoilsensor-GV15-NAME=High Conductivity Alarm Limit (mS/cm))
+ST-nlssoilsensor-GV15-NAME=High Conductivity Alarm Limit (mS/cm)
 ST-nlssoilsensor-GV20-NAME=Connection State
 ST-nlssoilsensor-GV30-NAME=Online State
 ST-nlssoilsensor-TIME-NAME=Last device update
@@ -781,6 +781,73 @@ CMD-nlswaterdept-SETATTR-NAME=Set water level alarms
 CMD-nlswaterdept-NAME=Update Status
 CMDP-waterLowAlarm-NAME=Low Water Alarm (0-1000)
 CMDP-waterHighAlarm-NAME=High Water Alarm (0-1000)
+
+
+ND-yosprinklerv2-NAME=YoLink Smart Sprinkler V2
+ND-yosprinklerv2-ICON=Irrigation
+#ND-yosprinklerv2G-NAME=YoLink Water Level Sensor
+#ND-yosprinklerv2G-ICON=Irrigation
+ST-nlssprinkler-NAME=Nodeserver Status
+ST-nlssprinkler-ST-NAME=Current State
+#ST-nlssprinkler-GV0-NAME=Water Running
+ST-nlssprinkler-GV1-NAME=Curent No Water Alarm
+#ST-nlssprinkler-GV2-NAME=Water Mode Attrib (schedule/Manual)
+#ST-nlssprinkler-GV3-NAME=Water Amount Mode Attrib (Volume/Time)
+#ST-nlssprinkler-GV4-NAME=Water Amount Atttrib
+
+ST-nlssprinkler-GV5-NAME=Latest Operation
+#ST-nlssprinkler-GV6-NAME=Latest Mode used
+ST-nlssprinkler-GV7-NAME=Latest Water Method
+ST-nlssprinkler-GV8-NAME=Latest Water Amount target
+ST-nlssprinkler-GV9-NAME=Latest Water Alarm
+ST-nlssprinkler-GV10-NAME=Time for Latest operation Update
+ST-nlssprinkler-GV12-NAME=Time Delay
+
+
+
+ST-nlssprinkler-GV20-NAME=Connection State
+ST-nlssprinkler-GV30-NAME=Online State
+ST-nlssprinkler-BATLVL-NAME=Battery Level
+ST-nlssprinkler-TIME-NAME=Last Data Update
+ST-nlssprinkler-CLITEMP-NAME=Sensor Temperature
+ST-nlssprinkler-CLIHUM-NAME=Current Rel Humidity (%)
+
+CMD-nlssprinkler-UPDATE-NAME=Update Status
+CMD-nlssprinkler-STARTSTOP-NAME=Start/Stop 
+CMD-nlssprinkler-WATERMODE-NAME=Mode (Schedule/Manual)
+CMD-nlssprinkler-WATTRIB-NAME=Set watering Attributes
+CMD-nlssprinkler-WDELAY-NAME=Set water delay
+CMDP-wmode-NAME=Watering Method
+CMDP-wmethod-NAME=Watering Measure Method
+CMDP-wamount-NAME=Set Amount
+CMDP-wdeltime-NAME=Set Delay
+
+running-0=Stop
+running-1=Start
+sprinklerstate-0=Manual
+sprinklerstate-1=Schedule
+sprinklermethod-0=Water Volume
+sprinklermethod-1=Time
+
+waterrun-0=Stopped
+waterrun-1=Water Running
+waterrun-99=Unknown
+
+watermode-1=Scheduled
+watermode-0=Manual
+watermode-99=Unknown
+
+runningmode-0=Water Volume
+runningmode-1=Time
+runningmode-99=Unknown
+
+nowateralarm-0=Normal (No alarm)
+nowateralarm-1=Alarm - No Water Detected
+nowateralarm-99=Unknown
+
+runningmode-0=Fixed Water Amount
+runningmode-1=Fixed Run Time
+runningmode-99=Uknown
 
 wl_state-99=Unknown
 wl_state-98=Updating (may take up to 1 hour)
