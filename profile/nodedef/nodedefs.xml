@@ -1790,6 +1790,9 @@
             <cmd id="SETCMD" > 
                <p id="" editor="cmdsetting" init="GV2" /> 
             </cmd >  
+            <cmd id="SETBEEP" > 
+               <p id="" editor="beeping" init="GV4" />
+            </cmd >
             <!--<cmd id="DON" /> 
             <cmd id="DOF" /> -->       
             <cmd id="UPDATE" /> 

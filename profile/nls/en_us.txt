@@ -394,6 +394,14 @@ ST-nlsleaksens-GV1-NAME=Sensor Battery Level
 ST-nlsleaksens-GV2-NAME=Command Setting
 ST-nlsleaksens-GV3-NAME=Last State Change
 ST-nlsleaksens-CLITEMP-NAME=Sensor Temperature
+ST-nlsleaksens-GV4-NAME=Sensor Sound
+ST-nlsleaksens-GV5-NAME=Operating Mode
+ST-nlsleaksens-GV6-NAME=Sensitivity
+ST-nlsleaksens-GV7-NAME=Sensor Move Alert
+ST-nlsleaksens-GV8-NAME=Sensor Freeze Alert
+ST-nlsleaksens-GV9-NAME=Sensor Error
+ST-nlsleaksens-GV10-NAME=Reminder
+
 ST-nlsleaksens-GV20-NAME=Connection State
 ST-nlsleaksens-GV30-NAME=Online State
 ST-nlsleaksens-BATLVL-NAME=Battery Level
@@ -821,6 +829,30 @@ CMDP-wmode-NAME=Watering Method
 CMDP-wmethod-NAME=Watering Measure Method
 CMDP-wamount-NAME=Set Amount
 CMDP-wdeltime-NAME=Set Delay
+
+beeping-0=No Beep
+beeping-1=beeping
+
+
+leakOpMode-0=Detect Water
+leakOpMode-1=Detect No Water
+
+sensitivity-0=Low
+sensitivity-1=High
+
+moveAlert-0=Not Moveed
+moveAlert-1=Sensor Moveed
+
+freezeAlert-0=No Alert
+freezeAlert-1=Freeze Alert
+
+sensorError-0=Normal
+sensorError-1=Sensor Error Detected
+
+reminder-0=Normal
+remained-1=Active Reminder
+
+
 
 running-0=Stop
 running-1=Start

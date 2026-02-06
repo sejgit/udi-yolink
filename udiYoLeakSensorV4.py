@@ -21,7 +21,7 @@ import time
 
 
 class udiYoLeakSensor(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, state2ISY, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
 
     id = 'yoleaksens'
     
@@ -94,7 +94,6 @@ class udiYoLeakSensor(udi_interface.Node):
     ''' 
         
     drivers = [
-<<<<<<< Updated upstream
             {'driver': 'ST', 'value': 0, 'uom': 25}, #basic leak
             {'driver': 'GV0', 'value': 99, 'uom': 25}, # legacy basic leak 
             {'driver': 'BATLVL', 'value': 99, 'uom': 25}, #batlvl  GV1 - remember to notify
@@ -112,18 +111,6 @@ class udiYoLeakSensor(udi_interface.Node):
             {'driver': 'GV9', 'value': 99, 'uom': 25}, #Sensor Detecto Error
             {'driver': 'GV10', 'value': 99, 'uom': 25}, #Reminder Alert            
 
-=======
-            {'driver': 'ST', 'value': 0, 'uom': 25},        
-            {'driver': 'GV0', 'value': 99, 'uom': 25}, 
-            {'driver': 'GV1', 'value': 99, 'uom': 25}, 
-            {'driver': 'GV2', 'value': 0, 'uom': 25}, 
-            {'driver': 'CLITEMP', 'value': 99, 'uom': 25},
-            {'driver': 'GV3', 'value': int(time.time()), 'uom': 151},
-
-
-
-            {'driver': 'GV30', 'value': 0, 'uom': 25},
->>>>>>> Stashed changes
             {'driver': 'GV20', 'value': 99, 'uom': 25},   
             {'driver': 'GV30', 'value': 0, 'uom': 25},
 
@@ -225,8 +212,8 @@ class udiYoLeakSensor(udi_interface.Node):
                     self.my_setDriver('GV0', 99, type=message_type)
                     self.my_setDriver('ST', 99, type=message_type)   
                 self.last_state = waterState
-                self.my_setDriver('' \
-                self.yoLeakSensor.get_data('battery', 'state'), type=message_type)
+    
+                self.yoLeakSensor.get_data('battery', 'state')
                 self.my_setDriver('GV2', self.cmd_state, type=message_type)
                 #self.my_setDriver('ST', 1)
                 self.my_setDriver('GV30', 1, type=message_type)
@@ -245,14 +232,33 @@ class udiYoLeakSensor(udi_interface.Node):
                         self.my_setDriver('CLITEMP', round(devTemp*9/5+32,0), 17, type=message_type)
                 else:
                     self.my_setDriver('CLITEMP', 99, 25)
+                beeping = self.yoLeakSensor.get_data('beep')    
+                self.my_setDriver('GV4', self.state2ISY(beeping), type=message_type)
+                opmode= self.yoLeakSensor.get_data('sensorMode', 'state')
+                if opmode in ['WaterLeak', None]:   
+                    self.my_setDriver('GV5', 0, type=message_type)
+                elif opmode == 'WaterPeak':
+                    self.my_setDriver('GV5', 1, type=message_type)
+                sensitivity = self.yoLeakSensor.get_data('sensitivity', 'state')
+                if sensitivity in ['Low', 'low', None]:
+                    self.my_setDriver('GV6', 0, type=message_type)
+                else:
+                    self.my_setDriver('GV6', 1, type=message_type)
+                sensorMove = self.yoLeakSensor.get_data('stayError', 'alarmStateonline')
+                self.my_setDriver('GV7', self.state2ISY(sensorMove), type=message_type)
+                sensorFreeze = self.yoLeakSensor.get_data('freezeError', 'alarmStateonline')
+                self.my_setDriver('GV8', self.state2ISY(sensorFreeze), type=message_type)
+                sensorDetectError = self.yoLeakSensor.get_data('detectorError', 'alarmStateonline')  
+                self.my_setDriver('GV9', self.state2ISY(sensorDetectError), type=message_type)
+                reminderAlert = self.yoLeakSensor.get_data('reminder', 'alarmStateonline')
+                self.my_setDriver('GV10', self.state2ISY(reminderAlert), type=message_type)
+
                 if self.yoLeakSensor.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
                     self.my_setDriver('GV20', 0)             
             else:
-                #self.my_setDriver('GV0', 99)
-                #self.my_setDriver('GV1', 99)
-                #self.my_setDriver('CLITEMP', 99, 25)
+
                 self.my_setDriver('GV30', 1)
                 self.my_setDriver('GV20', 2)       
 
@@ -260,6 +266,16 @@ class udiYoLeakSensor(udi_interface.Node):
         logging.debug('updateStatus - yoLeakSensor')
         self.yoLeakSensor.updateStatus(data)
         self.updateData()
+
+    def set_beep_alert(self, command):
+        beeping = int(command.get('value')) == 1   
+        logging.info('Leak Sensor  set_beep_alert - {}'.format(beeping))        
+        params = {
+            'beep': beeping
+        }   
+        self.yoLeakSensor.setAttributes(params)
+
+
 
     def set_cmd(self, command):
         ctrl = int(command.get('value'))   
@@ -276,7 +292,8 @@ class udiYoLeakSensor(udi_interface.Node):
         pass
 
     commands = {
-                'SETCMD': set_cmd,        
+                'SETCMD': set_cmd,    
+                'SETBEEP': set_beep_alert,    
                 'UPDATE': update,
                 #'DON'   : noop,
                 #'DOF'   : noop
