@@ -831,27 +831,37 @@ CMDP-wamount-NAME=Set Amount
 CMDP-wdeltime-NAME=Set Delay
 
 beeping-0=No Beep
+beeping-1=Beeping
+beeping-99=Unknown
+
+beeping-0=No Beep
 beeping-1=beeping
+beeping-99=Unknown
 
 
 leakOpMode-0=Detect Water
 leakOpMode-1=Detect No Water
+leakOpMode-99=Unknown
 
 sensitivity-0=Low
 sensitivity-1=High
+sensitivity-99=Unknown
 
 moveAlert-0=Not Moveed
 moveAlert-1=Sensor Moveed
+moveAlert-99=Unknown
 
 freezeAlert-0=No Alert
 freezeAlert-1=Freeze Alert
+freezeAlert-99=Unknown
 
 sensorError-0=Normal
 sensorError-1=Sensor Error Detected
+sensorError-99=Unknown
 
 reminder-0=Normal
 remained-1=Active Reminder
-
+remained-99=Unknown
 
 
 running-0=Stop

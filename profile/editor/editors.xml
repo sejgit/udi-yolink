@@ -408,24 +408,28 @@
     <range uom="25" subset="0,1,99" nls="nowateralarm" />
   </editor>
   <editor id="beeping">
-    <range uom="25" subset="0,1" nls="beeping" />
+    <range uom="25" subset="0,1,99" nls="beeping" />
   </editor>
+  <editor id="beepingIn">
+    <range uom="25" subset="0,1,99" nls="beeping" />
+  </editor>
+
   <editor id="leakOpMode">
-    <range uom="25" subset="0,1" nls="leakOpMode" />
+    <range uom="25" subset="0,1,99" nls="leakOpMode" />
   </editor>
   <editor id="sensitivity">
-    <range uom="25" subset="0,1" nls="sensitivity" />
+    <range uom="25" subset="0,1,99" nls="sensitivity" />
   </editor>  
   <editor id="moveAlert">
-    <range uom="25" subset="0,1" nls="moveAlert" />
+    <range uom="25" subset="0,1,99" nls="moveAlert" />
   </editor>  
   <editor id="freezeAlert">
-    <range uom="25" subset="0,1" nls="freezeAlert" />
+    <range uom="25" subset="0,1,99" nls="freezeAlert" />
   </editor>  
     <editor id="sensorError">
-    <range uom="25" subset="0,1" nls="sensorError" />
+    <range uom="25" subset="0,1,99" nls="sensorError" />
   </editor>  
     <editor id="reminder">
-    <range uom="25" subset="0,1" nls="reminder" />
+    <range uom="25" subset="0,1,99" nls="reminder" />
   </editor>  
 </editors>

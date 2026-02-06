@@ -101,15 +101,15 @@ class udiYoLeakSensor(udi_interface.Node):
             {'driver': 'CLITEMP', 'value': 99, 'uom': 25}, # dev temp
             {'driver': 'GV3', 'value': int(time.time()), 'uom': 151}, #latest change 
 
-            {'driver': 'GV4', 'value': 99, 'uom': 25}, #Beeping
-            {'driver': 'GV5', 'value': 99, 'uom': 25}, #Operation Mode
-            {'driver': 'GV6', 'value': 99, 'uom': 25}, #Sensitivity
+            {'driver': 'GV4', 'value': 0, 'uom': 25}, #Beeping
+            {'driver': 'GV5', 'value': 0, 'uom': 25}, #Operation Mode
+            {'driver': 'GV6', 'value': 0, 'uom': 25}, #Sensitivity
 
 
-            {'driver': 'GV7', 'value': 99, 'uom': 25}, #Sensor Move 
-            {'driver': 'GV8', 'value': 99, 'uom': 25}, #Sensor Freeze Alert
-            {'driver': 'GV9', 'value': 99, 'uom': 25}, #Sensor Detecto Error
-            {'driver': 'GV10', 'value': 99, 'uom': 25}, #Reminder Alert            
+            {'driver': 'GV7', 'value': 0, 'uom': 25}, #Sensor Move 
+            {'driver': 'GV8', 'value': 0, 'uom': 25}, #Sensor Freeze Alert
+            {'driver': 'GV9', 'value': 0, 'uom': 25}, #Sensor Detecto Error
+            {'driver': 'GV10', 'value': 0, 'uom': 25}, #Reminder Alert            
 
             {'driver': 'GV20', 'value': 99, 'uom': 25},   
             {'driver': 'GV30', 'value': 0, 'uom': 25},
