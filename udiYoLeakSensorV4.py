@@ -222,7 +222,7 @@ class udiYoLeakSensor(udi_interface.Node):
                 if state_change is not None:
                     self.my_setDriver('GV3', int(state_change/1000), type=message_type)
                 else:
-                    self.my_setDriver('GV3', 99, uom=25, type=message_type)
+                    self.my_setDriver('GV3', 99, Unit=25, type=message_type)
 
                 devTemp =  self.yoLeakSensor.get_data('devTemperature', 'state')
                 if isinstance(devTemp, (int, float)):
