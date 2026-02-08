@@ -1732,11 +1732,11 @@
          <st id="CLITEMP" editor="celsius" />
          <st id="GV3" editor="unixtime" /> 
          <st id="GV4" editor="beeping" /> 
-         <st id="GV5" editor="LeakOpMode" /> 
+         <st id="GV5" editor="leakOpMode" /> 
          <st id="GV6" editor="sensitivity" /> 
          <st id="GV7" editor="moveAlert" /> 
-         <st id="GV8" editor="FreezeAlert" /> 
-         <st id="GV9" editor="SensorError" /> 
+         <st id="GV8" editor="freezeAlert" /> 
+         <st id="GV9" editor="sensorError" /> 
          <st id="GV10" editor="reminder" /> 
 
 
@@ -1765,37 +1765,45 @@
       </cmds>
    </nodeDef> 
 
-   <nodeDef id="yoleaksensF" nls="nlsleaksens">
-      <editors />
-      <sts>
+<st id="ST"  editor="waterstate" />      
          <st id="GV0" editor="waterstate" />
          <st id="GV1" editor="batlevel" />
          <st id="GV2" editor="cmdsetting" />
          <st id="CLITEMP" editor="farenheit" />
-         <!-- <st id="GV8" editor="online" /> -->
-         <st id="ST"  editor="waterstate" />
+         <st id="GV3" editor="unixtime" /> 
+         <st id="GV4" editor="beeping" /> 
+         <st id="GV5" editor="leakOpMode" /> 
+         <st id="GV6" editor="sensitivity" /> 
+         <st id="GV7" editor="moveAlert" /> 
+         <st id="GV8" editor="freezeAlert" /> 
+         <st id="GV9" editor="sensorError" /> 
+         <st id="GV10" editor="reminder" /> 
+
+
+
          <st id="GV30"  editor="status" />  
          <st id="GV20" editor="suspendstate" /> 
          <st id="TIME" editor="unixtime" />                             
       </sts>
       <cmds>
          <sends>
+            <!--<cmd id="DON" editor="waterstate"  /> 
+            <cmd id="DOF" editor="waterstate"  />    -->
             <cmd id="DON"  />               
             <cmd id="DOF"  />    
+
          </sends>
          <accepts>
             <cmd id="SETCMD" > 
                <p id="" editor="cmdsetting" init="GV2" /> 
             </cmd >  
-            <cmd id="SETBEEP" > 
-               <p id="" editor="beepingIn" init="GV4" />
-            </cmd >
+            <!--<cmd id="DON" /> 
+            <cmd id="DOF" /> -->       
             <cmd id="UPDATE" /> 
 
          </accepts>
       </cmds>
    </nodeDef> 
-
 
    <nodeDef id="yoCOSmokesens" nls="nlssmokesens">
       <editors />
