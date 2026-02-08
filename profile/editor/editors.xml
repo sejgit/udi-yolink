@@ -411,7 +411,7 @@
     <range uom="25" subset="0,1,99" nls="beeping" />
   </editor>
   <editor id="beepingIn">
-    <range uom="25" subset="0,1,99" nls="beeping" />
+    <range uom="25" subset="0,1" nls="beeping" />
   </editor>
 
   <editor id="leakOpMode">

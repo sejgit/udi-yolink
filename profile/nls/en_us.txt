@@ -834,11 +834,6 @@ beeping-0=No Beep
 beeping-1=Beeping
 beeping-99=Unknown
 
-beeping-0=No Beep
-beeping-1=beeping
-beeping-99=Unknown
-
-
 leakOpMode-0=Detect Water
 leakOpMode-1=Detect No Water
 leakOpMode-99=Unknown
