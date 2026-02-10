@@ -75,7 +75,7 @@ class udiYoTHsensor(udi_interface.Node):
         self.devInfo =  deviceInfo
         self.yoTHsensor  = None
         self.node_ready = False
-
+        self.poly = polyglot
         self.temp_unit = self.yoAccess.get_temp_unit()   
 
 
@@ -103,12 +103,12 @@ class udiYoTHsensor(udi_interface.Node):
         # subscribe to the events we want
         #polyglot.subscribe(polyglot.CUSTOMPARAMS, self.parameterHandler)
         #polyglot.subscribe(polyglot.POLL, self.poll)
-        polyglot.subscribe(polyglot.START, self.start, self.address)
-        polyglot.subscribe(polyglot.STOP, self.stop)
+        self.poly.subscribe(polyglot.START, self.start, self.address)
+        self.poly.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
                      
         # start processing events and create add our controller node
-        polyglot.ready()
+        self.poly.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
 

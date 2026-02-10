@@ -16,7 +16,7 @@ except ImportError:
 
 import time
 import math
-from yolinkSmartRemoterV2 import YoLinkSmartRemote
+from yolinkSmartRemoterV3 import YoLinkSmartRemoter
 
 class udiRemoteKey(udi_interface.Node):
     from  udiYolinkLib import my_setDriver, save_cmd_struct, retrieve_cmd_struct, bool2ISY, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
@@ -313,7 +313,7 @@ class udiYoSmartRemoter(udi_interface.Node):
 
         logging.info('start - udiYoSmartRemoter')
         self.node.setDriver('GV30', 0, True, True)
-        self.yoSmartRemote  = YoLinkSmartRemote(self.yoAccess, self.devInfo, self.updateStatus)
+        self.yoSmartRemote  = YoLinkSmartRemoter(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.temp_unit = self.yoAccess.get_temp_unit()
         self.yoSmartRemote.initNode()

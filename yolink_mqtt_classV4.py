@@ -1681,6 +1681,7 @@ class YoLinkMQTTDevice(object):
         except Exception as E:
             logging.error('Exception in get_event_in_state {} {}'.format(E,yolink.dataAPI[yolink.dData][yolink.dState] ))
             return(None)
+        
     def clear_event_from_state(yolink):
         logging.debug('clear_event_from_state and last message')
         try:

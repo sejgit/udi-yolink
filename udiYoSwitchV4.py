@@ -55,7 +55,7 @@ class udiYoSwitch(udi_interface.Node):
     def  __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
         super().__init__( polyglot, primary, address, name)   
         logging.debug('udiYoSwitchSec INIT- {}'.format(deviceInfo['name']))
-        self.poly = polyglot
+        self.poly = polyglot    
         self.devInfo =  deviceInfo   
         self.yoAccess = yoAccess
         self.address = address
@@ -89,13 +89,13 @@ class udiYoSwitch(udi_interface.Node):
         # subscribe to the events we want
         #polyglot.subscribe(polyglot.CUSTOMPARAMS, self.parameterHandler)
         #polyglot.subscribe(polyglot.POLL, self.poll)
-        polyglot.subscribe(polyglot.START, self.start, self.address)
-        polyglot.subscribe(polyglot.STOP, self.stop)
+        self.poly.subscribe(self.poly.START, self.start, self.address)
+        self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
                
 
         # start processing events and create add our controller node
-        polyglot.ready()
+        self.poly.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
@@ -118,7 +118,7 @@ class udiYoSwitch(udi_interface.Node):
         #self.yoSwitch.refreshSchedules()
         self.node_ready = True
         for key in range (0,self.nbr_keys):
-            logging.debug('Adding keys to 2 button switch: {}'.format(key) )
+            logging.debug(' {}'.format(key) )
             k_address =  self.address[4:14]+'key' + str(key)
             k_address = self.poly.getValidAddress(str(k_address))
             k_name =  str(self.name) + ' key' + str(key+1)

@@ -10,7 +10,7 @@ except ImportError:
 from yolink_mqtt_classV4 import YoLinkMQTTDevice
 
 
-class YoLinkSmartRemote(YoLinkMQTTDevice):
+class YoLinkSmartRemoter(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__(yoAccess,  deviceInfo, callback)
         yolink.methodList = ['getState' ]
@@ -42,11 +42,3 @@ class YoLinkSmartRemote(YoLinkMQTTDevice):
         if yolink.clear_event_from_state():
             logging.debug('clearEventData - SUCCESS:')
 
-class YoLinkSmartRemoter(YoLinkSmartRemote):
-    def __init__(yolink, yoAccess,  deviceInfo):
-        super().__init__( yoAccess,  deviceInfo, yolink.updateStatus)
-        yolink.initNode()
-
-    # Enable Event Support (True below)
-    def updateStatus(yolink, data):
-        yolink.updateCallbackStatus(data, True)
