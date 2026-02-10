@@ -23,7 +23,7 @@ from yolink_mqtt_classV4 import YoLinkMQTTDevice
 
 
 class udiYoSchedule(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, get_schedule_info, prep_schedule, convert_timestr_to_epoch, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, bool2ISY, mask2key
+    from  udiYolinkLib import my_setDriver,  prep_schedule, convert_timestr_to_epoch, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, bool2ISY, mask2key
     id = 'yoschedule'
 
     drivers = [
@@ -350,7 +350,12 @@ class udiYoSchedule(udi_interface.Node):
         self.activated, self.schedule_selected = self.activate_schedule(query)
         self.yoSchedule.activateSchedule(self.schedule_selected, self.activated)
         
-
+    def get_schedule_info(self, command):
+        logging.info('udiYoSwitch get_schedule_info {}'.format(command))       
+        query = command.get("query")
+        schedule_selected, params = self.prep_schedule(query)
+        sch_info = self.yoSchedule.getScheduleInfo(schedule_selected)
+        logging.info('get_schedule_info {}'.format(sch_info))   
 
 
     commands = {
