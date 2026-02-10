@@ -138,7 +138,11 @@ class udiYoOutlet(udi_interface.Node):
     def updateData(self):
         logging.info('udiYoOutlet updateData -  {}'.format(self.schedule_selected))
         if self.node is not None:
-            message_type = self.yoOutlet.get_last_message_type()
+            message_type, message_action = self.yoOutlet.get_last_message_type()
+            if 'Schedules' in message_action:  # neED TO THINK THIS THROUGH
+                logging.debug('Schedule update detected')
+                #sch_info = self.yoOutlet.getScheduleInfo(self.schedule_selected)
+                self.schedule.refresh_schedules(message_action)
             unix_time = self.yoOutlet.get_report_time('time')
             logging.debug(f'unix time {unix_time}')
             self.my_setDriver('TIME', unix_time, 151)
@@ -198,10 +202,11 @@ class udiYoOutlet(udi_interface.Node):
 
                 self.my_setDriver('GV30',0)
                 self.my_setDriver('GV20', 2)
-  
+            if 'Schedules' in message_action:  # neED TO THINK THIS THROUGH
+                logging.debug('Schedule update detected')
 
-        sch_info = self.yoOutlet.getScheduleInfo(self.schedule_selected)
-        self.update_schedule_data(sch_info, self.schedule_selected)
+                #sch_info = self.yoOutlet.getScheduleInfo(self.schedule_selected)
+                self.schedule.update_schedule_data(self.schedule_selected)
 
     def updateStatus(self, data):
         logging.info('udiYoOutlet updateStatus')

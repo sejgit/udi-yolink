@@ -1379,7 +1379,7 @@ class YoLinkMQTTDevice(object):
 
     def get_last_message_type(yolink):
         try:
-            return(yolink.data['type'])
+            return(yolink.data['type'], yolink.data['action'])
         except KeyError as e:
             logging.error(f'EXCEPTION - get_last_message_type {e}')
             return(None)
@@ -1438,7 +1438,7 @@ class YoLinkMQTTDevice(object):
     #@measure_time
     def updateStatusData  (yolink, data):
         try:
-            logging.debug('{} - updateStatusData - start: '.format(yolink.type ))
+            logging.debug('{} - updateStatusData - start: {} - {}'.format(yolink.type, json.dumps(yolink.data, indent=4) ))
             '''
             yolink.data = data
             yolink.online = yolink.Status(data)

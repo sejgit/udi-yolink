@@ -221,28 +221,27 @@ class udiYoSwitch(udi_interface.Node):
 
                 self.my_setDriver('GV20', 2)
 
-####  Needs to be updated
             if self.nbr_keys > 0:
-                event_data = self.yoSwitch.getEventData()
-                logging.debug('updateData - event data {}'.format(event_data))
-                if event_data:
-                    key_mask = event_data['keyMask']
-                    press_type = event_data['type']
-                    remote_key = self.mask2key(key_mask)
-                    if press_type == 'LongPress':
-                        press = self.max_remote_keys
-                    else:
-                        press = 0
-                    logging.debug('remote key {} press {}'.format(remote_key, press))
-                    
-                    if self.yoSwitch.isControlEvent():
-                        self.keys[remote_key].send_command(press)
-                        self.yoSwitch.clearEventData()
-                        logging.debug('clearEventData')           
+                #logging.debug('updateData - event data {}'.format(event_data))
+                if self.yoSwitch.get_data('event') is not None:
+                    key_mask = self.yoSwitch.get_data('keyMask', 'event')
+                    press_type = self.yoSwitch.get_data('type', 'event')
+                    if isinstance(key_mask, int):
+                        remote_key = self.mask2key(key_mask)
+                        if press_type == 'LongPress':
+                            press = self.max_remote_keys
+                        else:
+                            press = 0
+                        logging.debug('remote key {} press {}'.format(remote_key, press))
+                        
+                        if  message_type in ['event', 'report'] and remote_key in self.keys:
+                            self.keys[remote_key].send_command(press)
+                            #self.yoSwitch.clearEventData()
+                            #logging.debug('clearEventData')           
 
-            self.my_setDriver('GV13', self.schedule_selected)
-            sch_info = self.yoSwitch.getScheduleInfo(self.schedule_selected)
-            self.update_schedule_data(sch_info, self.schedule_selected)
+            #self.my_setDriver('GV13', self.schedule_selected)
+            #sch_info = self.yoSwitch.getScheduleInfo(self.schedule_selected)
+            #self.update_schedule_data(sch_info, self.schedule_selected)
 
 
 

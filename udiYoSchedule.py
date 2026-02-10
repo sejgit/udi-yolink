@@ -23,7 +23,7 @@ from yolink_mqtt_classV4 import YoLinkMQTTDevice
 
 
 class udiYoSchedule(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, prep_schedule, convert_timestr_to_epoch, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, bool2ISY, mask2key
+    from  udiYolinkLib import my_setDriver, get_schedule_info, prep_schedule, convert_timestr_to_epoch, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, bool2ISY, mask2key
     id = 'yoschedule'
 
     drivers = [
@@ -219,9 +219,13 @@ class udiYoSchedule(udi_interface.Node):
             if drv['driver'] == name:
                 found = True
         return(found)
-
-
-    def update_schedule_data(self, sch_info, selected_schedule):
+    def refresh_schedules(self, message_action):
+        logging.debug('refresh_schedules: {}'.format(message_action)
+        
+                      )  
+    #Needs update 
+    def update_schedule_data(self, selected_schedule):        
+        sch_info = self.yoSchedule.getScheduleInfo(selected_schedule)
         logging.info('update_schedule_data {}'.format(sch_info)) 
 
         def check_name_in_drivers( name):
@@ -322,7 +326,7 @@ class udiYoSchedule(udi_interface.Node):
 
     def update(self, command = None):
         logging.info('Update Status Executed')
-        self.yoSchedule.refreshDevice()
+        self.yoSchedule.getScheduleInfo()
 
 
     def lookup_schedule(self, command):
