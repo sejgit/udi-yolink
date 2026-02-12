@@ -35,7 +35,7 @@ class udiYoSwitch(udi_interface.Node):
             {'driver': 'GV6', 'value': 99, 'uom': 25},
             {'driver': 'GV7', 'value': 99, 'uom': 25},
             {'driver': 'GV8', 'value': 99, 'uom': 25},
-
+            {'driver': 'GV9', 'value': 99, 'uom': 25},
             #{'driver': 'GV13', 'value': 0, 'uom': 25}, #Schedule index/no
             #{'driver': 'GV14', 'value': 99, 'uom': 25}, # Active
             #{'driver': 'GV15', 'value': 99, 'uom': 25}, #On Hour
@@ -191,6 +191,15 @@ class udiYoSwitch(udi_interface.Node):
                     self.my_setDriver('GV0', 99)
                     self.my_setDriver('ST', 99)
                 self.last_state = state 
+            led_state = self.yoSwitch.get_data('status', 'led')
+            if isinstance(led_state, str):
+                if led_state.lower() == 'on':   
+                    self.my_setDriver('GV9', 1, type=message_type)
+                else:
+                    self.my_setDriver('GV9', 0, type=message_type)
+            else:
+                self.my_setDriver('GV9', 99)
+
             if self.support_power:      
                 powerW = self.yoSwitch.get_data('power')                      
                 if isinstance(powerW, (int, float)):
@@ -379,6 +388,21 @@ class udiYoSwitch(udi_interface.Node):
         self.my_setDriver('GV2', self.offDelay * 60 )
         self.yoSwitch.setDelayList([{'on':self.onDelay, 'off':self.offDelay}]) 
 
+    def set_attributes(self, command):
+        logging.debug(f'set_attributes {command}')
+        #add led control
+        led_state = int(command.get('value'))
+
+        if isinstance(led_state, int) and led_state in [0,1]:
+            logging.info('Set LED attribute to {}'.format(led_state))
+            params = {}
+            params['led'] ={}
+            if led_state == 1:
+                params['led']['state'] = 'on'
+            else:
+                params['led']['state'] = 'off'
+            self.yoSwitch.setDeviceAttributes(params)
+
     def update(self, command = None):
         logging.info('udiYoSwitch Update Status')
         self.yoSwitch.refreshDevice()
@@ -442,6 +466,7 @@ class udiYoSwitch(udi_interface.Node):
                 'DFOF'          : set_switch_foff,                         
                 'SWCTRL'        : switchControl, 
                 'DELAYCTRL'     : program_delays, 
+                'SETATTRIB'     : set_attributes,
                 #'LOOKUPSCH'    : lookup_schedule,
                 #'DEFINESCH'    : define_schedule,
                 #'CTRLSCH'      : control_schedule,                

@@ -356,7 +356,7 @@
          <st id="GV6" editor="poweralert" />
          <st id="GV7" editor="poweralert" />
          <st id="GV8" editor="poweralert" />
-      
+         <st id="GV9" editor="LED" />
          <st id="ST"  editor="swstate" />
          <st id="GV30"  editor="status" />
          <st id="GV20" editor="suspendstate" />   
@@ -480,7 +480,8 @@
          <st id="GV0" editor="swstate" />
          <st id="GV1" editor="delay" />
          <st id="GV2" editor="delay" />
-      
+         <st id="GV9" editor="LED" />
+
          <st id="ST"  editor="swstate" />
          <st id="GV30"  editor="status" />         
          <st id="GV20" editor="suspendstate" />         
@@ -1728,14 +1729,14 @@
    </nodeDef> 
 
 
-   <nodeDef id="yoleaksens" nls="nlsleaksens">
+   <nodeDef id="yoleaksensF" nls="nlsleaksens">
       <editors />
       <sts>
          <st id="ST"  editor="waterstate" />      
          <st id="GV0" editor="waterstate" />
          <st id="GV1" editor="batlevel" />
          <st id="GV2" editor="cmdsetting" />
-         <st id="CLITEMP" editor="celsius" />
+         <st id="CLITEMP" editor="farenheit" />
          <st id="GV3" editor="unixtime" /> 
          <st id="GV4" editor="beeping" /> 
          <st id="GV5" editor="leakOpMode" /> 
@@ -1744,17 +1745,12 @@
          <st id="GV8" editor="freezeAlert" /> 
          <st id="GV9" editor="sensorError" /> 
          <st id="GV10" editor="reminder" /> 
-
-
-
          <st id="GV30"  editor="status" />  
          <st id="GV20" editor="suspendstate" /> 
          <st id="TIME" editor="unixtime" />                             
       </sts>
       <cmds>
          <sends>
-            <!--<cmd id="DON" editor="waterstate"  /> 
-            <cmd id="DOF" editor="waterstate"  />    -->
             <cmd id="DON"  />               
             <cmd id="DOF"  />    
 
@@ -1762,9 +1758,7 @@
          <accepts>
             <cmd id="SETCMD" > 
                <p id="" editor="cmdsetting" init="GV2" /> 
-            </cmd >  
-            <!--<cmd id="DON" /> 
-            <cmd id="DOF" /> -->       
+            </cmd >     
             <cmd id="UPDATE" /> 
 
          </accepts>

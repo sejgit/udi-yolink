@@ -432,4 +432,7 @@
     <editor id="reminder">
     <range uom="25" subset="0,1,99" nls="reminder" />
   </editor>  
+    <editor id="LED">
+    <range uom="25" subset="0,1,99" nls="LED" />
+  </editor> 
 </editors>

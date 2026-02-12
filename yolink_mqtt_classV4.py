@@ -371,7 +371,23 @@ class YoLinkMQTTDevice(object):
         logging.debug(yolink.type+' - setDevice -data {}'.format(data))
         yolink.yoAccess.publish_data(data)
         return(True)
+    
+    
+    def setDeviceAttributes(yolink,  data):
+        logging.debug(yolink.type+f' - setDeviceAttributes {data}')
+
+        methodStr = yolink.type+'.setDeviceAttributes'
+            
+        #data['time'] = str(int(time.time_ns()//1e6))# we assign time just before publish
+        data['method'] = methodStr
+        data["targetDevice"] =  yolink.deviceInfo['deviceId']
+        data["token"]= yolink.deviceInfo['token']
+        logging.debug(yolink.type+' - setDevice -data {}'.format(data))
+        yolink.yoAccess.publish_data(data)
+        return(True)
  
+
+
     #@measure_time
     def setDevice(yolink,  data):
         logging.debug(yolink.type+' - setDevice')
