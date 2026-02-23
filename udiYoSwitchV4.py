@@ -188,8 +188,8 @@ class udiYoSwitch(udi_interface.Node):
                     self.my_setDriver('ST', 0, type=message_type)
                     self.node.reportCmd('DOF')  
                 else:
-                    self.my_setDriver('GV0', 99)
-                    self.my_setDriver('ST', 99)
+                    self.my_setDriver('GV0', 99, type=message_type)
+                    self.my_setDriver('ST', 99, type=message_type)
                 self.last_state = state 
             led_state = self.yoSwitch.get_data('status', 'led')
             if isinstance(led_state, str):
@@ -198,7 +198,7 @@ class udiYoSwitch(udi_interface.Node):
                 else:
                     self.my_setDriver('GV9', 0, type=message_type)
             else:
-                self.my_setDriver('GV9', 99)
+                self.my_setDriver('GV9', 99, type=message_type)
 
             if self.support_power:      
                 powerW = self.yoSwitch.get_data('power')                      

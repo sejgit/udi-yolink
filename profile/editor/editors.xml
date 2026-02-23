@@ -435,4 +435,7 @@
     <editor id="LED">
     <range uom="25" subset="0,1,99" nls="LED" />
   </editor> 
+  <editor id="LEDctrl">
+    <range uom="25" subset="0,1" nls="LED" />
+  </editor> 
 </editors>
