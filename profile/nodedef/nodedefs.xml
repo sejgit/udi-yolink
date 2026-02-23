@@ -1728,10 +1728,10 @@
       </cmds>
    </nodeDef> 
 
-
    <nodeDef id="yoleaksensF" nls="nlsleaksens">
       <editors />
       <sts>
+
          <st id="ST"  editor="waterstate" />      
          <st id="GV0" editor="waterstate" />
          <st id="GV1" editor="batlevel" />
@@ -1764,12 +1764,15 @@
          </accepts>
       </cmds>
    </nodeDef> 
-
-<st id="ST"  editor="waterstate" />      
+   
+   <nodeDef id="yoleaksens" nls="nlsleaksens">
+      <editors />
+      <sts>
+         <st id="ST"  editor="waterstate" />      
          <st id="GV0" editor="waterstate" />
          <st id="GV1" editor="batlevel" />
          <st id="GV2" editor="cmdsetting" />
-         <st id="CLITEMP" editor="farenheit" />
+         <st id="CLITEMP" editor="celsius" />
          <st id="GV3" editor="unixtime" /> 
          <st id="GV4" editor="beeping" /> 
          <st id="GV5" editor="leakOpMode" /> 
