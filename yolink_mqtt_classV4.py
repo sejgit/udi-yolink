@@ -1454,7 +1454,7 @@ class YoLinkMQTTDevice(object):
     #@measure_time
     def updateStatusData  (yolink, data):
         try:
-            logging.debug('{} - updateStatusData - start: {} - {}'.format(yolink.type, json.dumps(yolink.data, indent=4) ))
+            logging.debug('{} - updateStatusData - start: {} - {}'.format(yolink.type, json.dumps(data, indent=4), json.dumps(yolink.data, indent=4)))
             '''
             yolink.data = data
             yolink.online = yolink.Status(data)
