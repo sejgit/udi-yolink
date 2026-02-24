@@ -96,7 +96,7 @@ class udiYoGarageFinger(udi_interface.Node):
         logging.debug('updateStatus - udiYoGarageFinger')
         self.yoDoorControl.updateCallbackStatus(data)
         logging.debug(data)
-        if self.node is not None:
+        if self.node is not None and self.node_ready:
             self.my_setDriver('ST',1)
             self.my_setDriver('GV30',1)
         if self.yoDoorControl.suspended:

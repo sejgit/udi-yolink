@@ -116,7 +116,7 @@ class udiYoSwitch(udi_interface.Node):
         #self.my_setDriver('GV30', 1)
         self.yoSwitch.delayTimerCallback (self.updateDelayCountdown, self.timer_update )
         #self.yoSwitch.refreshSchedules()
-        self.node_ready = True
+
         for key in range (0,self.nbr_keys):
             logging.debug(' {}'.format(key) )
             k_address =  self.address[4:14]+'key' + str(key)
@@ -132,7 +132,7 @@ class udiYoSwitch(udi_interface.Node):
         sch_address = self.poly.getValidAddress(sch_address)
         self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
         self.adr_list.append(sch_address)
-
+        self.node_ready = True
 
 
     def updateDelayCountdown (self, timeRemaining ) :
@@ -169,7 +169,7 @@ class udiYoSwitch(udi_interface.Node):
 
  
     def updateData(self):
-        if self.node is not None:
+        if self.node is not None and self.node_ready:
             
             message_type = self.yoSwitch.get_message_type()
             unix_time = self.yoSwitch.get_report_time('reportAt')

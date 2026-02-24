@@ -127,7 +127,7 @@ class udiYoWaterDept(udi_interface.Node):
         #alarms = self.yoWaterDept.getAlarms()
         #limits = self.yoWaterDept.getLimits()
         try:
-            if self.node is not None:
+            if self.node is not None and self.node_ready:
                 message_type = self.yoWaterDept.get_message_type() # if event some data may not be updated 
                 unix_time = self.yoWaterDept.get_report_time('reportAt')
                 self.my_setDriver('TIME', unix_time, 151)

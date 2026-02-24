@@ -123,7 +123,7 @@ class udiYoLockV2(udi_interface.Node):
             return 99            
 
     def updateData(self):
-        if self.node is not None:
+        if self.node is not None and self.node_ready:
             message_type = self.yoLock.get_message_type() # if event some data may not be updated 
             unix_time = self.yoLock.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
@@ -332,7 +332,7 @@ class udiYoLock(udi_interface.Node):
  
 
     def updateData(self):
-        if self.node is not None:
+        if self.node is not None and self.node_ready:
             message_type = self.yoLock.get_message_type() # if event some data may not be updated 
             unix_time = self.yoLock.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)

@@ -103,7 +103,7 @@ class udiYoBatteryHub(udi_interface.Node):
 
 
     def updateData(self):
-        if self.node is not None:
+        if self.node is not None and self.node_ready:
 
             if self.yoHub.online:
                 #pwr_info = self.yoHub.getPowerInfo()
@@ -230,7 +230,7 @@ class udiYoHub(udi_interface.Node):
             self.updateData()
 
     def updateData(self):
-        if self.node is not None:
+        if self.node is not None and self.node_ready:
             if self.yoHub.online:
                 message_type = self.yoHub.get_message_type()
                 #if state == 'ON':

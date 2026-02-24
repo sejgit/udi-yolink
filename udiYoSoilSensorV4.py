@@ -163,7 +163,7 @@ class udiYoSoilSensor(udi_interface.Node):
         #limits = self.yoSoilSensor.getLimits()
         logging.info('yoSoilSensor -  updateData')
         alarm_det = False 
-        if self.node is not None:
+        if self.node is not None and self.node_ready:
             message_type = self.yoSoilSensor.get_message_type() # if event some data may not be updated 
             unix_time = self.yoSoilSensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
