@@ -248,7 +248,7 @@ class udiYoSwitch(udi_interface.Node):
                             self.keys[remote_key].send_command(press)
                             #self.yoSwitch.clearEventData()
                             #logging.debug('clearEventData')           
-            if self.schedule.scheduleDataPresent():
+            if self.schedule.scheduleDataUpdate():
                 self.schedule.update_schedule_data()
             #self.my_setDriver('GV13', self.schedule_selected)
             #sch_info = self.yoSwitch.getScheduleInfo(self.schedule_selected)
