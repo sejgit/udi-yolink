@@ -83,7 +83,7 @@ class udiYoOutlet(udi_interface.Node):
         self.timer_expires = 0
         self.onDelay = 0
         self.offDelay = 0
-        self.schedule_selected = None
+        #self.schedule_selected = None
         self.poly = polyglot
         self.poly.subscribe(polyglot.START, self.start, self.address)
         self.poly.subscribe(polyglot.STOP, self.stop)
@@ -136,13 +136,13 @@ class udiYoOutlet(udi_interface.Node):
 
 
     def updateData(self):
-        logging.info('udiYoOutlet updateData -  {}'.format(self.schedule_selected))
+        logging.info('udiYoOutlet updateData - ')
         if self.node is not None:
             message_type, message_action = self.yoOutlet.get_last_message_type()
-            if 'Schedules' in message_action:  # neED TO THINK THIS THROUGH
-                logging.debug('Schedule update detected')
+            #if 'Schedules' in message_action:  # neED TO THINK THIS THROUGH
+            #    logging.debug('Schedule update detected')
                 #sch_info = self.yoOutlet.getScheduleInfo(self.schedule_selected)
-                self.schedule.refresh_schedules(message_action)
+            #    self.schedule.refresh_schedules(message_action)
             unix_time = self.yoOutlet.get_report_time('time')
             logging.debug(f'unix time {unix_time}')
             self.my_setDriver('TIME', unix_time, 151)
@@ -202,11 +202,11 @@ class udiYoOutlet(udi_interface.Node):
 
                 self.my_setDriver('GV30',0)
                 self.my_setDriver('GV20', 2)
-            if 'Schedules' in message_action:  # neED TO THINK THIS THROUGH
-                logging.debug('Schedule update detected')
 
                 #sch_info = self.yoOutlet.getScheduleInfo(self.schedule_selected)
-                self.schedule.update_schedule_data(self.schedule_selected)
+            if self.schedule.scheduleDataUpdate():
+                self.schedule.update_schedule_data()
+            #self.my_setDriver('GV13', self.schedule_sel
 
     def updateStatus(self, data):
         logging.info('udiYoOutlet updateStatus')
@@ -317,6 +317,7 @@ class udiYoOutlet(udi_interface.Node):
         self.yoOutlet.setDelayList([{'on':self.onDelay, 'off':self.offDelay}]) 
 
 
+    '''
     def lookup_schedule(self, command):
         logging.info('udiYoOutlet lookup_schedule {}'.format(command))
         self.schedule_selected = int(command.get('value'))
@@ -334,7 +335,7 @@ class udiYoOutlet(udi_interface.Node):
         query = command.get("query")
         self.activated, self.schedule_selected = self.activate_schedule(query)
         self.yoOutlet.activateSchedule(self.schedule_selected, self.activated)
-        
+    '''    
 
 
     commands = {

@@ -53,7 +53,7 @@ class udiYoSchedule(udi_interface.Node):
         self.devInfo =  deviceInfo   
         self.yoSchedule= None
         self.node_ready = False
-        self.schedule_selected = None
+        self.schedule_selected = 0
 
 
         self.poly = polyglot
@@ -233,7 +233,9 @@ class udiYoSchedule(udi_interface.Node):
         
                       )  
     #Needs update 
-    def update_schedule_data(self, selected_schedule):        
+    def update_schedule_data(self, selected_schedule=None):    
+        if selected_schedule is None:
+            selected_schedule = self.schedule_selected
         sch_info = self.yoSchedule.getScheduleInfo(selected_schedule)
         logging.info('update_schedule_data {}'.format(sch_info)) 
 
