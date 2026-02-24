@@ -26,6 +26,7 @@ class udiYoSwitch(udi_interface.Node):
     id = 'yoswitch'
 
     drivers = [
+            {'driver': 'ST', 'value': 0, 'uom': 25},        
             {'driver': 'GV0', 'value': 99, 'uom': 25},
             {'driver': 'GV1', 'value': 0, 'uom': 57}, 
             {'driver': 'GV2', 'value': 0, 'uom': 57}, 
@@ -46,7 +47,6 @@ class udiYoSwitch(udi_interface.Node):
             #{'driver': 'GV22', 'value': 99, 'uom': 25}, #offSec            
             #{'driver': 'GV19', 'value': 0, 'uom': 25}, #days
             {'driver': 'GV20', 'value': 99, 'uom': 25},                          
-            {'driver': 'ST', 'value': 0, 'uom': 25},
             {'driver': 'GV30', 'value': 0, 'uom': 25},
             {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},        
             ]
@@ -176,6 +176,7 @@ class udiYoSwitch(udi_interface.Node):
             self.my_setDriver('TIME', unix_time, 151)
 
             if self.yoSwitch.online:
+                
                 state =  self.yoSwitch.get_data('state')
                 self.my_setDriver('GV30', 1)
                 if state in ['on', 'ON', 'open', 'OPEN']:
@@ -191,39 +192,39 @@ class udiYoSwitch(udi_interface.Node):
                     self.my_setDriver('GV0', 99, type=message_type)
                     self.my_setDriver('ST', 99, type=message_type)
                 self.last_state = state 
-            led_state = self.yoSwitch.get_data('status', 'led')
-            if isinstance(led_state, str):
-                if led_state.lower() == 'on':   
-                    self.my_setDriver('GV9', 1, type=message_type)
+                led_state = self.yoSwitch.get_data('status', 'led')
+                if isinstance(led_state, str):
+                    if led_state.lower() == 'on':   
+                        self.my_setDriver('GV9', 1, type=message_type)
+                    else:
+                        self.my_setDriver('GV9', 0, type=message_type)
                 else:
-                    self.my_setDriver('GV9', 0, type=message_type)
-            else:
-                self.my_setDriver('GV9', 99, type=message_type)
+                    self.my_setDriver('GV9', 99, type=message_type)
 
-            if self.support_power:      
-                powerW = self.yoSwitch.get_data('power')                      
-                if isinstance(powerW, (int, float)):
-                    powerW = round(powerW/10,1) # reports 1/10W
-                    self.my_setDriver('GV3', powerW, 73, type=message_type)
+                if self.support_power:      
+                    powerW = self.yoSwitch.get_data('power')                      
+                    if isinstance(powerW, (int, float)):
+                        powerW = round(powerW/10,1) # reports 1/10W
+                        self.my_setDriver('GV3', powerW, 73, type=message_type)
 
-                energyWh = self.yoSwitch.get_data('watt')  
-                if isinstance(energyWh, (int, float)):            
-                    energyWh = round(energyWh/10,1) # reports 1/10Wh                    
-                self.my_setDriver('GV4', energyWh, 119, type=message_type)
+                    energyWh = self.yoSwitch.get_data('watt')  
+                    if isinstance(energyWh, (int, float)):            
+                        energyWh = round(energyWh/10,1) # reports 1/10Wh                    
+                    self.my_setDriver('GV4', energyWh, 119, type=message_type)
 
-                self.my_setDriver('GV5', self.state2ISY(self.yoSwitch.get_data('overload', 'alertType')), type=message_type)
-                self.my_setDriver('GV6', self.state2ISY(self.yoSwitch.get_data('highload', 'alertType')), type=message_type)
-                self.my_setDriver('GV7', self.state2ISY(self.yoSwitch.get_data('lowload', 'alertType')), type=message_type)
-                self.my_setDriver('GV8', self.state2ISY(self.yoSwitch.get_data('highTemperature', 'alertType')), type=message_type)
+                    self.my_setDriver('GV5', self.state2ISY(self.yoSwitch.get_data('overload', 'alertType')), type=message_type)
+                    self.my_setDriver('GV6', self.state2ISY(self.yoSwitch.get_data('highload', 'alertType')), type=message_type)
+                    self.my_setDriver('GV7', self.state2ISY(self.yoSwitch.get_data('lowload', 'alertType')), type=message_type)
+                    self.my_setDriver('GV8', self.state2ISY(self.yoSwitch.get_data('highTemperature', 'alertType')), type=message_type)
 
-                #logging.debug('Timer info : {} '. format(time.time() - self.timer_expires))
-                if time.time() >= self.timer_expires - self.timer_update and self.timer_expires != 0:
-                    self.my_setDriver('GV1', 0)
-                    self.my_setDriver('GV2', 0)
-                if self.yoSwitch.suspended:
-                    self.my_setDriver('GV20', 1)
-                else:
-                    self.my_setDriver('GV20', 0)
+                    #logging.debug('Timer info : {} '. format(time.time() - self.timer_expires))
+                    if time.time() >= self.timer_expires - self.timer_update and self.timer_expires != 0:
+                        self.my_setDriver('GV1', 0)
+                        self.my_setDriver('GV2', 0)
+                    if self.yoSwitch.suspended:
+                        self.my_setDriver('GV20', 1)
+                    else:
+                        self.my_setDriver('GV20', 0)
 
             else:
                 self.my_setDriver('GV30', 0)

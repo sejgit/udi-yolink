@@ -358,8 +358,8 @@
          <st id="GV8" editor="poweralert" />
          <st id="GV9" editor="LED" />
          <st id="ST"  editor="swstate" />
-         <st id="GV30"  editor="status" />
          <st id="GV20" editor="suspendstate" />   
+         <st id="GV30"  editor="status" />
          <st id="TIME" editor="unixtime" />                  
       </sts>
       <cmds>
@@ -487,8 +487,9 @@
          <st id="GV9" editor="LED" />
 
          <st id="ST"  editor="swstate" />
+         <st id="GV20" editor="suspendstate" />   
          <st id="GV30"  editor="status" />         
-         <st id="GV20" editor="suspendstate" />         
+      
          <st id="TIME" editor="unixtime" />            
       </sts>
       <cmds>

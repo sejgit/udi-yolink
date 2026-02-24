@@ -213,10 +213,15 @@ class udiYoLeakSensor(udi_interface.Node):
                     self.my_setDriver('ST', 99, type=message_type)   
                 self.last_state = waterState
     
-                self.yoLeakSensor.get_data('battery', 'state')
+                batlvl = self.yoLeakSensor.get_data('battery', 'state')
+                if isinstance(batlvl, (int, float)):
+                    self.my_setDriver('BATLVL', batlvl, type=message_type)
+                else:
+                    self.my_setDriver('BATLVL', 99, type=message_type)
+
                 self.my_setDriver('GV2', self.cmd_state, type=message_type)
                 #self.my_setDriver('ST', 1)
-                self.my_setDriver('GV30', 1, type=message_type)
+
                 state_change = self.yoLeakSensor.get_data('stateChangedAt', 'state')
                 logging.debug('state_change : {}'.format(state_change))
                 if state_change is not None:
@@ -244,15 +249,16 @@ class udiYoLeakSensor(udi_interface.Node):
                     self.my_setDriver('GV6', 0, type=message_type)
                 else:
                     self.my_setDriver('GV6', 1, type=message_type)
-                sensorMove = self.yoLeakSensor.get_data('stayError', 'alarmStateonline')
+                sensorMove = self.yoLeakSensor.get_data('stayError', 'alarmState')
                 self.my_setDriver('GV7', self.state2ISY(sensorMove), type=message_type)
-                sensorFreeze = self.yoLeakSensor.get_data('freezeError', 'alarmStateonline')
+                sensorFreeze = self.yoLeakSensor.get_data('freezeError', 'alarmState')
                 self.my_setDriver('GV8', self.state2ISY(sensorFreeze), type=message_type)
-                sensorDetectError = self.yoLeakSensor.get_data('detectorError', 'alarmStateonline')  
+                sensorDetectError = self.yoLeakSensor.get_data('detectorError', 'alarmState')  
                 self.my_setDriver('GV9', self.state2ISY(sensorDetectError), type=message_type)
-                reminderAlert = self.yoLeakSensor.get_data('reminder', 'alarmStateonline')
+                reminderAlert = self.yoLeakSensor.get_data('reminder', 'alarmState')
                 self.my_setDriver('GV10', self.state2ISY(reminderAlert), type=message_type)
 
+                self.my_setDriver('GV30', 1, type=message_type)
                 if self.yoLeakSensor.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
