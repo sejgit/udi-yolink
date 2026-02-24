@@ -517,7 +517,7 @@
              </cmd >   
 
             <cmd id="SETATTRIB" > 
-               <p id="" editor="LED" init="GV9" /> 
+               <p id="" editor="LEDctrl" init="GV9" /> 
             </cmd >
 
             <!--

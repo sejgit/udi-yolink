@@ -218,13 +218,13 @@ class udiYoSwitch(udi_interface.Node):
                     self.my_setDriver('GV8', self.state2ISY(self.yoSwitch.get_data('highTemperature', 'alertType')), type=message_type)
 
                     #logging.debug('Timer info : {} '. format(time.time() - self.timer_expires))
-                    if time.time() >= self.timer_expires - self.timer_update and self.timer_expires != 0:
-                        self.my_setDriver('GV1', 0)
-                        self.my_setDriver('GV2', 0)
-                    if self.yoSwitch.suspended:
-                        self.my_setDriver('GV20', 1)
-                    else:
-                        self.my_setDriver('GV20', 0)
+                if time.time() >= self.timer_expires - self.timer_update and self.timer_expires != 0:
+                    self.my_setDriver('GV1', 0)
+                    self.my_setDriver('GV2', 0)
+                if self.yoSwitch.suspended:
+                    self.my_setDriver('GV20', 1)
+                else:
+                    self.my_setDriver('GV20', 0)
 
             else:
                 self.my_setDriver('GV30', 0)
@@ -399,9 +399,9 @@ class udiYoSwitch(udi_interface.Node):
             params = {}
             params['led'] ={}
             if led_state == 1:
-                params['led']['state'] = 'on'
+                params['led']['status'] = 'on'
             else:
-                params['led']['state'] = 'off'
+                params['led']['status'] = 'off'
             self.yoSwitch.setDeviceAttributes(params)
 
     def update(self, command = None):

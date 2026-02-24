@@ -125,6 +125,7 @@ CMD-nlsswitch-UPDATE-NAME=Update Status
 CMD-nlsswitch-ONDELAY-NAME=Set On Delay
 CMD-nlsswitch-OFFDELAY-NAME=Set Off Delay (0 if no delay)
 CMD-nlsswitch-SWCTRL-NAME=Switch control
+CMD-nlsswitch-SETATTRIB-NAME=LED control
 
 
 #YoLink Outlet
