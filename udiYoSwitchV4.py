@@ -171,7 +171,7 @@ class udiYoSwitch(udi_interface.Node):
     def updateData(self):
         if self.node is not None:
             
-            message_type = self.yoSwitch.get_last_message_type()
+            message_type = self.yoSwitch.get_message_type()
             unix_time = self.yoSwitch.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 

@@ -126,7 +126,7 @@ class udiYoMotionSensor(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            message_type = self.yoMotionsSensor.get_last_message_type()
+            message_type = self.yoMotionsSensor.get_message_type()
             unix_time = self.yoMotionsSensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
             if self.yoMotionsSensor.online:

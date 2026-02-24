@@ -256,7 +256,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
     def updateData(self):
         if self.node is not None:
             logging.debug('updateData - {}'.format(self.yoIRrem.online))
-            message_type = self.yoIRrem.get_last_message_type()
+            message_type = self.yoIRrem.get_message_type()
             unix_time = self.yoIRrem.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 

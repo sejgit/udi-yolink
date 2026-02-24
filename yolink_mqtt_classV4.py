@@ -1393,12 +1393,21 @@ class YoLinkMQTTDevice(object):
         except KeyError as e:
             logging.error(f'EXCEPTION - getData {e}')    
 
-    def get_last_message_type(yolink):
+    def get_message_type(yolink):
         try:
-            return(yolink.data['type'], yolink.data['action'])
+            msg_type = None
+            msg_action = None
+            if 'event' in yolink.data:
+                msg_type = 'event'
+                msg_action  = yolink.data['event'].split('.')[-1]
+            if 'method' in yolink.data:
+                msg_type = 'method'
+                msg_action = yolink.data['method'].split('.')[-1]
+            return(msg_type, msg_action)
+        
         except KeyError as e:
-            logging.error(f'EXCEPTION - get_last_message_type {e}')
-            return(None)
+            logging.error(f'EXCEPTION - get_message_type {e}')
+            return(None, None)
 
     def no_data(yolink):
         try:

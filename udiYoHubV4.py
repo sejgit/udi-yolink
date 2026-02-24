@@ -232,22 +232,23 @@ class udiYoHub(udi_interface.Node):
     def updateData(self):
         if self.node is not None:
             if self.yoHub.online:
+                message_type = self.yoHub.get_message_type()
                 #if state == 'ON':
                 #    self.node.setDriver('GV0', 1, True, True)
                 #elif  state == 'OFF':
                 #    self.node.setDriver('GV0', 0, True, True)
                 #else:
                 #    self.node.setDriver('GV0', 99, True, True)
-                self.my_setDriver('ST', 1)
-                self.my_setDriver('GV30', 1)
+                self.my_setDriver('ST', 1, type=message_type)
+                self.my_setDriver('GV30', 1, type=message_type)
                 if self.yoHub.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
                     self.my_setDriver('GV20', 0)
 
             else:
-                self.my_setDriver('ST', 0)
-                self.my_setDriver('GV30', 0)
+                self.my_setDriver('ST', 0,type=message_type)
+                self.my_setDriver('GV30', 0, type=message_type)
                 self.my_setDriver('GV20', 2)
                 #self.pollDelays()
 

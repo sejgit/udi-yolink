@@ -170,7 +170,7 @@ class udiYoDimmer(udi_interface.Node):
         logging.info('udiYoDimmer -  updateData{}'.format(self.schedule_selected))
 
         if self.node is not None:
-            message_type = self.yoDimmer.get_last_message_type()
+            message_type = self.yoDimmer.get_message_type()
             self.my_setDriver('TIME', self.yoDimmer.getLastUpdateTime(), 151)
             #state =  self.yoDimmer.getState().upper()
             state = self.yoDimmer.get_data('state')

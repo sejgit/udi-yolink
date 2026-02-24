@@ -125,7 +125,7 @@ class udiYoSchedule(udi_interface.Node):
         #    self.poly.delNode(self.node.address)
 
     def scheduleDataUpdate(self) -> bool:
-        msg_type, msg_action  = self.yoSchedule.get_last_message_type()
+        msg_type, msg_action  = self.yoSchedule.get_message_type()
         if isinstance(msg_type, str) and isinstance(msg_action, str):
             logging.debug('scheduleDataPresent - last message type: {}, action: {}'.format(msg_type, msg_action))
             if "Schedules" in msg_type:

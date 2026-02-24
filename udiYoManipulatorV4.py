@@ -128,8 +128,8 @@ class udiYoManipulator(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            message_type = self.yoMotionsSensor.get_last_message_type()
-            unix_time = self.yoMotionsSensor.get_report_time('reportAt')
+            message_type = self.yoManipulator.get_message_type()
+            unix_time = self.yoManipulator.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
             if self.yoManipulator.online:
                 state =  self.yoManipulator.get_data('state')

@@ -165,7 +165,7 @@ class udiYoSprinkler2(udi_interface.Node):
     def updateData(self):
         try:
             if self.node is not None:
-                message_type = self.yoSprinkler.get_last_message_type()
+                message_type = self.yoSprinkler.get_message_type()
                 unix_time = self.yoSprinkler.get_report_time('time')
                 self.my_setDriver('TIME', unix_time, 151)
                 if self.yoSprinkler.online:

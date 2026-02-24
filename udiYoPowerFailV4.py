@@ -111,7 +111,7 @@ class udiYoPowerFailSenor(udi_interface.Node):
     def updateData(self):
         alert_state = ['normal', 'alert', 'off']
         if self.node is not None:
-            message_type = self.yoPowerFail.get_last_message_type() # if event some data may not be updated 
+            message_type = self.yoPowerFail.get_message_type() # if event some data may not be updated 
             unix_time = self.yoPowerFail.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
      
