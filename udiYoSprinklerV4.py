@@ -170,7 +170,10 @@ class udiYoSprinkler(udi_interface.Node):
         #limits = self.yoTHsensor.getLimits()
         logging.info('yoTHsensor -  updateData')
         alarm_det = False 
-        if self.node is not None and self.node_ready:
+        if self.node is not None:
+            while not self.node_ready:
+                time.sleep(0.5)
+                
             message_type = self.yoTHsensor.get_message_type() # if event some data may not be updated 
             unix_time = self.yoTHsensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)

@@ -138,7 +138,9 @@ class udiYoSpeakerHub(udi_interface.Node):
         pass
 
     def updateData(self):
-        if self.node is not None and self.node_ready:
+        if self.node is not None:
+            while not self.node_ready:
+                time.sleep(0.5)
             self.my_setDriver('TIME', self.yoSpeakerHub.getLastUpdateTime(), 151)
             logging.debug(f'TIME {self.yoSpeakerHub.getLastUpdateTime()}')
             if self.yoSpeakerHub.online:

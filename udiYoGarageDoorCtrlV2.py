@@ -97,24 +97,23 @@ class udiYoGarageDoor(udi_interface.Node):
     
     def updateStatus(self, data):
         logging.debug('updateStatus - udiYoGarageDoor')
-        self.yoDoorControl.updateCallbackStatus(data)
-        if self.yoDoorControl.suspended:
-            self.my_setDriver('GV20', 1)
-        else:
-            self.my_setDriver('GV20', 0)
+        if self.node is not None:
+            while not self.node_ready:
+                time.sleep(0.5)
+            self.yoDoorControl.updateCallbackStatus(data)
+            if self.yoDoorControl.suspended:
+                self.my_setDriver('GV20', 1)
+            else:
+                self.my_setDriver('GV20', 0)
 
-        if self.yoDoorControl.online:
-            self.my_setDriver('ST', 1)
-            self.my_setDriver('GV30', 1)
-        else:
-            self.my_setDriver('GV20', 2)
-            #self.node.setDriver('ST', 0, True, True)
+            if self.yoDoorControl.online:
+                self.my_setDriver('ST', 1)
+                self.my_setDriver('GV30', 1)
+            else:
+                self.my_setDriver('GV20', 2)
+                #self.node.setDriver('ST', 0, True, True)
 
         
-
-        #logging.debug(data)
-        #if self.node is not None:
-        #    self.node.setDriver('ST',1, True, True)
 
 
     def toggleDoor(self, command = None):

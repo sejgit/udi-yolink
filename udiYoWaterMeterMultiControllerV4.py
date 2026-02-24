@@ -149,7 +149,9 @@ class udiYoWaterMeterMulti(udi_interface.Node):
 
     def updateData(self):
         try:
-            if self.node is not None and self.node_ready:
+            if self.node is not None:
+                while not self.node_ready:
+                    time.sleep(0.5)
                 message_type = self.yoWaterCtrl.get_message_type()
                 unix_time = self.yoWaterCtrl.get_report_time('time')
                 self.my_setDriver('TIME', unix_time, 151)
@@ -320,7 +322,9 @@ class udiYoSubWaterMeter(udi_interface.Node):
 
     def updateData(self):
         try:
-            if self.node is not None and self.node_ready:
+            if self.node is not None:
+                while not self.node_ready:
+                    time.sleep(0.5)
                 message_type = self.yoWaterCtrl.get_message_type()
                 if self.yoWaterCtrl.online:
                     #self.my_setDriver('GV30', 1)

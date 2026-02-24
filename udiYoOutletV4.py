@@ -137,7 +137,9 @@ class udiYoOutlet(udi_interface.Node):
 
     def updateData(self):
         logging.info('udiYoOutlet updateData - ')
-        if self.node is not None and self.node_ready:
+        if self.node is not None:
+            while not self.node_ready:
+                time.sleep(0.5)
             message_type, message_action = self.yoOutlet.get_message_type()
             #if 'Schedules' in message_action:  # neED TO THINK THIS THROUGH
             #    logging.debug('Schedule update detected')

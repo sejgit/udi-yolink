@@ -111,7 +111,9 @@ class udiYoVibrationSensor(udi_interface.Node):
 
 
     def updateData(self):
-        if self.node is not None and self.node_ready:
+            if self.node is not None:
+                while not self.node_ready:
+                    time.sleep(0.5)
             message_type = self.yoVibrationSensor.get_message_type() # if event some data may not be updated 
             unix_time = self.yoVibrationSensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)

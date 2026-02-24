@@ -103,23 +103,26 @@ class udiYoBatteryHub(udi_interface.Node):
 
 
     def updateData(self):
-        if self.node is not None and self.node_ready:
+        if self.node is not None:
+            while not self.node_ready:
+                time.sleep(0.5)
 
             if self.yoHub.online:
+                message_type = self.yoHub.get_message_type()
                 #pwr_info = self.yoHub.getPowerInfo()
                 dc_power = self.yoHub.get_data('dc', 'power')
                 #battery_exists = self.yoHub.get_data('battery', 'power')
                 battery_state = self.yoHub.get_data('batteryState', 'power')
                 if isinstance(dc_power, bool):
                     if dc_power:
-                        self.my_setDriver('ST', 1)
+                        self.my_setDriver('ST', 1, type=message_type)
                     else:
-                        self.my_setDriver('ST', 0)
+                        self.my_setDriver('ST', 0, type=message_type)
                 else:
-                    self.my_setDriver('ST', 99)
+                    self.my_setDriver('ST', 99, type=message_type)
                 if  isinstance(battery_state, int):
-                        self.my_setDriver('GV0', battery_state)  
-                self.my_setDriver('GV30', 1)
+                        self.my_setDriver('GV0', battery_state, type=message_type)  
+                self.my_setDriver('GV30', 1, type=message_type)
                 if self.yoHub.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
@@ -230,7 +233,9 @@ class udiYoHub(udi_interface.Node):
             self.updateData()
 
     def updateData(self):
-        if self.node is not None and self.node_ready:
+        if self.node is not None:
+            while not self.node_ready:
+                time.sleep(0.5)
             if self.yoHub.online:
                 message_type = self.yoHub.get_message_type()
                 #if state == 'ON':
