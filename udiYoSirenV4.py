@@ -94,6 +94,9 @@ class udiYoSiren(udi_interface.Node):
         #get get info even if battery operated 
         self.yoSiren.refreshDevice()    
 
+
+ 
+
     def checkDataUpdate(self):
         if self.yoSiren.data_updated():
             self.updateData()

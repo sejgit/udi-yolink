@@ -1745,9 +1745,32 @@ class YoLinkMQTTDevice(object):
     def schedule_support_sec(yolink):
         logging.debug('schedule_support_sec') 
 
-        return('supportSeconds' in yolink.schedule)
+        return(yolink.get_data('supportSeconds'))
+
 
     def getScheduleInfo(yolink, index):
+        logging.debug(f'{yolink.type} getScheduleInfo {index} -- {yolink.schedule}')      
+        indexS = str(index)
+        try: 
+            #logging.debug( 'getScheduleInfo 1 : {} '.format(yolink.dataAPI[yolink.dData]))
+            #logging.debug( 'getScheduleInfo 2 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule]))
+            #logging.debug( 'getScheduleInfo 3 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule][indexS]))
+            
+            if isinstance(yolink.get_data('supportSeconds'), bool):
+                yolink.scheduleSec = yolink.get_data('supportSeconds')
+            else:
+                yolink.scheduleSec = False
+            sch_data = yolink.get_data(str(index))    
+
+            logging.debug(' return {} support sec'.format(json.dumps(sch_data, indent=4), yolink.scheduleSec) )
+            return(sch_data)
+    
+        except Exception as e:
+            logging.debug('No schedules found {}'.format(e))
+            return(None)
+
+
+    def getScheduleInfo_org(yolink, index):
         logging.debug(f'{yolink.type} getScheduleInfo {index} -- {yolink.schedule}')      
         indexS = str(index)
         try: 
