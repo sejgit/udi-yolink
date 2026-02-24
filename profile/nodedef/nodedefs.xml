@@ -1743,7 +1743,7 @@
 
          <st id="ST"  editor="waterstate" />      
          <st id="GV0" editor="waterstate" />
-         <st id="GV1" editor="batlevel" />
+         <st id="BATLVL" editor="batlevel" />
          <st id="GV2" editor="cmdsetting" />
          <st id="CLITEMP" editor="farenheit" />
          <st id="GV3" editor="unixtime" /> 
@@ -1779,7 +1779,7 @@
       <sts>
          <st id="ST"  editor="waterstate" />      
          <st id="GV0" editor="waterstate" />
-         <st id="GV1" editor="batlevel" />
+         <st id="BATLVL" editor="batlevel" />
          <st id="GV2" editor="cmdsetting" />
          <st id="CLITEMP" editor="celsius" />
          <st id="GV3" editor="unixtime" /> 
