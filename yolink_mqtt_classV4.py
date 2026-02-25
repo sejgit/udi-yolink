@@ -1395,6 +1395,7 @@ class YoLinkMQTTDevice(object):
 
     def get_message_type(yolink):
         try:
+            logging.debug(f'get_message_type - data: {yolink.data}')
             msg_type = None
             msg_action = None
             if 'event' in yolink.data:
