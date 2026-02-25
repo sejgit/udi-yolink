@@ -172,133 +172,134 @@ class udiYoSwitch(udi_interface.Node):
         if self.node is not None:
             while not self.node_ready:
                 time.sleep(0.5)
-            
-            message_type = self.yoSwitch.get_message_type()
-            unix_time = self.yoSwitch.get_report_time('reportAt')
-            self.my_setDriver('TIME', unix_time, 151)
-
-            if self.yoSwitch.online:
-                
-                state =  self.yoSwitch.get_data('state')
-                self.my_setDriver('GV30', 1)
-                if state in ['on', 'ON', 'open', 'OPEN']:
-                    self.my_setDriver('GV0', 1, type=message_type)
-                    self.my_setDriver('ST', 1, type=message_type)
-        
-                    self.node.reportCmd('DON')  
-                elif  state in ['off', 'OFF', 'closed', 'CLOSED', 'close', 'CLOSE' ]:
-                    self.my_setDriver('GV0', 0, type=message_type)
-                    self.my_setDriver('ST', 0, type=message_type)
-                    self.node.reportCmd('DOF')  
-                else:
-                    self.my_setDriver('GV0', 99, type=message_type)
-                    self.my_setDriver('ST', 99, type=message_type)
-                self.last_state = state 
-                led_state = self.yoSwitch.get_data('status', 'led')
-                if isinstance(led_state, str):
-                    if led_state.lower() == 'on':   
-                        self.my_setDriver('GV9', 1, type=message_type)
-                    else:
-                        self.my_setDriver('GV9', 0, type=message_type)
-                else:
-                    self.my_setDriver('GV9', 99, type=message_type)
-
-                if self.support_power:      
-                    powerW = self.yoSwitch.get_data('power')                      
-                    if isinstance(powerW, (int, float)):
-                        powerW = round(powerW/10,1) # reports 1/10W
-                        self.my_setDriver('GV3', powerW, 73, type=message_type)
-
-                    energyWh = self.yoSwitch.get_data('watt')  
-                    if isinstance(energyWh, (int, float)):            
-                        energyWh = round(energyWh/10,1) # reports 1/10Wh                    
-                    self.my_setDriver('GV4', energyWh, 119, type=message_type)
-
-                    self.my_setDriver('GV5', self.state2ISY(self.yoSwitch.get_data('overload', 'alertType')), type=message_type)
-                    self.my_setDriver('GV6', self.state2ISY(self.yoSwitch.get_data('highload', 'alertType')), type=message_type)
-                    self.my_setDriver('GV7', self.state2ISY(self.yoSwitch.get_data('lowload', 'alertType')), type=message_type)
-                    self.my_setDriver('GV8', self.state2ISY(self.yoSwitch.get_data('highTemperature', 'alertType')), type=message_type)
-
-                    #logging.debug('Timer info : {} '. format(time.time() - self.timer_expires))
-                if time.time() >= self.timer_expires - self.timer_update and self.timer_expires != 0:
-                    self.my_setDriver('GV1', 0)
-                    self.my_setDriver('GV2', 0)
-                if self.yoSwitch.suspended:
-                    self.my_setDriver('GV20', 1)
-                else:
-                    self.my_setDriver('GV20', 0)
-
-            else:
-                self.my_setDriver('GV30', 0)
-
-                self.my_setDriver('GV20', 2)
-
-            if self.nbr_keys > 0:
-                #logging.debug('updateData - event data {}'.format(event_data))
-                if self.yoSwitch.get_data('event') is not None:
-                    key_mask = self.yoSwitch.get_data('keyMask', 'event')
-                    press_type = self.yoSwitch.get_data('type', 'event')
-                    if isinstance(key_mask, int):
-                        remote_key = self.mask2key(key_mask)
-                        if press_type == 'LongPress':
-                            press = self.max_remote_keys
-                        else:
-                            press = 0
-                        logging.debug('remote key {} press {}'.format(remote_key, press))
-                        
-                        if  message_type in ['event', 'report'] and remote_key in self.keys:
-                            self.keys[remote_key].send_command(press)
-                            #self.yoSwitch.clearEventData()
-                            #logging.debug('clearEventData')           
             if self.schedule.scheduleDataUpdate():
                 self.schedule.update_schedule_data()
-            #self.my_setDriver('GV13', self.schedule_selected)
-            #sch_info = self.yoSwitch.getScheduleInfo(self.schedule_selected)
-            #self.update_schedule_data(sch_info, self.schedule_selected)
+            else:            
+                message_type = self.yoSwitch.get_message_type()
+                unix_time = self.yoSwitch.get_report_time('reportAt')
+                self.my_setDriver('TIME', unix_time, 151)
 
-
-
+                if self.yoSwitch.online:
+                    
+                    state =  self.yoSwitch.get_data('state')
+                    self.my_setDriver('GV30', 1)
+                    if state in ['on', 'ON', 'open', 'OPEN']:
+                        self.my_setDriver('GV0', 1, type=message_type)
+                        self.my_setDriver('ST', 1, type=message_type)
             
-            '''
-            if sch_info:
+                        self.node.reportCmd('DON')  
+                    elif  state in ['off', 'OFF', 'closed', 'CLOSED', 'close', 'CLOSE' ]:
+                        self.my_setDriver('GV0', 0, type=message_type)
+                        self.my_setDriver('ST', 0, type=message_type)
+                        self.node.reportCmd('DOF')  
+                    else:
+                        self.my_setDriver('GV0', 99, type=message_type)
+                        self.my_setDriver('ST', 99, type=message_type)
+                    self.last_state = state 
+                    led_state = self.yoSwitch.get_data('status', 'led')
+                    if isinstance(led_state, str):
+                        if led_state.lower() == 'on':   
+                            self.my_setDriver('GV9', 1, type=message_type)
+                        else:
+                            self.my_setDriver('GV9', 0, type=message_type)
+                    else:
+                        self.my_setDriver('GV9', 99, type=message_type)
 
-                self.my_setDriver('GV13', self.schedule_selected)
-                if self.yoSwitch.isScheduleActive(self.schedule_selected):
-                    self.my_setDriver('GV14', 1)
+                    if self.support_power:      
+                        powerW = self.yoSwitch.get_data('power')                      
+                        if isinstance(powerW, (int, float)):
+                            powerW = round(powerW/10,1) # reports 1/10W
+                            self.my_setDriver('GV3', powerW, 73, type=message_type)
+
+                        energyWh = self.yoSwitch.get_data('watt')  
+                        if isinstance(energyWh, (int, float)):            
+                            energyWh = round(energyWh/10,1) # reports 1/10Wh                    
+                        self.my_setDriver('GV4', energyWh, 119, type=message_type)
+
+                        self.my_setDriver('GV5', self.state2ISY(self.yoSwitch.get_data('overload', 'alertType')), type=message_type)
+                        self.my_setDriver('GV6', self.state2ISY(self.yoSwitch.get_data('highload', 'alertType')), type=message_type)
+                        self.my_setDriver('GV7', self.state2ISY(self.yoSwitch.get_data('lowload', 'alertType')), type=message_type)
+                        self.my_setDriver('GV8', self.state2ISY(self.yoSwitch.get_data('highTemperature', 'alertType')), type=message_type)
+
+                        #logging.debug('Timer info : {} '. format(time.time() - self.timer_expires))
+                    if time.time() >= self.timer_expires - self.timer_update and self.timer_expires != 0:
+                        self.my_setDriver('GV1', 0)
+                        self.my_setDriver('GV2', 0)
+                    if self.yoSwitch.suspended:
+                        self.my_setDriver('GV20', 1)
+                    else:
+                        self.my_setDriver('GV20', 0)
+
                 else:
-                    self.my_setDriver('GV14', 0)
-                timestr = sch_info['on']
-                logging.debug('timestr : {}'.format(timestr))
-                if '25:0' in timestr:
-                    self.my_setDriver('GV15', 98, 25)
-                    self.my_setDriver('GV16', 98,  25)
+                    self.my_setDriver('GV30', 0)
+
+                    self.my_setDriver('GV20', 2)
+
+                if self.nbr_keys > 0:
+                    #logging.debug('updateData - event data {}'.format(event_data))
+                    if self.yoSwitch.get_data('event') is not None:
+                        key_mask = self.yoSwitch.get_data('keyMask', 'event')
+                        press_type = self.yoSwitch.get_data('type', 'event')
+                        if isinstance(key_mask, int):
+                            remote_key = self.mask2key(key_mask)
+                            if press_type == 'LongPress':
+                                press = self.max_remote_keys
+                            else:
+                                press = 0
+                            logging.debug('remote key {} press {}'.format(remote_key, press))
+                            
+                            if  message_type in ['event', 'report'] and remote_key in self.keys:
+                                self.keys[remote_key].send_command(press)
+                                #self.yoSwitch.clearEventData()
+                                #logging.debug('clearEventData')           
+
+                #self.my_setDriver('GV13', self.schedule_selected)
+                #sch_info = self.yoSwitch.getScheduleInfo(self.schedule_selected)
+                #self.update_schedule_data(sch_info, self.schedule_selected)
+
+
+
+                
+                '''
+                if sch_info:
+
+                    self.my_setDriver('GV13', self.schedule_selected)
+                    if self.yoSwitch.isScheduleActive(self.schedule_selected):
+                        self.my_setDriver('GV14', 1)
+                    else:
+                        self.my_setDriver('GV14', 0)
+                    timestr = sch_info['on']
+                    logging.debug('timestr : {}'.format(timestr))
+                    if '25:0' in timestr:
+                        self.my_setDriver('GV15', 98, 25)
+                        self.my_setDriver('GV16', 98,  25)
+                    else:
+                        timelist =  timestr.split(':')
+                        hour = int(timelist[0])
+                        minute = int(timelist[1])
+                        self.my_setDriver('GV15', int(hour),  19)
+                        self.my_setDriver('GV16', int(minute),  44)
+                    timestr = sch_info['off']
+                    logging.debug('timestr : {}'.format(timestr))
+                    if '25:0' in timestr:
+                        self.my_setDriver('GV17', 98,  25)
+                        self.my_setDriver('GV18', 98, 25)
+                    else:
+                        timelist =  timestr.split(':')
+                        hour = timelist[0]
+                        minute = timelist[1]               
+                        self.my_setDriver('GV17', int(hour), 19)
+                        self.my_setDriver('GV18', int(minute),  44)
+                    self.my_setDriver('GV19',  int(sch_info['week']))
                 else:
-                    timelist =  timestr.split(':')
-                    hour = int(timelist[0])
-                    minute = int(timelist[1])
-                    self.my_setDriver('GV15', int(hour),  19)
-                    self.my_setDriver('GV16', int(minute),  44)
-                timestr = sch_info['off']
-                logging.debug('timestr : {}'.format(timestr))
-                if '25:0' in timestr:
-                    self.my_setDriver('GV17', 98,  25)
-                    self.my_setDriver('GV18', 98, 25)
-                else:
-                    timelist =  timestr.split(':')
-                    hour = timelist[0]
-                    minute = timelist[1]               
-                    self.my_setDriver('GV17', int(hour), 19)
-                    self.my_setDriver('GV18', int(minute),  44)
-                self.my_setDriver('GV19',  int(sch_info['week']))
-            else:
-                self.my_setDriver('GV13', self.schedule_selected)
-                self.my_setDriver('GV14', 99)
-                self.my_setDriver('GV15', 99, 25)
-                self.my_setDriver('GV16', 99,  25)
-                self.my_setDriver('GV17', 99, 25)
-                self.my_setDriver('GV18', 99, 25)
-                self.my_setDriver('GV19', 0)    
-            '''
+                    self.my_setDriver('GV13', self.schedule_selected)
+                    self.my_setDriver('GV14', 99)
+                    self.my_setDriver('GV15', 99, 25)
+                    self.my_setDriver('GV16', 99,  25)
+                    self.my_setDriver('GV17', 99, 25)
+                    self.my_setDriver('GV18', 99, 25)
+                    self.my_setDriver('GV19', 0)    
+                '''
 
     def updateStatus(self, data):
         logging.info('updateStatus - Switch')

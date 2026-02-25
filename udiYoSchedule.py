@@ -126,9 +126,9 @@ class udiYoSchedule(udi_interface.Node):
 
     def scheduleDataUpdate(self) -> bool:
         msg_type, msg_action  = self.yoSchedule.get_message_type()
+        logging.debug('scheduleDataPresent - last message type: {}, action: {}'.format(msg_type, msg_action))
         if isinstance(msg_type, str) and isinstance(msg_action, str):
-            logging.debug('scheduleDataPresent - last message type: {}, action: {}'.format(msg_type, msg_action))
-            if "Schedules" in msg_type:
+            if msg_action in ['getSchedules', 'setSchedules']:
                 return True
         return False
     

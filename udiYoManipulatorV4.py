@@ -130,57 +130,59 @@ class udiYoManipulator(udi_interface.Node):
         if self.node is not None:
             while not self.node_ready:
                 time.sleep(0.5)
-            message_type = self.yoManipulator.get_message_type()
-            unix_time = self.yoManipulator.get_report_time('reportAt')
-            self.my_setDriver('TIME', unix_time, 151)
-            if self.yoManipulator.online:
-                state =  self.yoManipulator.get_data('state')
 
-                if state.upper() == 'OPEN':
-                    self.valveState = 1
-                    self.my_setDriver('GV0', self.valveState, type = message_type )
-                    self.my_setDriver('ST', self.valveState, type = message_type )
-                    if self.last_state != state:
-                        self.node.reportCmd('DON')
-                elif state.upper() == 'CLOSED':
-                    self.valveState = 0
-                    self.my_setDriver('GV0', self.valveState, type=message_type )
-                    self.my_setDriver('ST', self.valveState, type=message_type )
-                    if self.last_state != state:    
-                        self.node.reportCmd('DOF')
+            if self.schedule.scheduleDataUpdate():
+                self.schedule.update_schedule_data()
+            else:                
+                message_type = self.yoManipulator.get_message_type()
+                unix_time = self.yoManipulator.get_report_time('reportAt')
+                self.my_setDriver('TIME', unix_time, 151)
+                if self.yoManipulator.online:
+                    state =  self.yoManipulator.get_data('state')
+
+                    if state.upper() == 'OPEN':
+                        self.valveState = 1
+                        self.my_setDriver('GV0', self.valveState, type = message_type )
+                        self.my_setDriver('ST', self.valveState, type = message_type )
+                        if self.last_state != state:
+                            self.node.reportCmd('DON')
+                    elif state.upper() == 'CLOSED':
+                        self.valveState = 0
+                        self.my_setDriver('GV0', self.valveState, type=message_type )
+                        self.my_setDriver('ST', self.valveState, type=message_type )
+                        if self.last_state != state:    
+                            self.node.reportCmd('DOF')
+                    else:
+                        self.my_setDriver('GV0', 99)
+                        self.my_setDriver('ST',99)
+                    self.last_state = state
+                    self.my_setDriver('GV30', 1)
+                    #logging.debug('Timer info : {} '. format(time.time() - self.timer_expires))
+                    if time.time() >= self.timer_expires - self.timer_update and self.timer_expires != 0:
+                        self.my_setDriver('GV1', 0)
+                        self.my_setDriver('GV2', 0)  
+                    #logging.debug('udiYoManipulator - getBattery: {}'.format(self.yoManipulator.getBattery()))    
+                    self.my_setDriver('BATLVL', self.yoManipulator.get_data('battery'), type=message_type)      
+                    if self.yoManipulator.suspended:
+                        self.my_setDriver('GV20', 1)
+                    else:
+                        self.my_setDriver('GV20', 0)
+
                 else:
-                    self.my_setDriver('GV0', 99)
-                    self.my_setDriver('ST',99)
-                self.last_state = state
-                self.my_setDriver('GV30', 1)
-                #logging.debug('Timer info : {} '. format(time.time() - self.timer_expires))
-                if time.time() >= self.timer_expires - self.timer_update and self.timer_expires != 0:
-                    self.my_setDriver('GV1', 0)
-                    self.my_setDriver('GV2', 0)  
-                #logging.debug('udiYoManipulator - getBattery: {}'.format(self.yoManipulator.getBattery()))    
-                self.my_setDriver('BATLVL', self.yoManipulator.get_data('battery'), type=message_type)      
-                if self.yoManipulator.suspended:
-                    self.my_setDriver('GV20', 1)
-                else:
-                    self.my_setDriver('GV20', 0)
+                    #self.my_setDriver('GV0', 99)
+                    #self.my_setDriver('GV1', 0)     
+                    #self.my_setDriver('GV2', 0)
+                    #self.my_setDriver('BATLVL', 99)
+                    self.my_setDriver('GV30', 0)
+                    self.my_setDriver('GV20', 2)
+                    #self.my_setDriver('GV13', self.schedule_selected)
+                    #self.my_setDriver('GV14', 99)
+                    #self.my_setDriver('GV15', 99, 25)
+                    #self.my_setDriver('GV16', 99, 25)
+                    #self.my_setDriver('GV17', 99, 25)
+                    #self.my_setDriver('GV18', 99, 25)
+                    #self.my_setDriver('GV19', 0)        
 
-            else:
-                #self.my_setDriver('GV0', 99)
-                #self.my_setDriver('GV1', 0)     
-                #self.my_setDriver('GV2', 0)
-                #self.my_setDriver('BATLVL', 99)
-                self.my_setDriver('GV30', 0)
-                self.my_setDriver('GV20', 2)
-                #self.my_setDriver('GV13', self.schedule_selected)
-                #self.my_setDriver('GV14', 99)
-                #self.my_setDriver('GV15', 99, 25)
-                #self.my_setDriver('GV16', 99, 25)
-                #self.my_setDriver('GV17', 99, 25)
-                #self.my_setDriver('GV18', 99, 25)
-                #self.my_setDriver('GV19', 0)        
-
-            sch_info = self.yoManipulator.getScheduleInfo(self.schedule_selected)
-            self.update_schedule_data(sch_info, self.schedule_selected)            
 
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoManipulator')

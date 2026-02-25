@@ -156,7 +156,7 @@ def wait_for_node_done(self):
 
 def my_setDriver(self, key, value, UOM=None, force=False, type=None):
     with driver_lock:
-        logging.debug(f'my_setDriver : {key} {value} {UOM} ')
+        logging.debug(f'my_setDriver : {key} {value} {UOM} {type}')
         try:
             if any(item.get('driver') == key for item in self.drivers):
                 if value is None:
