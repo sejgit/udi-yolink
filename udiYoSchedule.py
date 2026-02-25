@@ -124,14 +124,7 @@ class udiYoSchedule(udi_interface.Node):
         #if self.node:
         #    self.poly.delNode(self.node.address)
 
-    def scheduleDataUpdate(self) -> bool:
-        msg_type, msg_action  = self.yoSchedule.get_message_type()
-        logging.debug('scheduleDataPresent - last message type: {}, action: {}'.format(msg_type, msg_action))
-        if isinstance(msg_type, str) and isinstance(msg_action, str):
-            if msg_action in ['getSchedules', 'setSchedules']:
-                return True
-        return False
-    
+
 
     def checkDataUpdate(self):
         #if self.yoSchedule.data_updated():
@@ -233,10 +226,13 @@ class udiYoSchedule(udi_interface.Node):
         
                       )  
     #Needs update 
-    def update_schedule_data(self, selected_schedule=None):    
+    def update_schedule_data(self, selected_schedule=None, source_device=None):    
         if selected_schedule is None:
             selected_schedule = self.schedule_selected
-        sch_info = self.yoSchedule.getScheduleInfo(selected_schedule)
+        if source_device:
+            sch_info = source_device.getScheduleInfo(selected_schedule)
+        else:    
+            sch_info = self.yoSchedule.getScheduleInfo(selected_schedule)
         logging.info('update_schedule_data {}'.format(sch_info)) 
 
         def check_name_in_drivers( name):

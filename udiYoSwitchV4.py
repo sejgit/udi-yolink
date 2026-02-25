@@ -172,8 +172,8 @@ class udiYoSwitch(udi_interface.Node):
         if self.node is not None:
             while not self.node_ready:
                 time.sleep(0.5)
-            if self.schedule.scheduleDataUpdate():
-                self.schedule.update_schedule_data()
+            if self.yoSwitch.scheduleDataUpdate():
+                self.schedule.update_schedule_data(source_device=self.yoSwitch)
             else:            
                 message_type = self.yoSwitch.get_message_type()
                 unix_time = self.yoSwitch.get_report_time('reportAt')
@@ -237,25 +237,16 @@ class udiYoSwitch(udi_interface.Node):
 
                 if self.nbr_keys > 0:
                     #logging.debug('updateData - event data {}'.format(event_data))
-                    if self.yoSwitch.get_data('event') is not None:
+                    if self.yoSwitch.get_data('event') is not None: 
                         key_mask = self.yoSwitch.get_data('keyMask', 'event')
                         press_type = self.yoSwitch.get_data('type', 'event')
+                        logging.debug('key_mask {} press_type {}'.format(key_mask, press_type))
                         if isinstance(key_mask, int):
                             remote_key = self.mask2key(key_mask)
-                            if press_type == 'LongPress':
-                                press = self.max_remote_keys
-                            else:
-                                press = 0
-                            logging.debug('remote key {} press {}'.format(remote_key, press))
-                            
-                            if  message_type in ['event', 'report'] and remote_key in self.keys:
-                                self.keys[remote_key].send_command(press)
-                                #self.yoSwitch.clearEventData()
-                                #logging.debug('clearEventData')           
-
-                #self.my_setDriver('GV13', self.schedule_selected)
-                #sch_info = self.yoSwitch.getScheduleInfo(self.schedule_selected)
-                #self.update_schedule_data(sch_info, self.schedule_selected)
+                            if isinstance(press_type, str):
+                                if  remote_key in self.keys:
+                                    self.keys[remote_key].send_command(press_type)
+                                    # Send command updates ISY variables and reports to ISY as needed.
 
 
 

@@ -131,8 +131,8 @@ class udiYoManipulator(udi_interface.Node):
             while not self.node_ready:
                 time.sleep(0.5)
 
-            if self.schedule.scheduleDataUpdate():
-                self.schedule.update_schedule_data()
+            if self.yoManipulator.scheduleDataUpdate():
+                self.schedule.update_schedule_data(source_device=self.yoManipulator)
             else:                
                 message_type = self.yoManipulator.get_message_type()
                 unix_time = self.yoManipulator.get_report_time('reportAt')

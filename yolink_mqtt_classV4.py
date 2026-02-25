@@ -1393,6 +1393,18 @@ class YoLinkMQTTDevice(object):
         except KeyError as e:
             logging.error(f'EXCEPTION - getData {e}')    
 
+
+
+    def scheduleDataUpdate(self) -> bool:
+        msg_type, msg_action  = self.get_message_type()
+        logging.debug('scheduleDataPresent - last message type: {}, action: {}'.format(msg_type, msg_action))
+        if isinstance(msg_type, str) and isinstance(msg_action, str):
+            if msg_action in ['getSchedules', 'setSchedules']:
+                return True
+        return False
+    
+
+
     def get_message_type(yolink):
         try:
             logging.debug(f'get_message_type - data: {yolink.data}')
