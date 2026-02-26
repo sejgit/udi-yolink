@@ -156,7 +156,7 @@ def addNodes (self, deviceList) -> list:
     
     supportedYoTypes = ['SprinklerV2', 'Sprinkler', 'Thermostat', 'SoilThcSensor' ]     
     supportedYoTypes = ['Switch', 'LeakSensor', 'Thermostat', 'SprinklerV2', 'Outlet' ]   
-    
+    supportedYoTypes = ['Switch']       
     remove_list= []
     for dev in deviceList:
         logging.debug(f'DEVICE BEING ANALYZED {dev}')
