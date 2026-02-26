@@ -1366,6 +1366,25 @@ class YoLinkMQTTDevice(object):
         except KeyError as e:
             logging.error(f'EXCEPTION - getData {e}')      
 
+
+    def get_dict_data(yolink, key):    
+        try:
+            ret_val = None  
+            if yolink.online and yolink.dData in yolink.data:
+                logging.debug(yolink.type+f' - getData key {key} category {category} index {WM_index} {yolink.data[yolink.dData]}')
+
+                if yolink.data[yolink.dData] is {}:
+                    logging.info(f'No data exists (no data returned)')
+                    return("no data")
+                if key in yolink.data[yolink.dData] and isinstance(yolink.data[yolink.dData][key], dict): # MAy need to add list in future if it exists
+                        logging.debug(f'ret_val0  {key} {yolink.data[yolink.dData][key]}')
+                        return(yolink.data[yolink.dData][key])
+                else:
+                    return(None)
+        except KeyError as e:
+            logging.error(f'EXCEPTION - getData {e}')   
+
+
     def get_data(yolink, key :str, category=None, WM_index = None):    
         try:
             ret_val = None  
@@ -1777,12 +1796,11 @@ class YoLinkMQTTDevice(object):
             #logging.debug( 'getScheduleInfo 1 : {} '.format(yolink.dataAPI[yolink.dData]))
             #logging.debug( 'getScheduleInfo 2 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule]))
             #logging.debug( 'getScheduleInfo 3 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule][indexS]))
-            
-            if isinstance(yolink.get_data('supportSeconds'), bool):
-                yolink.scheduleSec = yolink.get_data('supportSeconds')
-            else:
+            yolink.scheduleSec= yolink.get_data('supportSeconds')
+            if not isinstance(yolink.scheduleSec, bool):
                 yolink.scheduleSec = False
-            sch_data = yolink.get_data(str(index))    
+
+            sch_data = yolink.get_dict_data(str(index))    
 
             logging.debug(' return {} support sec'.format(json.dumps(sch_data, indent=4), yolink.scheduleSec) )
             return(sch_data)
