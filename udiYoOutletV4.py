@@ -141,7 +141,7 @@ class udiYoOutlet(udi_interface.Node):
             while not self.node_ready:
                 time.sleep(0.5)
             message_type, message_action = self.yoOutlet.get_message_type()
-            if message_type in ['getSchedules', 'setSchedules']:
+            if message_action in ['getSchedules', 'setSchedules']:
                 self.schedule.update_schedule_data(source_device=self.yoOutlet)
             else:
                 

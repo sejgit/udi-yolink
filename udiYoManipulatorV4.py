@@ -130,11 +130,11 @@ class udiYoManipulator(udi_interface.Node):
         if self.node is not None:
             while not self.node_ready:
                 time.sleep(0.5)
-
-            if self.yoManipulator.scheduleDataUpdate():
+            message_type, message_action  = self.yoManipulator.get_message_type()
+            if message_action in ['getSchedules', 'setSchedules']:
                 self.schedule.update_schedule_data(source_device=self.yoManipulator)
             else:                
-                message_type = self.yoManipulator.get_message_type()
+
                 unix_time = self.yoManipulator.get_report_time('reportAt')
                 self.my_setDriver('TIME', unix_time, 151)
                 if self.yoManipulator.online:
