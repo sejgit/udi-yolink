@@ -1371,7 +1371,7 @@ class YoLinkMQTTDevice(object):
         try:
             ret_val = None  
             if yolink.online and yolink.dData in yolink.data:
-                logging.debug(yolink.type+f' - getData key {key} category {category} index {WM_index} {yolink.data[yolink.dData]}')
+                logging.debug(yolink.type+f' - getData key {key} category {json.dumps(yolink.data[yolink.dData], indent=4)}')
 
                 if yolink.data[yolink.dData] is {}:
                     logging.info(f'No data exists (no data returned)')
