@@ -213,14 +213,7 @@ class udiYoSchedule(udi_interface.Node):
         #self.yolink.activateSchedule(schedule_selected, activated)
         return(activated, schedule_selected)
 
-    def check_name_in_drivers(self,  name):
-        logging.debug('check_name_in_drivers: {}'.format(name))
-        found = False
-        for drv in enumerate(self.node.drivers):
-            logging.debug('check_name_in_drivers: {}'.format(drv))
-            if drv['driver'] == name:
-                found = True
-        return(found)
+
     def refresh_schedules(self, message_action):
         logging.debug('refresh_schedules: {}'.format(message_action)
         
@@ -284,8 +277,9 @@ class udiYoSchedule(udi_interface.Node):
                     self.my_setDriver('GV21', second, 57)
 
             timestr = sch_info['off']
-            logging.debug('timestr : {}'.format(timestr))
-            timelist =  timestr.split(':')
+
+            logging.debug('timestr : {} timelist : {}'.format(timestr, timelist))
+
             if len(timelist) == 2:
                 hour = int(timelist[0])
                 minute = int(timelist[1])
@@ -295,7 +289,7 @@ class udiYoSchedule(udi_interface.Node):
                 else:
                     self.my_setDriver('GV17', int(hour), 19)
                     self.my_setDriver('GV18', int(minute), 44)
-            elif len(timelist) == 3 and self.support_seconds:
+            elif len(timelist) == 3:
                 hour = int(timelist[0])
                 minute = int(timelist[1])
                 second = int(timelist[2])     
