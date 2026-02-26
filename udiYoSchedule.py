@@ -230,6 +230,7 @@ class udiYoSchedule(udi_interface.Node):
         if selected_schedule is None:
             selected_schedule = self.schedule_selected
         if source_device:
+            logging.debug('update_schedule_data - source device provided {}'.format(source_device.devInfo['name']))
             sch_info = source_device.getScheduleInfo(selected_schedule)
         else:    
             sch_info = self.yoSchedule.getScheduleInfo(selected_schedule)
