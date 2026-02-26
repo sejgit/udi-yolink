@@ -260,6 +260,7 @@ class udiYoSchedule(udi_interface.Node):
                 self.my_setDriver('GV14', 0)
             timestr = sch_info['on']
             timelist =  timestr.split(':')
+            logging.debug('timestr : {} timelist : {}'.format(timestr, timelist))
             if len(timelist) == 2:
                 hour = int(timelist[0])
                 minute = int(timelist[1])
