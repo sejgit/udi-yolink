@@ -64,16 +64,20 @@ class udiYoSchedule(udi_interface.Node):
         self.yoSchedule = YoLinkSchedule(self.yoAccess, self.devInfo, self.updateStatus)               
         time.sleep(2)
         self.yoSchedule.refreshSchedules()
-        time.sleep(1)
+        attempts = 1
+        while self.yoSchedule.no_data() and attempts <= 3:
+            logging.debug('Schedule data not found, device likely off line - trying again ')
+            time.sleep(2)
+            self.yoSchedule.refreshSchedules()
+            attempts += 1
+            time.sleep(1)
 
 
         if self.yoSchedule.no_data():
-            logging.debug('Schedule support_seconds not found, default to False - device likely off line')
-            
+            logging.debug('Schedule support_seconds not found, default to False - device likely off line - forcing no seconds support')
             self.support_seconds = False
         else:
-            self.support_seconds = self.yoSchedule.get_data('supports_seconds')
-            logging.debug('Schedule support_seconds {}not found, device likely off line')
+            self.support_seconds = self.yoSchedule.get_data('supportSeconds')
         logging.debug('Schedule support_seconds: {}'.format(self.support_seconds))
         if dev_type == 'InfraredRemoter':
             if self.support_seconds:    
@@ -263,7 +267,7 @@ class udiYoSchedule(udi_interface.Node):
                 else:
                     self.my_setDriver('GV15', int(hour),19)
                     self.my_setDriver('GV16', int(minute), 44)
-            elif len(timelist) == 3 and self.support_seconds:
+            elif len(timelist) == 3:
                 hour = int(timelist[0])
                 minute = int(timelist[1])
                 second = int(timelist[2])
