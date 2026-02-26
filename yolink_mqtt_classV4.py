@@ -1366,7 +1366,7 @@ class YoLinkMQTTDevice(object):
         except KeyError as e:
             logging.error(f'EXCEPTION - getData {e}')      
 
-    def get_data(yolink, key, category=None, WM_index = None):    
+    def get_data(yolink, key :str, category=None, WM_index = None):    
         try:
             ret_val = None  
             if yolink.online and yolink.dData in yolink.data:
@@ -1771,7 +1771,7 @@ class YoLinkMQTTDevice(object):
 
 
     def getScheduleInfo(yolink, index):
-        logging.debug(f'{yolink.type} getScheduleInfo {index} -- {yolink.schedule}')      
+        logging.debug(f'{yolink.type} getScheduleInfo {index}')      
         indexS = str(index)
         try: 
             #logging.debug( 'getScheduleInfo 1 : {} '.format(yolink.dataAPI[yolink.dData]))
