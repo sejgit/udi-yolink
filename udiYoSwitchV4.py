@@ -173,6 +173,7 @@ class udiYoSwitch(udi_interface.Node):
             while not self.node_ready:
                 time.sleep(0.5)
             if self.yoSwitch.scheduleDataUpdate():
+                
                 self.schedule.update_schedule_data(source_device=self.yoSwitch)
             else:            
                 message_type = self.yoSwitch.get_message_type()
