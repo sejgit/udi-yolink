@@ -86,7 +86,7 @@ class udiYoSchedule(udi_interface.Node):
                 self.id = 'yoirSchedule'    
             self.scheduleType = 'Key'
             self.drivers.append({'driver': 'GV12', 'value': 99, 'uom': 25}) #outport/channel
-        elif dev_type in ['Switch', 'Outlet']:
+        elif dev_type in ['Switch', 'Outlet', 'Diummer', 'Manipulator']:
             if self.support_seconds:    
                 self.id = 'yoScheduleSec'    
             else:    
