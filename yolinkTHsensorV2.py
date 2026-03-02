@@ -103,15 +103,5 @@ class YoLinkTHSensor(YoLinkMQTTDevice):
     #def probeData(yolink):
     #    return(yolink.getData() )
 
-'''
-Stand-Alone Operation of THsensor (no call back to live update data - pooling data in upper APP)
-''' 
 
-#class YoLinkTHSensor(YoLinkTHSen):
-#    def __init__(yolink, yoAccess,  deviceInfo):
-#        super().__init__( yoAccess,  deviceInfo, yolink.updateStatus)    
-#        yolink.initNode()
 
-#   Enable Event Support (True below)
-#    def updateStatus(yolink, data):
-#        yolink.updateCallbackStatus(data, True)

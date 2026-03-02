@@ -15,7 +15,7 @@ from os import truncate
 #import udi_interface
 #import sys
 import time
-from yolinkSirenV2 import YoLinkSir
+from yolinkSirenV3 import YoLinkSir
 
 
 class udiYoSiren(udi_interface.Node):

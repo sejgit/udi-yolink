@@ -11,7 +11,7 @@ except ImportError:
     import logging
     logging.basicConfig(level=logging.DEBUG)
 
-class YoLinkSiren(YoLinkMQTTDevice):
+class YoLinkSir(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__( yoAccess,  deviceInfo, callback)
         yolink.maxSchedules = 6
@@ -66,26 +66,31 @@ class YoLinkSiren(YoLinkMQTTDevice):
         #yolink.online = yolink.getOnlineStatus()
         if yolink.online:
             attempts = 0
-            while yolink.dataAPI[yolink.dData] == {} and attempts < 3:
+            while yolink.no_data() and attempts < 3:
                 time.sleep(1)
                 attempts = attempts + 1
             if attempts <= 5:
-                if  yolink.dataAPI[yolink.dData][yolink.dState]['state'] == 'normal':
-                    return('normal')
-                elif yolink.dataAPI[yolink.dData][yolink.dState]['state'] == 'alert':
-                    return('alert')
-                elif yolink.dataAPI[yolink.dData][yolink.dState]['state'] == 'off':
-                    return('off')
+                state_data = yolink.get_data("state")
+                if state_data and 'state' in state_data:
+                    if state_data['state'] == 'normal':
+                        return('normal')
+                    elif state_data['state'] == 'alert':
+                        return('alert')
+                    elif state_data['state'] == 'off':
+                        return('off')
+                    else:
+                        return('Unkown')
                 else:
                     return('Unkown')
             else:
                 return('Unkown')
     
     def getSupplyType(yolink):
-        logging.debug(yolink.type+' - getSupplyType = {}'.format(yolink.dataAPI[yolink.dData]))
+        state_data = yolink.get_data("state")
+        logging.debug(yolink.type+' - getSupplyType = {}'.format(state_data))
         try:
-            if 'powerSupply' in yolink.dataAPI[yolink.dData][yolink.dState]:
-                if yolink.dataAPI[yolink.dData][yolink.dState]['powerSupply'] == 'battery':
+            if state_data and 'powerSupply' in state_data:
+                if state_data['powerSupply'] == 'battery':
                     return('battery')
                 else:
                     return('ext_supply')
@@ -94,10 +99,11 @@ class YoLinkSiren(YoLinkMQTTDevice):
             return(None)   
 
     def getSirenDuration(yolink):
-        logging.debug(yolink.type+' - getSirenDuration:{}'.format(yolink.dataAPI[yolink.dData]))
+        state_data = yolink.get_data("state")
+        logging.debug(yolink.type+' - getSirenDuration:{}'.format(state_data))
         try:
-            if 'alarmDuation' in yolink.dataAPI[yolink.dData][yolink.dState]:
-                return (yolink.dataAPI[yolink.dData][yolink.dState]['alarmDuation'])
+            if state_data and 'alarmDuation' in state_data:
+                return (state_data['alarmDuation'])
             else:
                 return (0)          
         except Exception as e:
@@ -111,3 +117,11 @@ class YoLinkSiren(YoLinkMQTTDevice):
             return(yolink.getData())
 
 
+class YoLinkSiren(YoLinkSir):
+    def __init__(yolink, yoAccess,  deviceInfo):
+        super().__init__(  yoAccess,  deviceInfo, yolink.updateStatus)
+        yolink.initNode()
+
+
+    def updateStatus(yolink, data):
+        yolink.updateCallbackStatus(data, True)

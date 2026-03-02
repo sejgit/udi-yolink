@@ -270,7 +270,7 @@ class udiYoOutlet(udi_interface.Node):
             self.my_setDriver('ST',0 )
             self.node.reportCmd('DOF')
         elif ctrl == 2: #toggle
-            state = str(self.yoOutlet.getState()).upper() 
+            state = str(self.yoOutlet.get_data('state')) 
             if state == 'open':
                 self.yoOutlet.setState('closed')
                 self.my_setDriver('GV0',0 )

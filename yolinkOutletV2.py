@@ -126,11 +126,3 @@ class YoLinkOutlet(YoLinkMQTTDevice):
                 return(None)
     
     
-#class YoLinkOutlet(YoLinkOutl):
-#    def __init__(yolink, yoAccess,  deviceInfo):
-#        super().__init__(  yoAccess,  deviceInfo, yolink.updateStatus)
-#        yolink.initNode()
-
-
-#   def updateStatus(yolink, data):
-#        yolink.updateCallbackStatus(data, True)

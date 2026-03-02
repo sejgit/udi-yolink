@@ -62,14 +62,18 @@ class YoLinkManipulator(YoLinkMQTTDevice):
         #yolink.online = yolink.getOnlineStatus()
         if yolink.online:   
             attempts = 0
-            while yolink.dataAPI[yolink.dData][yolink.dState]  == {} and attempts < 3:
+            while yolink.no_data() and attempts < 3:
                 time.sleep(1)
                 attempts = attempts + 1
             if attempts <= 5:
-                if  yolink.dataAPI[yolink.dData][yolink.dState]['state'] == 'open':
-                    return('open')
-                elif yolink.dataAPI[yolink.dData][yolink.dState]['state'] == 'closed':
-                    return('closed')
+                state_data = yolink.get_data("state")
+                if state_data and 'state' in state_data:
+                    if state_data['state'] == 'open':
+                        return('open')
+                    elif state_data['state'] == 'closed':
+                        return('closed')
+                    else:
+                        return('Unkown')
                 else:
                     return('Unkown')
             else:

@@ -303,13 +303,13 @@ class udiYoSwitch(udi_interface.Node):
             #self.my_setDriver('ST',0 )
             #self.node.reportCmd('DOF')
         elif ctrl == 2: #toggle
-            state = str(self.yoSwitch.getState()).upper() 
-            if state == 'ON':
+            state = self.yoSwitch.get_data('state')
+            if state == 'on' or state == 'open':
                 self.yoSwitch.setState('OFF')
                 #self.my_setDriver('GV0',0 )
                 #self.my_setDriver('ST',0 )
                 #self.node.reportCmd('DOF')
-            elif state == 'OFF':
+            elif state == 'off' or state == 'closed':
                 self.yoSwitch.setState('ON')
                 #self.my_setDriver('GV0',1 )
                 #self.my_setDriver('ST',1 )

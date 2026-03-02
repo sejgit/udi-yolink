@@ -16,7 +16,7 @@ except ImportError:
 
 import time
 
-from yolinkMotionSensorV2 import YoLinkMotionSens
+from yolinkMotionSensorV4 import YoLinkMotionSensor
 
 
 
