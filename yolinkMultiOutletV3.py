@@ -13,7 +13,7 @@ except ImportError:
     import logging
     logging.basicConfig(level=logging.DEBUG)
 
-class YoLinkMultiOut(YoLinkMQTTDevice):
+class YoLinkMultiOutlet(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__(  yoAccess, deviceInfo, callback)
         yolink.yoAccess = yoAccess
@@ -459,17 +459,3 @@ class YoLinkMultiOut(YoLinkMQTTDevice):
         yolink.diconnect = True
         yolink.yolinkMQTTclient.shut_down()
     '''
-class YoLinkMultiOutlet(YoLinkMultiOut):
-
-    def __init__(yolink, yoAccess, deviceInfo):
-        super().__init__(  yoAccess, deviceInfo, yolink.updateStatus)
-        yolink.initNode()
-        if yolink.online:
-            logging.info('MultiOutlet init - Nbr Outlets : {}'.format(yolink.nbrOutlets))
-            logging.info('MultiOutlet init - Nbr USB : {}'.format(yolink.nbrUsb))
-        else:
-            logging.info ('MultiOutlet not online')   
-
-
-    def updateStatus(self, data):
-        self.updateCallbackStatus(data, True)

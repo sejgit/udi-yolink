@@ -13,7 +13,7 @@ except ImportError:
 
 #import sys
 import time
-from yolinkMultiOutletV3 import YoLinkMultiOut
+from yolinkMultiOutletV3 import YoLinkMultiOutlet
 import re
 
 #assigned_addresses
@@ -84,7 +84,7 @@ class udiYoSubOutlet(udi_interface.Node):
         try:
             state = self.yolink.getMultiOutPortState(self.port)
             #self.my_setDriver('GV30', 1) 
-            if state.upper() == 'ON' or  state.upper() == 'OPEN':
+            if state in ['ON','OPEN', 'on', 'open']:
                 self.my_setDriver('GV0', 1) 
                 self.my_setDriver('ST', 1) 
                 self.portState = 1
@@ -240,8 +240,7 @@ class udiYoSubOutlet(udi_interface.Node):
         logging.info('udiYoSubOutlet setOnDelay Executed')
         self.onDelay =int(command.get('value'))
         logging.info('udiYoSubOutlet prepOnDelay Executed {}'.format( self.onDelay ))
-        #self.yolink.setMultiOutDelayList([{'ch':self.port, 'on':self.onDelay}]  )
-        #self.my_setDriver('GV1', self.onDelay * 60)
+
 
 
         
@@ -250,8 +249,7 @@ class udiYoSubOutlet(udi_interface.Node):
         logging.info('udiYoSubOutlet setOffDelay Executed')
         self.offDelay =int(command.get('value'))
         logging.info('udiYoSubOutlet prepOffDelay Executed {}'.format( self.offDelay ))
-        #self.yolink.setMultiOutDelayList([{'ch':self.port, 'off':self.offDelay }]  )
-        #self.my_setDriver('GV2', self.offDelay * 60 )
+
   
 
     def update(self, command = None):
@@ -498,7 +496,7 @@ class udiYoMultiOutlet(udi_interface.Node):
         #self.usbExists = True
         logging.debug('start - udiYoMultiOutlet: {}'.format(self.devInfo['name']))
         self.my_setDriver('GV30', 0)
-        self.yoMultiOutlet  = YoLinkMultiOut(self.yoAccess, self.devInfo, self.updateStatus)
+        self.yoMultiOutlet  = YoLinkMultiOutlet(self.yoAccess, self.devInfo, self.updateStatus)
         self.yoMultiOutlet.nbrOutlets = self.nbrOutlets
         self.yoMultiOutlet.nbrUsb = self.nbrUsb
         
