@@ -48,19 +48,11 @@ class YoLinkSpeakerH(YoLinkMQTTDevice):
 
     def getWiFiInfo(yolink):
         logging.debug('getWiFiInfo')
-        if 'data' in yolink.dataAPI['lastMessage']:
-            if 'wifi' in yolink.dataAPI['lastMessage']['data']:
-                return(yolink.dataAPI['lastMessage']['data']['wifi'])
-        else:
-            return(None)
+        return(yolink.get_dict_data('wifi'))
 
     def getEthernetInfo(yolink):
         logging.debug('getEthernetInfo')
-        if 'data' in yolink.dataAPI['lastMessage']:
-            if 'eth' in yolink.dataAPI['lastMessage']['data']:
-                return(yolink.dataAPI['lastMessage']['data']['eth'])
-        else:
-            return(None)
+        return(yolink.get_dict_data('eth'))
             
     def getOptionInfo(yolink):
         logging.debug('getOptionInfo')
@@ -191,25 +183,7 @@ class YoLinkSpeakerH(YoLinkMQTTDevice):
         yolink.yoAccess.publish_data( data)
         yolink.lastControlPacket = data
 
-    '''
-    def getState(yolink):
-        logging.debug(yolink.type+' - getState')
-        attempts = 0
-        yolink.refreshDevice
-        while yolink.dState not in yolink.dataAPI[yolink.dData] and attempts < 5:
-            time.sleep(1)
-            attempts = attempts + 1
-        if attempts < 5 and 'state' in yolink.dataAPI[yolink.dData][yolink.dState]:
-            if  yolink.dataAPI[yolink.dData][yolink.dState]['state'] == 'open':
-                return('on')
-            elif yolink.dataAPI[yolink.dData][yolink.dState]['state'] == 'closed':
-                return('off')
-            else:
-                return('Unkown')
-        else:
-            return('Unkown')
-    '''
- 
+
 
 class YoLinkSpeakerHub(YoLinkSpeakerH):
     def __init__(yolink, yoAccess,  deviceInfo):

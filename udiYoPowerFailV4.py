@@ -118,7 +118,6 @@ class udiYoPowerFailSenor(udi_interface.Node):
             self.my_setDriver('TIME', unix_time, 151)
      
             if self.yoPowerFail.online:               
-                #state = self.yoPowerFail.getAlertState()
                 state = self.yoPowerFail.get_data('state', 'state')
                 logging.debug('state GV0 : {}'.format(state))
                 if state in alert_state:    

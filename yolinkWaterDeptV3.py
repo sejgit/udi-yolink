@@ -48,26 +48,28 @@ class YoLinkWaterDeptSensor(YoLinkMQTTDevice):
         data['params'] = {}
         try:
             if 'setAttributes' in yolink.methodList:
-                if 'alarmSettings' not in yolink.dataAPI[yolink.dData][yolink.dState]:
+                alarm_settings = yolink.get_data('alarmSettings', 'state')
+                if not isinstance(alarm_settings, dict):
                     yolink.refreshDevice()
-                logging.debug('alarmSettings data: {}'.format(yolink.dataAPI[yolink.dData]))
+                    alarm_settings = yolink.get_data('alarmSettings', 'state')
+                logging.debug('alarmSettings data: {}'.format(alarm_settings))
                 if 'low' in attribs:
                     yolink.alarmSettings['low'] = attribs['low']
                 else:
-                    yolink.alarmSettings['low'] = yolink.dataAPI[yolink.dData][yolink.dState]['alarmSettings']['low']
+                    yolink.alarmSettings['low'] = alarm_settings.get('low') if isinstance(alarm_settings, dict) else None
                 if 'high' in attribs:
                     yolink.alarmSettings['high'] = attribs['high']
                 else:
-                    yolink.alarmSettings['high'] = yolink.dataAPI[yolink.dData][yolink.dState]['alarmSettings']['high']
+                    yolink.alarmSettings['high'] = alarm_settings.get('high') if isinstance(alarm_settings, dict) else None
 
                 if 'standby' in attribs:
                     yolink.alarmSettings['standby'] = attribs['standby']
                 else:
-                    yolink.alarmSettings['standby'] = yolink.dataAPI[yolink.dData][yolink.dState]['alarmSettings']['standby']
+                    yolink.alarmSettings['standby'] = alarm_settings.get('standby') if isinstance(alarm_settings, dict) else None
                 if 'interval' in attribs:
                     yolink.alarmSettings['interval'] = attribs['interval']    
                 else:
-                    yolink.alarmSettings['interval'] = yolink.dataAPI[yolink.dData][yolink.dState]['alarmSettings']['interval']
+                    yolink.alarmSettings['interval'] = alarm_settings.get('interval') if isinstance(alarm_settings, dict) else None
 
                 data['params']['alarmSetting'] = yolink.alarmSettings
                 return(yolink.setDevice( data))
@@ -82,40 +84,31 @@ class YoLinkWaterDeptSensor(YoLinkMQTTDevice):
         try:
             alarms = {}
             if yolink.online:
-                if yolink.dState in yolink.dataAPI[yolink.dData]:
-                    alarms['low'] = yolink.dataAPI[yolink.dData][yolink.dState]['alarm']['lowAlarm']
-                    alarms['high'] = yolink.dataAPI[yolink.dData][yolink.dState]['alarm']['highAlarm']
-                    alarms['error'] = yolink.dataAPI[yolink.dData][yolink.dState]['alarm']['detectorError']  
-                elif 'waterDepth' in yolink.dataAPI[yolink.dData]:
-                    alarms['low'] = yolink.dataAPI[yolink.dData][yolink.dState]['alarm']['lowAlarm']
-                    alarms['high'] = yolink.dataAPI[yolink.dData][yolink.dState]['alarm']['highAlarm']
-                    alarms['error'] = yolink.dataAPI[yolink.dData][yolink.dState]['alarm']['detectorError']  
+                alarm_data = yolink.get_data('alarm', 'state')
+                if isinstance(alarm_data, dict):
+                    alarms['low'] = alarm_data.get('lowAlarm')
+                    alarms['high'] = alarm_data.get('highAlarm')
+                    alarms['error'] = alarm_data.get('detectorError')
             return(alarms)
         
         except Exception as e:
-            logging.error(f'Exception - getAlarms data not found {yolink.dataAPI[yolink.dData]}' )
+            logging.error(f'Exception - getAlarms data not found {e}' )
             return({})
         
     def getAlarmSettings(yolink):
         logging.debug(yolink.type+ ' - getAlarmsLevels')
         try:
             if yolink.online:
-                if yolink.dState in yolink.dataAPI[yolink.dData]:
-                    yolink.alarmSettings['low'] = yolink.dataAPI[yolink.dData][yolink.dState]['alarmSettings']['low']
-                    yolink.alarmSettings['high'] = yolink.dataAPI[yolink.dData][yolink.dState]['alarmSettings']['high']
-                    yolink.alarmSettings['standby'] = yolink.dataAPI[yolink.dData][yolink.dState]['alarmSettings']['standby']
-                    yolink.alarmSettings['interval'] = yolink.dataAPI[yolink.dData][yolink.dState]['alarmSettings']['interval']
-
-
-                elif 'waterDepth' in yolink.dataAPI[yolink.dData]:
-                    yolink.alarmSettings['low'] = yolink.dataAPI[yolink.dData][yolink.dState]['alarmSettings']['low']
-                    yolink.alarmSettings['high'] = yolink.dataAPI[yolink.dData][yolink.dState]['alarmSettings']['high']
-                    yolink.alarmSettings['standby'] = yolink.dataAPI[yolink.dData][yolink.dState]['alarmSettings']['standby']
-                    yolink.alarmSettings['interval'] = yolink.dataAPI[yolink.dData][yolink.dState]['alarmSettings']['interval']
+                alarm_settings = yolink.get_data('alarmSettings', 'state')
+                if isinstance(alarm_settings, dict):
+                    yolink.alarmSettings['low'] = alarm_settings.get('low')
+                    yolink.alarmSettings['high'] = alarm_settings.get('high')
+                    yolink.alarmSettings['standby'] = alarm_settings.get('standby')
+                    yolink.alarmSettings['interval'] = alarm_settings.get('interval')
             return(yolink.alarmSettings)
         
         except Exception as e:
-            logging.error(f'Exception - getAlarmSettings not found {yolink.dataAPI[yolink.dData]}' )
+            logging.error(f'Exception - getAlarmSettings not found {e}' )
             return({})
     
 
@@ -124,10 +117,9 @@ class YoLinkWaterDeptSensor(YoLinkMQTTDevice):
         try:
             waterDepth = None
             if yolink.online:
-                if yolink.dState in yolink.dataAPI[yolink.dData]:
-                    waterDepth = yolink.dataAPI[yolink.dData][yolink.dState]['waterDepth']
-                elif 'waterDepth' in yolink.dataAPI[yolink.dData]:
-                     waterDepth = yolink.dataAPI[yolink.dData][yolink.dState]['waterDepth']
+                waterDepth = yolink.get_data('waterDepth', 'state')
+                if waterDepth is None:
+                    waterDepth = yolink.get_data('waterDepth')
             return(waterDepth)
         
         except Exception as e:

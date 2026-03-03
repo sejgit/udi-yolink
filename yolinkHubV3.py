@@ -32,8 +32,10 @@ class YoLinkHub(YoLinkMQTTDevice):
     def setWiFi (yolink, SSID, password):
         logging.debug(yolink.type+' - setWiFi')
         maxAttempts = 2
-        if yolink.dataAPI['lastMessage']['data']['wifi']['enable']:
-            if password != '' and SSID != '' and yolink.dataAPI['lastMessage']['data']['wifi']['enable'] :
+        wifi_info = yolink.get_dict_data('wifi')
+        wifi_enabled = isinstance(wifi_info, dict) and wifi_info.get('enable')
+        if wifi_enabled:
+            if password != '' and SSID != '' and wifi_enabled:
                 data = {}
                 data['params'] = {}
                 data['method'] = yolink.type+'.setWiFi'
@@ -49,24 +51,23 @@ class YoLinkHub(YoLinkMQTTDevice):
 
     def getPowerInfo(yolink):
         logging.debug('getPowerInfo')
+        temp = {}
         try:
-            temp = {}
-            if 'other' in yolink.dataAPI['data'] and 'power' in yolink.dataAPI['data']['other']:
-                temp['powered'] = yolink.dataAPI['data']['other']['power']['dc']
-                temp['battery'] = yolink.dataAPI['data']['other']['power']['battery']
-                temp['batteryState'] = yolink.dataAPI['data']['other']['power']['batteryState']
+            temp['powered'] = yolink.get_data('dc', 'power')
+            temp['battery'] = yolink.get_data('battery', 'power')
+            temp['batteryState'] = yolink.get_data('batteryState', 'power')
             return(temp)
         except KeyError as e: 
-            logging.error(f'No Battery Info available {yolink.dataAPI}')
+            logging.error('No Battery Info available')
             return(temp)
 
 
     def getWiFiInfo(yolink):
         logging.debug('getWiFiInfo')
-        return(yolink.dataAPI['lastMessage']['data']['wifi'])
+        return(yolink.get_dict_data('wifi'))
 
 
     def getEthernetInfo(yolink):
         logging.debug('getEthernetInfo')
-        return(yolink.dataAPI['lastMessage']['data']['eth'])
+        return(yolink.get_dict_data('eth'))
 

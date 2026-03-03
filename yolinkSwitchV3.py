@@ -84,31 +84,30 @@ class YoLinkSwitch(YoLinkMQTTDevice):
         logging.debug(yolink.type+' - getState')
         attempts = 0
 
-        while yolink.dState not in yolink.dataAPI[yolink.dData] and attempts < 5:
+        while yolink.no_data() and attempts < 5:
             time.sleep(1)
             attempts = attempts + 1
-        if attempts < 5 and 'state' in yolink.dataAPI[yolink.dData][yolink.dState]:
-            if  yolink.dataAPI[yolink.dData][yolink.dState]['state'] == 'open':
-                return('on')
-            elif yolink.dataAPI[yolink.dData][yolink.dState]['state'] == 'closed':
-                return('off')
-            else:
-                return('Unkown')
+
+        state_data = yolink.get_data('state')
+        state_val = state_data.get('state') if isinstance(state_data, dict) else state_data
+
+        if attempts < 5 and state_val == 'open':
+            return('on')
+        elif attempts < 5 and state_val == 'closed':
+            return('off')
         else:
             return('Unkown')
-    '''
-    def getEnergy(yolink):
-        logging.debug(yolink.type+' - getEnergy')
-        return({'power':yolink.dataAPI[yolink.dData][yolink.dState]['power'], 'watt':yolink.dataAPI[yolink.dData][yolink.dState]['power']})
-    '''
-
     def getEnergy(yolink):
         logging.debug(yolink.type+' - getEnergy : {}'.format(yolink.dataAPI))
 
         #yolink.online = yolink.getOnlineStatus()
         if yolink.online:   
-            try:    
-                return({'power':yolink.dataAPI[yolink.dData][yolink.dState]['power'], 'watt':yolink.dataAPI[yolink.dData][yolink.dState]['watt']})
+            try:
+                power = yolink.get_data('power')
+                watt = yolink.get_data('watt')
+                if power is None and watt is None:
+                    return(None)
+                return({'power': power, 'watt': watt})
             except:
                 return(None)
     

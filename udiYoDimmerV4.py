@@ -18,6 +18,7 @@ except ImportError:
 from os import truncate
 #import udi_interface
 #import sys
+from sre_parse import State
 import time
 
 from attr import attributes
@@ -174,7 +175,6 @@ class udiYoDimmer(udi_interface.Node):
                 time.sleep(0.5)
             message_type = self.yoDimmer.get_message_type()
             self.my_setDriver('TIME', self.yoDimmer.getLastUpdateTime(), 151)
-            #state =  self.yoDimmer.getState().upper()
             state = self.yoDimmer.get_data('state')
             if message_type == 'setAttributes':
                 logging.debug('Attributes updated')
@@ -351,13 +351,13 @@ class udiYoDimmer(udi_interface.Node):
             self.my_setDriver('GV0',0 )
             self.node.reportCmd('DOF')
         elif ctrl == 2: #toggle
-            state = str(self.yoDimmer.getState()).upper() 
+            state = str(self.yoDimmer.get_data('State'))
             logging.debug('switchControl : {}, {}'.format(ctrl, state))
-            if state == 'ON':
+            if state == 'on' or state == 'open' or state == 'ON' or state == 'OPEN':
                 self.yoDimmer.setState('OFF')
                 self.my_setDriver('GV0',0 )
                 self.node.reportCmd('DOF')
-            elif state == 'OFF':
+            elif state == 'off' or state == 'closed' or state == 'OFF' or state == 'CLOSED' :
                 self.yoDimmer.setState('ON')
                 self.my_setDriver('GV0',1 )
                 self.node.reportCmd('DON')

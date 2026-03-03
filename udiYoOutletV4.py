@@ -156,7 +156,6 @@ class udiYoOutlet(udi_interface.Node):
                     logging.debug('Outlet is online')
                     #if  self.yoOutlet.online:
                     self.my_setDriver('GV30',1)
-                    #state = str(self.yoOutlet.getState()).upper()
                     state = str(self.yoOutlet.get_data('state'))
                     logging.debug('Outlet Online State : {} '. format(state))
                     logging.debug('Outlet State : {} '. format(state))
@@ -177,9 +176,6 @@ class udiYoOutlet(udi_interface.Node):
                     self.last_state = state           
                         
 
-                    #tmp =  self.yoOutlet.getEnergy()
-                    #logging.debug('Power/Energy info : {} '. format(tmp))
-                    
                     if self.powerSupported: 
                         powerW = self.yoOutlet.get_data('power')
                         if isinstance(powerW, (int, float)):

@@ -100,7 +100,7 @@ class udiYoDoorSensor(udi_interface.Node):
         #    self.poly.delNode(self.node.address)
 
     def doorState(self):
-        state = self.yoDoorSensor.getState()
+        state = self.yoDoorSensor.get_data('state')
         if state.lower() == 'closed':
             return(0)
         elif state.lower() == 'open':

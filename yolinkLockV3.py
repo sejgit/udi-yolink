@@ -78,10 +78,10 @@ class YoLinkLock(YoLinkMQTTDevice):
         lock_st = str(state)
         #yolink.online = yolink.getOnlineStatus()
         if yolink.online:
-            if 'setState'  in yolink.methodList:          
+            if 'setState'  in yolink.methodList:
                 if lock_st.lower() not in yolink.stateList:
                     logging.error('Unknows state passed')
-                    return(False, yolink.dataAPI[yolink.dOnline])
+                    return(False, yolink.check_system_online())
                 if lock_st.lower() == 'lock':
                     state = 'lock'
                 if state.lower() == 'unlock':
@@ -106,16 +106,18 @@ class YoLinkLock(YoLinkMQTTDevice):
         #yolink.online = yolink.getOnlineStatus()
         if yolink.online:       
             if yolink.lock_type == 'LockV2':
-                if  yolink.dataAPI[yolink.dData][yolink.dState]['lock'] == 'locked':
+                lock_state = yolink.get_data('lock', 'state')
+                if lock_state == 'locked':
                     return('LOCK')
-                elif yolink.dataAPI[yolink.dData][yolink.dState]['lock']  == 'unlocked':
+                elif lock_state == 'unlocked':
                     return('UNLOCK')
                 else:
                     return('Unkown')              
             else:
-                if  yolink.dataAPI[yolink.dData][yolink.dState]['state'] == 'locked':
+                lock_state = yolink.get_data('state')
+                if lock_state == 'locked':
                     return('LOCK')
-                elif yolink.dataAPI[yolink.dData][yolink.dState]['state'] == 'unlocked':
+                elif lock_state == 'unlocked':
                     return('UNLOCK')
                 else:
                     return('Unkown')   

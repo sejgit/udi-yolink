@@ -15,7 +15,7 @@ from os import truncate
 #import udi_interface
 #import sys
 import time
-from yolinkManipulatorV2 import YoLinkManipulator
+from yolinkManipulatorV3 import YoLinkManipulator
 from udiYoSchedule import udiYoSchedule
 
 
