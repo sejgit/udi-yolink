@@ -17,10 +17,10 @@ except ImportError:
 class YoLinkCOSmokeSensor(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__(yoAccess,  deviceInfo, callback)
-        yolink.methodList = ['getState' ]
-        yolink.eventList = ['Report','Alert']
-        yolink.waterName = 'WaterEvent'
-        yolink.eventTime = 'Time'
+        #yolink.methodList = ['getState' ]
+        #yolink.eventList = ['Report','Alert']
+        #yolink.waterName = 'WaterEvent'
+        #yolink.eventTime = 'Time'
         yolink.type = deviceInfo['type']
         #time.sleep(1)
         #yolink.refreshSensor()

@@ -13,10 +13,10 @@ from yolink_mqtt_classV4 import YoLinkMQTTDevice
 class YoLinkSmartRemoter(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__(yoAccess,  deviceInfo, callback)
-        yolink.methodList = ['getState' ]
-        yolink.eventList = ['Alert' , 'getState', 'StatusChange']
-        yolink.eventName = 'SmartRemoteEvent'
-        yolink.eventTime = 'Time'
+        #yolink.methodList = ['getState' ]
+        #yolink.eventList = ['Alert' , 'getState', 'StatusChange']
+        #yolink.eventName = 'SmartRemoteEvent'
+        #yolink.eventTime = 'Time'
         yolink.type = deviceInfo['type']
         #time.sleep(2)
        

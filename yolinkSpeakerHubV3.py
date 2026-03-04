@@ -15,10 +15,10 @@ class YoLinkSpeakerH(YoLinkMQTTDevice):
         super().__init__(yoAccess,  deviceInfo, callback)
         yolink.WiFipassword = ''
         yolink.WiFiSSID = ''
-        yolink.methodList = ['getState', 'setWiFi', 'playAudio', 'setOption' ]
-        yolink.eventList = ['StatusChange', 'Report', 'getState']
-        yolink.toneList = ['none', 'Emergency', 'Alert', 'Warn', 'Tip'] #index used
-        yolink.eventTime = 'Time'
+        #yolink.methodList = ['getState', 'setWiFi', 'playAudio', 'setOption' ]
+        #yolink.eventList = ['StatusChange', 'Report', 'getState']
+        #yolink.toneList = ['none', 'Emergency', 'Alert', 'Warn', 'Tip'] #index used
+        #yolink.eventTime = 'Time'
         yolink.type = deviceInfo['type']
 
         yolink.volume = 5

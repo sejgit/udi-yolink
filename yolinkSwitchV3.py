@@ -18,10 +18,10 @@ class YoLinkSwitch(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__(yoAccess,  deviceInfo, callback)
         
-        yolink.methodList = ['getState', 'setState', 'setDelay', 'getSchedules', 'setSchedules', 'getUpdate'   ]
-        yolink.eventList = ['StatusChange', 'Report', 'getState']
-        yolink.stateList = ['open', 'closed', 'on', 'off']
-        yolink.eventTime = 'Time'
+        #yolink.methodList = ['getState', 'setState', 'setDelay', 'getSchedules', 'setSchedules', 'getUpdate'   ]
+        #yolink.eventList = ['StatusChange', 'Report', 'getState']
+        #yolink.stateList = ['open', 'closed', 'on', 'off']
+        #yolink.eventTime = 'Time'
         yolink.type = deviceInfo['type']
         #time.sleep(2)
         #print('yolink.refreshState')

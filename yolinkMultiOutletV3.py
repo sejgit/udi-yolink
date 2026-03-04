@@ -18,14 +18,14 @@ class YoLinkMultiOutlet(YoLinkMQTTDevice):
         super().__init__(  yoAccess, deviceInfo, callback)
         yolink.yoAccess = yoAccess
         yolink.maxSchedules = 6
-        yolink.methodList = ['getState', 'setState', 'setDelay', 'getSchedules', 'setSchedules', 'getUpdates'   ]
-        yolink.eventList = ['StatusChange', 'Report']
+        #yolink.methodList = ['getState', 'setState', 'setDelay', 'getSchedules', 'setSchedules', 'getUpdates'   ]
+        #yolink.eventList = ['StatusChange', 'Report']
         yolink.type = deviceInfo['type']
         yolink.MQTT_class = 'c'
         yolink.last_set_data = None
         yolink.attempt = 0
-        yolink.MultiOutletName = 'MultiOutletEvent'
-        yolink.eventTime = 'Time'
+        #yolink.MultiOutletName = 'MultiOutletEvent'
+        #yolink.eventTime = 'Time'
         yolink.delayUpdateInt = 15
         yolink.nbrOutlets = 0
         yolink.nbrUsb = 0

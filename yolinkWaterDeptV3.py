@@ -14,12 +14,12 @@ except ImportError:
 class YoLinkWaterDeptSensor(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__( yoAccess,  deviceInfo, callback)    
-        yolink.methodList = ['getState', 'setAttributes' ]
-        yolink.eventList = ['Report']
-        yolink.tempName = 'WaterDept'
+        #yolink.methodList = ['getState', 'setAttributes' ]
+        #yolink.eventList = ['Report']
+        #yolink.tempName = 'WaterDept'
         #yolink.temperature = 'Temperature'
         #yolink.humidity = 'Humidity'
-        yolink.eventTime = 'Time'
+        #yolink.eventTime = 'Time'
         yolink.type = deviceInfo['type']
         #time.sleep(2)
         yolink.alarmSettings = {'standby':None, 'interval':None, 'high':None, 'low':None}

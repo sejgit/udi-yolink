@@ -14,8 +14,8 @@ except ImportError:
 class YoLinkSprinkler(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__( yoAccess,  deviceInfo, callback)    
-        yolink.methodList = ['getState', 'setState', 'setAttributes' ]
-        yolink.eventList = ['Report']
+        #yolink.methodList = ['getState', 'setState', 'setAttributes' ]
+        #yolink.eventList = ['Report']
 
         yolink.type = deviceInfo['type']
 

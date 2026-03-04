@@ -16,10 +16,10 @@ except ImportError:
 class YoLinkGarageDoorCtrl(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__(yoAccess, deviceInfo, callback)
-        yolink.methodList = ['toggle' ]
-        yolink.eventList = ['Report']
-        yolink.ToggleName = 'GarageEvent'
-        yolink.eventTime = 'Time'
+        #yolink.methodList = ['toggle' ]
+        #yolink.eventList = ['Report']
+        #yolink.ToggleName = 'GarageEvent'
+        #yolink.eventTime = 'Time'
         yolink.type = deviceInfo['type']
         yolink.online = True # No way to check 
         

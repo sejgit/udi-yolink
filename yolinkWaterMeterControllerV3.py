@@ -20,11 +20,11 @@ class YoLinkWaterMeter(YoLinkMQTTDevice):
         super().__init__( yoAccess,  deviceInfo, callback)
   
         yolink.maxSchedules = 6
-        yolink.methodList = ['setAttributes', 'getState', 'setState', 'setDelay', 'getSchedules', 'setSchedules', 'getUpdate'   ]
-        yolink.eventList = ['StatusChange', 'Report', 'HourlyReport']
+        #yolink.methodList = ['setAttributes', 'getState', 'setState', 'setDelay', 'getSchedules', 'setSchedules', 'getUpdate'   ]
+        #yolink.eventList = ['StatusChange', 'Report', 'HourlyReport']
         yolink.stateList = ['open', 'closed', 'on', 'off']
-        yolink.ManipulatorName = 'WaterMeterControllerEvent'
-        yolink.eventTime = 'Time'
+        #yolink.ManipulatorName = 'WaterMeterControllerEvent'
+        #yolink.eventTime = 'Time'
         yolink.type = deviceInfo['type']
         yolink.MQTT_type = 'c'
         yolink.uom = None

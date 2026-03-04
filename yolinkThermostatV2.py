@@ -14,12 +14,12 @@ except ImportError:
 class YoLinkThermostat(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__( yoAccess,  deviceInfo, callback)    
-        yolink.methodList = ['getState' ]
-        yolink.eventList = ['Report']
-        yolink.tempName = 'THEvent'
-        yolink.temperature = 'Temperature'
-        yolink.humidity = 'Humidity'
-        yolink.eventTime = 'Time'
+        #yolink.methodList = ['getState' ]
+        #yolink.eventList = ['Report']
+        #yolink.tempName = 'THEvent'
+        #yolink.temperature = 'Temperature'
+        #yolink.humidity = 'Humidity'
+        #yolink.eventTime = 'Time'
         yolink.type = deviceInfo['type']
         yolink.sensordata_24_hours = {}
         #time.sleep(2)

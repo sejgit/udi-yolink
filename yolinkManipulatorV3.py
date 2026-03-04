@@ -15,11 +15,11 @@ class YoLinkManipulator(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__( yoAccess,  deviceInfo, callback)
         yolink.maxSchedules = 6
-        yolink.methodList = ['getState', 'setState', 'setDelay', 'getSchedules', 'setSchedules', 'getUpdate'   ]
-        yolink.eventList = ['StatusChange', 'Report']
-        yolink.stateList = ['open', 'closed', 'on', 'off']
-        yolink.ManipulatorName = 'ManipulatorEvent'
-        yolink.eventTime = 'Time'
+        #yolink.methodList = ['getState', 'setState', 'setDelay', 'getSchedules', 'setSchedules', 'getUpdate'   ]
+        #yolink.eventList = ['StatusChange', 'Report']
+        #yolink.stateList = ['open', 'closed', 'on', 'off']
+        #yolink.ManipulatorName = 'ManipulatorEvent'
+        #yolink.eventTime = 'Time'
         yolink.type = deviceInfo['type']
         yolink.MQTT_type = 'c'
         #time.sleep(1)
