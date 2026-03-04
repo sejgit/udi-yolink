@@ -113,7 +113,7 @@ class udiYoSiren(udi_interface.Node):
             unix_time = self.yoSiren.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
             state_list = ['normal', 'alert', 'off']
-            if self.yoSiren.online:
+            if self.yoSiren.check_system_online():
                 state =  self.yoSiren.get_data('state')
                 logging.debug('Siren state {}'.format(state))
                 if state in state_list:

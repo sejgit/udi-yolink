@@ -143,7 +143,7 @@ class udiYoSpeakerHub(udi_interface.Node):
                 time.sleep(0.5)
             self.my_setDriver('TIME', self.yoSpeakerHub.getLastUpdateTime(), 151)
             logging.debug(f'TIME {self.yoSpeakerHub.getLastUpdateTime()}')
-            if self.yoSpeakerHub.online:
+            if self.yoSpeakerHub.check_system_online():
                 self.my_setDriver('GV0', self.volume)
                 self.my_setDriver('GV1', self.bool2ISY(self.beepEnabled))
                 self.my_setDriver('GV2', self.bool2ISY(self.mute))

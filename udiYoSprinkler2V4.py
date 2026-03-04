@@ -16,6 +16,7 @@ from os import truncate
 #import sys
 import time
 from yolinkSprinklerV2 import YoLinkSprinkler
+from udiYoSchedule import udiYoSchedule
 
 
 
@@ -112,7 +113,7 @@ class udiYoSprinkler2(udi_interface.Node):
         self.my_setDriver('GV20', 0)
         self.yoSprinkler= YoLinkSprinkler(self.yoAccess, self.devInfo, self.updateStatus)
         self.yoSprinkler.initNode()
-        while not self.yoSprinkler.online:
+        while not self.yoSprinkler.check_system_online():
             logging.info('waiting for watermeter to be online')
             time.sleep(5)
       
@@ -125,6 +126,12 @@ class udiYoSprinkler2(udi_interface.Node):
         #self.my_setDriver('GV4',  self.meter_unit, 25)          
         self.ISYmeter_uom = self.water_meter_unit2uom( self.ISYwater_unit)
         logging.debug(f'meter unit : { self.meter_unit} ISY unit: { self.ISYwater_unit} uom: {self.ISYmeter_uom} meterFactor: {self.step_factor}')
+        sch_address = self.address[4:14] + '_SCH'
+        sch_address = self.poly.getValidAddress(sch_address)
+        self.schedule = udiYoSchedule(self.poly, self.address, sch_address, 'Schedules', self.yoAccess, self.devInfo)
+        self.adr_list.append(sch_address)
+        time.sleep(2)
+        
         self.node_ready = True
         self.updateData()
 
@@ -170,7 +177,10 @@ class udiYoSprinkler2(udi_interface.Node):
                 message_type = self.yoSprinkler.get_message_type()
                 unix_time = self.yoSprinkler.get_report_time('time')
                 self.my_setDriver('TIME', unix_time, 151)
-                if self.yoSprinkler.online:
+                if message_type and 'Schedules' in str(message_type):
+                    self.schedule.update_schedule_data(source_device=self.yoSprinkler)
+                    return
+                if self.yoSprinkler.check_system_online():
                     self.my_setDriver('GV30', 1)
                     if self.yoSprinkler.emptyData():
                         logging.debug('Empty data received - skip updateData')

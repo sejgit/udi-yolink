@@ -187,7 +187,7 @@ class udiYoDimmer(udi_interface.Node):
 
             #self.dim_setting['dim'] = self.yoDimmer.brightness
             self.dim_setting['dim'] = self.yoDimmer.get_data('brightness')
-            if self.yoDimmer.online:
+            if self.yoDimmer.check_system_online():
                 #self.my_setDriver('ST', 1)
                 self.my_setDriver('GV30', 1)               
                 if state in[ 'ON', 'open', 'on', 'OPEN']:

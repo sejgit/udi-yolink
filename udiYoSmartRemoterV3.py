@@ -361,7 +361,7 @@ class udiYoSmartRemoter(udi_interface.Node):
             if self.node is not None:
                 while not self.node_ready:
                     time.sleep(0.5)
-                if self.yoSmartRemote.online:               
+                if self.yoSmartRemote.check_system_online():               
                     event_data = self.yoSmartRemote.getEventData()
                     logging.debug('updateData - event data {}'.format(event_data))
                     if event_data:

@@ -117,7 +117,7 @@ class udiYoVibrationSensor(udi_interface.Node):
             message_type = self.yoVibrationSensor.get_message_type() # if event some data may not be updated 
             unix_time = self.yoVibrationSensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
-            if self.yoVibrationSensor.online:               
+            if self.yoVibrationSensor.check_system_online():               
                 vib_state = self.yoVibrationSensor.get_data('state', 'state')
                 if vib_state == ['normal'] :
                     self.my_setDriver('GV0', 1, type=message_type)

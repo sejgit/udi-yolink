@@ -140,7 +140,7 @@ class udiYoCOSmokeSensor(udi_interface.Node):
             unix_time = self.yoCOSmokeSensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 
-            if self.yoCOSmokeSensor.online:
+            if self.yoCOSmokeSensor.check_system_online():
                 smoke_alert =   self.yoCOSmokeSensor.get_data('smoke', 'state')  
                 logging.debug('Smokedetector smoke: {}'.format(smoke_alert))
                 self.my_setDriver('GV0', self.bool2nbr(smoke_alert), type=message_type)

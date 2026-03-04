@@ -126,7 +126,7 @@ class udiYoTHsensor(udi_interface.Node):
         time.sleep(1)
         self.yoTHsensor.initNode()
         time.sleep(1)
-        while not self.yoTHsensor.online:
+        while not self.yoTHsensor.check_system_online():
             logging.info('Waiting for TH sensor to come online...')
             time.sleep(2)
 
@@ -175,7 +175,7 @@ class udiYoTHsensor(udi_interface.Node):
             message_type = self.yoTHsensor.get_message_type() # if event some data may not be updated 
             unix_time = self.yoTHsensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
-            if self.yoTHsensor.online:
+            if self.yoTHsensor.check_system_online():
                 tempC = self.yoTHsensor.get_data('temperature', 'state')
                 tempLimMin = self.yoTHsensor.get_data('min', 'tempLimit')
                 tempLimMax = self.yoTHsensor.get_data('max', 'tempLimit')    

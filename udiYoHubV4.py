@@ -107,7 +107,7 @@ class udiYoBatteryHub(udi_interface.Node):
             while not self.node_ready:
                 time.sleep(0.5)
 
-            if self.yoHub.online:
+            if self.yoHub.check_system_online():
                 message_type = self.yoHub.get_message_type()
                 #pwr_info = self.yoHub.getPowerInfo()
                 dc_power = self.yoHub.get_data('dc', 'power')
@@ -236,7 +236,7 @@ class udiYoHub(udi_interface.Node):
         if self.node is not None:
             while not self.node_ready:
                 time.sleep(0.5)
-            if self.yoHub.online:
+            if self.yoHub.check_system_online():
                 message_type = self.yoHub.get_message_type()
                 #if state == 'ON':
                 #    self.node.setDriver('GV0', 1, True, True)

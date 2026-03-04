@@ -113,7 +113,7 @@ class udiYoWaterMeterOnly(udi_interface.Node):
         self.my_setDriver('GV20', 0)
         self.yoWaterCtrl= YoLinkWaterMeter(self.yoAccess, self.devInfo, self.updateStatus)
         self.yoWaterCtrl.initNode()
-        while not self.yoWaterCtrl.online:
+        while not self.yoWaterCtrl.check_system_online():
             logging.info('waiting for watermeter to be online')
             time.sleep(5)
 
@@ -160,7 +160,7 @@ class udiYoWaterMeterOnly(udi_interface.Node):
                 message_type = self.yoWaterCtrl.get_message_type() # if event some data may not be updated 
                 unix_time = self.yoWaterCtrl.get_report_time('reportAt')
                 self.my_setDriver('TIME', unix_time, 151)
-                if self.yoWaterCtrl.online:
+                if self.yoWaterCtrl.check_system_online():
                     self.my_setDriver('GV30', 1)
                     '''
                     state =  self.yoWaterCtrl.getValveState()

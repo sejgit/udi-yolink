@@ -135,7 +135,7 @@ class udiYoWaterDept(udi_interface.Node):
                 self.my_setDriver('TIME', unix_time, 151)
 
 
-                if self.yoWaterDept.online:
+                if self.yoWaterDept.check_system_online():
                     water_dept = self.yoWaterDept.get_data('waterDepth', 'state')
                     logging.debug(f"yoWaterDept : {water_dept}")
                 

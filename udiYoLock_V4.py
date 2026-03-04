@@ -130,7 +130,7 @@ class udiYoLockV2(udi_interface.Node):
             unix_time = self.yoLock.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 
-            if  self.yoLock.online:
+            if  self.yoLock.check_system_online():
                 state = str(self.yoLock.get_data('lock','state'))
                 logging.debug('LockV2 state: {}'.format(state))
                 if state in ['lock','locked'] :
@@ -341,7 +341,7 @@ class udiYoLock(udi_interface.Node):
             unix_time = self.yoLock.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 
-            if  self.yoLock.online:
+            if  self.yoLock.check_system_online():
                 state = str(self.yoLock.get_data('state','state'))
                 logging.debug('Lock state: {}'.format(state))
                 if state in ['lock','locked'] :

@@ -512,7 +512,7 @@ class udiYoMultiOutlet(udi_interface.Node):
         #    #self.node_fully_config = False
 
         #logging.debug('before start {} {}'.format(self.yoMultiOutlet.nbrOutlets, self.node_fully_config ))
-        if self.yoMultiOutlet.nbrOutlets == 0 and not self.yoMultiOutlet.online:
+        if self.yoMultiOutlet.nbrOutlets == 0 and not self.yoMultiOutlet.check_system_online():
             logging.debug(' No config yet {} {}'.format(self.yoMultiOutlet.nbrOutlets, self.yoMultiOutlet.online))
             self.my_setDriver('GV20', 2)
         else:
@@ -606,7 +606,7 @@ class udiYoMultiOutlet(udi_interface.Node):
             for outlet in range(0,self.nbrOutlets):
                 portName = 'port'+str(outlet)
                 state = 99
-                if self.yoMultiOutlet.online:   
+                if self.yoMultiOutlet.check_system_online():   
                     if portName in outletStates:
                         if 'state' in outletStates[portName]:
                             if outletStates[portName]['state'] == 'open':
@@ -615,7 +615,7 @@ class udiYoMultiOutlet(udi_interface.Node):
                                 state = 0
                         else:
                             logging.error(f'PortName {portName} not in outletState  {outletStates}')
-                        if 'delays'in outletStates[portName] and self.yoMultiOutlet.online:
+                        if 'delays'in outletStates[portName] and self.yoMultiOutlet.check_system_online():
                             if 'on' in outletStates[portName]['delays']:
                                 onDelay = outletStates[portName]['delays']['on']*60
                             else:
@@ -632,7 +632,7 @@ class udiYoMultiOutlet(udi_interface.Node):
 
             for usb in range(0,self.nbrUsb):       
                 usbName = 'usb'+str(usb)
-                if self.yoMultiOutlet.online:
+                if self.yoMultiOutlet.check_system_online():
                     if outletStates[usbName]['state'] == 'open':
                         state = 1
                     elif outletStates[usbName]['state'] == 'closed':
@@ -646,7 +646,7 @@ class udiYoMultiOutlet(udi_interface.Node):
             self.my_setDriver('ST',0)
             self.my_setDriver('GV20', 2)
 
-        if not self.yoMultiOutlet.online:
+        if not self.yoMultiOutlet.check_system_online():
             logging.error( '{} - not on line'.format(self.nodeName))
             #self.my_setDriver('GV30', 0)
             self.my_setDriver('GV20', 2)

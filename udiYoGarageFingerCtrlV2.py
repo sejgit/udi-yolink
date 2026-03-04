@@ -107,7 +107,7 @@ class udiYoGarageFinger(udi_interface.Node):
             else:
                 self.my_setDriver('GV20', 0)
                 
-            if self.yoDoorControl.online:
+            if self.yoDoorControl.check_system_online():
                 self.my_setDriver('ST', 1)
                 self.my_setDriver('GV30', 1)
             else:

@@ -110,7 +110,7 @@ class udiYoMotionSensor(udi_interface.Node):
     
 
     def getMotionState(self):
-        if self.yoMotionsSensor.online:
+        if self.yoMotionsSensor.check_system_online():
             if  self.yoMotionsSensor.get_data('state', 'state') in ['normal']:
                 return(0)
             else:
@@ -131,7 +131,7 @@ class udiYoMotionSensor(udi_interface.Node):
             message_type = self.yoMotionsSensor.get_message_type()
             unix_time = self.yoMotionsSensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
-            if self.yoMotionsSensor.online:
+            if self.yoMotionsSensor.check_system_online():
                 logging.debug('Motion sensor CMD setting: {}'.format(self.cmd_state))
                 motion_state = self.yoMotionsSensor.get_data('state', 'state')
                 if motion_state in ['normal'] :

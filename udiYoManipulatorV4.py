@@ -137,7 +137,7 @@ class udiYoManipulator(udi_interface.Node):
 
                 unix_time = self.yoManipulator.get_report_time('reportAt')
                 self.my_setDriver('TIME', unix_time, 151)
-                if self.yoManipulator.online:
+                if self.yoManipulator.check_system_online():
                     state =  self.yoManipulator.get_data('state')
 
                     if state.upper() == 'OPEN':

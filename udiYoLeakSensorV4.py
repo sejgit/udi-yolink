@@ -195,7 +195,7 @@ class udiYoLeakSensor(udi_interface.Node):
             unix_time = self.yoLeakSensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 
-            if self.yoLeakSensor.online:
+            if self.yoLeakSensor.check_system_online():
                 waterState =   self.yoLeakSensor.get_data('state', 'state')
 
                 #logging.debug( 'Leak Sensor 0,1,8: {}  {} {}'.format(waterState,self.yoLeakSensor.getBattery(),self.yoLeakSensor.bool2Nbr(self.yoLeakSensor.online)  ))

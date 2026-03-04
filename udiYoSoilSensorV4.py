@@ -120,7 +120,7 @@ class udiYoSoilSensor(udi_interface.Node):
         time.sleep(1)
         self.yoSoilSensor.initNode()
         time.sleep(1)
-        while not self.yoSoilSensor.online:
+        while not self.yoSoilSensor.check_system_online():
             logging.info('Waiting for TH sensor to come online...')
             time.sleep(2)
 
@@ -170,7 +170,7 @@ class udiYoSoilSensor(udi_interface.Node):
             message_type = self.yoSoilSensor.get_message_type() # if event some data may not be updated 
             unix_time = self.yoSoilSensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
-            if self.yoSoilSensor.online:
+            if self.yoSoilSensor.check_system_online():
                 conductivity = self.yoSoilSensor.get_data('conductivity', 'state')
                 lowCondAlarm = self.yoSoilSensor.get_data('lowConductivity', 'alarm')
                 highCondAlarm = self.yoSoilSensor.get_data('highConductivity', 'alarm')

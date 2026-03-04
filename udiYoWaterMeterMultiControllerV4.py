@@ -92,7 +92,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
             return
         else:
             self.yoWaterCtrl.initNode()
-            while not self.yoWaterCtrl.online:
+            while not self.yoWaterCtrl.check_system_online():
                 logging.info('waiting for watermeter to be online')
                 time.sleep(5)
             self.meter_count = self.yoWaterCtrl.getMeterCount()
@@ -155,7 +155,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                 message_type = self.yoWaterCtrl.get_message_type()
                 unix_time = self.yoWaterCtrl.get_report_time('time')
                 self.my_setDriver('TIME', unix_time, 151)
-                if self.yoWaterCtrl.online:
+                if self.yoWaterCtrl.check_system_online():
 
                     if self.yoWaterCtrl.emptyData():
                         logging.debug('Empty data received - skip updateData')
@@ -326,7 +326,7 @@ class udiYoSubWaterMeter(udi_interface.Node):
                 while not self.node_ready:
                     time.sleep(0.5)
                 message_type = self.yoWaterCtrl.get_message_type()
-                if self.yoWaterCtrl.online:
+                if self.yoWaterCtrl.check_system_online():
                     #self.my_setDriver('GV30', 1)
                     if self.yoWaterCtrl.emptyData():
                         logging.debug('Empty data received - skip updateData')

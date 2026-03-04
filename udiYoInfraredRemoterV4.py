@@ -87,7 +87,7 @@ class udiYoInfraredCode(udi_interface.Node):
             if self.yoIRrem.send_code( self.code):
                 #time.sleep(0.5)
                 #res = self.yoIRrem.get_send_status()
-                #while res is {} and self.yoIRrem.online:
+                #while res is {} and self.yoIRrem.check_system_online():
                 time.sleep(1)
                 #res = self.yoIRrem.get_send_status()
                 #logging.debug(f'Send code {self.code} {res}')
@@ -264,7 +264,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
             unix_time = self.yoIRrem.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 
-        if  self.yoIRrem.online:
+        if  self.yoIRrem.check_system_online():
             res = self.yoIRrem.get_status_code()
             logging.debug(f'IR remote status code: {res}')
             self.my_setDriver('ST', self.err_code2nbr(res), type=message_type)

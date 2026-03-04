@@ -181,7 +181,7 @@ class udiYoSwitch(udi_interface.Node):
                 unix_time = self.yoSwitch.get_report_time('reportAt')
                 self.my_setDriver('TIME', unix_time, 151)
 
-                if self.yoSwitch.online:
+                if self.yoSwitch.check_system_online():
                     self.my_setDriver('GV30', 1)                    
                     state =  self.yoSwitch.get_data('state')
                     if isinstance(state, str):

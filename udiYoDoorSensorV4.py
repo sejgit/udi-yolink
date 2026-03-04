@@ -126,7 +126,7 @@ class udiYoDoorSensor(udi_interface.Node):
             unix_time = self.yoDoorSensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 
-            if self.yoDoorSensor.online:
+            if self.yoDoorSensor.check_system_online():
                 doorstate = self.doorState()
                 if doorstate == 1:
                     self.my_setDriver('GV0', 1 )

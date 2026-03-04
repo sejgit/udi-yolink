@@ -143,6 +143,8 @@ class udiYoOutlet(udi_interface.Node):
             message_type, message_action = self.yoOutlet.get_message_type()
             if message_action in ['getSchedules', 'setSchedules']:
                 self.schedule.update_schedule_data(source_device=self.yoOutlet)
+                if self.yoOutlet.check_system_online():
+                    self.my_setDriver('GV30',1)
             else:
                 
                 #if 'Schedules' in message_action:  # neED TO THINK THIS THROUGH
@@ -152,9 +154,7 @@ class udiYoOutlet(udi_interface.Node):
                 unix_time = self.yoOutlet.get_report_time('time')
                 logging.debug(f'unix time {unix_time}')
                 self.my_setDriver('TIME', unix_time, 151)
-                if self.yoOutlet.online: 
-                    logging.debug('Outlet is online')
-                    #if  self.yoOutlet.online:
+                if self.yoOutlet.check_system_online(): 
                     self.my_setDriver('GV30',1)
                     state = str(self.yoOutlet.get_data('state'))
                     logging.debug('Outlet Online State : {} '. format(state))
