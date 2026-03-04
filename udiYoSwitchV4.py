@@ -111,12 +111,12 @@ class udiYoSwitch(udi_interface.Node):
         time.sleep(3)
         self.yoSwitch.initNode()
         time.sleep(2)
+        self.yoSwitch.refreshSchedules()
+        time.sleep(1)
 
 
         #self.my_setDriver('GV30', 1)
         self.yoSwitch.delayTimerCallback (self.updateDelayCountdown, self.timer_update )
-        #self.yoSwitch.refreshSchedules()
-
         for key in range (0,self.nbr_keys):
             logging.debug(' {}'.format(key) )
             k_address =  self.address[4:14]+'key' + str(key)

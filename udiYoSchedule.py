@@ -41,6 +41,107 @@ class BaseScheduleNode(udi_interface.Node):
     """
     
     from  udiYolinkLib import my_setDriver, convert_timestr_to_epoch, node_queue, wait_for_node_done, bool2ISY, mask2key
+
+    def _resolve_support_seconds_from_parent_node(self):
+        """Check the already-created parent device node for supportSeconds."""
+        try:
+            parent_node = self.poly.getNode(self.primary)
+        except Exception:
+            return None
+
+        if parent_node is None:
+            return None
+
+        candidate_attrs = (
+            'yoSwitch', 'yoOutlet', 'yoDimmer', 'yoManipulator',
+            'yoInfraredRemoter', 'yoMultiOutlet', 'yoSprinkler',
+        )
+
+        for attr in candidate_attrs:
+            source = getattr(parent_node, attr, None)
+            if source is None:
+                continue
+
+            try:
+                val = source.get_data('supportSeconds')
+                if isinstance(val, bool):
+                    self._support_seconds_source = f'parent.{attr}.get_data(supportSeconds)'
+                    return val
+            except Exception:
+                pass
+
+            try:
+                schedules = getattr(source, 'schedules', None)
+                if isinstance(schedules, dict):
+                    val = schedules.get('supportSeconds')
+                    if isinstance(val, bool):
+                        self._support_seconds_source = f'parent.{attr}.schedules.supportSeconds'
+                        return val
+            except Exception:
+                pass
+
+            try:
+                raw_data = getattr(source, 'data', {})
+                if isinstance(raw_data, dict):
+                    data_block = raw_data.get('data', {})
+                    if isinstance(data_block, dict):
+                        val = data_block.get('supportSeconds')
+                        if isinstance(val, bool):
+                            self._support_seconds_source = f'parent.{attr}.data.data.supportSeconds'
+                            return val
+                        schedules_block = data_block.get('schedules')
+                        if isinstance(schedules_block, dict):
+                            val = schedules_block.get('supportSeconds')
+                            if isinstance(val, bool):
+                                self._support_seconds_source = f'parent.{attr}.data.data.schedules.supportSeconds'
+                                return val
+            except Exception:
+                pass
+
+        return None
+
+    def _resolve_support_seconds(self):
+        """Best-effort detection of supportSeconds before node profile binding."""
+        parent_val = self._resolve_support_seconds_from_parent_node()
+        if isinstance(parent_val, bool):
+            return parent_val
+
+        try:
+            val = self.yoSchedule.get_data('supportSeconds')
+            if isinstance(val, bool):
+                self._support_seconds_source = 'schedule_wrapper.get_data(supportSeconds)'
+                return val
+        except Exception:
+            pass
+
+        try:
+            raw_data = getattr(self.yoSchedule, 'data', {})
+            if isinstance(raw_data, dict):
+                data_block = raw_data.get('data', {})
+                if isinstance(data_block, dict):
+                    val = data_block.get('supportSeconds')
+                    if isinstance(val, bool):
+                        self._support_seconds_source = 'schedule_wrapper.data.data.supportSeconds'
+                        return val
+
+                    schedules_block = data_block.get('schedules')
+                    if isinstance(schedules_block, dict):
+                        val = schedules_block.get('supportSeconds')
+                        if isinstance(val, bool):
+                            self._support_seconds_source = 'schedule_wrapper.data.data.schedules.supportSeconds'
+                            return val
+        except Exception:
+            pass
+
+        try:
+            val = getattr(self.yoSchedule, 'scheduleSec', None)
+            if isinstance(val, bool):
+                self._support_seconds_source = 'schedule_wrapper.scheduleSec'
+                return val
+        except Exception:
+            pass
+
+        return None
     
     def __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
         logging.debug(f'{self.__class__.__name__} INIT - {deviceInfo["name"]}')
@@ -55,29 +156,35 @@ class BaseScheduleNode(udi_interface.Node):
         self.node_ready = False
         self.schedule_selected = 0
         self.poly = polyglot
+        self._support_seconds_source = 'unresolved'
         
         # Create yoSchedule wrapper and determine support_seconds BEFORE node initialization
         self.yoSchedule = self._create_yolink_schedule()               
-        time.sleep(2)
-        self.yoSchedule.refreshSchedules()
-        attempts = 1
-        while self.yoSchedule.no_data() and attempts <= 3:
-            logging.debug('Schedule data not found, device likely offline - retrying...')
-            time.sleep(2)
-            self.yoSchedule.refreshSchedules()
-            attempts += 1
+        support_seconds = self._resolve_support_seconds()
+        attempts = 0
+        while not isinstance(support_seconds, bool) and attempts < 5:
             time.sleep(1)
+            self.yoSchedule.refreshSchedules()
+            time.sleep(1)
+            support_seconds = self._resolve_support_seconds()
+            attempts += 1
 
-        if self.yoSchedule.no_data():
-            logging.debug('Schedule data not found, defaulting to no seconds support')
-            self.support_seconds = False
-        else:
-            self.support_seconds = self.yoSchedule.get_data('supportSeconds')
+        if not isinstance(support_seconds, bool):
+            logging.debug('Could not determine supportSeconds during init, defaulting to False')
+            support_seconds = False
+            self._support_seconds_source = 'default_false'
+
+        self.support_seconds = support_seconds
         
-        logging.debug(f'Schedule support_seconds: {self.support_seconds}')
+        logging.debug(
+            f'Schedule support_seconds: {self.support_seconds} '
+            f'(source: {self._support_seconds_source})'
+        )
         
-        # Adjust node ID based on seconds support BEFORE super().__init__()
-        self._set_id_for_seconds_support()
+        # Resolve node ID BEFORE super().__init__(); do not mutate after init.
+        resolved_id = self._set_id_for_seconds_support()
+        if isinstance(resolved_id, str) and resolved_id:
+            self.id = resolved_id
         
         # NOW call super().__init__() with correct id
         super().__init__(polyglot, primary, address, name)
@@ -102,10 +209,10 @@ class BaseScheduleNode(udi_interface.Node):
     
     def _set_id_for_seconds_support(self):
         """
-        Set the node ID based on seconds support.
-        Base class defaults to no change - override in subclasses.
+        Return the node ID based on seconds support.
+        Base class defaults to current id - override in subclasses.
         """
-        pass
+        return getattr(self, 'id', None)
     
     def start(self):
         """Start schedule node and initialize drivers."""
@@ -385,7 +492,8 @@ class OnOffScheduleNode(BaseScheduleNode):
     def _set_id_for_seconds_support(self):
         """Set node ID based on seconds support."""
         if self.support_seconds:
-            self.id = 'yoScheduleSec'
+            return 'yoScheduleSec'
+        return 'yoSchedule'
     
     def prep_schedule(self, query):
         """Prepare schedule parameters from UI query."""
@@ -478,12 +586,10 @@ class KeyScheduleNode(BaseScheduleNode):
         {'driver': 'GV19', 'value': 0, 'uom': 25},      # Weekday mask
     ]
 
-    def __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
-        super().__init__(polyglot, primary, address, name, yoAccess, deviceInfo)
-        
-        # Adjust node ID based on seconds support
+    def _set_id_for_seconds_support(self):
         if self.support_seconds:
-            self.id = 'yoirScheduleSec'
+            return 'yoirScheduleSec'
+        return 'yoirSchedule'
 
     def prep_schedule(self, query):
         """Prepare infrared schedule parameters from UI query."""
@@ -596,12 +702,10 @@ class MultiOutletScheduleNode(BaseScheduleNode):
         {'driver': 'GV19', 'value': 0, 'uom': 25},      # Weekday mask
     ]
 
-    def __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
-        super().__init__(polyglot, primary, address, name, yoAccess, deviceInfo)
-        
-        # Adjust node ID based on seconds support
+    def _set_id_for_seconds_support(self):
         if self.support_seconds:
-            self.id = 'yoMScheduleSec'
+            return 'yoMScheduleSec'
+        return 'yoMSchedule'
 
     def prep_schedule(self, query):
         """Prepare multi-outlet schedule parameters from UI query."""
@@ -663,7 +767,7 @@ class MultiOutletScheduleNode(BaseScheduleNode):
         if schedule_selected is not None and params:
             self.yoSchedule.setSchedule(schedule_selected, params)
 
-    def _update_schedule_display(self, sch_info, selected_schedule):
+    def _update_schedule_display(self, sch_info, selected_schedule, source_device=None):
         """Update driver display, including channel field."""
         if not sch_info:
             logging.debug('No schedule exists for selected index')
@@ -677,7 +781,7 @@ class MultiOutletScheduleNode(BaseScheduleNode):
             self.my_setDriver('GV12', int(sch_info['ch']))
         
         # Call parent to update common fields
-        super()._update_schedule_display(sch_info, selected_schedule)
+        super()._update_schedule_display(sch_info, selected_schedule, source_device=source_device)
 
     def _get_schedule_type_name(self):
         return 'MultiOutlet'
@@ -706,12 +810,10 @@ class SprinklerScheduleNode(OnOffScheduleNode):
 
     id = 'yoSprinklerSchedule'
 
-    def __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
-        super().__init__(polyglot, primary, address, name, yoAccess, deviceInfo)
-        
-        # Adjust node ID based on seconds support
+    def _set_id_for_seconds_support(self):
         if self.support_seconds:
-            self.id = 'yoSprinklerScheduleSec'
+            return 'yoSprinklerScheduleSec'
+        return 'yoSprinklerSchedule'
 
     def _get_schedule_type_name(self):
         return 'Sprinkler'
