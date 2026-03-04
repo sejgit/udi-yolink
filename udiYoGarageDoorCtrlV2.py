@@ -33,7 +33,7 @@ class udiYoGarageDoor(udi_interface.Node):
         
     drivers = [ 
             {'driver': 'ST', 'value': 0, 'uom': 25},
-            {'driver': 'GV30', 'value': 0, 'uom': 25},
+            {'driver': 'GV30', 'value': 99, 'uom': 25},
             {'driver': 'GV20', 'value': 99, 'uom': 25},
             ]
 

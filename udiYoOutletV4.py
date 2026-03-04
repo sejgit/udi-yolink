@@ -55,9 +55,9 @@ class udiYoOutlet(udi_interface.Node):
             #{'driver': 'GV19', 'value': 0, 'uom': 25}, #days
 
             {'driver': 'ST', 'value': 0, 'uom': 25},
-            {'driver': 'GV30', 'value': 0, 'uom': 25},            
+            {'driver': 'GV30', 'value': 99, 'uom': 25},            
             {'driver': 'GV20', 'value': 99, 'uom': 25},              
-             {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},
+            {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},
 
             ]
 
@@ -102,7 +102,7 @@ class udiYoOutlet(udi_interface.Node):
 
     def start(self):
         logging.info('start - YoOutlet')
-        self.my_setDriver('GV30', 0)
+        #self.my_setDriver('GV30', 0)
         self.yoOutlet = YoLinkOutlet(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoOutlet.initNode()

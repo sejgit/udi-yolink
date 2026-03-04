@@ -26,7 +26,7 @@ class udiYoSwitch(udi_interface.Node):
     id = 'yoswitch'
 
     drivers = [
-            {'driver': 'ST', 'value': 0, 'uom': 25},        
+            {'driver': 'ST', 'value': 99, 'uom': 25},        
             {'driver': 'GV0', 'value': 99, 'uom': 25},
             {'driver': 'GV1', 'value': 0, 'uom': 57}, 
             {'driver': 'GV2', 'value': 0, 'uom': 57}, 
@@ -47,7 +47,7 @@ class udiYoSwitch(udi_interface.Node):
             #{'driver': 'GV22', 'value': 99, 'uom': 25}, #offSec            
             #{'driver': 'GV19', 'value': 0, 'uom': 25}, #days
             {'driver': 'GV20', 'value': 99, 'uom': 25},                          
-            {'driver': 'GV30', 'value': 0, 'uom': 25},
+            {'driver': 'GV30', 'value': 99, 'uom': 25},
             {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},        
             ]
 
@@ -106,7 +106,7 @@ class udiYoSwitch(udi_interface.Node):
 
     def start(self):
         logging.info('start - udiYoSwitch')
-        self.my_setDriver('GV30', 0)
+        #self.my_setDriver('GV30', 0)
         self.yoSwitch  = YoLinkSwitch(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(3)
         self.yoSwitch.initNode()

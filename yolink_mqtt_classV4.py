@@ -1375,7 +1375,9 @@ class YoLinkMQTTDevice(object):
         except KeyError as e:
             logging.debug(f'EXCEPTION - no_data {e}')    
             return(False)
-
+        
+        
+    #@measure_time
     def updatePacketData(yolink, data):
         try:
             logging.debug('{} - updatePacketData - start: '.format(yolink.type ))
@@ -1655,7 +1657,7 @@ class YoLinkMQTTDevice(object):
             logging.error('Exception updateStatusData - {}'.format(e))
             logging.error('Exception Data - {}'.format(data))
     '''
-    
+
     def get_event_from_state(yolink):
         logging.debug('get_event_from_state')
         try:

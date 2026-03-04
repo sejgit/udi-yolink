@@ -31,7 +31,7 @@ class udiYoSpeakerHub(udi_interface.Node):
             {'driver': 'GV3', 'value': 0, 'uom': 25}, 
             {'driver': 'GV4', 'value': 0, 'uom': 56}, 
             {'driver': 'GV5', 'value': 0, 'uom': 56},        
-            {'driver': 'GV30', 'value': 0, 'uom': 25},
+            {'driver': 'GV30', 'value': 99, 'uom': 25},
             {'driver': 'GV20', 'value': 99, 'uom': 25}, 
             {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},
             ]

@@ -113,7 +113,7 @@ class udiYoLeakSensor(udi_interface.Node):
             {'driver': 'GV10', 'value': 0, 'uom': 25}, #Reminder Alert            
 
             {'driver': 'GV20', 'value': 99, 'uom': 25},   
-            {'driver': 'GV30', 'value': 0, 'uom': 25},
+            {'driver': 'GV30', 'value': 99, 'uom': 25},
 
              {'driver': 'TIME', 'value': int(time.time()), 'uom': 151},
 

@@ -46,7 +46,7 @@ class udiYoDimmer(udi_interface.Node):
             #{'driver': 'GV22', 'value': 99, 'uom': 25}, #start sec             
             #{'driver': 'GV19', 'value': 0, 'uom': 25}, #days
                  
-            {'driver': 'GV30', 'value': 0, 'uom': 25},
+            {'driver': 'GV30', 'value': 99, 'uom': 25},
             {'driver': 'GV20', 'value': 99, 'uom': 25},            
             {'driver': 'TIME', 'value': int(time.time()), 'uom': 151},
             ]

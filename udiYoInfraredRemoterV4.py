@@ -33,7 +33,7 @@ class udiYoInfraredCode(udi_interface.Node):
     id = 'yoircode'
     drivers = [
             {'driver': 'ST', 'value': 0, 'uom': 25},
-            {'driver': 'GV30', 'value': 0, 'uom': 25},
+            {'driver': 'GV30', 'value': 99, 'uom': 25},
             {'driver': 'GV20', 'value': 99, 'uom': 25},       
             {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},                 
             ] 
@@ -146,7 +146,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
     id = 'yoirremote'
     drivers = [
             {'driver': 'ST', 'value': 0, 'uom': 25},
-            {'driver': 'GV30', 'value': 0, 'uom': 25},
+            {'driver': 'GV30', 'value': 99, 'uom': 25},
             {'driver': 'GV0', 'value': 0, 'uom': 56},
             {'driver': 'GV1', 'value': 0, 'uom': 25},
             {'driver': 'GV2', 'value': 0, 'uom': 25},

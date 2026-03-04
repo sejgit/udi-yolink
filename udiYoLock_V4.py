@@ -40,7 +40,7 @@ class udiYoLockV2(udi_interface.Node):
             {'driver': 'GV4', 'value': 0, 'uom': 25}, 
             {'driver': 'GV5', 'value': 98, 'uom': 25},            
             {'driver': 'ST', 'value': 0, 'uom': 25},
-            {'driver': 'GV30', 'value': 0, 'uom': 25},
+            {'driver': 'GV30', 'value': 99, 'uom': 25},
             {'driver': 'GV20', 'value': 99, 'uom': 25},
              {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},            
             ]
@@ -273,7 +273,7 @@ class udiYoLock(udi_interface.Node):
             #{'driver': 'GV4', 'value': 0, 'uom': 25}, 
             #{'driver': 'GV5', 'value': 98, 'uom': 25},            
             {'driver': 'ST', 'value': 0, 'uom': 25},
-            {'driver': 'GV30', 'value': 0, 'uom': 25},
+            {'driver': 'GV30', 'value': 99, 'uom': 25},
             {'driver': 'GV20', 'value': 99, 'uom': 25},
              {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},            
             ]
