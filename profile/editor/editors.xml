@@ -263,6 +263,9 @@
   <editor id="schIndex">
     <range uom="25" subset="0-9,98,99" nls="sch_indexM" />
   </editor>
+  <editor id="schCount">
+    <range uom="70" min="0" max="20" />
+  </editor>
   <editor id="schIndexM">
     <range uom="25" subset="0-9,99" nls="sch_indexM" />
   </editor>

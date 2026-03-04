@@ -334,6 +334,7 @@ class OnOffScheduleNode(BaseScheduleNode):
     drivers = [
         {'driver': 'GV13', 'value': 0, 'uom': 25},     # Schedule index
         {'driver': 'GV14', 'value': 99, 'uom': 25},    # Active (enabled)
+        {'driver': 'GV23', 'value': 0, 'uom': 70},     # Total schedules
         {'driver': 'GV15', 'value': 99, 'uom': 25},    # On hour
         {'driver': 'GV16', 'value': 99, 'uom': 25},    # On minute
         {'driver': 'GV21', 'value': 99, 'uom': 25},    # On second
@@ -431,6 +432,7 @@ class KeyScheduleNode(BaseScheduleNode):
         {'driver': 'GV12', 'value': 99, 'uom': 25},     # Infrared key/channel
         {'driver': 'GV13', 'value': 0, 'uom': 25},      # Schedule index
         {'driver': 'GV14', 'value': 99, 'uom': 25},     # Active (enabled)
+        {'driver': 'GV23', 'value': 0, 'uom': 70},      # Total schedules
         {'driver': 'GV15', 'value': 99, 'uom': 25},     # On hour
         {'driver': 'GV16', 'value': 99, 'uom': 25},     # On minute
         {'driver': 'GV21', 'value': 99, 'uom': 25},     # On second
@@ -548,6 +550,7 @@ class MultiOutletScheduleNode(BaseScheduleNode):
         {'driver': 'GV12', 'value': 99, 'uom': 25},     # Channel/outlet number
         {'driver': 'GV13', 'value': 0, 'uom': 25},      # Schedule index
         {'driver': 'GV14', 'value': 99, 'uom': 25},     # Active (enabled)
+        {'driver': 'GV23', 'value': 0, 'uom': 70},      # Total schedules
         {'driver': 'GV15', 'value': 99, 'uom': 25},     # On hour
         {'driver': 'GV16', 'value': 99, 'uom': 25},     # On minute
         {'driver': 'GV21', 'value': 99, 'uom': 25},     # On second
@@ -664,6 +667,15 @@ class SprinklerScheduleNode(OnOffScheduleNode):
 
     This class maps those fields to/from the existing schedule UI drivers.
     """
+
+    id = 'yoSprinklerSchedule'
+
+    def __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
+        super().__init__(polyglot, primary, address, name, yoAccess, deviceInfo)
+        
+        # Adjust node ID based on seconds support
+        if self.support_seconds:
+            self.id = 'yoSprinklerScheduleSec'
 
     def _get_schedule_type_name(self):
         return 'Sprinkler'
