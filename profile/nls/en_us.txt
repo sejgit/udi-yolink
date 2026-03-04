@@ -413,7 +413,6 @@ ST-nlsleaksens-GV20-NAME=Connection State
 ST-nlsleaksens-GV30-NAME=Online State
 ST-nlsleaksens-BATLVL-NAME=Battery Level
 ST-nlsleaksens-TIME-NAME=Last device update
-ST-nlsleaksens-CLITEMP-NAME=Sensor Temperature
 ST-nlsleaksens-CLIHUM-NAME=Current Rel Humidity (%)
 CMD-nlsleaksens-SETCMD-NAME=Select Command Action
 CMD-nlsleaksens-DON-NAME=Water Alert Detected
@@ -874,10 +873,6 @@ waterrun-99=Unknown
 watermode-1=Scheduled
 watermode-0=Manual
 watermode-99=Unknown
-
-runningmode-0=Water Volume
-runningmode-1=Time
-runningmode-99=Unknown
 
 nowateralarm-0=Normal (No alarm)
 nowateralarm-1=Alarm - No Water Detected
