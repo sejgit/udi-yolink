@@ -43,9 +43,9 @@ class BaseScheduleNode(udi_interface.Node):
     from  udiYolinkLib import my_setDriver, convert_timestr_to_epoch, node_queue, wait_for_node_done, bool2ISY, mask2key
     
     def __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
-        super().__init__(polyglot, primary, address, name)   
-        
         logging.debug(f'{self.__class__.__name__} INIT - {deviceInfo["name"]}')
+        
+        # Store references before calling super().__init__()
         self.n_queue = []
         self.address = address
         self.primary = primary
@@ -54,12 +54,9 @@ class BaseScheduleNode(udi_interface.Node):
         self.yoSchedule = None
         self.node_ready = False
         self.schedule_selected = 0
-        
         self.poly = polyglot
-        self.poly.subscribe(self.poly.START, self.start, self.address)
-        self.poly.subscribe(self.poly.STOP, self.stop)
-        self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         
+        # Create yoSchedule wrapper and determine support_seconds BEFORE node initialization
         self.yoSchedule = self._create_yolink_schedule()               
         time.sleep(2)
         self.yoSchedule.refreshSchedules()
@@ -78,6 +75,16 @@ class BaseScheduleNode(udi_interface.Node):
             self.support_seconds = self.yoSchedule.get_data('supportSeconds')
         
         logging.debug(f'Schedule support_seconds: {self.support_seconds}')
+        
+        # Adjust node ID based on seconds support BEFORE super().__init__()
+        self._set_id_for_seconds_support()
+        
+        # NOW call super().__init__() with correct id
+        super().__init__(polyglot, primary, address, name)
+        
+        self.poly.subscribe(self.poly.START, self.start, self.address)
+        self.poly.subscribe(self.poly.STOP, self.stop)
+        self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
 
         polyglot.ready()
         self.poly.addNode(self, conn_status=None, rename=True)
@@ -92,6 +99,13 @@ class BaseScheduleNode(udi_interface.Node):
         Override in subclasses to return device-specific wrappers.
         """
         return YoLinkSchedule(self.yoAccess, self.devInfo, self.updateStatus)
+    
+    def _set_id_for_seconds_support(self):
+        """
+        Set the node ID based on seconds support.
+        Base class defaults to no change - override in subclasses.
+        """
+        pass
     
     def start(self):
         """Start schedule node and initialize drivers."""
@@ -289,6 +303,13 @@ class BaseScheduleNode(udi_interface.Node):
         
         logging.debug(f'Updating schedule display: {sch_info}')
         
+        # Update total schedules count from device's schedule dictionary
+        if self.yoSchedule and hasattr(self.yoSchedule, 'schedules'):
+            schedule_dict = self.yoSchedule.schedules
+            if isinstance(schedule_dict, (list, dict)):
+                total_schedules = len(schedule_dict)
+                self.my_setDriver('GV23', total_schedules)
+        
         # Common schedule fields
         self.my_setDriver('GV13', selected_schedule)
         self.my_setDriver('GV14', 1 if sch_info.get('isValid', False) else 0)
@@ -344,10 +365,8 @@ class OnOffScheduleNode(BaseScheduleNode):
         {'driver': 'GV19', 'value': 0, 'uom': 25},     # Weekday mask
     ]
 
-    def __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
-        super().__init__(polyglot, primary, address, name, yoAccess, deviceInfo)
-        
-        # Adjust node ID based on seconds support
+    def _set_id_for_seconds_support(self):
+        """Set node ID based on seconds support."""
         if self.support_seconds:
             self.id = 'yoScheduleSec'
     
