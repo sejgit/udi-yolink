@@ -181,7 +181,7 @@ class YoLinkMQTTDevice(object):
 
     #@measure_time
     def refreshDevice(yolink):
-        logging.debug('{} - refreshDevice - supports {}'.format(yolink.type))
+        logging.debug('{} - refreshDevice - supports'.format(yolink.type))
         #attempt = 1
         #maxAttempts = 3
 
