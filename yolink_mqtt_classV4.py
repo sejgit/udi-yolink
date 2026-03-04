@@ -1419,12 +1419,12 @@ class YoLinkMQTTDevice(object):
             logging.error('Exception updateStatusData - {}'.format(e))
             logging.error('Exception Data - {}'.format(json.dumps(data, indent=4)))
 
-
+    '''
     #@measure_time
     def updateStatusData  (yolink, data):
         try:
             logging.debug('{} - updateStatusData - start: {} - {}'.format(yolink.type, json.dumps(data, indent=4), json.dumps(yolink.data, indent=4)))
-            '''
+            
             yolink.data = data
             yolink.online = yolink.Status(data)
 
@@ -1451,7 +1451,7 @@ class YoLinkMQTTDevice(object):
                 yolink.schdeule = data['data']
 
 
-            '''
+            
             temp = yolink.data.get('lastMessage', {})
             yolink.reset_structure() #do not let old data persist
             yolink.data['lastMessage'] = temp    
@@ -1654,7 +1654,8 @@ class YoLinkMQTTDevice(object):
         except Exception as e:
             logging.error('Exception updateStatusData - {}'.format(e))
             logging.error('Exception Data - {}'.format(data))
-
+    '''
+    
     def get_event_from_state(yolink):
         logging.debug('get_event_from_state')
         try:
