@@ -287,28 +287,45 @@ class BaseScheduleNode(udi_interface.Node):
                 raw_schedule = self.yoSchedule.getScheduleInfo(selected_schedule)
 
         sch_info = self._normalize_schedule_info(raw_schedule, selected_schedule)
-        self._update_schedule_display(sch_info, selected_schedule)
+        self._update_schedule_display(sch_info, selected_schedule, source_device=source_device)
 
-    def _update_schedule_display(self, sch_info, selected_schedule):
+    def _count_schedules(self, schedules_payload):
+        """Count real schedules while ignoring metadata keys like supportSeconds."""
+        if isinstance(schedules_payload, list):
+            return sum(1 for entry in schedules_payload if isinstance(entry, dict))
+
+        if isinstance(schedules_payload, dict):
+            count = 0
+            for key, value in schedules_payload.items():
+                if not isinstance(value, dict):
+                    continue
+
+                key_is_index = isinstance(key, str) and key.isdigit()
+                looks_like_schedule = any(field in value for field in ('index', 'on', 'off', 'time'))
+                if key_is_index or looks_like_schedule:
+                    count += 1
+            return count
+
+        return 0
+
+    def _update_schedule_display(self, sch_info, selected_schedule, source_device=None):
         """
         Update driver display with schedule information.
         
         Base implementation handles common time/weekday display.
         Override in subclasses for device-specific fields (key, channel, etc.).
         """
+        # Update total schedules count from the same source payload used by getSchedules
+        schedule_source = source_device if source_device is not None else self.yoSchedule
+        schedules_payload = getattr(schedule_source, 'schedules', None)
+        self.my_setDriver('GV23', self._count_schedules(schedules_payload))
+
         if not sch_info:
             logging.debug('No schedule exists for selected index')
             self._clear_schedule_display(selected_schedule)
             return
         
         logging.debug(f'Updating schedule display: {sch_info}')
-        
-        # Update total schedules count from device's schedule dictionary
-        if self.yoSchedule and hasattr(self.yoSchedule, 'schedules'):
-            schedule_dict = self.yoSchedule.schedules
-            if isinstance(schedule_dict, (list, dict)):
-                total_schedules = len(schedule_dict)
-                self.my_setDriver('GV23', total_schedules)
         
         # Common schedule fields
         self.my_setDriver('GV13', selected_schedule)
@@ -528,7 +545,7 @@ class KeyScheduleNode(BaseScheduleNode):
         if schedule_selected is not None and params:
             self.yoSchedule.setSchedule(schedule_selected, params)
 
-    def _update_schedule_display(self, sch_info, selected_schedule):
+    def _update_schedule_display(self, sch_info, selected_schedule, source_device=None):
         """Update driver display, including key field."""
         if not sch_info:
             logging.debug('No schedule exists for selected index')
@@ -542,7 +559,7 @@ class KeyScheduleNode(BaseScheduleNode):
             self.my_setDriver('GV12', int(sch_info['key']))
         
         # Call parent to update common fields
-        super()._update_schedule_display(sch_info, selected_schedule)
+        super()._update_schedule_display(sch_info, selected_schedule, source_device=source_device)
 
     def _get_schedule_type_name(self):
         return 'Key'
