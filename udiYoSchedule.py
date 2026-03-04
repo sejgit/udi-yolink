@@ -42,6 +42,27 @@ class BaseScheduleNode(udi_interface.Node):
     
     from  udiYolinkLib import my_setDriver, convert_timestr_to_epoch, node_queue, wait_for_node_done, bool2ISY, mask2key
 
+    def _is_schedule_message(self, source):
+        """True only when latest packet type/action is schedule-related."""
+        try:
+            if source is None:
+                return False
+
+            if hasattr(source, 'get_message_type'):
+                msg_type, msg_action = source.get_message_type()
+                if msg_type in ['method', 'event'] and isinstance(msg_action, str) and msg_action in ['getSchedules', 'setSchedules']:
+                    return True
+
+            data = getattr(source, 'data', {})
+            if isinstance(data, dict):
+                method = data.get('method', '')
+                if isinstance(method, str) and (method.endswith('.getSchedules') or method.endswith('.setSchedules')):
+                    return True
+        except Exception:
+            return False
+
+        return False
+
     def _resolve_support_seconds_from_parent_node(self):
         """Check the already-created parent device node for supportSeconds."""
         try:
@@ -60,6 +81,9 @@ class BaseScheduleNode(udi_interface.Node):
         for attr in candidate_attrs:
             source = getattr(parent_node, attr, None)
             if source is None:
+                continue
+
+            if not self._is_schedule_message(source):
                 continue
 
             try:
@@ -100,11 +124,37 @@ class BaseScheduleNode(udi_interface.Node):
 
         return None
 
+    def _refresh_parent_schedules(self):
+        """Ask the parent device wrapper to refresh schedules (best effort)."""
+        try:
+            parent_node = self.poly.getNode(self.primary)
+        except Exception:
+            return
+
+        if parent_node is None:
+            return
+
+        candidate_attrs = (
+            'yoSwitch', 'yoOutlet', 'yoDimmer', 'yoManipulator',
+            'yoInfraredRemoter', 'yoMultiOutlet', 'yoSprinkler',
+        )
+
+        for attr in candidate_attrs:
+            source = getattr(parent_node, attr, None)
+            if source is not None and hasattr(source, 'refreshSchedules'):
+                try:
+                    source.refreshSchedules()
+                except Exception:
+                    pass
+
     def _resolve_support_seconds(self):
         """Best-effort detection of supportSeconds before node profile binding."""
         parent_val = self._resolve_support_seconds_from_parent_node()
         if isinstance(parent_val, bool):
             return parent_val
+
+        if not self._is_schedule_message(self.yoSchedule):
+            return None
 
         try:
             val = self.yoSchedule.get_data('supportSeconds')
@@ -162,7 +212,8 @@ class BaseScheduleNode(udi_interface.Node):
         self.yoSchedule = self._create_yolink_schedule()               
         support_seconds = self._resolve_support_seconds()
         attempts = 0
-        while not isinstance(support_seconds, bool) and attempts < 5:
+        while not isinstance(support_seconds, bool) and attempts < 8:
+            self._refresh_parent_schedules()
             time.sleep(1)
             self.yoSchedule.refreshSchedules()
             time.sleep(1)
@@ -995,9 +1046,9 @@ class YoLinkSchedule(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess, deviceInfo, callback):
         super().__init__(yoAccess, deviceInfo, callback)
 
-        #yolink.methodList = ['getSchedules', 'setSchedules']
-        #yolink.eventList = ['StatusChange', 'Report', 'getState']
-        #yolink.stateList = ['open', 'closed', 'on', 'off']
-        #yolink.ManipulatorName = 'OutletEvent'
-        #yolink.eventTime = 'Time'
+        yolink.methodList = ['getSchedules', 'setSchedules']
+        yolink.eventList = ['StatusChange', 'Report', 'getState']
+        yolink.stateList = ['open', 'closed', 'on', 'off']
+        yolink.ManipulatorName = 'OutletEvent'
+        yolink.eventTime = 'Time'
         yolink.type = deviceInfo['type']
