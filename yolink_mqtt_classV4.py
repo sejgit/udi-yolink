@@ -88,37 +88,10 @@ class YoLinkMQTTDevice(object):
         yolink.data = {}
         yolink.schedule = {}
         if yolink.type in yolink.delaySupport and yolink.type not in yolink.scheduleSupport :
-            yolink.dataAPI = {
-                              yolink.lastUpd:0
-                            , yolink.lastMessage:{}
-                            ,'lastStateTime':{}
-                            , yolink.dOnline:False
-                            ,'emptyData': False
-                            , yolink.dData :{yolink.dState:{}
-                                             }
-                            }
             yolink.extDelayTimer = CountdownTimer()
         elif yolink.type in yolink.scheduleSupport:
-            yolink.dataAPI = {
-                              yolink.lastUpd:0
-                            , yolink.lastMessage:{}
-                            ,'lastStateTime':{}
-                            , yolink.dOnline:False
-                            ,'emptyData': False                            
-                            , yolink.dData :{   yolink.dState:{}
-                                                ,yolink.dSchedule : [] 
-                                                }
-                            }
             yolink.extDelayTimer = CountdownTimer()
         else:
-            yolink.dataAPI = {
-                              yolink.lastUpd:0
-                            , yolink.lastMessage:{}
-                            ,'lastStateTime':{}
-                            , yolink.dOnline :False
-                            ,'emptyData': False                            
-                            , yolink.dData :{ yolink.dState:{} }
-                            }  
             yolink.extDelayTimer = None
         yolink.eventQueue = Queue()
         #yolink.mutex = threading.Lock()
@@ -131,35 +104,13 @@ class YoLinkMQTTDevice(object):
     
     def reset_structure(yolink):
         if yolink.type in yolink.delaySupport and yolink.type not in yolink.scheduleSupport :
-            yolink.dataAPI = {
-                              yolink.lastUpd:0
-                            , yolink.lastMessage:{}
-                            ,'lastStateTime':{}
-                            , yolink.dOnline:False
-                            ,'emptyData': False
-                            , yolink.dData :{yolink.dState:{} }
-                            }
+            pass
             #yolink.extDelayTimer = CountdownTimer()
         elif yolink.type in yolink.scheduleSupport:
-            yolink.dataAPI = {
-                              yolink.lastUpd:0
-                            , yolink.lastMessage:{}
-                            ,'lastStateTime':{}
-                            , yolink.dOnline:False
-                            ,'emptyData': False                            
-                            , yolink.dData :{  yolink.dState:{}
-                                              ,yolink.dSchedule : [] }
-                            }
+            pass
             #yolink.extDelayTimer = CountdownTimer()
         else:
-            yolink.dataAPI = {
-                              yolink.lastUpd:0
-                            , yolink.lastMessage:{}
-                            ,'lastStateTime':{}
-                            , yolink.dOnline :False
-                            ,'emptyData': False                            
-                            , yolink.dData :{ yolink.dState:{} }
-                            } 
+            pass
     def delayTimerCallback(yolink, callback, updateTime=5):
 
         yolink.extDelayTimer.timerReportInterval(updateTime)
@@ -203,7 +154,7 @@ class YoLinkMQTTDevice(object):
     #@measure_time
     def deviceError(yolink, data):
         logging.debug(yolink.type+' - deviceError : {}'.format(data))
-        yolink.dataAPI[yolink.dOnline] = False
+        yolink.online = False
         # may need to add more error handling 
 
     #@measure_time
@@ -254,9 +205,9 @@ class YoLinkMQTTDevice(object):
         logging.debug('{} - Checking last update'.format(yolink.type))
         logging.debug('Data: {}'.format(yolink.dataAPI))
         if 'stateChangedAt' in yolink.data[yolink.dData]:
-            logging.debug('lastUpdate stateChangedAt {}'.format(yolink.dataAPI[yolink.dData]['stateChangedAt']))
+            logging.debug('lastUpdate stateChangedAt {}'.format(yolink.data.get(yolink.dData, {})['stateChangedAt']))
             return(yolink.data[yolink.dData]['stateChangedAt'])
-        elif 'lastStateTime' in yolink.dataAPI:
+        elif 'lastStateTime' in yolink.data:
             logging.debug('lastUpdate lastStateTime {}'.format(yolink.dataAPI['lastStateTime' ]))
             if isinstance(yolink.data['lastStateTime'], (int, float)):
                 return(yolink.data['lastStateTime'] )
@@ -268,16 +219,16 @@ class YoLinkMQTTDevice(object):
                 return(yolink.data[yolink.lastUpd ])
             else:
                 return(0)            
-        elif 'reportAt' in yolink.dataAPI:
-            timestamp = yolink.dataAPI['reportAt']
+        elif 'reportAt' in yolink.data:
+            timestamp = yolink.data.get('reportAt')
             dt = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")
             
             logging.debug('lastUpdate reportAt {}'.format(int(dt.timestamp())))
             return(dt.timestamp()*1000) # make in ms
-        elif 'time' in  yolink.dataAPI:
-            logging.debug('lastUpdate time {}'.format(yolink.dataAPI['time']))
+        elif 'time' in yolink.data:
+            logging.debug('lastUpdate time {}'.format(yolink.data.get('time')))
 
-            return(yolink.dataAPI['time'])
+            return(yolink.data.get('time'))
         else:
             return(0)
 
@@ -286,31 +237,31 @@ class YoLinkMQTTDevice(object):
     def lastUpdate(yolink):
         logging.debug('{} - Checking last update'.format(yolink.type))
         logging.debug('Data: {}'.format(yolink.dataAPI))
-        if 'stateChangedAt' in yolink.dataAPI[yolink.dData]:
-            logging.debug('lastUpdate stateChangedAt {}'.format(yolink.dataAPI[yolink.dData]['stateChangedAt']))
-            return(yolink.dataAPI[yolink.dData]['stateChangedAt'])
-        elif 'lastStateTime' in yolink.dataAPI:
+        if 'stateChangedAt' in yolink.data.get(yolink.dData, {}):
+            logging.debug('lastUpdate stateChangedAt {}'.format(yolink.data.get(yolink.dData, {})['stateChangedAt']))
+            return(yolink.data.get(yolink.dData, {})['stateChangedAt'])
+        elif 'lastStateTime' in yolink.data:
             logging.debug('lastUpdate lastStateTime {}'.format(yolink.dataAPI['lastStateTime' ]))
-            if isinstance(yolink.dataAPI['lastStateTime'], (int, float)):
-                return(yolink.dataAPI['lastStateTime'] )
+            if isinstance(yolink.data.get('lastStateTime', 0), (int, float)):
+                return(yolink.data.get('lastStateTime', 0) )
             else:
                 return(0)        
-        elif yolink.lastUpd in yolink.dataAPI:
-            logging.debug('lastUpdate lastUpdTime {}'.format(yolink.dataAPI[yolink.lastUpd ]))
-            if isinstance(yolink.dataAPI[yolink.lastUpd ], (int, float)):
-                return(yolink.dataAPI[yolink.lastUpd ])
+        elif yolink.lastUpd in yolink.data:
+            logging.debug('lastUpdate lastUpdTime {}'.format(yolink.data.get(yolink.lastUpd)))
+            if isinstance(yolink.data.get(yolink.lastUpd), (int, float)):
+                return(yolink.data.get(yolink.lastUpd))
             else:
                 return(0)            
-        elif 'reportAt' in yolink.dataAPI:
-            timestamp = yolink.dataAPI['reportAt']
+        elif 'reportAt' in yolink.data:
+            timestamp = yolink.data.get('reportAt')
             dt = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")
             
             logging.debug('lastUpdate reportAt {}'.format(int(dt.timestamp())))
             return(dt.timestamp()*1000) # make in ms
-        elif 'time' in  yolink.dataAPI:
-            logging.debug('lastUpdate time {}'.format(yolink.dataAPI['time']))
+        elif 'time' in yolink.data:
+            logging.debug('lastUpdate time {}'.format(yolink.data.get('time')))
 
-            return(yolink.dataAPI['time'])
+            return(yolink.data.get('time'))
         else:
             return(0)
         
@@ -318,7 +269,7 @@ class YoLinkMQTTDevice(object):
     def check_system_online(yolink):
         #return(yolink.yoAccess.online)
         if yolink.yoAccess.online:
-            yolink.online = yolink.dataAPI[yolink.dOnline]
+            yolink.online = yolink.data.get(yolink.dOnline, False)
         else:
             yolink.online = False
         return(yolink.online)
@@ -417,18 +368,12 @@ class YoLinkMQTTDevice(object):
     def getDataValue(yolink,key): 
         logging.debug('{} -     def getDataValue {}: '.format(yolink.type, key))
         try:
-            count = 1
-            #while key not in yolink.dataAPI[yolink.dData] and count <3:
-            #    time.sleep(1)
-            #    count = count + 1
-            #logging.debug('DEBUGME getDataValue {}-{} : {}'.format(yolink.type, key, yolink.dataAPI[yolink.dData] ))
-            if key in yolink.dataAPI[yolink.dData]:
-                yolink.online = yolink.check_system_online()
-                return(yolink.dataAPI[yolink.dData][key])
-            else:
-                #yolink.online = False
-                logging.debug('getDataValue NO Match  - {}  {}'.format(key, yolink.dataAPI[yolink.dData]))
+            yolink.online = yolink.check_system_online()
+            result = yolink.get_data(key)
+            if result is None:
+                logging.debug('getDataValue NO Match  - {} '.format(key))
                 return('NA')
+            return(result)
         except Exception as E:
             logging.error('getDataValue Exception: {}'.format(E))
     #@measure_time
@@ -440,79 +385,57 @@ class YoLinkMQTTDevice(object):
     def getDataStateValue(yolink, key):
         logging.debug('{} - getDataStateValue, key:{}'.format(yolink.type, key))
         try:
-            count = 1
             yolink.online = yolink.check_system_online()
-            #logging.debug("getStateValue Online: {}".format(yolink.online))
-            if yolink.online :
-                #while key not in yolink.dataAPI[yolink.dData][yolink.dState] and count <3:
-                #    time.sleep(1)
-                #    count = count + 1
-                #logging.debug('DEBUGME getDataStateValue {}-{} : {}'.format(yolink.type, key, yolink.dataAPI[yolink.dData][yolink.dState] ))
-                if key in yolink.dataAPI[yolink.dData][yolink.dState]:
-                    return(yolink.dataAPI[yolink.dData][yolink.dState][key])
-                else:
-                    logging.debug('getDataStateValue NO MATCH - {} {}'.format(key, yolink.dataAPI[yolink.dData]))
-                    return(None)
+            if yolink.online:
+                result = yolink.get_data(key, category=yolink.dState)
+                if result is None:
+                    logging.debug('getDataStateValue NO MATCH - {} '.format(key))
+                return(result)
             else:
                 return(None)
         except Exception as E:
             logging.debug('getData exception: {}'.format(E) )
-            return( )
+            return(None)
 
     #@measure_time
     def getValue(yolink,key): 
         logging.debug('{} -     def getValue {}: '.format(yolink.type, key))
         try:
-            count = 1
-            #while key not in yolink.dataAPI[yolink.dData] and count <3:
-            #    time.sleep(1)
-            #    count = count + 1
-            #logging.debug('DEBUG getValue {}-{} : {}'.format(yolink.type, key, yolink.dataAPI[yolink.dData] ))
-            if key in yolink.dataAPI[yolink.dData]:
-                yolink.online = yolink.check_system_online()
-                return(yolink.dataAPI[yolink.dData][key])
-            else:
-                yolink.online = False 
-                logging.debug('getValue NO MATCH - {} {}'.format(key, yolink.dataAPI[yolink.dData]))
-                return(None)
+            yolink.online = yolink.check_system_online()
+            result = yolink.get_data(key)
+            if result is None:
+                logging.debug('getValue NO MATCH - {} '.format(key))
+            return(result)
         except Exception as E:
             logging.debug('getData exception: {}'.format(E) )
-            return( )    
+            return(None)    
 
     #@measure_time
     def getStateValue(yolink, key):
-    
         logging.debug('{} - getStateValue, key:{}'.format(yolink.type, key))
         try:
             yolink.online = yolink.check_system_online()
-            #logging.debug("getStateValue Online: {}".format(yolink.online))
-            if yolink.online :
-                #while key not in yolink.dataAPI[yolink.dData][yolink.dState] and count <3:
-                #    time.sleep(1)
-                #    count = count + 1
-                #logging.debug('DEBUG getStateValue {}-{} : {}'.format(yolink.type, key, yolink.dataAPI[yolink.dData]))
-                if key in yolink.dataAPI[yolink.dData][yolink.dState]:
-                    return(yolink.dataAPI[yolink.dData][yolink.dState][key])
-                else:
-                    logging.debug('getStateValue NO MATCH - {} {}'.format(key, yolink.dataAPI[yolink.dData]))
-
-                    return(None)
+            if yolink.online:
+                result = yolink.get_data(key, category=yolink.dState)
+                if result is None:
+                    logging.debug('getStateValue NO MATCH - {} '.format(key))
+                return(result)
             else:
                 return(99)
         except Exception as e:
             logging.debug('getData exception: {}'.format(e) )
-            return( )
+            return(None)
     
     #@measure_time
     def getInfoAPI (yolink):
-        return(yolink.dataAPI)
+        return(yolink.data)
 
     #def sensorOnline(yolink):
     #    return(yolink.check_system_online() )       
 
     #@measure_time
     def getAlarms(yolink):
-        return(yolink.getStateValue('alarm'))
+        return(yolink.get_data('alarm', category=yolink.dState))
 
     def getLimits(yolink):
         res = {}
@@ -537,8 +460,8 @@ class YoLinkMQTTDevice(object):
     def getAlertInfo(yolink):
         logging.debug('getAlertInfo {}'.format(yolink.dataAPI))
         try:
-            if 'alertType' in yolink.dataAPI[yolink.dData][yolink.dState]:
-                return(yolink.dataAPI[yolink.dData][yolink.dState]['alertType'])
+            if 'alertType' in yolink.data.get(yolink.dData, {})[yolink.dState]:
+                return(yolink.data.get(yolink.dData, {})[yolink.dState]['alertType'])
             else:
                 return(None)
         except Exception as e:
@@ -557,7 +480,7 @@ class YoLinkMQTTDevice(object):
         try:
             return(yolink.lastUpdate())
         except:
-            logging.debug('Exception yolink.dataAPI[yolink.lastUpd] does not exist')
+            logging.debug('Exception yolink.data.get(yolink.lastUpd, 0) does not exist')
             return(time.time())
         
     def getDataTimestamp(yolink):
@@ -610,19 +533,23 @@ class YoLinkMQTTDevice(object):
     def getDataAll(yolink):
         try:
             logging.debug(yolink.type +' - getDataAll')
-            return(yolink.dataAPI[yolink.dData])
+            if yolink.dData in yolink.data:
+                return(yolink.data[yolink.dData])
+            return({})
         except Exception as e:
             logging.debug('getDataAll exception: {}'.format(e) )
-            return(None)
+            return({})
 
     #@measure_time
     def getLastDataPacket(yolink):
-        return(yolink.dataAPI['lastMessage']) 
+        if 'lastMessage' in yolink.data:
+            return(yolink.data['lastMessage'])
+        return({}) 
 
     #@measure_time
     #def getState(yolink):
     #    try:                
-    #        return(yolink.dataAPI[yolink.dData][yolink.dState][yolink.dState] )
+    #        return(yolink.data.get(yolink.dData, {})[yolink.dState][yolink.dState] )
     #    except Exception as e:
     #        logging.debug('getState exception: {}'.format(e) )
     #        return(None)
@@ -631,7 +558,7 @@ class YoLinkMQTTDevice(object):
     #def getData(yolink):
     #    try:
     #        logging.debug(yolink.type +' - getData')
-    #        return(yolink.dataAPI[yolink.dData][yolink.dState])
+    #        return(yolink.data.get(yolink.dData, {})[yolink.dState])
     #    except Exception as e:
     #        logging.debug('getData exception: {}'.format(e) )
     #        return(None)
@@ -641,7 +568,7 @@ class YoLinkMQTTDevice(object):
         maxCount = 3
         attempt = 1
         logging.debug(yolink.type+' - getOnlineStatus')
-        if 'online' in yolink.dataAPI:
+        if 'online' in yolink.data:
             return(yolink.check_system_online())
         else:
             return(False)
@@ -699,11 +626,11 @@ class YoLinkMQTTDevice(object):
                     yolink.noconnect = 0
                     if  '.getState' in data['method'] :
                         #if int(data['time']) > int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data) 
+                        yolink.updatePacketData(data) 
                         
                     elif  '.setState' in data['method'] :
                         #if int(data['time']) > int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data)                          
+                        yolink.updatePacketData(data)                          
                     elif  '.setDelay'  in data['method']:
                         #if int(data['time']) > int(yolink.getLastUpdate()):
                         yolink.updateDelayData(data)       
@@ -721,33 +648,33 @@ class YoLinkMQTTDevice(object):
                     #    yolink.updateFWStatus(data)
                     elif  '.toggle' in data['method']:
                         #if int(data['time']) > int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data)          
+                        yolink.updatePacketData(data)          
                     elif  '.setWiFi' in data['method'] :
                         #if int(data['time']) > int(yolink.getLastUpdate()):
                         #yolink.updateStatusData(data)       
                         logging.debug('Do Nothing for now')
                     elif  '.playAudio' in data['method'] :
                         #if int(data['time']) > int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data)   
+                        yolink.updatePacketData(data)   
                         logging.debug('playAudio No data returned - just update time')
                             #yolink.updateStatusData(data)    
                             #yolink.updateMessageInfo(data)  
                     elif  '.setOption' in data['method'] :
                         #if int(data['time']) > int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data)   
+                        yolink.updatePacketData(data)   
                         logging.debug('setOption No data returned - just update time')
                         #yolink.updateStatusData(data)    
                         yolink.updateMessageInfo(data)  
                         #yolink.updateStatusData(data)   
                     elif  '.StatusChange' in data['method']:
                         #if int(data['time']) > int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data)     
+                        yolink.updatePacketData(data)     
                     elif  '.send' in data['method']:
                         #if int(data['time']) > int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data)     
+                        yolink.updatePacketData(data)     
                     elif  '.learn' in data['method']:
                         #if int(data['time']) > int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data)   
+                        yolink.updatePacketData(data)   
                     else:
                         logging.debug('Unsupported Method passed' + str(json.dumps(data))) 
                 #elif data['code'] == '000201': #Cannot connect to device - retry
@@ -764,16 +691,16 @@ class YoLinkMQTTDevice(object):
                 #yolink.online = True #
                 if '.StatusChange' in data['event']:
                     if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data)              
+                        yolink.updatePacketData(data)              
                 elif '.Report' in data['event']:
                     if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data)  
+                        yolink.updatePacketData(data)  
                 elif '.getState' in data['event']:
                     if int(data['time']) >= int(yolink.getLastUpdate()):
-                       yolink.updateStatusData(data)  
+                       yolink.updatePacketData(data)  
                 elif '.setState' in data['event']:
                     if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data)                      
+                        yolink.updatePacketData(data)                      
                 elif '.getSchedules' in data['event']:
                     if int(data['time']) >= int(yolink.getLastUpdate()):
                         yolink.updateScheduleStatus(data)   
@@ -782,25 +709,25 @@ class YoLinkMQTTDevice(object):
                         yolink.updateScheduleStatus(data)   
                 elif '.Alert' in data['event']:         
                     if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data)  
+                        yolink.updatePacketData(data)  
                 elif '.StatusChange' in data['event']:         
                     if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data)                          
+                        yolink.updatePacketData(data)                          
                 elif '.setDelay' in data['event']:         
                     if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data)     
+                        yolink.updatePacketData(data)     
                 elif '.openReminder' in data['event']:         
                     if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data)
+                        yolink.updatePacketData(data)
                 elif '.DataRecord' in  data['event']:
                     if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data)
+                        yolink.updatePacketData(data)
                 elif '.powerReport' in  data['event']:
                     if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data)
+                        yolink.updatePacketData(data)
                 elif '.DevEvent' in  data['event']:
                     if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data)
+                        yolink.updatePacketData(data)
                 elif '.HourlyUsageReport' in  data['event']:
                     if int(data['time']) >= int(yolink.getLastUpdate()):
                         yolink.updateHourlyData(data)
@@ -813,7 +740,7 @@ class YoLinkMQTTDevice(object):
                 else:
                     logging.debug('Unsupported Event passed - trying anyway; {}'.format(data) )
                     if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updateStatusData(data)
+                        yolink.updatePacketData(data)
                         '''
                         try:
                             if int(data['time']) >= int(yolink.getLastUpdate()) and data['data'] != {}:
@@ -822,9 +749,9 @@ class YoLinkMQTTDevice(object):
                                 elif data['event'].find('ersion') >= 0 :
                                     yolink.updateFWStatus(data)
                                 else:
-                                    yolink.updateStatusData(data)   
+                                    yolink.updatePacketData(data)   
                             else:
-                                yolink.dataAPI[yolink.dOnline] = False
+                                yolink.online = False
                                 logging.error('Device appears offline: '+ data['desc'])
                         except logging.exception as E:
                             logging.error('Unsupported event detected: ' + str(E))
@@ -837,7 +764,7 @@ class YoLinkMQTTDevice(object):
                 yolink.online = yolink.Status(data)
 
                 logging.debug('updateStatus: Unsupported packet type: ' +  json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')))
-            yolink.dataAPI[yolink.dOnline] = yolink.online 
+            # Online status tracked in yolink.online 
         except Exception as e:
             logging.debug('Exception: updateCallbackStatus: {}'.format(e))
             logging.debug('Exception data: {}'.format(data))
@@ -1013,13 +940,13 @@ class YoLinkMQTTDevice(object):
         
         yolink.refreshSchedules()
         time.sleep(2)
-        #while 'schedules' not in yolink.dataAPI[yolink.dData]:
+        #while 'schedules' not in yolink.data.get(yolink.dData, {}):
         #    time.sleep(1)
         #    logging.debug('Waiting for schedules to be retrieved')
             
-        #nbrSchedules  = len(yolink.dataAPI[yolink.dData])
-        #f 'supportSeconds' in yolink.dataAPI[yolink.dData][yolink.dSchedule]:
-        #   yolink.scheduleSec = yolink.dataAPI[yolink.dData][yolink.dSchedule]['supportSeconds']
+        #nbrSchedules  = len(yolink.data.get(yolink.dData, {}))
+        #f 'supportSeconds' in yolink.data.get(yolink.dData, {})[yolink.dSchedule]:
+        #   yolink.scheduleSec = yolink.data.get(yolink.dData, {})[yolink.dSchedule]['supportSeconds']
         #else:
         #    yolink.scheduleSec = False
         yolink.scheduleSec = yolink.get_data('supportSeconds')
@@ -1045,7 +972,7 @@ class YoLinkMQTTDevice(object):
     
     def activateSchedule(yolink, index, active):
         logging.debug(yolink.type + '- activateSchedule {} {} '.format(index, active))
-        #logging.debug('dataAPI {}'.format(yolink.dataAPI[yolink.dData]))
+        #logging.debug('dataAPI {}'.format(yolink.data.get(yolink.dData, {})))
         logging.debug('dataAPI-schedules {}'.format( yolink.schedules))
         indexS = str(index)
         if indexS in yolink.schedules:
@@ -1234,11 +1161,12 @@ class YoLinkMQTTDevice(object):
     def setOnline(yolink, data):
         logging.debug('SetOnline:')
         if yolink.dOnline in data[yolink.dData]:
-            yolink.dataAPI[yolink.dOnline] = data[yolink.dData][yolink.dOnline]
+            pass
+            # Online status set in updatePacketData
         elif data[yolink.dData] == {}:
-            yolink.dataAPI[yolink.dOnline] = False
+            yolink.online = False
         else:
-            yolink.dataAPI[yolink.dOnline] = True
+            yolink.online = True
         yolink.online = yolink.Status(data)
         logging.debug('online: {}'.format( yolink.online))
  
@@ -1246,19 +1174,19 @@ class YoLinkMQTTDevice(object):
     def updateLoraInfo(yolink, data):
         if yolink.dState in data[yolink.dData]:
             if 'loraInfo' in data[yolink.dData][yolink.dState]:
-                yolink.dataAPI[yolink.dData][yolink.dState]['loraInfo']= data[yolink.dData][yolink.dState]['loraInfo']
+                yolink.data.get(yolink.dData, {})[yolink.dState]['loraInfo']= data[yolink.dData][yolink.dState]['loraInfo']
 
     def updateMessageInfo(yolink, data):
         logging.debug(f'updateMessageInfo {data}')
         if yolink.lastUpd in data:
-            yolink.dataAPI[yolink.lastUpd] = data[yolink.lastUpd]
+            yolink.data[yolink.lastUpd] = data[yolink.lastUpd]
         elif yolink.messageTime in data:
-            yolink.dataAPI[yolink.lastUpd] = data[yolink.messageTime]
+            yolink.data[yolink.lastUpd] = data[yolink.messageTime]
         else:
-            yolink.dataAPI[yolink.lastUpd] = 0
-        logging.debug(f'updateMessageInfo 2 {yolink.dataAPI}')
+            yolink.data[yolink.lastUpd] = 0
+        logging.debug(f'updateMessageInfo 2 {yolink.data}')
         # should be last update time 
-        yolink.dataAPI[yolink.lastMessage] = data
+        yolink.data[yolink.lastMessage] = data
    
     #@measure_time
     def initData  (yolink, data):
@@ -1266,22 +1194,22 @@ class YoLinkMQTTDevice(object):
             logging.debug('{} - initData : {}'.format(yolink.type , data))
             #yolink.setOnline(data)
             if 'time' in data[yolink.dData] :
-                yolink.dataAPI['lastStateTime'] = data[yolink.messageTime]
+                yolink.data['lastStateTime'] = data[yolink.messageTime]
             if 'event' in data:
                 if ".initData" in data['event']:
                     logging.debug("initData detected")               
                     for key in data[yolink.dData]:
                         #logging.debug('Adding data values {} {}'.format(key, data[yolink.dData][key]))
-                        yolink.dataAPI[yolink.dData][yolink.dState][key] = data[yolink.dData][key]
+                        yolink.data.get(yolink.dData, {})[yolink.dState][key] = data[yolink.dData][key]
                         if key == 'initState':
-                            yolink.dataAPI[yolink.dData][yolink.dState]['state'] = data[yolink.dData][key]
+                            yolink.data.get(yolink.dData, {})[yolink.dState]['state'] = data[yolink.dData][key]
                 else:
                     #logging.debug('adding event data {}'.format(data[yolink.dData]))
-                    if yolink.dState not in  yolink.dataAPI[yolink.dData]:
-                        yolink.dataAPI[yolink.dData][yolink.dState] = {}
+                    if yolink.dState not in  yolink.data.get(yolink.dData, {}):
+                        yolink.data.get(yolink.dData, {})[yolink.dState] = {}
                     for key in data[yolink.dData]:
                         #logging.debug('adding event data {}  {}'.format(key, data[yolink.dData]))
-                        yolink.dataAPI[yolink.dData][yolink.dState][key] = data[yolink.dData][key] # sAdding all keys to state                    
+                        yolink.data.get(yolink.dData, {})[yolink.dState][key] = data[yolink.dData][key] # sAdding all keys to state                    
 
                 yolink.updateLoraInfo(data)
                 yolink.updateMessageInfo(data)
@@ -1294,8 +1222,8 @@ class YoLinkMQTTDevice(object):
         logging.debug('{} - updateHourlyData : {}'.format(yolink.type , json.dumps(data, indent=4)))
 
     def emptyData(yolink):
-        logging.debug('{} - emptyData : {}'.format(yolink.type , yolink.dataAPI['emptyData']))
-        return(yolink.dataAPI['emptyData'] )
+        logging.debug('{} - emptyData : {}'.format(yolink.type , yolink.data.get('emptyData', False)))
+        return(yolink.data.get('emptyData', False) )
 
 
     def extract_two_level(yolink, key1: str, key2: str) -> List[Any]:
@@ -1516,7 +1444,7 @@ class YoLinkMQTTDevice(object):
                     yolink.data['emptyData'] = True
                     return
             else:
-                yolink.dataAPI['emptyData'] = False
+                yolink.data['emptyData'] = False
                 yolink.data['emptyData'] = False
 
             if yolink.data['action'] in ['getSchedules' , 'setSchedules'] and 'data' in data:
@@ -1524,20 +1452,20 @@ class YoLinkMQTTDevice(object):
 
 
             '''
-            temp = yolink.dataAPI['lastMessage']
+            temp = yolink.data.get('lastMessage', {})
             yolink.reset_structure() #do not let old data persist
-            yolink.dataAPI['lastMessage'] = temp    
+            yolink.data['lastMessage'] = temp    
             if 'delays' in data['data']:
                     yolink.nbrOutlets = len(data['data']['delays'])
                     yolink.nbrUsb = data['data']['delays'][0]['ch']
                     yolink.nbrPorts = yolink.nbrOutlets + yolink.nbrUsb
             if 'reportAt' in data[yolink.dData] :
                 reportAt = datetime.strptime(data[yolink.dData]['reportAt'], '%Y-%m-%dT%H:%M:%S.%fZ')
-                yolink.dataAPI['lastStateTime'] = (reportAt.timestamp() -  yolink.timezoneOffsetSec)*1000
+                yolink.data['lastStateTime'] = (reportAt.timestamp() -  yolink.timezoneOffsetSec)*1000
             elif 'stateChangedAt' in data[yolink.dData]:
-                yolink.dataAPI['lastStateTime'] = data[yolink.dData]['stateChangedAt' ]
+                yolink.data['lastStateTime'] = data[yolink.dData]['stateChangedAt' ]
             else:
-                yolink.dataAPI['lastStateTime'] = data[yolink.messageTime]
+                yolink.data['lastStateTime'] = data[yolink.messageTime]
 
             if 'method' in data:
                 if data['method'] == 'getSchedules' or data['method'] == 'setSchedules':
@@ -1546,12 +1474,12 @@ class YoLinkMQTTDevice(object):
                     if yolink.dState in data[yolink.dData]:
                         #if 'reportAt' in data[yolink.dData] or 'stateChangedAt' in data[yolink.dData]:
                         #    reportAt = datetime.strptime(data[yolink.dData]['reportAt'], '%Y-%m-%dT%H:%M:%S.%fZ')
-                        #    yolink.dataAPI['lastStateTime'] = (reportAt.timestamp() -  yolink.timezoneOffsetSec)*1000
+                        #    yolink.data['lastStateTime'] = (reportAt.timestamp() -  yolink.timezoneOffsetSec)*1000
                         #else:
-                        #    yolink.dataAPI['lastStateTime'] = data[yolink.messageTime]
+                        #    yolink.data['lastStateTime'] = data[yolink.messageTime]
                         if type(data[yolink.dData][yolink.dState]) is dict:
                             logging.debug('State is Dict: {} '.format(json.dumps(data[yolink.dData][yolink.dState])))
-                            yolink.dataAPI[yolink.dData][yolink.dState] = data[yolink.dData][yolink.dState] # maintain data structure
+                            yolink.data.get(yolink.dData, {})[yolink.dState] = data[yolink.dData][yolink.dState] # maintain data structure
                             temp_dict = data[yolink.dData][yolink.dState]
                             if 'loraInfo' in temp_dict:
                                 lora_inf = temp_dict['loraInfo']
@@ -1564,15 +1492,15 @@ class YoLinkMQTTDevice(object):
                                     temp = []
                                     temp.append(temp_dict[yolink.dDelay])
                                     yolink.extDelayTimer.addDelays(temp)
-                                    # yolink.dataAPI[yolink.dData][yolink.dDelay].append(data[yolink.dData][yolink.dState][yolink.dDelay])
+                                    # yolink.data.get(yolink.dData, {})[yolink.dDelay].append(data[yolink.dData][yolink.dState][yolink.dDelay])
                                 else:
-                                    yolink.dataAPI[yolink.dData][yolink.dState][key] = temp_dict[key]  
+                                    yolink.data.get(yolink.dData, {})[yolink.dState][key] = temp_dict[key]  
                             for info in data[yolink.dData]: 
                                 if info != yolink.dState:
                                     #logging.debug(f'info loop {info}')
-                                    yolink.dataAPI[yolink.dData][info] = data[yolink.dData][info]
+                                    yolink.data.get(yolink.dData, {})[info] = data[yolink.dData][info]
 
-                            #logging.debug('After parsing {}'.format(json.dumps(yolink.dataAPI[yolink.dData], indent=4)))
+                            #logging.debug('After parsing {}'.format(json.dumps(yolink.data.get(yolink.dData, {}), indent=4)))
                         elif  type(data[yolink.dData][yolink.dState]) is list:
                             #logging.debug('State is List (multi): {} '.format(data[yolink.dData][yolink.dState]))
                             if yolink.dDelays in data[yolink.dData]:
@@ -1583,18 +1511,18 @@ class YoLinkMQTTDevice(object):
                                 yolink.nbrPorts = yolink.nbrOutlets + yolink.nbrUsb
                                 #temp = []
                                 #for delatIndx in range(0,len(data[yolink.dData][yolink.dDelays])):
-                                # yolink.dataAPI[yolink.dData][yolink.dDelays] = data[yolink.dData][yolink.dDelays]
+                                # yolink.data.get(yolink.dData, {})[yolink.dDelays] = data[yolink.dData][yolink.dDelays]
                                 #yolink.extDelayTimer.add(data[yolink.dData][yolink.dDelays])
-                                #yolink.nbrPorts = len( yolink.dataAPI[yolink.dData][yolink.dDelays])
-                                #yolink.fistOutlet = yolink.dataAPI[yolink.dData][yolink.dDelays][0]['ch']
+                                #yolink.nbrPorts = len( yolink.data.get(yolink.dData, {})[yolink.dDelays])
+                                #yolink.fistOutlet = yolink.data.get(yolink.dData, {})[yolink.dDelays][0]['ch']
                                 #need to update USB handling
-                            yolink.dataAPI[yolink.dData][yolink.dState] = data[yolink.dData][yolink.dState][0:yolink.nbrPorts+yolink.nbrUsb]
+                            yolink.data.get(yolink.dData, {})[yolink.dState] = data[yolink.dData][yolink.dState][0:yolink.nbrPorts+yolink.nbrUsb]
                             
                         else:
                             logging.debug('input data: {}'.format(data[yolink.dData]) )
-                            #if  yolink.dataAPI[yolink.dData][yolink.dState] is not dict:
-                                #logging.debug('State is not dict - {}'.format(yolink.dataAPI[yolink.dData]))
-                                #yolink.dataAPI[yolink.dData][yolink.dState]= {}
+                            #if  yolink.data.get(yolink.dData, {})[yolink.dState] is not dict:
+                                #logging.debug('State is not dict - {}'.format(yolink.data.get(yolink.dData, {})))
+                                #yolink.data.get(yolink.dData, {})[yolink.dState]= {}
                             for key in data[yolink.dData]:
                                 #logging.debug('adding data : {} - {} {} '.format(key, data[yolink.dData][key], yolink.dataAPI))
                                 if key == yolink.dDelay:
@@ -1612,18 +1540,18 @@ class YoLinkMQTTDevice(object):
                                     yolink.nbrPorts = yolink.nbrOutlets + yolink.nbrUsb
                                 else:
                                     #logging.debug('adding 1 {} {}:'.format(key,data[yolink.dData] ))
-                                    #logging.debug('adding 2 {} {}:'.format(key, yolink.dataAPI[yolink.dData][yolink.dState]))  
+                                    #logging.debug('adding 2 {} {}:'.format(key, yolink.data.get(yolink.dData, {})[yolink.dState]))  
                                     #logging.debug('adding 3 {} {}:'.format(key, data[yolink.dData][key]))
-                                    if yolink.dState not in yolink.dataAPI[yolink.dData]:
-                                        yolink.dataAPI[yolink.dData][yolink.dState] = {}
+                                    if yolink.dState not in yolink.data.get(yolink.dData, {}):
+                                        yolink.data.get(yolink.dData, {})[yolink.dState] = {}
                                         #logging.debug('dState added')
-                                    yolink.dataAPI[yolink.dData][yolink.dState][key] = data[yolink.dData][key]
+                                    yolink.data.get(yolink.dData, {})[yolink.dState][key] = data[yolink.dData][key]
 
 
                     else: # setDelay only returns data
                         if 'data' in data:  #new
-                            yolink.dataAPI[yolink.dData] = data['data'] #new
-                        yolink.dataAPI['lastStateTime'] = data[yolink.messageTime]
+                            yolink.data[yolink.dData] = data['data'] #new
+                        yolink.data['lastStateTime'] = data[yolink.messageTime]
                         if ".setDelay" in data['method']:
                             logging.debug("setDelay detected")
                             if data[yolink.dData] != {}: #multiOutlet currently returns {}
@@ -1667,13 +1595,13 @@ class YoLinkMQTTDevice(object):
                                             if 'humidity' in element:
                                                 tmp_hum = element['humidity']
                             if tmp_temp:
-                                yolink.dataAPI[yolink.dData][yolink.dState]['temperature'] =  tmp_temp        
+                                yolink.data.get(yolink.dData, {})[yolink.dState]['temperature'] =  tmp_temp        
                             if tmp_hum:
-                                yolink.dataAPI[yolink.dData][yolink.dState]['humidity'] =  tmp_hum                             
+                                yolink.data.get(yolink.dData, {})[yolink.dState]['humidity'] =  tmp_hum                             
                             if meas_time != -1:
-                                yolink.dataAPI[yolink.dData][yolink.dState]['time'] =  meas_time                                         
+                                yolink.data.get(yolink.dData, {})[yolink.dState]['time'] =  meas_time                                         
                         else:
-                            yolink.dataAPI[yolink.dData][yolink.dState][key] = data[yolink.dData][key] 
+                            yolink.data.get(yolink.dData, {})[yolink.dState][key] = data[yolink.dData][key] 
                 #elif '.DevEvent'in data['event']:
                 #    logging.debug('.DevEvent {}'.format(data))
 
@@ -1685,7 +1613,7 @@ class YoLinkMQTTDevice(object):
                                 temp.append(data[yolink.dData][key])
                                 yolink.extDelayTimer.addDelays(temp)   
                             else:
-                                yolink.dataAPI[yolink.dData][yolink.dState][key] = data[yolink.dData][yolink.dState][key]
+                                yolink.data.get(yolink.dData, {})[yolink.dState][key] = data[yolink.dData][yolink.dState][key]
                     elif  type(data[yolink.dData][yolink.dState]) is list:           
                         if yolink.dDelays in data[yolink.dData]:
                             if data[yolink.dData][yolink.dDelays] is not {}:
@@ -1694,31 +1622,31 @@ class YoLinkMQTTDevice(object):
                                 yolink.nbrOutlets = len(data[yolink.dData][yolink.dDelays])
                                 yolink.nbrUsb = data[yolink.dData][yolink.dDelays][0]['ch']
                                 yolink.nbrPorts = yolink.nbrOutlets + yolink.nbrUsb
-                        yolink.dataAPI[yolink.dData][yolink.dState] = data[yolink.dData][yolink.dState][0:yolink.nbrPorts+yolink.nbrUsb]
+                        yolink.data.get(yolink.dData, {})[yolink.dState] = data[yolink.dData][yolink.dState][0:yolink.nbrPorts+yolink.nbrUsb]
 
                     else: #must be single key - add all keys but contains key = 'state
                         #logging.debug('data - {}'.format(data))
-                        #logging.debug('dataAPI - {}'.format(yolink.dataAPI[yolink.dData]))
+                        #logging.debug('dataAPI - {}'.format(yolink.data.get(yolink.dData, {})))
                         for key in data[yolink.dData]:
                             #logging.debug('Adding data values {} {}'.format(key, data[yolink.dData][key]))
-                            yolink.dataAPI[yolink.dData][yolink.dState][key] = data[yolink.dData][key]
-                        #logging.debug('dataAPI AFTER - {}'.format(yolink.dataAPI[yolink.dData]))
+                            yolink.data.get(yolink.dData, {})[yolink.dState][key] = data[yolink.dData][key]
+                        #logging.debug('dataAPI AFTER - {}'.format(yolink.data.get(yolink.dData, {})))
                 else:
                     #logging.debug('adding event data {}'.format(data[yolink.dData]))
-                    if yolink.dState not in  yolink.dataAPI[yolink.dData]:
-                        yolink.dataAPI[yolink.dData][yolink.dState] = {}
+                    if yolink.dState not in  yolink.data.get(yolink.dData, {}):
+                        yolink.data.get(yolink.dData, {})[yolink.dState] = {}
                     for key in data[yolink.dData]:
                         #logging.debug('adding event data {}  {}'.format(key, data[yolink.dData]))
-                        yolink.dataAPI[yolink.dData][yolink.dState][key] = data[yolink.dData][key] # sAdding all keys to state
+                        yolink.data.get(yolink.dData, {})[yolink.dState][key] = data[yolink.dData][key] # sAdding all keys to state
                     
-                        #yolink.dataAPI[yolink.dData][yolink.dState][key] = data[yolink.dData][key]
+                        #yolink.data.get(yolink.dData, {})[yolink.dState][key] = data[yolink.dData][key]
                 yolink.updateLoraInfo(data)
                 yolink.updateMessageInfo(data)
                 logging.debug('Nbr Outlets {}'.format(yolink.nbrOutlets ))
                 logging.debug('updateStatusData - Event data : {}'.format(yolink.dataAPI))
-                #if  yolink.dataAPI[yolink.dData][yolink.dState] is not dict:
-                    #logging.debug('END State is not dict 1 - {}'.format(yolink.dataAPI[yolink.dData][yolink.dState]))
-                    #logging.debug('END State is not dict 2 - {}'.format(yolink.dataAPI[yolink.dData]))
+                #if  yolink.data.get(yolink.dData, {})[yolink.dState] is not dict:
+                    #logging.debug('END State is not dict 1 - {}'.format(yolink.data.get(yolink.dData, {})[yolink.dState]))
+                    #logging.debug('END State is not dict 2 - {}'.format(yolink.data.get(yolink.dData, {})))
             #yolink.dataAPI['nbrPorts'] = yolink.nbrPorts
             #yolink.online = yolink.Status(data)
             #logging.debug('After parsing {}'.format(json.dumps(yolink.data, indent=4)))
@@ -1730,21 +1658,21 @@ class YoLinkMQTTDevice(object):
     def get_event_from_state(yolink):
         logging.debug('get_event_from_state')
         try:
-            logging.debug('get_event_from_state: {}'.format(yolink.dataAPI[yolink.dData]))
-            if 'event' in yolink.dataAPI[yolink.dData][yolink.dState]:
-                return(yolink.dataAPI[yolink.dData][yolink.dState]['event'])
+            logging.debug('get_event_from_state: {}'.format(yolink.data.get(yolink.dData, {})))
+            if 'event' in yolink.data.get(yolink.dData, {})[yolink.dState]:
+                return(yolink.data.get(yolink.dData, {})[yolink.dState]['event'])
             else:
                 return(None)
         except Exception as E:
-            logging.error('Exception in get_event_in_state {} {}'.format(E,yolink.dataAPI[yolink.dData][yolink.dState] ))
+            logging.error('Exception in get_event_in_state {} {}'.format(E,yolink.data.get(yolink.dData, {})[yolink.dState] ))
             return(None)
         
     def clear_event_from_state(yolink):
         logging.debug('clear_event_from_state and last message')
         try:
-            yolink.dataAPI[yolink.dData][yolink.dState]['event'] =  None
-            if 'event' in yolink.dataAPI[yolink.lastMessage]:
-                yolink.dataAPI[yolink.lastMessage]['event'] = {}
+            yolink.data.get(yolink.dData, {})[yolink.dState]['event'] =  None
+            if 'event' in yolink.data.get(yolink.lastMessage, {}):
+                yolink.data.get(yolink.lastMessage, {})['event'] = {}
             return(True)
         except Exception as E:
             return(False)
@@ -1752,7 +1680,7 @@ class YoLinkMQTTDevice(object):
     def isControlEvent(yolink):
         logging.debug('isControlEvent')
         try:
-            data = yolink.dataAPI[yolink.lastMessage] 
+            data = yolink.data.get(yolink.lastMessage, {}) 
             logging.debug('isControlEvent - data {}'.format(data))
             if 'method' in data:
                 temp = data['method']
@@ -1793,9 +1721,9 @@ class YoLinkMQTTDevice(object):
         logging.debug(f'{yolink.type} getScheduleInfo {index}')      
         indexS = str(index)
         try: 
-            #logging.debug( 'getScheduleInfo 1 : {} '.format(yolink.dataAPI[yolink.dData]))
-            #logging.debug( 'getScheduleInfo 2 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule]))
-            #logging.debug( 'getScheduleInfo 3 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule][indexS]))
+            #logging.debug( 'getScheduleInfo 1 : {} '.format(yolink.data.get(yolink.dData, {})))
+            #logging.debug( 'getScheduleInfo 2 : {} '.format(yolink.data.get(yolink.dData, {})[yolink.dSchedule]))
+            #logging.debug( 'getScheduleInfo 3 : {} '.format(yolink.data.get(yolink.dData, {})[yolink.dSchedule][indexS]))
             yolink.scheduleSec= yolink.get_data('supportSeconds')
             if not isinstance(yolink.scheduleSec, bool):
                 yolink.scheduleSec = False
@@ -1814,11 +1742,11 @@ class YoLinkMQTTDevice(object):
         logging.debug(f'{yolink.type} getScheduleInfo {index} -- {yolink.schedule}')      
         indexS = str(index)
         try: 
-            #logging.debug( 'getScheduleInfo 1 : {} '.format(yolink.dataAPI[yolink.dData]))
-            #logging.debug( 'getScheduleInfo 2 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule]))
-            #logging.debug( 'getScheduleInfo 3 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule][indexS]))
+            #logging.debug( 'getScheduleInfo 1 : {} '.format(yolink.data.get(yolink.dData, {})))
+            #logging.debug( 'getScheduleInfo 2 : {} '.format(yolink.data.get(yolink.dData, {})[yolink.dSchedule]))
+            #logging.debug( 'getScheduleInfo 3 : {} '.format(yolink.data.get(yolink.dData, {})[yolink.dSchedule][indexS]))
             if  yolink.schedule_support_sec():
-                yolink.scheduleSec = yolink.dataAPI[yolink.dData][yolink.dSchedule]['supportSeconds']
+                yolink.scheduleSec = yolink.data.get(yolink.dData, {})[yolink.dSchedule]['supportSeconds']
             else:
                 yolink.scheduleSec = False
             if  indexS in yolink.schedule:
@@ -1837,15 +1765,15 @@ class YoLinkMQTTDevice(object):
         logging.debug(f'{yolink.type} getScheduleInfo {index} -- {yolink.schedule}')     
         indexS = str(index)
         try: 
-            #logging.debug( 'getScheduleInfo 1 : {} '.format(yolink.dataAPI[yolink.dData]))
-            #logging.debug( 'getScheduleInfo 2 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule]))
-            #logging.debug( 'getScheduleInfo 3 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule][indexS]))
+            #logging.debug( 'getScheduleInfo 1 : {} '.format(yolink.data.get(yolink.dData, {})))
+            #logging.debug( 'getScheduleInfo 2 : {} '.format(yolink.data.get(yolink.dData, {})[yolink.dSchedule]))
+            #logging.debug( 'getScheduleInfo 3 : {} '.format(yolink.data.get(yolink.dData, {})[yolink.dSchedule][indexS]))
             if 'supportSeconds' in yolink.schedule:
-                yolink.scheduleSec = yolink.dataAPI[yolink.dData][yolink.dSchedule]['supportSeconds']
+                yolink.scheduleSec = yolink.data.get(yolink.dData, {})[yolink.dSchedule]['supportSeconds']
             else:
                 yolink.scheduleSec = False
-            if  indexS in yolink.dataAPI[yolink.dData][yolink.dSchedule]:
-                sch = yolink.dataAPI[yolink.dData][yolink.dSchedule][indexS]
+            if  indexS in yolink.data.get(yolink.dData, {})[yolink.dSchedule]:
+                sch = yolink.data.get(yolink.dData, {})[yolink.dSchedule][indexS]
             else:
                 sch = None
             logging.debug(' return {}'.format(sch) )
@@ -1869,12 +1797,12 @@ class YoLinkMQTTDevice(object):
             #yolink.setOnline(data)
             #yolink.setNbrPorts(data)
             #yolink.updateLoraInfo(data)
-            #if yolink.dSchedule not in yolink.dataAPI[yolink.dData]:
-            #    yolink.dataAPI[yolink.dData][yolink.dSchedule] = {}
+            #if yolink.dSchedule not in yolink.data.get(yolink.dData, {}):
+            #    yolink.data.get(yolink.dData, {})[yolink.dSchedule] = {}
             #logging.debug('updateScheduleStatus 1: {}'.format(yolink.dataAPI) )
-            #yolink.dataAPI[yolink.dData][yolink.dSchedule] = data[yolink.dData]
+            #yolink.data.get(yolink.dData, {})[yolink.dSchedule] = data[yolink.dData]
             #logging.debug('updateScheduleStatus 2: {}'.format(yolink.dataAPI) )
-            #yolink.dataAPI[yolink.lastMessage] = data
+            #yolink.data[yolink.lastMessage] = data
             #logging.debug('updateScheduleStatus finish: {}'.format(yolink.dataAPI) )
         except Exception as e:
             logging.debug(' Error schedules not fully supported yet {}'.format(e))
@@ -1886,12 +1814,12 @@ class YoLinkMQTTDevice(object):
             #yolink.setOnline(data)
             #yolink.setNbrPorts(data)
             #yolink.updateLoraInfo(data)
-            if yolink.dSchedule not in yolink.dataAPI[yolink.dData]:
-                yolink.dataAPI[yolink.dData][yolink.dSchedule] = {}
+            if yolink.dSchedule not in yolink.data.get(yolink.dData, {}):
+                yolink.data.get(yolink.dData, {})[yolink.dSchedule] = {}
             #logging.debug('updateScheduleStatus 1: {}'.format(yolink.dataAPI) )
-            yolink.dataAPI[yolink.dData][yolink.dSchedule] = data[yolink.dData]
+            yolink.data.get(yolink.dData, {})[yolink.dSchedule] = data[yolink.dData]
             #logging.debug('updateScheduleStatus 2: {}'.format(yolink.dataAPI) )
-            #yolink.dataAPI[yolink.lastMessage] = data
+            #yolink.data[yolink.lastMessage] = data
             #logging.debug('updateScheduleStatus finish: {}'.format(yolink.dataAPI) )
         except Exception as e:
             logging.debug(' Error schedules not fully supported yet {}'.format(e)) 
@@ -1901,9 +1829,9 @@ class YoLinkMQTTDevice(object):
         active = None
         indexS = str(index)
         try: 
-            #logging.debug( 'getScheduleInfo 1 : {} '.format(yolink.dataAPI[yolink.dData]))
-            #logging.debug( 'getScheduleInfo 2 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule]))
-            #logging.debug( 'getScheduleInfo 3 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule][indexS]))
+            #logging.debug( 'getScheduleInfo 1 : {} '.format(yolink.data.get(yolink.dData, {})))
+            #logging.debug( 'getScheduleInfo 2 : {} '.format(yolink.data.get(yolink.dData, {})[yolink.dSchedule]))
+            #logging.debug( 'getScheduleInfo 3 : {} '.format(yolink.data.get(yolink.dData, {})[yolink.dSchedule][indexS]))
             active
             
             if  indexS in yolink.schedule:
@@ -1921,11 +1849,11 @@ class YoLinkMQTTDevice(object):
         active = None
         indexS = str(index)
         try: 
-            #logging.debug( 'getScheduleInfo 1 : {} '.format(yolink.dataAPI[yolink.dData]))
-            #logging.debug( 'getScheduleInfo 2 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule]))
-            #logging.debug( 'getScheduleInfo 3 : {} '.format(yolink.dataAPI[yolink.dData][yolink.dSchedule][indexS]))
-            if  indexS in yolink.dataAPI[yolink.dData][yolink.dSchedule]:
-                active = yolink.dataAPI[yolink.dData][yolink.dSchedule][indexS]['isValid']
+            #logging.debug( 'getScheduleInfo 1 : {} '.format(yolink.data.get(yolink.dData, {})))
+            #logging.debug( 'getScheduleInfo 2 : {} '.format(yolink.data.get(yolink.dData, {})[yolink.dSchedule]))
+            #logging.debug( 'getScheduleInfo 3 : {} '.format(yolink.data.get(yolink.dData, {})[yolink.dSchedule][indexS]))
+            if  indexS in yolink.data.get(yolink.dData, {})[yolink.dSchedule]:
+                active = yolink.data.get(yolink.dData, {})[yolink.dSchedule][indexS]['isValid']
             logging.debug( 'getScheduleInfo {}'.format(active))
             return(active)
         except Exception as e:
