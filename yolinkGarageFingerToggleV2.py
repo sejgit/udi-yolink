@@ -16,7 +16,7 @@ except ImportError:
 class YoLinkGarageFingerCtrl(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__(yoAccess, deviceInfo, callback)
-        #yolink.methodList = ['toggle' ]
+        yolink.methodList = ['toggle' ]
         #yolink.eventList = ['Report']
         #yolink.ToggleName = 'GarageEvent'
         #yolink.eventTime = 'Time'
