@@ -81,6 +81,7 @@ class udiYoSprinkler2(udi_interface.Node):
 
         self.devInfo =  deviceInfo
         self.yoSprinkler= None
+        self.schedule = None
         self.node_ready = False
         self.last_state = ''
         self.timer_cleared = True
@@ -131,6 +132,8 @@ class udiYoSprinkler2(udi_interface.Node):
         self.schedule = udiYoSchedule(self.poly, self.address, sch_address, 'Schedules', self.yoAccess, self.devInfo)
         self.adr_list.append(sch_address)
         time.sleep(2)
+        # Prime schedule node values immediately after startup.
+        self.yoSprinkler.refreshSchedules()
         
         self.node_ready = True
         self.updateData()
@@ -178,7 +181,8 @@ class udiYoSprinkler2(udi_interface.Node):
                 unix_time = self.yoSprinkler.get_report_time('time')
                 self.my_setDriver('TIME', unix_time, 151)
                 if message_type and 'Schedules' in str(message_type):
-                    self.schedule.update_schedule_data(source_device=self.yoSprinkler)
+                    if self.schedule is not None:
+                        self.schedule.update_schedule_data(source_device=self.yoSprinkler)
                     return
                 if self.yoSprinkler.check_system_online():
                     self.my_setDriver('GV30', 1)
@@ -348,6 +352,8 @@ class udiYoSprinkler2(udi_interface.Node):
     def update(self, command = None):
         logging.info('Update Status Executed')
         self.yoSprinkler.refreshDevice()
+        # Keep schedule child node in sync when user requests UPDATE.
+        self.yoSprinkler.refreshSchedules()
         
 
 

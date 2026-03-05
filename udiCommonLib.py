@@ -3,7 +3,7 @@
 Yolink Control Main Node  program 
 MIT License
 """
-version = '1.8.3'
+version = '1.8.4'
 import sys
 import re
 import time
@@ -156,7 +156,7 @@ def addNodes (self, deviceList) -> list:
     
     supportedYoTypes = ['SprinklerV2', 'Sprinkler', 'Thermostat', 'SoilThcSensor' ]     
     supportedYoTypes = ['Switch', 'LeakSensor', 'Thermostat', 'SprinklerV2', 'Outlet' ]   
-    supportedYoTypes = ['Switch', 'Outlet' ]       
+      
     remove_list= []
     for dev in deviceList:
         logging.debug(f'DEVICE BEING ANALYZED {dev}')

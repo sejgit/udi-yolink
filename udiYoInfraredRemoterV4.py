@@ -166,6 +166,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.address = address
         self.primary = primary
         self.yoIRrem = None
+        self.schedule = None
         self.node_ready = False
         self.powerSupported = True # assume 
         self.n_queue = []     
@@ -209,6 +210,8 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
         self.adr_list.append(sch_address)
         time.sleep(2)
+        # Prime schedule values as soon as the schedule child node is created.
+        self.yoIRrem.refreshSchedules()
 
         for code in range(0, len(code_dict_temp)):
             if code_dict_temp[code]:
@@ -264,6 +267,11 @@ class udiYoInfraredRemoter(udi_interface.Node):
             unix_time = self.yoIRrem.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 
+            if message_type and 'Schedules' in str(message_type):
+                if self.schedule is not None:
+                    self.schedule.update_schedule_data(source_device=self.yoIRrem)
+                return
+
         if  self.yoIRrem.check_system_online():
             res = self.yoIRrem.get_status_code()
             logging.debug(f'IR remote status code: {res}')
@@ -307,6 +315,8 @@ class udiYoInfraredRemoter(udi_interface.Node):
     def update(self, command = None):
         logging.info('Update Status Executed')
         self.yoIRrem.refreshDevice()
+        # Keep schedule child node in sync when UPDATE is requested.
+        self.yoIRrem.refreshSchedules()
     
     
     def find_next_code(self):  

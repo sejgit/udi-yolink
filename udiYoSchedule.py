@@ -10,6 +10,7 @@ This module provides schedule node classes for different device types:
 - KeyScheduleNode: For InfraredRemoter (infrared key codes)
 - MultiOutletScheduleNode: For MultiOutlet (per-channel on/off)
 - SprinklerScheduleNode: For SprinklerV2/Sprinkler watering schedules
+- WaterMeterScheduleNode: For WaterMeterController valve/leak schedules
 
 Each class handles device-specific schedule parameters while sharing
 common time-based schedule logic.
@@ -48,16 +49,29 @@ class BaseScheduleNode(udi_interface.Node):
             if source is None:
                 return False
 
+            schedule_actions = (
+                'getSchedules', 'setSchedules',
+                'getLeakSchedules', 'setLeakSchedules',
+                'getValveSchedules', 'setValveSchedules',
+            )
+
             if hasattr(source, 'get_message_type'):
                 msg_type, msg_action = source.get_message_type()
-                if msg_type in ['method', 'event'] and isinstance(msg_action, str) and msg_action in ['getSchedules', 'setSchedules']:
+                if (
+                    msg_type in ['method', 'event']
+                    and isinstance(msg_action, str)
+                    and msg_action in schedule_actions
+                ):
                     return True
 
             data = getattr(source, 'data', {})
             if isinstance(data, dict):
                 method = data.get('method', '')
-                if isinstance(method, str) and (method.endswith('.getSchedules') or method.endswith('.setSchedules')):
-                    return True
+                if isinstance(method, str):
+                    if any(method.endswith(f'.{action}') for action in schedule_actions):
+                        return True
+                    if any(method == action for action in schedule_actions):
+                        return True
         except Exception:
             return False
 
@@ -896,6 +910,12 @@ class SprinklerScheduleNode(OnOffScheduleNode):
                 # UI currently supports weekly mask only.
                 # Preserve device data on write, but display mask as 0.
                 days_value = 0
+        elif isinstance(days_obj, (int, str)):
+            # Some payloads provide weekly mask directly as an integer.
+            try:
+                days_value = int(days_obj)
+            except (TypeError, ValueError):
+                days_value = 0
 
         return {
             'index': sch_info.get('index', selected_schedule),
@@ -908,9 +928,15 @@ class SprinklerScheduleNode(OnOffScheduleNode):
     def prep_schedule(self, query):
         """Prepare SprinklerV2 schedule payload from the current UI query."""
         try:
+            def _as_int(value):
+                if isinstance(value, int):
+                    return value
+                if isinstance(value, str) and value.strip() != '':
+                    return int(value)
+                return None
+
             schedule_selected = query.get('index.uom25')
-            if isinstance(schedule_selected, str):
-                schedule_selected = int(schedule_selected)
+            schedule_selected = _as_int(schedule_selected)
 
             if not isinstance(schedule_selected, int):
                 return (None, None)
@@ -928,8 +954,8 @@ class SprinklerScheduleNode(OnOffScheduleNode):
             else:
                 params['valid'] = bool(existing.get('valid', True))
 
-            onH = query.get('onH.uom19')
-            onM = query.get('onM.uom44')
+            onH = _as_int(query.get('onH.uom19'))
+            onM = _as_int(query.get('onM.uom44'))
             if isinstance(onH, int) and isinstance(onM, int):
                 params['time'] = f'{onH}:{onM}'
             else:
@@ -948,14 +974,20 @@ class SprinklerScheduleNode(OnOffScheduleNode):
             params['waterDelay'] = water_delay
 
             binDays = query.get('bindays.uom25')
-            if isinstance(binDays, str):
-                try:
-                    binDays = int(binDays)
-                except ValueError:
-                    binDays = 0
+            parsed_days = _as_int(binDays)
+            if isinstance(parsed_days, int):
+                # UI edits use weekly mask, so mark repeat type accordingly.
+                params['days'] = {'type': 'weekly', 'value': parsed_days}
             else:
-                binDays = 0
-            params['days'] = {'type': 'weekly', 'value': binDays}
+                existing_days = existing.get('days')
+                if isinstance(existing_days, dict):
+                    # Preserve current repeat mode if UI did not provide weekly mask.
+                    params['days'] = {
+                        'type': existing_days.get('type', 'weekly'),
+                        'value': existing_days.get('value', 0),
+                    }
+                else:
+                    params['days'] = {'type': 'weekly', 'value': 0}
 
             return (schedule_selected, params)
         except Exception as e:
@@ -990,6 +1022,13 @@ class SprinklerScheduleNode(OnOffScheduleNode):
         raw['index'] = schedule_selected
         raw['valid'] = bool(activated)
 
+        if 'startDate' not in raw:
+            raw['startDate'] = '1-1'
+        if 'endDate' not in raw:
+            raw['endDate'] = '12-31'
+        if 'time' not in raw:
+            raw['time'] = '0:0'
+
         if 'days' not in raw or not isinstance(raw['days'], dict):
             raw['days'] = {'type': 'weekly', 'value': 0}
         if 'waterDelay' not in raw or not isinstance(raw['waterDelay'], dict):
@@ -1001,6 +1040,111 @@ class SprinklerScheduleNode(OnOffScheduleNode):
         'UPDATE': BaseScheduleNode.update,
         'LOOKUPSCH': BaseScheduleNode.lookup_schedule,
         'DEFINESCH': define_schedule,
+        'CTRLSCH': control_schedule,
+    }
+
+
+class WaterMeterScheduleNode(OnOffScheduleNode):
+    """
+    Schedule node for WaterMeterController schedules.
+
+    WaterMeterController has valve schedules and leak schedules. Leak schedules
+    include an additional `leakLimit` field in each schedule record. The current
+    schedule UI does not expose leakLimit directly, so this node preserves that
+    field when users edit activation/time/week settings.
+    """
+
+    id = 'yoWMSchedule'
+
+    drivers = [
+        {'driver': 'GV12', 'value': 99, 'uom': 56},    # Leak limit
+        {'driver': 'GV13', 'value': 0, 'uom': 25},     # Schedule index
+        {'driver': 'GV14', 'value': 99, 'uom': 25},    # Active (enabled)
+        {'driver': 'GV23', 'value': 0, 'uom': 70},     # Total schedules
+        {'driver': 'GV15', 'value': 99, 'uom': 25},    # On hour
+        {'driver': 'GV16', 'value': 99, 'uom': 25},    # On minute
+        {'driver': 'GV21', 'value': 99, 'uom': 25},    # On second
+        {'driver': 'GV17', 'value': 99, 'uom': 25},    # Off hour
+        {'driver': 'GV18', 'value': 99, 'uom': 25},    # Off minute
+        {'driver': 'GV22', 'value': 99, 'uom': 25},    # Off second
+        {'driver': 'GV19', 'value': 0, 'uom': 25},     # Weekday mask
+    ]
+
+    def _set_id_for_seconds_support(self):
+        if self.support_seconds:
+            return 'yoWMScheduleSec'
+        return 'yoWMSchedule'
+
+    def _get_schedule_type_name(self):
+        return 'WaterMeter'
+
+    def _update_schedule_display(self, sch_info, selected_schedule, source_device=None):
+        """Update display including leakLimit when present."""
+        super()._update_schedule_display(sch_info, selected_schedule, source_device=source_device)
+        if isinstance(sch_info, dict) and 'leakLimit' in sch_info:
+            try:
+                self.my_setDriver('GV12', float(sch_info.get('leakLimit', 99)))
+            except (TypeError, ValueError):
+                self.my_setDriver('GV12', 99)
+        else:
+            self.my_setDriver('GV12', 99)
+
+    def prep_schedule(self, query):
+        """Prepare WaterMeter schedule payload while preserving leakLimit data."""
+        try:
+            schedule_selected, params = super().prep_schedule(query)
+            if schedule_selected is None or not isinstance(params, dict):
+                return (schedule_selected, params)
+
+            existing = self.yoSchedule.getScheduleInfo(schedule_selected)
+
+            leak_limit = None
+            for key, value in query.items():
+                if isinstance(key, str) and key.startswith('L_LIMIT.uom'):
+                    try:
+                        leak_limit = float(value)
+                    except (TypeError, ValueError):
+                        leak_limit = None
+                    break
+
+            if leak_limit is not None:
+                params['leakLimit'] = leak_limit
+            if isinstance(existing, dict) and 'leakLimit' in existing and 'leakLimit' not in params:
+                params['leakLimit'] = existing.get('leakLimit')
+
+            return (schedule_selected, params)
+        except Exception as e:
+            logging.error(f'Exception in WaterMeter prep_schedule: {e}')
+            return (None, None)
+
+    def control_schedule(self, command):
+        """Toggle WaterMeter schedule valid flag while preserving leakLimit data."""
+        logging.info('WaterMeter control_schedule')
+        query = command.get("query")
+        activated, schedule_selected = self.activate_schedule(query)
+        if not isinstance(schedule_selected, int):
+            return
+
+        raw = self.yoSchedule.getScheduleInfo(schedule_selected)
+        if not isinstance(raw, dict):
+            raw = {'index': schedule_selected, 'week': 0}
+
+        raw['index'] = schedule_selected
+        raw['isValid'] = bool(activated)
+
+        if 'on' not in raw:
+            raw['on'] = '25:0'
+        if 'off' not in raw:
+            raw['off'] = '25:0'
+        if 'week' not in raw:
+            raw['week'] = 0
+
+        self.yoSchedule.setSchedule(schedule_selected, raw)
+
+    commands = {
+        'UPDATE': BaseScheduleNode.update,
+        'LOOKUPSCH': BaseScheduleNode.lookup_schedule,
+        'DEFINESCH': OnOffScheduleNode.define_schedule,
         'CTRLSCH': control_schedule,
     }
 
@@ -1021,7 +1165,8 @@ def udiYoSchedule(polyglot, primary, address, name, yoAccess, deviceInfo):
         deviceInfo: Device information dictionary
         
     Returns:
-        Appropriate schedule node instance (OnOff, Key, MultiOutlet, or Sprinkler)
+        Appropriate schedule node instance (OnOff, Key, MultiOutlet,
+        Sprinkler, or WaterMeter)
     """
     dev_type = deviceInfo.get('type', '')
     
@@ -1031,6 +1176,8 @@ def udiYoSchedule(polyglot, primary, address, name, yoAccess, deviceInfo):
         return MultiOutletScheduleNode(polyglot, primary, address, name, yoAccess, deviceInfo)
     elif dev_type in ['SprinklerV2', 'Sprinkler']:
         return SprinklerScheduleNode(polyglot, primary, address, name, yoAccess, deviceInfo)
+    elif dev_type in ['WaterMeterController']:
+        return WaterMeterScheduleNode(polyglot, primary, address, name, yoAccess, deviceInfo)
     else:  # Default to OnOff for Switch, Outlet, Dimmer, Manipulator, etc.
         return OnOffScheduleNode(polyglot, primary, address, name, yoAccess, deviceInfo)
 

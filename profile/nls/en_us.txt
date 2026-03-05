@@ -57,6 +57,10 @@ ND-yoSprinklerScheduleSec-NAME=Sprinkler Schedules
 ND-yoSprinklerScheduleSec-ICON=GenericCtl
 ND-yoSprinklerSchedule-NAME=Sprinkler Schedules
 ND-yoSprinklerSchedule-ICON=GenericCtl
+ND-yoWMScheduleSec-NAME=Water Meter Schedules
+ND-yoWMScheduleSec-ICON=GenericCtl
+ND-yoWMSchedule-NAME=Water Meter Schedules
+ND-yoWMSchedule-ICON=GenericCtl
 ST-nlsschedule-GV12-NAME=Selected code/port
 ST-nlsschedule-GV13-NAME=Schedule Index
 ST-nlsschedule-GV14-NAME=Activated
@@ -83,6 +87,22 @@ CMDP-offH-NAME=Off Hour
 CMDP-offM-NAME=Off Min
 CMDP-offS-NAME=Off Seconds
 CMDP-bindays-NAME=Active Days (Su|Mo|Tu|We|Th|Fr|Sa)
+
+ST-nlswmschedule-GV12-NAME=Leak Limit
+ST-nlswmschedule-GV13-NAME=Schedule Index
+ST-nlswmschedule-GV14-NAME=Activated
+ST-nlswmschedule-GV15-NAME=On Hour
+ST-nlswmschedule-GV16-NAME=On Minute
+ST-nlswmschedule-GV21-NAME=On Sec
+ST-nlswmschedule-GV17-NAME=Off Hour
+ST-nlswmschedule-GV18-NAME=Off Minute
+ST-nlswmschedule-GV22-NAME=Off Sec
+ST-nlswmschedule-GV19-NAME=Active Days
+ST-nlswmschedule-GV23-NAME=Total Schedules
+CMD-nlswmschedule-CTRLSCH-NAME=Set Schedule
+CMD-nlswmschedule-LOOKUPSCH-NAME=Lookup Schedule
+CMD-nlswmschedule-DEFINESCH-NAME=Define Schedule
+CMD-nlswmschedule-UPDATE-NAME=Update Status
 
 
 # YoLink Switch
