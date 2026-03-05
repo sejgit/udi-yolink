@@ -53,15 +53,15 @@ class YoLinkOutlet(YoLinkMQTTDevice):
         logging.debug(yolink.type + ' - setState + {}'.format(state))
         outlet = str(state)
         #yolink.online = yolink.getOnlineStatus()
-        if yolink.online:
-            if outlet.lower() in [ 'on', 'open']:
-                state = 'open'
-            if state.lower() in ['off', 'closed']:
-                state = 'closed'
-            data = {}
-            data['params'] = {}
-            data['params']['state'] = state.lower()
-            return(yolink.setDevice( data))
+
+        if outlet.lower() in [ 'on', 'open']:
+            state = 'open'
+        if state.lower() in ['off', 'closed']:
+            state = 'closed'
+        data = {}
+        data['params'] = {}
+        data['params']['state'] = state.lower()
+        return(yolink.setDevice( data))
     
 
     def getState(yolink):

@@ -43,15 +43,15 @@ class YoLinkManipulator(YoLinkMQTTDevice):
     def setState(yolink, state):
         logging.debug(yolink.type+' - setState')
         #yolink.online = yolink.getOnlineStatus()
-        if yolink.online:   
-            if state.lower() in ['on', 'open']:
-                state = 'open'
-            if state.lower() in ['off', 'closed']:
-                state = 'closed'
-            data = {}
-            data['params'] = {}
-            data['params']['state'] = state.lower()
-            return(yolink.setDevice(data))
+ 
+        if state.lower() in ['on', 'open']:
+            state = 'open'
+        if state.lower() in ['off', 'closed']:
+            state = 'closed'
+        data = {}
+        data['params'] = {}
+        data['params']['state'] = state.lower()
+        return(yolink.setDevice(data))
 
 
     def getState(yolink):

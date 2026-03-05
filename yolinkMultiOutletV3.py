@@ -138,9 +138,9 @@ class YoLinkMultiOutlet(YoLinkMQTTDevice):
             else:
                 logging.error('wrong port number (range 0 - '+str(yolink.nbrPorts)+'): ' + str(i))
                 return(False)
-        if value.lower() == 'on' or value.lower() == 'open':
+        if value.lower() in ['on', 'open']:
             state = 'open'
-        elif value.lower() == 'off' or value.lower() == 'closed' :
+        elif value.lower() in ['off', 'closed']:
             state = 'closed'
         else:
             logging.error('Unknows state passed')
