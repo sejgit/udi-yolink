@@ -114,9 +114,9 @@ class udiYoSprinkler2(udi_interface.Node):
         self.my_setDriver('GV20', 0)
         self.yoSprinkler= YoLinkSprinkler(self.yoAccess, self.devInfo, self.updateStatus)
         self.yoSprinkler.initNode()
-        while not self.yoSprinkler.check_system_online():
-            logging.info('waiting for watermeter to be online')
-            time.sleep(5)
+        #while not self.yoSprinkler.check_system_online():
+        #    logging.info('waiting for watermeter to be online')
+        #    time.sleep(5)
       
         self.meter_unit = self.yoSprinkler.get_data('meterUnit', 'attributes')
         self.step_factor = self.yoSprinkler.get_data('meterStepFactor', 'attributes')

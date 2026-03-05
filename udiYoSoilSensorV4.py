@@ -120,9 +120,9 @@ class udiYoSoilSensor(udi_interface.Node):
         time.sleep(1)
         self.yoSoilSensor.initNode()
         time.sleep(1)
-        while not self.yoSoilSensor.check_system_online():
-            logging.info('Waiting for TH sensor to come online...')
-            time.sleep(2)
+        #while not self.yoSoilSensor.check_system_online():
+        #    logging.info('Waiting for TH sensor to come online...')
+        #    time.sleep(2)
 
         self.temp_unit = self.yoAccess.get_temp_unit()
         self.node_ready = True
