@@ -282,7 +282,7 @@
   </editor>
   <editor id="stSec">
     <range uom="57" min="0" max="59" />
-    <range uom="25" subset="0,99" nls="nosupport" />
+    <range uom="25" subset="0,99" nls="notdefined" />
   </editor>
   <editor id="stHourI">
     <range uom="19" min="0" max="24" />
@@ -294,7 +294,7 @@
   </editor>
   <editor id="stSecI">
     <range uom="57" min="0" max="59" />
-    <range uom="25" subset="0" nls="nosupport" />
+    <range uom="25" subset="0" nls="notdefined" />
   </editor>
   <editor id="binDays">
     <range uom="25" subset="0-127" nls="bindays" />

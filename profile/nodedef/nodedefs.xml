@@ -153,6 +153,7 @@
          <st id="GV12" editor="outport" />      
          <st id="GV13" editor="schIndex" />      
          <st id="GV14" editor="schActive" />    
+         <st id="GV23" editor="schCount" />
          <st id="GV15" editor="stHour" />      
          <st id="GV16" editor="stMin" />    
          <st id="GV21" editor="stSec" />              
@@ -235,6 +236,7 @@
          <st id="GV12" editor="outport" />
          <st id="GV13" editor="schIndex" />      
          <st id="GV14" editor="schActive" />    
+         <st id="GV23" editor="schCount" />
          <st id="GV15" editor="stHour" />      
          <st id="GV16" editor="stMin" />              
          <st id="GV17" editor="stHour" />      

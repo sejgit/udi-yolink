@@ -25,6 +25,8 @@ class YoLinkDim(YoLinkMQTTDevice):
         #yolink.stateList = ['open', 'closed', 'on', 'off']
         #yolink.eventTime = 'Time'
         yolink.type = deviceInfo['type']
+        yolink.maxSchedules = 6
+        logging.debug(f'Dimmer - GV23 maxSchedules: {yolink.maxSchedules}')
 
         yolink.brightness = 50  #default
         yolink.ramp_up_time = 1 #sec

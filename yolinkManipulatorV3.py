@@ -15,6 +15,7 @@ class YoLinkManipulator(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__( yoAccess,  deviceInfo, callback)
         yolink.maxSchedules = 6
+        logging.debug(f'Manipulator - GV23 maxSchedules: {yolink.maxSchedules}')
         #yolink.methodList = ['getState', 'setState', 'setDelay', 'getSchedules', 'setSchedules', 'getUpdate'   ]
         #yolink.eventList = ['StatusChange', 'Report']
         #yolink.stateList = ['open', 'closed', 'on', 'off']

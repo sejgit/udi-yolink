@@ -517,7 +517,6 @@ class BaseScheduleNode(udi_interface.Node):
             'CTRLSCH': self.control_schedule,
         }
 
-
 class OnOffScheduleNode(BaseScheduleNode):
     """
     Schedule node for on/off devices (Switch, Outlet, Dimmer, Manipulator).

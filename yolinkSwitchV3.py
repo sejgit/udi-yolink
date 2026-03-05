@@ -23,6 +23,8 @@ class YoLinkSwitch(YoLinkMQTTDevice):
         #yolink.stateList = ['open', 'closed', 'on', 'off']
         #yolink.eventTime = 'Time'
         yolink.type = deviceInfo['type']
+        yolink.maxSchedules = 6
+        logging.debug(f'Switch - GV23 maxSchedules: {yolink.maxSchedules}')
         #time.sleep(2)
         #print('yolink.refreshState')
         #yolink.refreshState()

@@ -21,6 +21,8 @@ class YoLinkOutlet(YoLinkMQTTDevice):
         #yolink.ManipulatorName = 'OutletEvent'
         #yolink.eventTime = 'Time'
         yolink.type = deviceInfo['type']
+        yolink.maxSchedules = 6
+        logging.debug(f'Outlet - GV23 maxSchedules: {yolink.maxSchedules}')
         #time.sleep(2)
         
         #yolink.refreshState()
