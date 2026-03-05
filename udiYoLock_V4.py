@@ -232,39 +232,6 @@ class udiYoLockV2(udi_interface.Node):
             self.node.reportCmd('DOF')
 
 
-    def set_lock(self, command = None):
-        logging.info('udiYoLock set_lock')
-        self.yoLock.setState('LOCK')
-        self.my_setDriver('GV0',1 )
-        self.my_setDriver('ST',1 )
-
-        self.node.reportCmd('DON')
-
-    def set_unlock(self, command = None):
-        logging.info('udiYoLock set_outlet_off')
-        self.yoLock.setState('UNLOCK')
-        self.my_setDriver('GV0',0 )
-        self.my_setDriver('ST',0 )
-        self.node.reportCmd('DOF')
-
-
-
-    def lockControl(self, command):
-        ctrl = int(command.get('value'))   
-        logging.info('udiYoLock switchControl - {}'.format(ctrl))
-        ctrl = int(command.get('value'))     
-        if ctrl == 1:
-            self.yoLock.setState('LOCK')
-            self.my_setDriver('GV0',1 )
-            self.my_setDriver('ST',1 )    
-            self.node.reportCmd('DON')
-        elif ctrl == 0:
-            self.yoLock.setState('UNLOCK')
-            self.my_setDriver('GV0',0 ) 
-            self.my_setDriver('ST',0 )
-            self.node.reportCmd('DOF')
-      
-        
         
     def update(self, command = None):
         logging.info('Update Status Executed')
@@ -426,6 +393,39 @@ class udiYoLock(udi_interface.Node):
         self.yoLock.refreshDevice()
 
 
+    def set_lock(self, command = None):
+        logging.info('udiYoLock set_lock')
+        self.yoLock.setState('LOCK')
+        self.my_setDriver('GV0',1 )
+        self.my_setDriver('ST',1 )
+
+        self.node.reportCmd('DON')
+
+    def set_unlock(self, command = None):
+        logging.info('udiYoLock set_outlet_off')
+        self.yoLock.setState('UNLOCK')
+        self.my_setDriver('GV0',0 )
+        self.my_setDriver('ST',0 )
+        self.node.reportCmd('DOF')
+
+
+
+    def lockControl(self, command):
+        ctrl = int(command.get('value'))   
+        logging.info('udiYoLock switchControl - {}'.format(ctrl))
+        ctrl = int(command.get('value'))     
+        if ctrl == 1:
+            self.yoLock.setState('LOCK')
+            self.my_setDriver('GV0',1 )
+            self.my_setDriver('ST',1 )    
+            self.node.reportCmd('DON')
+        elif ctrl == 0:
+            self.yoLock.setState('UNLOCK')
+            self.my_setDriver('GV0',0 ) 
+            self.my_setDriver('ST',0 )
+            self.node.reportCmd('DOF')
+      
+        
         
         
     def update(self, command = None):
