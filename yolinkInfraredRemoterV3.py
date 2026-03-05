@@ -69,11 +69,12 @@ class YoLinkInfraredRem(YoLinkMQTTDevice):
             # NEEDS UPDATE 
             logging.debug('{} - updateStatus: {}'.format(yolink.type, data))
             yolink.updateCallbackStatus(data, False)
+            data_section = yolink.data.setdefault(yolink.dData, {})
             logging.debug(f'updateStatus 1 {data}')
-            #yolink.dataAPI[yolink.dData]['key'] = None
-            #yolink.dataAPI[yolink.dData]['success'] = None
-            #yolink.dataAPI[yolink.dData]['errorCode'] = None
-            #yolink.dataAPI[yolink.dData]['IRtype'] = None
+            #yolink.data[yolink.dData]['key'] = None
+            #yolink.data[yolink.dData]['success'] = None
+            #yolink.data[yolink.dData]['errorCode'] = None
+            #yolink.data[yolink.dData]['IRtype'] = None
             time.sleep(0.5)
             logging.debug(f'updateStatus 2 {data}')
             if 'method' in data:
@@ -83,53 +84,53 @@ class YoLinkInfraredRem(YoLinkMQTTDevice):
                     logging.debug(f'.learn detected {data}')
                     if 'data' in data:
                         if 'success' in data['data']:
-                            yolink.dataAPI[yolink.dData]['success'] = data['data']['success']
+                            data_section['success'] = data['data']['success']
                         if 'errorCode' in data:
-                            yolink.dataAPI[yolink.dData]['errorCode']= data['data']['errorCode']
+                            data_section['errorCode'] = data['data']['errorCode']
                         if 'key' in data:
-                            yolink.dataAPI[yolink.dData]['key'] = data['data']['key']    
-                        #yolink.dataAPI[yolink.dData]['IRtype'] = 'learn' 
+                            data_section['key'] = data['data']['key']    
+                        #yolink.data[yolink.dData]['IRtype'] = 'learn' 
                         
                         #yolink.learn_started = False  ## Not sure 
                 if 'getState' in data['method']:
                     if 'data' in data:
                         if 'battery' in data['data']:
-                            yolink.dataAPI[yolink.dData]['battery'] = data['data']['battery']
-                            logging.debug('battery: {}'.format(yolink.dataAPI[yolink.dData]['battery']))
+                            data_section['battery'] = data['data']['battery']
+                            logging.debug('battery: {}'.format(data_section['battery']))
                         if 'keys' in data['data']:
-                            yolink.dataAPI[yolink.dData]['keys'] = data['data']['keys']
+                            data_section['keys'] = data['data']['keys']
                             nbr_codes = 0
                             for indx in range(0,64):
-                                if yolink.dataAPI[yolink.dData]['keys'][indx]:
+                                if data_section['keys'][indx]:
                                     nbr_codes = nbr_codes + 1
                             yolink.nbr_codes = nbr_codes
-                            logging.debug('keys: {} - {}'.format( yolink.nbr_codes, yolink.dataAPI[yolink.dData]['keys']))
-                        #yolink.dataAPI[yolink.dData]['IRtype'] = None
+                            logging.debug('keys: {} - {}'.format( yolink.nbr_codes, data_section['keys']))
+                        #yolink.data[yolink.dData]['IRtype'] = None
                 if 'send' in data['method']:
                     if 'data' in data:
                         if 'success' in data['data']:
-                            yolink.dataAPI[yolink.dData]['success']  = data['data']['success']
+                            data_section['success']  = data['data']['success']
                         if 'errorCode' in data:
-                            yolink.dataAPI[yolink.dData]['errorCode']= data['data']['errorCode']
+                            data_section['errorCode'] = data['data']['errorCode']
                         if 'key' in data:
-                            yolink.dataAPI[yolink.dData]['key'] = data['data']['key']
-                        #yolink.dataAPI[yolink.dData]['IRtype'] = 'send'        
+                            data_section['key'] = data['data']['key']
+                        #yolink.data[yolink.dData]['IRtype'] = 'send'        
 
             if 'event' in data:
                 if '.learn' in data['event']:
                     if 'data' in data:
                         if 'success' in data['data']:
                             yolink.learn_started = data['data']['success']
-                            yolink.dataAPI[yolink.dData]['success'] = yolink.learn_started
+                            data_section['success'] = yolink.learn_started
                         if 'errorCode' in data:
-                            yolink.dataAPI[yolink.dData]['errorCode'] = data['data']['errorCode']
+                            data_section['errorCode'] = data['data']['errorCode']
                         if 'key' in data:
-                            yolink.dataAPI[yolink.dData]['key'] = data['data']['key']     
-                        yolink.dataAPI[yolink.dData]['IRtype'] = 'learn'          
-            logging.debug('{} - updateStatus after callback: {}'.format(yolink.type, yolink.dataAPI[yolink.dData]))                   
+                            data_section['key'] = data['data']['key']     
+                        data_section['IRtype'] = 'learn'          
+            logging.debug('{} - updateStatus after callback: {}'.format(yolink.type, data_section))                   
         except Exception as E:
             logging.error('{} - Exception - {} '.format(yolink.type, E))
-            logging.error (yolink.dataAPI[yolink.dData])
+            logging.error(yolink.data.get(yolink.dData, {}))
 
     def getBattery(yolink):
         try:
@@ -272,10 +273,10 @@ class YoLinkInfraredRem(YoLinkMQTTDevice):
     def get_learn_status(yolink):
         logging.debug( '{} - get_learn_status'.format(yolink.type))
         temp = {}
-        if yolink.dataAPI[yolink.dData]['key'] != None:
-            temp['key'] = yolink.dataAPI[yolink.dData]['key']
-            temp['success'] = yolink.dataAPI[yolink.dData]['success']
-            temp['errorCode'] = yolink.dataAPI[yolink.dData]['errorCode']
+        if yolink.data[yolink.dData]['key'] != None:
+            temp['key'] = yolink.data[yolink.dData]['key']
+            temp['success'] = yolink.data[yolink.dData]['success']
+            temp['errorCode'] = yolink.data[yolink.dData]['errorCode']
         return(temp)
     '''
     def get_send_status(yolink):

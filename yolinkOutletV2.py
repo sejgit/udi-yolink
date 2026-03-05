@@ -54,44 +54,35 @@ class YoLinkOutlet(YoLinkMQTTDevice):
         outlet = str(state)
         #yolink.online = yolink.getOnlineStatus()
         if yolink.online:
-            if 'setState'  in yolink.methodList:
-                if outlet.lower() not in yolink.stateList:
-                    logging.error('Unknows state passed')
-                    return(False, yolink.check_system_online())
-                if outlet.lower() == 'on':
-                    state = 'open'
-                if state.lower() == 'off':
-                    state = 'closed'
-                data = {}
-                data['params'] = {}
-                data['params']['state'] = state.lower()
-                return(yolink.setDevice( data))
-        else:
-            return(False)
+            if outlet.lower() == 'on':
+                state = 'open'
+            if state.lower() == 'off':
+                state = 'closed'
+            data = {}
+            data['params'] = {}
+            data['params']['state'] = state.lower()
+            return(yolink.setDevice( data))
     
 
     def getState(yolink):
-        logging.debug(yolink.type+' - getState :{}'.format(yolink.dataAPI))
+        
         dev_state = 'Unknown'
         #yolink.online = yolink.getOnlineStatus()
         try:
-            if yolink.online or  'lastMessage' in yolink.dataAPI:
-                logging.debug(yolink.type+' - getState online')
-                state_data = yolink.get_data('state')
-                logging.debug(yolink.type+' - getState data {}'.format(state_data))
+            state_data = yolink.get_data('state')
+            logging.debug(yolink.type+' - getState data {}'.format(state_data))
+            state_val = None
+            if isinstance(state_data, dict):
+                state_val = state_data.get('state')
+            elif isinstance(state_data, str):
+                state_val = state_data
 
-                state_val = None
-                if isinstance(state_data, dict):
-                    state_val = state_data.get('state')
-                elif isinstance(state_data, str):
-                    state_val = state_data
-
-                if state_val == 'open':
-                    dev_state = 'ON'
-                elif state_val == 'closed':
-                    dev_state = 'OFF'
-                else:
-                    dev_state = 'Unknown'
+            if state_val == 'open':
+                dev_state = 'ON'
+            elif state_val == 'closed':
+                dev_state = 'OFF'
+            else:
+                dev_state = 'Unknown'
             logging.debug(yolink.type+' - getState - return {} '.format(dev_state))
             return(dev_state)
         except Exception as e:
@@ -100,7 +91,7 @@ class YoLinkOutlet(YoLinkMQTTDevice):
         
         
     def getEnergy(yolink):
-        logging.debug(yolink.type+' - getEnergy : {}'.format(yolink.dataAPI))
+        logging.debug(yolink.type+' - getEnergy : ')
 
         #yolink.online = yolink.getOnlineStatus()
         if yolink.online:   

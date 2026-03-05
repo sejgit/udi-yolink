@@ -315,9 +315,9 @@ class udiYoManipulator(udi_interface.Node):
                 #'ONDELAY' : prepOnDelay,
                 #'OFFDELAY' : prepOffDelay,
                 'DELAYCTRL'    : program_delays, 
-                'LOOKUPSCH'    : lookup_schedule,
-                'DEFINESCH'    : define_schedule,
-                'CTRLSCH'      : control_schedule,                
+                #'LOOKUPSCH'    : lookup_schedule,
+                #'DEFINESCH'    : define_schedule,
+                #'CTRLSCH'      : control_schedule,                
                 }
 
 

@@ -84,9 +84,9 @@ class udiYoWaterMeterController(udi_interface.Node):
         model = str(deviceInfo['modelName'][:6])  
         if model in ['YS5007']:
             if self.temp_unit == 1 and self.water_unit == 0:
-                self.id = 'yowatermeterOnlyF'
+                self.id = 'yowatermeterCtrlF'
             else:
-                self.id = 'yowatermeterOnly'
+                self.id = 'yowatermeterCtrl'
             self.ValveSupported = False
             if self.commands.get('DON') is not None:
                 del self.commands['DON']

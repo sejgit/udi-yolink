@@ -87,9 +87,6 @@ class YoLinkDim(YoLinkMQTTDevice):
         logging.debug('Dimmer Brightness: {}'.format(yolink.brightness))
 
         #if 'setState'  in yolink.methodList:          
-        if state.lower() not in yolink.stateList:
-            logging.error('Unknows state passed')
-            return(False)
         if state.lower() == 'on':
             state = 'open'
         if state.lower() == 'off':

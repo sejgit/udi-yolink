@@ -98,7 +98,7 @@ class YoLinkSwitch(YoLinkMQTTDevice):
         else:
             return('Unkown')
     def getEnergy(yolink):
-        logging.debug(yolink.type+' - getEnergy : {}'.format(yolink.dataAPI))
+        logging.debug(yolink.type+' - getEnergy : {}'.format(yolink.data))
 
         #yolink.online = yolink.getOnlineStatus()
         if yolink.online:   

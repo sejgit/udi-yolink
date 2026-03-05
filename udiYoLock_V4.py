@@ -208,6 +208,35 @@ class udiYoLockV2(udi_interface.Node):
         self.yoLock.setState('LOCK')
         self.my_setDriver('GV0',1 )
         self.my_setDriver('ST',1 )
+        self.node.reportCmd('DON')
+
+    def set_unlock(self, command = None):
+        logging.info('udiYoLock set_unlock')
+        self.yoLock.setState('UNLOCK')
+        self.my_setDriver('GV0',0 )
+        self.my_setDriver('ST',0 )
+        self.node.reportCmd('DOF')
+
+    def lockControl(self, command):
+        ctrl = int(command.get('value'))
+        logging.info('udiYoLock lockControl - {}'.format(ctrl))
+        if ctrl == 1:
+            self.yoLock.setState('LOCK')
+            self.my_setDriver('GV0',1 )
+            self.my_setDriver('ST',1 )
+            self.node.reportCmd('DON')
+        elif ctrl == 0:
+            self.yoLock.setState('UNLOCK')
+            self.my_setDriver('GV0',0 )
+            self.my_setDriver('ST',0 )
+            self.node.reportCmd('DOF')
+
+
+    def set_lock(self, command = None):
+        logging.info('udiYoLock set_lock')
+        self.yoLock.setState('LOCK')
+        self.my_setDriver('GV0',1 )
+        self.my_setDriver('ST',1 )
 
         self.node.reportCmd('DON')
 
@@ -408,7 +437,9 @@ class udiYoLock(udi_interface.Node):
 
     commands = {
                 'UPDATE' : update,
-
+                'LOCK'   : set_lock,
+                'UNLOCK' : set_unlock,
+                'LOCKCTRL' : lockControl,
 
                 }
 

@@ -44,9 +44,6 @@ class YoLinkManipulator(YoLinkMQTTDevice):
         logging.debug(yolink.type+' - setState')
         #yolink.online = yolink.getOnlineStatus()
         if yolink.online:   
-            if state.lower() not in yolink.stateList:
-                logging.error('Unknows state passed')
-                return(False)
             if state.lower() == 'on':
                 state = 'open'
             if state.lower() == 'off':

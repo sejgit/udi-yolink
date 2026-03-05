@@ -525,7 +525,7 @@ class OnOffScheduleNode(BaseScheduleNode):
     Handles schedules with on/off state transitions at specified times.
     """
     
-    id = 'yoSchedule'
+    id = 'yoScheduleSec'
     
     drivers = [
         {'driver': 'GV13', 'value': 0, 'uom': 25},     # Schedule index

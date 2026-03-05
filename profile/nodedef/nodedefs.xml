@@ -430,12 +430,12 @@
                <p id="" editor="LEDctrl" init="GV9" /> 
             </cmd >
 
-            <!--
-            <cmd id="DELAYCTRL" > 
-               <p id="ondelay" editor="delaymin" init="GV1" /> 
-               <p id="offdelay" editor="delaymin" init="GV2" />                                     
-             </cmd >   
+            <cmd id="DELAYCTRL" >
+               <p id="ondelay" editor="delaymin" init="GV1" />
+               <p id="offdelay" editor="delaymin" init="GV2" />
+            </cmd >
 
+            <!--
             <cmd id="LOOKUPSCH" > 
                <p id="" editor="schIndexS" init="GV13" /> 
              </cmd >
@@ -529,6 +529,12 @@
          <st id="GV0" editor="swstate" />
          <st id="GV1" editor="delay" />
          <st id="GV2" editor="delay" />
+         <st id="GV3" editor="watt" />
+         <st id="GV4" editor="energy" />
+         <st id="GV5" editor="poweralert" />
+         <st id="GV6" editor="poweralert" />
+         <st id="GV7" editor="poweralert" />
+         <st id="GV8" editor="poweralert" />
          <st id="GV9" editor="LED" />
 
          <st id="ST"  editor="swstate" />
@@ -688,6 +694,12 @@
          <st id="GV0" editor="swstate" />
          <st id="GV1" editor="delay" />
          <st id="GV2" editor="delay" />
+         <st id="GV3" editor="watt" />
+         <st id="GV4" editor="energy" />
+         <st id="GV5" editor="poweralert" />
+         <st id="GV6" editor="poweralert" />
+         <st id="GV7" editor="poweralert" />
+         <st id="GV8" editor="poweralert" />
 
          <st id="ST"  editor="swstate" />
          <st id="GV30"  editor="status" />
@@ -1521,6 +1533,7 @@
          <st id="CLITEMP" editor="farenheit" />
          <st id="GV1" editor="alarm" />
          <st id="GV2" editor="alarm" />
+      <st id="GV3" editor="alarm" />
          <st id="CLIHUM" editor="humidity" />
          <st id="GV4" editor="alarm" />
          <st id="GV5" editor="alarm" />
@@ -1535,8 +1548,6 @@
          <st id="GV13" editor="humidity" />
          <st id="GV14" editor="farenheit" />
          <st id="GV15" editor="farenheit" />
-         <st id="GV16" editor="humidity" />
-         <st id="GV17" editor="humidity" />
 
          <st id="GV20" editor="suspendstate" />
          <st id="GV30" editor="status" />
@@ -1602,14 +1613,21 @@
          <st id="CLITEMP" editor="celsius" />
          <st id="GV1" editor="alarm" />
          <st id="GV2" editor="alarm" />
+         <st id="CLIHUM" editor="humidity" />
+         <st id="GV4" editor="alarm" />
+         <st id="GV5" editor="alarm" />
          <st id="BATLVL" editor="batlevel" />
          <st id="GV7" editor="alarm" />
          <st id="GV8" editor="alarm" />
          <st id="GV9" editor="cmdsetting" />
          <st id="GV10" editor="celsius" />
          <st id="GV11" editor="celsius" />
+         <st id="GV12" editor="humidity" />
+         <st id="GV13" editor="humidity" />
          <st id="GV14" editor="celsius" />
          <st id="GV15" editor="celsius" />
+         <st id="GV16" editor="humidity" />
+         <st id="GV17" editor="humidity" />
          <st id="GV20" editor="suspendstate" />
          <st id="GV30" editor="status" />
          <st id="TIME" editor="unixtime" />                              
@@ -1631,18 +1649,25 @@
 <nodeDef id="yotsensF" nls="nlstsens">
       <editors />
       <sts>
-         <st id="ST" editor="celsius" />
+         <st id="ST" editor="farenheit" />
          <st id="CLITEMP" editor="farenheit" />
          <st id="GV1" editor="alarm" />
          <st id="GV2" editor="alarm" />
+         <st id="CLIHUM" editor="humidity" />
+         <st id="GV4" editor="alarm" />
+         <st id="GV5" editor="alarm" />
          <st id="BATLVL" editor="batlevel" />
          <st id="GV7" editor="alarm" />
          <st id="GV8" editor="alarm" />
          <st id="GV9" editor="cmdsetting" />
          <st id="GV10" editor="farenheit" />
          <st id="GV11" editor="farenheit" />
+         <st id="GV12" editor="humidity" />
+         <st id="GV13" editor="humidity" />
          <st id="GV14" editor="farenheit" />
          <st id="GV15" editor="farenheit" />
+         <st id="GV16" editor="humidity" />
+         <st id="GV17" editor="humidity" />
          <st id="GV20" editor="suspendstate" />
          <st id="GV30" editor="status" />
          <st id="TIME" editor="unixtime" />                              
@@ -1813,6 +1838,9 @@
             <cmd id="SETCMD" > 
                <p id="" editor="cmdsetting" init="GV2" /> 
             </cmd >     
+            <cmd id="SETBEEP" >
+               <p id="" editor="beeping" init="GV4" />
+            </cmd >
             <cmd id="UPDATE" /> 
 
          </accepts>
@@ -1854,6 +1882,9 @@
             <cmd id="SETCMD" > 
                <p id="" editor="cmdsetting" init="GV2" /> 
             </cmd >  
+            <cmd id="SETBEEP" >
+               <p id="" editor="beeping" init="GV4" />
+            </cmd >
             <!--<cmd id="DON" /> 
             <cmd id="DOF" /> -->       
             <cmd id="UPDATE" /> 
