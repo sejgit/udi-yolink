@@ -27,7 +27,7 @@ from udiYoCOSmokeSensorV4 import udiYoCOSmokeSensor
 from udiYoDoorSensorV4 import udiYoDoorSensor
 from udiYoOutletV4 import udiYoOutlet
 #from udiYoOutletPwrV2 import udiYoOutletPwr
-from udiYoMultiOutletV2 import udiYoMultiOutlet
+from udiYoMultiOutletV4 import udiYoMultiOutlet
 from udiYoManipulatorV4 import udiYoManipulator
 from udiYoSpeakerHubV4 import udiYoSpeakerHub
 from udiYoLock_V4 import udiYoLock, udiYoLockV2
