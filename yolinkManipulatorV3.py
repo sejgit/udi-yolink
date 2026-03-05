@@ -57,7 +57,7 @@ class YoLinkManipulator(YoLinkMQTTDevice):
     def getState(yolink):
         logging.debug(yolink.type+' - getState')
         #yolink.online = yolink.getOnlineStatus()
-        if yolink.online:   
+        if yolink.check_system_online():   
             attempts = 0
             while yolink.no_data() and attempts < 3:
                 time.sleep(1)
@@ -78,7 +78,7 @@ class YoLinkManipulator(YoLinkMQTTDevice):
     
     def getData(yolink):
         #yolink.online = yolink.getOnlineStatus()
-        if yolink.online:   
+        if yolink.check_system_online():   
             return(yolink.getData())
 
 

@@ -28,7 +28,7 @@ class YoLinkCOSmokeSensor(YoLinkMQTTDevice):
     def refreshSensor(yolink):
         logging.debug('refreshWaterSensor')
         #time.sleep(2)
-        if yolink.online:   
+        if yolink.check_system_online():   
             return(yolink.refreshDevice())
 
     def updateStatus(yolink, data):

@@ -77,7 +77,7 @@ class YoLinkLock(YoLinkMQTTDevice):
         logging.debug(yolink.type + ' - setState')
         lock_st = str(state)
         #yolink.online = yolink.getOnlineStatus()
-        if yolink.online:
+        if yolink.check_system_online():
 
             if lock_st.lower() == 'lock':
                 state = 'lock'
@@ -100,7 +100,7 @@ class YoLinkLock(YoLinkMQTTDevice):
         logging.debug(yolink.type+' - getState')
         logging.debug(f'yolink.data {yolink.data}')
         #yolink.online = yolink.getOnlineStatus()
-        if yolink.online:       
+        if yolink.check_system_online():       
             if yolink.lock_type == 'LockV2':
                 lock_state = yolink.get_data('lock', 'state')
                 if lock_state == 'locked':

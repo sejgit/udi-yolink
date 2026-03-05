@@ -24,14 +24,6 @@ class YoLinkWaterDeptSensor(YoLinkMQTTDevice):
         #time.sleep(2)
         yolink.alarmSettings = {'standby':None, 'interval':None, 'high':None, 'low':None}
 
-    '''    
-    def initNode(yolink):
-        yolink.refreshSensor()
-        time.sleep(2)
-        #yolink.online = yolink.getOnlineStatus()
-        if not yolink.online:
-            logging.error('WaterDept not online')
-    '''
     
     def updateStatus(yolink, data):
         logging.debug('updataStatus WaterDept  : {}'.format(data))
@@ -83,7 +75,7 @@ class YoLinkWaterDeptSensor(YoLinkMQTTDevice):
         logging.debug(yolink.type+ ' - getAlarms')
         try:
             alarms = {}
-            if yolink.online:
+            if yolink.check_system_online():
                 alarm_data = yolink.get_data('alarm', 'state')
                 if isinstance(alarm_data, dict):
                     alarms['low'] = alarm_data.get('lowAlarm')
@@ -98,7 +90,7 @@ class YoLinkWaterDeptSensor(YoLinkMQTTDevice):
     def getAlarmSettings(yolink):
         logging.debug(yolink.type+ ' - getAlarmsLevels')
         try:
-            if yolink.online:
+            if yolink.check_system_online():
                 alarm_settings = yolink.get_data('alarmSettings', 'state')
                 if isinstance(alarm_settings, dict):
                     yolink.alarmSettings['low'] = alarm_settings.get('low')
@@ -116,7 +108,7 @@ class YoLinkWaterDeptSensor(YoLinkMQTTDevice):
         logging.debug(yolink.type+ ' - getWaterDepth')
         try:
             waterDepth = None
-            if yolink.online:
+            if yolink.check_system_online():
                 waterDepth = yolink.get_data('waterDepth', 'state')
                 if waterDepth is None:
                     waterDepth = yolink.get_data('waterDepth')

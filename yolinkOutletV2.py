@@ -94,7 +94,7 @@ class YoLinkOutlet(YoLinkMQTTDevice):
         logging.debug(yolink.type+' - getEnergy : ')
 
         #yolink.online = yolink.getOnlineStatus()
-        if yolink.online:   
+        if yolink.check_system_online():   
             try:
                 power = yolink.get_data('power')
                 watt = yolink.get_data('watt')

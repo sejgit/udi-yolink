@@ -513,7 +513,7 @@ class udiYoMultiOutlet(udi_interface.Node):
 
         #logging.debug('before start {} {}'.format(self.yoMultiOutlet.nbrOutlets, self.node_fully_config ))
         if self.yoMultiOutlet.nbrOutlets == 0 and not self.yoMultiOutlet.check_system_online():
-            logging.debug(' No config yet {} {}'.format(self.yoMultiOutlet.nbrOutlets, self.yoMultiOutlet.online))
+            logging.debug(' No config yet {} {}'.format(self.yoMultiOutlet.nbrOutlets, self.yoMultiOutlet.check_system_online()))
             self.my_setDriver('GV20', 2)
         else:
             self.yoMultiOutlet.delayTimerCallback (self.updateDelayCountdown, self.timer_update)

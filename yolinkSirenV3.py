@@ -46,7 +46,7 @@ class YoLinkSir(YoLinkMQTTDevice):
         state = str(state).lower()
         logging.debug(yolink.type+' - setState = {}'.format(state))
         #yolink.online = yolink.getOnlineStatus()
-        if yolink.online:
+        if yolink.check_system_online():
             if state == 'on' or state == 'alert' or state == True:
                 sirenState = True
             elif state == 'off' or state == 'normal' or state == False:
@@ -64,7 +64,7 @@ class YoLinkSir(YoLinkMQTTDevice):
     def getState(yolink):
         logging.debug(yolink.type+' - getState')
         #yolink.online = yolink.getOnlineStatus()
-        if yolink.online:
+        if yolink.check_system_online():
             attempts = 0
             while yolink.no_data() and attempts < 3:
                 time.sleep(1)
@@ -113,7 +113,7 @@ class YoLinkSir(YoLinkMQTTDevice):
 
     def getData(yolink):
         #yolink.online = yolink.getOnlineStatus()
-        if yolink.online:   
+        if yolink.check_system_online():   
             return(yolink.getData())
 
 

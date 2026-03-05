@@ -196,7 +196,7 @@ class YoLinkSpeakerHub(YoLinkSpeakerH):
         print('SpeakerHub update data {}'.format(data))
         if 'method' in  data:
             if data['code'] == '000000':                
-                yolink.online = yolink.checkOnlineStatus(data)
+                yolink.online = yolink.check_system_online()
                 if  '.setWiFi' in data['method'] :
                     if int(data['time']) > int(yolink.getLastUpdate()):
                         #yolink.updateStatusData(data)       
@@ -215,7 +215,7 @@ class YoLinkSpeakerHub(YoLinkSpeakerH):
                 yolink.updateCallbackStatus(data, True)
             else:
                 yolink.deviceError(data)
-                yolink.online = yolink.checkOnlineStatus(data)
+                yolink.online = yolink.check_system_online()
                 logging.error(yolink.type+ ': ' + data['desc'])
         else:
             yolink.updateCallbackStatus(data, True)
