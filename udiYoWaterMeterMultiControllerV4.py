@@ -92,9 +92,9 @@ class udiYoWaterMeterMulti(udi_interface.Node):
             return
         else:
             self.yoWaterCtrl.initNode()
-            while not self.yoWaterCtrl.check_system_online():
-                logging.info('waiting for watermeter to be online')
-                time.sleep(5)
+            #while not self.yoWaterCtrl.check_system_online():
+            #    logging.info('waiting for watermeter to be online')
+            #    time.sleep(5)
             self.meter_count = self.yoWaterCtrl.getMeterCount()
             self.meter_unit = self.yoWaterCtrl.getMeterUnit()
             logging.debug(f'Meter count: {self.meter_count}')

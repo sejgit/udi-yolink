@@ -141,9 +141,9 @@ class udiYoWaterMeterController(udi_interface.Node):
         self.my_setDriver('GV20', 0)
         self.yoWaterCtrl= YoLinkWaterMeter(self.yoAccess, self.devInfo, self.updateStatus)
         self.yoWaterCtrl.initNode()
-        while not self.yoWaterCtrl.check_system_online():
-            logging.info('waiting for watermeter to be online')
-            time.sleep(5)
+        #while not self.yoWaterCtrl.check_system_online():
+        #    logging.info('waiting for watermeter to be online')
+        #    time.sleep(5)
         self.yoWaterCtrl.getMeterCount()
         self.meter_unit = self.yoWaterCtrl.getMeterUnit()
         #self.my_setDriver('GV30', 1)
