@@ -50,13 +50,13 @@ class YoLinkOutlet(YoLinkMQTTDevice):
         self.updateCallbackStatus(data, False)
 
     def setState(yolink, state):
-        logging.debug(yolink.type + ' - setState')
+        logging.debug(yolink.type + ' - setState + {}'.format(state))
         outlet = str(state)
         #yolink.online = yolink.getOnlineStatus()
         if yolink.online:
-            if outlet.lower() == 'on':
+            if outlet.lower() in [ 'on', 'open']:
                 state = 'open'
-            if state.lower() == 'off':
+            if state.lower() in ['off', 'closed']:
                 state = 'closed'
             data = {}
             data['params'] = {}

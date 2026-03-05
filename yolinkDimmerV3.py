@@ -87,9 +87,9 @@ class YoLinkDim(YoLinkMQTTDevice):
         logging.debug('Dimmer Brightness: {}'.format(yolink.brightness))
 
         #if 'setState'  in yolink.methodList:          
-        if state.lower() == 'on':
+        if state.lower() in['on', 'open']:
             state = 'open'
-        if state.lower() == 'off':
+        if state.lower() in ['off', 'closed']:
             state = 'closed'
         data = {}
         data['params'] = {}

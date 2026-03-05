@@ -51,21 +51,17 @@ class YoLinkSwitch(YoLinkMQTTDevice):
     '''
 
     def setState(yolink, state):
-        logging.debug(yolink.type+' - setState')
-        if 'setState'  in yolink.methodList:          
-            if state.lower() not in yolink.stateList:
-                logging.error('Unknows state passed')
-                return(False)
-            if state.lower() == 'on':
-                state = 'open'
-            if state.lower() == 'off':
-                state = 'closed'
-            data = {}
-            data['params'] = {}
-            data['params']['state'] = state.lower()
-            return(yolink.setDevice( data))
-        else:
-            return(False)
+        logging.debug(yolink.type+' - setState + {}'.format(state))
+      
+        if state.lower() in ['on', 'open']:
+            state = 'open'
+        if state.lower() in ['off', 'closed']:
+            state = 'closed'
+        data = {}
+        data['params'] = {}
+        data['params']['state'] = state.lower()
+        return(yolink.setDevice( data))
+
     
     def getEventData(yolink):
         temp = yolink.get_event_from_state()
