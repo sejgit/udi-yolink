@@ -1401,3 +1401,157 @@ sphtts-2=Messa3
 sphtts-3=Messag4
 sphtts-4=Message 5
 sphtts-5=mes77
+
+
+# Thermostat Node Definitions
+ND-yothermostat-NAME=YoLink Thermostat (C)
+ND-yothermostat-ICON=Thermostat
+ND-yothermostatf-NAME=YoLink Thermostat (F)
+ND-yothermostatf-ICON=Thermostat
+
+# Thermostat Status Names
+ST-nlsthermostat-ST-NAME=Running State
+ST-nlsthermostat-CLITEMP-NAME=Temperature
+ST-nlsthermostat-CLIHUM-NAME=Humidity
+ST-nlsthermostat-CLISPH-NAME=Heat Setpoint
+ST-nlsthermostat-CLISPC-NAME=Cool Setpoint
+ST-nlsthermostat-CLIMD-NAME=Mode
+ST-nlsthermostat-CLIFS-NAME=Fan Setting
+ST-nlsthermostat-CLISMD-NAME=Schedule Mode
+ST-nlsthermostat-CLIHCS-NAME=Heat/Cool State
+ST-nlsthermostat-CLIFRS-NAME=Fan Running
+ST-nlsthermostat-GV0-NAME=Sensor 1 Temp
+ST-nlsthermostat-GV1-NAME=Sensor 2 Temp
+ST-nlsthermostat-GV2-NAME=Aux Heat Running
+ST-nlsthermostat-GV3-NAME=Stage 2 Running
+ST-nlsthermostat-GV4-NAME=ECO Mode
+ST-nlsthermostat-GV5-NAME=DR Running
+ST-nlsthermostat-GV6-NAME=Min Runtime
+ST-nlsthermostat-GV7-NAME=Cool Limit
+ST-nlsthermostat-GV8-NAME=Heat Limit
+ST-nlsthermostat-GV9-NAME=Mute
+ST-nlsthermostat-GV10-NAME=Menu Lock
+ST-nlsthermostat-GV11-NAME=Aux Standby
+ST-nlsthermostat-GV12-NAME=Aux Max Span
+ST-nlsthermostat-GV13-NAME=Aux Threshold
+ST-nlsthermostat-GV14-NAME=Stage2 Standby
+ST-nlsthermostat-GV15-NAME=Stage2 Max Span
+ST-nlsthermostat-GV16-NAME=Stage2 Threshold
+ST-nlsthermostat-GV17-NAME=Master Source
+ST-nlsthermostat-GV20-NAME=Suspended
+ST-nlsthermostat-GV30-NAME=Online
+ST-nlsthermostat-TIME-NAME=Last Update
+
+ST-nlsthermostatf-ST-NAME=Running State
+ST-nlsthermostatf-CLITEMP-NAME=Temperature
+ST-nlsthermostatf-CLIHUM-NAME=Humidity
+ST-nlsthermostatf-CLISPH-NAME=Heat Setpoint
+ST-nlsthermostatf-CLISPC-NAME=Cool Setpoint
+ST-nlsthermostatf-CLIMD-NAME=Mode
+ST-nlsthermostatf-CLIFS-NAME=Fan Setting
+ST-nlsthermostatf-CLISMD-NAME=Schedule Mode
+ST-nlsthermostatf-CLIHCS-NAME=Heat/Cool State
+ST-nlsthermostatf-CLIFRS-NAME=Fan Running
+ST-nlsthermostatf-GV0-NAME=Sensor 1 Temp
+ST-nlsthermostatf-GV1-NAME=Sensor 2 Temp
+ST-nlsthermostatf-GV2-NAME=Aux Heat Running
+ST-nlsthermostatf-GV3-NAME=Stage 2 Running
+ST-nlsthermostatf-GV4-NAME=ECO Mode
+ST-nlsthermostatf-GV5-NAME=DR Running
+ST-nlsthermostatf-GV6-NAME=Min Runtime
+ST-nlsthermostatf-GV7-NAME=Cool Limit
+ST-nlsthermostatf-GV8-NAME=Heat Limit
+ST-nlsthermostatf-GV9-NAME=Mute
+ST-nlsthermostatf-GV10-NAME=Menu Lock
+ST-nlsthermostatf-GV11-NAME=Aux Standby
+ST-nlsthermostatf-GV12-NAME=Aux Max Span
+ST-nlsthermostatf-GV13-NAME=Aux Threshold
+ST-nlsthermostatf-GV14-NAME=Stage2 Standby
+ST-nlsthermostatf-GV15-NAME=Stage2 Max Span
+ST-nlsthermostatf-GV16-NAME=Stage2 Threshold
+ST-nlsthermostatf-GV17-NAME=Master Source
+ST-nlsthermostatf-GV20-NAME=Suspended
+ST-nlsthermostatf-GV30-NAME=Online
+ST-nlsthermostatf-TIME-NAME=Last Update
+
+# Thermostat Command Names
+CMD-nlsthermostat-UPDATE-NAME=Update
+CMD-nlsthermostat-SETLOWTEMP-NAME=Set Heat Setpoint
+CMD-nlsthermostat-SETHIGHTEMP-NAME=Set Cool Setpoint
+CMD-nlsthermostat-SETMODE-NAME=Set Mode
+CMD-nlsthermostat-SETFAN-NAME=Set Fan
+CMD-nlsthermostat-SETSCHE-NAME=Set Schedule Mode
+CMD-nlsthermostat-SETECO-NAME=Set ECO Mode
+CMD-nlsthermostat-SETMINRUNTIME-NAME=Set Min Runtime
+CMD-nlsthermostat-SETCOOLLIMIT-NAME=Set Cool Limit
+CMD-nlsthermostat-SETHEATLIMIT-NAME=Set Heat Limit
+CMD-nlsthermostat-SETMUTE-NAME=Set Mute
+CMD-nlsthermostat-SETMENULOCK-NAME=Set Menu Lock
+CMD-nlsthermostat-SETMASTER-NAME=Set Master Source
+
+CMD-nlsthermostatf-UPDATE-NAME=Update
+CMD-nlsthermostatf-SETLOWTEMP-NAME=Set Heat Setpoint
+CMD-nlsthermostatf-SETHIGHTEMP-NAME=Set Cool Setpoint
+CMD-nlsthermostatf-SETMODE-NAME=Set Mode
+CMD-nlsthermostatf-SETFAN-NAME=Set Fan
+CMD-nlsthermostatf-SETSCHE-NAME=Set Schedule Mode
+CMD-nlsthermostatf-SETECO-NAME=Set ECO Mode
+CMD-nlsthermostatf-SETMINRUNTIME-NAME=Set Min Runtime
+CMD-nlsthermostatf-SETCOOLLIMIT-NAME=Set Cool Limit
+CMD-nlsthermostatf-SETHEATLIMIT-NAME=Set Heat Limit
+CMD-nlsthermostatf-SETMUTE-NAME=Set Mute
+CMD-nlsthermostatf-SETMENULOCK-NAME=Set Menu Lock
+CMD-nlsthermostatf-SETMASTER-NAME=Set Master Source
+
+# Thermostat Value NLS
+tstat_mode-0=Off
+tstat_mode-1=Heat
+tstat_mode-2=Cool
+tstat_mode-3=Auto
+tstat_mode-99=Unknown
+
+tstat_fan-0=Auto
+tstat_fan-1=On
+tstat_fan-99=Unknown
+
+tstat_sche-0=Run
+tstat_sche-1=Hold
+tstat_sche-99=Unknown
+
+tstat_hcs-0=Idle
+tstat_hcs-1=Heating
+tstat_hcs-2=Cooling
+tstat_hcs-99=Unknown
+
+tstat_fan_running-0=Off
+tstat_fan_running-1=On
+tstat_fan_running-99=Unknown
+
+aux_heat-0=No
+aux_heat-1=Yes
+aux_heat-99=Unknown
+
+stage2-0=No
+stage2-1=Yes
+stage2-99=Unknown
+
+eco_mode-0=Off
+eco_mode-1=On
+eco_mode-99=Unknown
+
+dr_running-0=No
+dr_running-1=Yes
+dr_running-99=Unknown
+
+mute_setting-0=Off
+mute_setting-1=On
+mute_setting-99=Unknown
+
+menu_lock-0=Unlocked
+menu_lock-1=Locked
+menu_lock-99=Unknown
+
+master_src-0=Local
+master_src-1=Sensor 1
+master_src-2=Sensor 2
+master_src-99=Unknown

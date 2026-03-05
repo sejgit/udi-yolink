@@ -440,5 +440,79 @@
   </editor> 
   <editor id="LEDctrl">
     <range uom="25" subset="0,1" nls="LED" />
-  </editor> 
+  </editor>
+
+  <!-- Thermostat Editors -->
+  <editor id="I_TEMP_DEG">
+    <range uom="4" min="-40" max="60" prec="1" />
+    <range uom="25" subset="98,99" nls="error" />
+  </editor>
+  <editor id="I_TEMP_F">
+    <range uom="17" min="-40" max="140" prec="1" />
+    <range uom="25" subset="98,99" nls="error" />
+  </editor>
+  <editor id="I_CLISPH_DEG">
+    <range uom="4" min="5" max="35" prec="1" />
+  </editor>
+  <editor id="I_CLISPH_F">
+    <range uom="17" min="40" max="95" prec="1" />
+  </editor>
+  <editor id="I_CLISPC_DEG">
+    <range uom="4" min="5" max="35" prec="1" />
+  </editor>
+  <editor id="I_CLISPC_F">
+    <range uom="17" min="40" max="95" prec="1" />
+  </editor>
+  <editor id="I_TSTAT_MODE">
+    <range uom="67" subset="0,1,2,3,99" nls="tstat_mode" />
+  </editor>
+  <editor id="I_TSTAT_FAN">
+    <range uom="68" subset="0,1,99" nls="tstat_fan" />
+  </editor>
+  <editor id="I_CLISMD_DEG">
+    <range uom="25" subset="0,1,99" nls="tstat_sche" />
+  </editor>
+  <editor id="I_TSTAT_HCS">
+    <range uom="66" subset="0,1,2,99" nls="tstat_hcs" />
+  </editor>
+  <editor id="I_CLIFRS">
+    <range uom="80" subset="0,1,99" nls="tstat_fan_running" />
+  </editor>
+  <editor id="I_HUMIDITY">
+    <range uom="51" min="0" max="100" prec="1" />
+    <range uom="25" subset="98,99" nls="error" />
+  </editor>
+  <editor id="I_AUX_HEAT">
+    <range uom="25" subset="0,1,99" nls="aux_heat" />
+  </editor>
+  <editor id="I_STAGE2">
+    <range uom="25" subset="0,1,99" nls="stage2" />
+  </editor>
+  <editor id="I_ECO_MODE">
+    <range uom="25" subset="0,1,99" nls="eco_mode" />
+  </editor>
+  <editor id="I_DR_RUNNING">
+    <range uom="25" subset="0,1,99" nls="dr_running" />
+  </editor>
+  <editor id="I_MINRUNTIME">
+    <range uom="44" min="0" max="120" prec="0" />
+  </editor>
+  <editor id="I_MUTE">
+    <range uom="25" subset="0,1,99" nls="mute_setting" />
+  </editor>
+  <editor id="I_MENULOCK">
+    <range uom="25" subset="0,1,99" nls="menu_lock" />
+  </editor>
+  <editor id="I_HOURS">
+    <range uom="20" min="0" max="24" prec="0" />
+  </editor>
+  <editor id="I_MASTER_SRC">
+    <range uom="25" subset="0,1,2,99" nls="master_src" />
+  </editor>
+  <editor id="I_SUSPENDED_ST">
+    <range uom="25" subset="0,1,2,99" nls="suspended" />
+  </editor>
+  <editor id="I_ONLINE_ST">
+    <range uom="25" subset="0,1,99" nls="online" />
+  </editor>
 </editors>

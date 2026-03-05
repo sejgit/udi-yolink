@@ -2469,5 +2469,165 @@
             </cmd > 
          </accepts>
       </cmds>
-   </nodeDef> 
+   </nodeDef>
+
+   <nodeDef id="yothermostat" nls="nlsthermostat">
+      <editors />
+      <sts>
+         <st id="ST" editor="I_TSTAT_HCS" />
+         <st id="CLITEMP" editor="I_TEMP_DEG" />
+         <st id="CLIHUM" editor="I_HUMIDITY" />
+         <st id="CLISPH" editor="I_CLISPH_DEG" />
+         <st id="CLISPC" editor="I_CLISPC_DEG" />
+         <st id="CLIMD" editor="I_TSTAT_MODE" />
+         <st id="CLIFS" editor="I_TSTAT_FAN" />
+         <st id="CLISMD" editor="I_CLISMD_DEG" />
+         <st id="CLIHCS" editor="I_TSTAT_HCS" />
+         <st id="CLIFRS" editor="I_CLIFRS" />
+         <st id="GV0" editor="I_TEMP_DEG" />
+         <st id="GV1" editor="I_TEMP_DEG" />
+         <st id="GV2" editor="I_AUX_HEAT" />
+         <st id="GV3" editor="I_STAGE2" />
+         <st id="GV4" editor="I_ECO_MODE" />
+         <st id="GV5" editor="I_DR_RUNNING" />
+         <st id="GV6" editor="I_MINRUNTIME" />
+         <st id="GV7" editor="I_TEMP_DEG" />
+         <st id="GV8" editor="I_TEMP_DEG" />
+         <st id="GV9" editor="I_MUTE" />
+         <st id="GV10" editor="I_MENULOCK" />
+         <st id="GV11" editor="I_MINRUNTIME" />
+         <st id="GV12" editor="I_HOURS" />
+         <st id="GV13" editor="I_TEMP_DEG" />
+         <st id="GV14" editor="I_MINRUNTIME" />
+         <st id="GV15" editor="I_HOURS" />
+         <st id="GV16" editor="I_TEMP_DEG" />
+         <st id="GV17" editor="I_MASTER_SRC" />
+         <st id="GV20" editor="I_SUSPENDED_ST" />
+         <st id="GV30" editor="I_ONLINE_ST" />
+         <st id="TIME" editor="unixtime" />
+      </sts>
+      <cmds>
+         <sends>
+         </sends>
+         <accepts>
+            <cmd id="UPDATE" />
+            <cmd id="SETLOWTEMP">
+               <p id="value" editor="I_CLISPH_DEG" />
+            </cmd>
+            <cmd id="SETHIGHTEMP">
+               <p id="value" editor="I_CLISPC_DEG" />
+            </cmd>
+            <cmd id="SETMODE">
+               <p id="value" editor="I_TSTAT_MODE" />
+            </cmd>
+            <cmd id="SETFAN">
+               <p id="value" editor="I_TSTAT_FAN" />
+            </cmd>
+            <cmd id="SETSCHE">
+               <p id="value" editor="I_CLISMD_DEG" />
+            </cmd>
+            <cmd id="SETECO">
+               <p id="value" editor="I_ECO_MODE" />
+            </cmd>
+            <cmd id="SETMINRUNTIME">
+               <p id="value" editor="I_MINRUNTIME" />
+            </cmd>
+            <cmd id="SETCOOLLIMIT">
+               <p id="value" editor="I_TEMP_DEG" />
+            </cmd>
+            <cmd id="SETHEATLIMIT">
+               <p id="value" editor="I_TEMP_DEG" />
+            </cmd>
+            <cmd id="SETMUTE">
+               <p id="value" editor="I_MUTE" />
+            </cmd>
+            <cmd id="SETMENULOCK">
+               <p id="value" editor="I_MENULOCK" />
+            </cmd>
+            <cmd id="SETMASTER">
+               <p id="value" editor="I_MASTER_SRC" />
+            </cmd>
+         </accepts>
+      </cmds>
+   </nodeDef>
+
+   <nodeDef id="yothermostatf" nls="nlsthermostatf">
+      <editors />
+      <sts>
+         <st id="ST" editor="I_TSTAT_HCS" />
+         <st id="CLITEMP" editor="I_TEMP_F" />
+         <st id="CLIHUM" editor="I_HUMIDITY" />
+         <st id="CLISPH" editor="I_CLISPH_F" />
+         <st id="CLISPC" editor="I_CLISPC_F" />
+         <st id="CLIMD" editor="I_TSTAT_MODE" />
+         <st id="CLIFS" editor="I_TSTAT_FAN" />
+         <st id="CLISMD" editor="I_CLISMD_DEG" />
+         <st id="CLIHCS" editor="I_TSTAT_HCS" />
+         <st id="CLIFRS" editor="I_CLIFRS" />
+         <st id="GV0" editor="I_TEMP_F" />
+         <st id="GV1" editor="I_TEMP_F" />
+         <st id="GV2" editor="I_AUX_HEAT" />
+         <st id="GV3" editor="I_STAGE2" />
+         <st id="GV4" editor="I_ECO_MODE" />
+         <st id="GV5" editor="I_DR_RUNNING" />
+         <st id="GV6" editor="I_MINRUNTIME" />
+         <st id="GV7" editor="I_TEMP_F" />
+         <st id="GV8" editor="I_TEMP_F" />
+         <st id="GV9" editor="I_MUTE" />
+         <st id="GV10" editor="I_MENULOCK" />
+         <st id="GV11" editor="I_MINRUNTIME" />
+         <st id="GV12" editor="I_HOURS" />
+         <st id="GV13" editor="I_TEMP_F" />
+         <st id="GV14" editor="I_MINRUNTIME" />
+         <st id="GV15" editor="I_HOURS" />
+         <st id="GV16" editor="I_TEMP_F" />
+         <st id="GV17" editor="I_MASTER_SRC" />
+         <st id="GV20" editor="I_SUSPENDED_ST" />
+         <st id="GV30" editor="I_ONLINE_ST" />
+         <st id="TIME" editor="unixtime" />
+      </sts>
+      <cmds>
+         <sends>
+         </sends>
+         <accepts>
+            <cmd id="UPDATE" />
+            <cmd id="SETLOWTEMP">
+               <p id="value" editor="I_CLISPH_F" />
+            </cmd>
+            <cmd id="SETHIGHTEMP">
+               <p id="value" editor="I_CLISPC_F" />
+            </cmd>
+            <cmd id="SETMODE">
+               <p id="value" editor="I_TSTAT_MODE" />
+            </cmd>
+            <cmd id="SETFAN">
+               <p id="value" editor="I_TSTAT_FAN" />
+            </cmd>
+            <cmd id="SETSCHE">
+               <p id="value" editor="I_CLISMD_DEG" />
+            </cmd>
+            <cmd id="SETECO">
+               <p id="value" editor="I_ECO_MODE" />
+            </cmd>
+            <cmd id="SETMINRUNTIME">
+               <p id="value" editor="I_MINRUNTIME" />
+            </cmd>
+            <cmd id="SETCOOLLIMIT">
+               <p id="value" editor="I_TEMP_F" />
+            </cmd>
+            <cmd id="SETHEATLIMIT">
+               <p id="value" editor="I_TEMP_F" />
+            </cmd>
+            <cmd id="SETMUTE">
+               <p id="value" editor="I_MUTE" />
+            </cmd>
+            <cmd id="SETMENULOCK">
+               <p id="value" editor="I_MENULOCK" />
+            </cmd>
+            <cmd id="SETMASTER">
+               <p id="value" editor="I_MASTER_SRC" />
+            </cmd>
+         </accepts>
+      </cmds>
+   </nodeDef>
 </nodeDefs> 

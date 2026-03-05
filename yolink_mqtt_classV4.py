@@ -269,9 +269,9 @@ class YoLinkMQTTDevice(object):
     #@measure_time
     def check_system_online(yolink):
         #return(yolink.yoAccess.online)
-        if yolink.yoAccess.online:
-            yolink.online = yolink.data.get(yolink.dOnline, False)
-        else:
+     
+        yolink.online = yolink.data.get(yolink.dOnline, False)
+        if  yolink.online is None:
             yolink.online = False
         return(yolink.online)
 
