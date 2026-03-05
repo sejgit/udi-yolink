@@ -18,7 +18,7 @@ except ImportError:
 #import sys
 import time
 from yolinkSwitchV3 import YoLinkSwitch
-from udiYoSmartRemoterV3 import udiRemoteKey
+from udiYoSmartRemoterV4 import udiRemoteKey
 from udiYoSchedule import udiYoSchedule
 
 class udiYoSwitch(udi_interface.Node):

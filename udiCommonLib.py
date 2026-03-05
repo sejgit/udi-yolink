@@ -19,8 +19,8 @@ from udiYoSwitchV4 import udiYoSwitch
 #from udiYoSwitchPwrSecV2 import udiYoSwitchPwrSec
 from udiYoTHsensorV4 import udiYoTHsensor 
 from udiYoWaterDeptV4 import udiYoWaterDept 
-from udiYoGarageDoorCtrlV2 import udiYoGarageDoor
-from udiYoGarageFingerCtrlV2 import udiYoGarageFinger
+from udiYoGarageDoorCtrlV4 import udiYoGarageDoor
+from udiYoGarageFingerCtrlV4 import udiYoGarageFinger
 from udiYoMotionSensorV4 import udiYoMotionSensor
 from udiYoLeakSensorV4 import udiYoLeakSensor
 from udiYoCOSmokeSensorV4 import udiYoCOSmokeSensor
@@ -29,12 +29,12 @@ from udiYoOutletV4 import udiYoOutlet
 #from udiYoOutletPwrV2 import udiYoOutletPwr
 from udiYoMultiOutletV2 import udiYoMultiOutlet
 from udiYoManipulatorV4 import udiYoManipulator
-from udiYoSpeakerHubV2 import udiYoSpeakerHub
+from udiYoSpeakerHubV4 import udiYoSpeakerHub
 from udiYoLock_V4 import udiYoLock, udiYoLockV2
 from udiYoInfraredRemoterV4 import udiYoInfraredRemoter
 from udiYoDimmerV4 import udiYoDimmer
 from udiYoVibrationSensorV4 import udiYoVibrationSensor
-from udiYoSmartRemoterV3 import udiYoSmartRemoter
+from udiYoSmartRemoterV4 import udiYoSmartRemoter
 from udiYoPowerFailV4 import udiYoPowerFailSenor
 #from udiYoSprinklerV4 import udiYoSprinkler
 from udiYoSprinkler2V4 import udiYoSprinkler2
