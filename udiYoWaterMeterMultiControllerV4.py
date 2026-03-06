@@ -16,6 +16,7 @@ from os import truncate
 #import sys
 import time
 from yolinkWaterMeterControllerV3 import YoLinkWaterMeter
+from udiYoSchedule import udiYoSchedule
 
 
 class udiYoWaterMeterMulti(udi_interface.Node):
@@ -59,6 +60,8 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         self.name = name
         self.address = address
         self.yoWaterCtrl= None
+        self.schedule_valve = None
+        self.schedule_leak = None
         self.node_ready = False
         self.last_state = ''
         self.ISYmeter_uom= None
@@ -120,10 +123,25 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                     self.adr_list.append(wm_address)
                     logging.info(f'Added Water Meter Node: {wm_name} at {wm_address}')
 
+            # Create valve schedule child node
+            sch_address_valve = self.address[4:14] + '_VSC'
+            sch_address_valve = self.poly.getValidAddress(sch_address_valve)
+            self.schedule_valve = udiYoSchedule(self.poly, self.address, sch_address_valve, 'Valve Schedules', self.yoAccess, self.devInfo, schedule_type='valve')
+            self.adr_list.append(sch_address_valve)
+            
+            # Create leak schedule child node
+            sch_address_leak = self.address[4:14] + '_LSC'
+            sch_address_leak = self.poly.getValidAddress(sch_address_leak)
+            self.schedule_leak = udiYoSchedule(self.poly, self.address, sch_address_leak, 'Leak Schedules', self.yoAccess, self.devInfo, schedule_type='leak')
+            self.adr_list.append(sch_address_leak)
             
         time.sleep(4)
         self.yoWaterCtrl.initNode()
         time.sleep(2)
+        
+        # Prime schedule data for both child schedule nodes.
+        self.yoWaterCtrl.refreshSchedules()
+        
         #self.my_setDriver('GV30', 1)
         #self.yoWaterCtrl.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
         self.node_ready = True
@@ -155,6 +173,16 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                 message_type = self.yoWaterCtrl.get_message_type()
                 unix_time = self.yoWaterCtrl.get_report_time('time')
                 self.my_setDriver('TIME', unix_time, 151)
+                
+                if message_type and 'Schedules' in str(message_type):
+                    # Route valve schedules to valve node
+                    if 'Valve' in str(message_type) and self.schedule_valve is not None:
+                        self.schedule_valve.update_schedule_data(source_device=self.yoWaterCtrl)
+                    # Route leak schedules to leak node
+                    elif 'Leak' in str(message_type) and self.schedule_leak is not None:
+                        self.schedule_leak.update_schedule_data(source_device=self.yoWaterCtrl)
+                    return
+                
                 if self.yoWaterCtrl.check_system_online():
 
                     if self.yoWaterCtrl.emptyData():
@@ -197,6 +225,9 @@ class udiYoWaterMeterMulti(udi_interface.Node):
     def update(self, command = None):
         logging.info('Update Status Executed')
         self.yoWaterCtrl.refreshDevice()
+        time.sleep(2)
+        # Keep schedule node synchronized on explicit UPDATE.
+        self.yoWaterCtrl.refreshSchedules()
                     
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoWaterMeterController')

@@ -61,6 +61,14 @@ ND-yoWMScheduleSec-NAME=Water Meter Schedules
 ND-yoWMScheduleSec-ICON=GenericCtl
 ND-yoWMSchedule-NAME=Water Meter Schedules
 ND-yoWMSchedule-ICON=GenericCtl
+ND-yoWMVlScheduleSec-NAME=Water Meter Valve Schedules
+ND-yoWMVlScheduleSec-ICON=GenericCtl
+ND-yoWMVlSchedule-NAME=Water Meter Valve Schedules
+ND-yoWMVlSchedule-ICON=GenericCtl
+ND-yoWMLkScheduleSec-NAME=Water Meter Leak Schedules
+ND-yoWMLkScheduleSec-ICON=GenericCtl
+ND-yoWMLkSchedule-NAME=Water Meter Leak Schedules
+ND-yoWMLkSchedule-ICON=GenericCtl
 ST-nlsschedule-GV12-NAME=Selected code/port
 ST-nlsschedule-GV13-NAME=Schedule Index
 ST-nlsschedule-GV14-NAME=Activated
@@ -103,6 +111,38 @@ CMD-nlswmschedule-CTRLSCH-NAME=Set Schedule
 CMD-nlswmschedule-LOOKUPSCH-NAME=Lookup Schedule
 CMD-nlswmschedule-DEFINESCH-NAME=Define Schedule
 CMD-nlswmschedule-UPDATE-NAME=Update Status
+
+ST-nlswmvalveschedule-GV12-NAME=Reserved
+ST-nlswmvalveschedule-GV13-NAME=Schedule Index
+ST-nlswmvalveschedule-GV14-NAME=Activated
+ST-nlswmvalveschedule-GV15-NAME=On Hour
+ST-nlswmvalveschedule-GV16-NAME=On Minute
+ST-nlswmvalveschedule-GV21-NAME=On Sec
+ST-nlswmvalveschedule-GV17-NAME=Off Hour
+ST-nlswmvalveschedule-GV18-NAME=Off Minute
+ST-nlswmvalveschedule-GV22-NAME=Off Sec
+ST-nlswmvalveschedule-GV19-NAME=Active Days
+ST-nlswmvalveschedule-GV23-NAME=Total Schedules
+CMD-nlswmvalveschedule-CTRLSCH-NAME=Set Schedule
+CMD-nlswmvalveschedule-LOOKUPSCH-NAME=Lookup Schedule
+CMD-nlswmvalveschedule-DEFINESCH-NAME=Define Schedule
+CMD-nlswmvalveschedule-UPDATE-NAME=Update Status
+
+ST-nlswmleakschedule-GV12-NAME=Leak Limit
+ST-nlswmleakschedule-GV13-NAME=Schedule Index
+ST-nlswmleakschedule-GV14-NAME=Activated
+ST-nlswmleakschedule-GV15-NAME=On Hour
+ST-nlswmleakschedule-GV16-NAME=On Minute
+ST-nlswmleakschedule-GV21-NAME=On Sec
+ST-nlswmleakschedule-GV17-NAME=Off Hour
+ST-nlswmleakschedule-GV18-NAME=Off Minute
+ST-nlswmleakschedule-GV22-NAME=Off Sec
+ST-nlswmleakschedule-GV19-NAME=Active Days
+ST-nlswmleakschedule-GV23-NAME=Total Schedules
+CMD-nlswmleakschedule-CTRLSCH-NAME=Set Schedule
+CMD-nlswmleakschedule-LOOKUPSCH-NAME=Lookup Schedule
+CMD-nlswmleakschedule-DEFINESCH-NAME=Define Schedule
+CMD-nlswmleakschedule-UPDATE-NAME=Update Status
 
 
 # YoLink Switch

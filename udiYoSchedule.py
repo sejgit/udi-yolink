@@ -1049,15 +1049,16 @@ class WaterMeterScheduleNode(OnOffScheduleNode):
     Schedule node for WaterMeterController schedules.
 
     WaterMeterController has valve schedules and leak schedules. Leak schedules
-    include an additional `leakLimit` field in each schedule record. The current
-    schedule UI does not expose leakLimit directly, so this node preserves that
-    field when users edit activation/time/week settings.
+    include an additional `leakLimit` field in each schedule record. This node
+    can manage either valve or leak schedules based on the schedule_type flag.
+    
+    schedule_type: 'valve' for valve control schedules, 'leak' for leak detection schedules
     """
 
     id = 'yoWMSchedule'
 
     drivers = [
-        {'driver': 'GV12', 'value': 99, 'uom': 56},    # Leak limit
+        {'driver': 'GV12', 'value': 99, 'uom': 56},    # Leak limit (or repurposed for data)
         {'driver': 'GV13', 'value': 0, 'uom': 25},     # Schedule index
         {'driver': 'GV14', 'value': 99, 'uom': 25},    # Active (enabled)
         {'driver': 'GV23', 'value': 0, 'uom': 70},     # Total schedules
@@ -1070,10 +1071,28 @@ class WaterMeterScheduleNode(OnOffScheduleNode):
         {'driver': 'GV19', 'value': 0, 'uom': 25},     # Weekday mask
     ]
 
+    def __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo, schedule_type='valve'):
+        """
+        Initialize WaterMeter schedule node.
+        
+        Args:
+            schedule_type: 'valve' or 'leak' to determine which schedule methods to use
+        """
+        self.schedule_type = schedule_type
+        super().__init__(polyglot, primary, address, name, yoAccess, deviceInfo)
+
     def _set_id_for_seconds_support(self):
-        if self.support_seconds:
-            return 'yoWMScheduleSec'
-        return 'yoWMSchedule'
+        """Set node ID based on schedule type and seconds support."""
+        if self.schedule_type == 'leak':
+            # Leak schedule nodes
+            if self.support_seconds:
+                return 'yoWMLkScheduleSec'
+            return 'yoWMLkSchedule'
+        else:
+            # Valve schedule nodes (default)
+            if self.support_seconds:
+                return 'yoWMVlScheduleSec'
+            return 'yoWMVlSchedule'
 
     def _get_schedule_type_name(self):
         return 'WaterMeter'
@@ -1139,7 +1158,7 @@ class WaterMeterScheduleNode(OnOffScheduleNode):
         if 'week' not in raw:
             raw['week'] = 0
 
-        self.yoSchedule.setSchedule(schedule_selected, raw)
+        self.yoSchedule.setSchedule(schedule_selected, raw, schedule_method=self.schedule_type)
 
     commands = {
         'UPDATE': BaseScheduleNode.update,
@@ -1149,7 +1168,7 @@ class WaterMeterScheduleNode(OnOffScheduleNode):
     }
 
 
-def udiYoSchedule(polyglot, primary, address, name, yoAccess, deviceInfo):
+def udiYoSchedule(polyglot, primary, address, name, yoAccess, deviceInfo, schedule_type=None):
     """
     Factory function to create appropriate schedule node based on device type.
     
@@ -1163,6 +1182,7 @@ def udiYoSchedule(polyglot, primary, address, name, yoAccess, deviceInfo):
         name: Display name
         yoAccess: YoLink access object
         deviceInfo: Device information dictionary
+        schedule_type: Optional schedule type (e.g., 'valve' or 'leak' for WaterMeterController)
         
     Returns:
         Appropriate schedule node instance (OnOff, Key, MultiOutlet,
@@ -1177,7 +1197,7 @@ def udiYoSchedule(polyglot, primary, address, name, yoAccess, deviceInfo):
     elif dev_type in ['SprinklerV2', 'Sprinkler']:
         return SprinklerScheduleNode(polyglot, primary, address, name, yoAccess, deviceInfo)
     elif dev_type in ['WaterMeterController']:
-        return WaterMeterScheduleNode(polyglot, primary, address, name, yoAccess, deviceInfo)
+        return WaterMeterScheduleNode(polyglot, primary, address, name, yoAccess, deviceInfo, schedule_type=schedule_type or 'valve')
     else:  # Default to OnOff for Switch, Outlet, Dimmer, Manipulator, etc.
         return OnOffScheduleNode(polyglot, primary, address, name, yoAccess, deviceInfo)
 

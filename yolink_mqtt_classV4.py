@@ -931,17 +931,29 @@ class YoLinkMQTTDevice(object):
     
     def refreshSchedules(yolink):
         logging.debug(yolink.type + '- refreshSchedules')
-        attempt = 1
-        maxAttempts = 3
-        #if 'getSchedules' in yolink.methodList:
-        methodStr = yolink.type+'.getSchedules'
-        #logging.debug(methodStr)  
         data = {}
-        #data['time'] = str(int(time.time_ns()//1e6))
-        data['method'] = methodStr
-        data["targetDevice"] =  yolink.deviceInfo['deviceId']
-        data["token"]= yolink.deviceInfo['token']
-        yolink.yoAccess.publish_data(data) 
+        
+        # WaterMeterController supports both valve and leak schedules
+        if yolink.type == 'WaterMeterController':
+            # Refresh valve schedules
+            data['method'] = 'WaterMeterController.getValveSchedules'
+            data["targetDevice"] = yolink.deviceInfo['deviceId']
+            data["token"] = yolink.deviceInfo['token']
+            yolink.yoAccess.publish_data(data)
+            
+            # Refresh leak schedules
+            data = {}
+            data['method'] = 'WaterMeterController.getLeakSchedules'
+            data["targetDevice"] = yolink.deviceInfo['deviceId']
+            data["token"] = yolink.deviceInfo['token']
+            yolink.yoAccess.publish_data(data)
+        else:
+            # Standard getSchedules for other device types
+            methodStr = yolink.type + '.getSchedules'
+            data['method'] = methodStr
+            data["targetDevice"] = yolink.deviceInfo['deviceId']
+            data["token"] = yolink.deviceInfo['token']
+            yolink.yoAccess.publish_data(data) 
             
     
     '''
@@ -993,11 +1005,20 @@ class YoLinkMQTTDevice(object):
    
 
 
-    def setSchedule(yolink, index, params):
+    def setSchedule(yolink, index, params, schedule_method=None):
         logging.debug(yolink.type + '- setSchedule')
         indexS = str(index)
         data = {}
-        data['method'] = yolink.type+'.setSchedules'
+        
+        # For WaterMeterController, use specific valve or leak schedule methods
+        if yolink.type == 'WaterMeterController' and schedule_method in ['valve', 'leak']:
+            if schedule_method == 'valve':
+                data['method'] = 'WaterMeterController.setValveSchedules'
+            else:  # leak
+                data['method'] = 'WaterMeterController.setLeakSchedules'
+        else:
+            data['method'] = yolink.type+'.setSchedules'
+            
         data["targetDevice"] =  yolink.deviceInfo['deviceId']
         data["token"]= yolink.deviceInfo['token']
         data['params'] = {}

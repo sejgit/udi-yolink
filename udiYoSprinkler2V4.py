@@ -352,6 +352,7 @@ class udiYoSprinkler2(udi_interface.Node):
     def update(self, command = None):
         logging.info('Update Status Executed')
         self.yoSprinkler.refreshDevice()
+        time.sleep(2)
         # Keep schedule child node in sync when user requests UPDATE.
         self.yoSprinkler.refreshSchedules()
         
