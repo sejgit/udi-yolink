@@ -269,10 +269,15 @@ class YoLinkMQTTDevice(object):
     #@measure_time
     def check_system_online(yolink):
         #return(yolink.yoAccess.online)
-        if yolink.yoAccess.online:
-            yolink.online = yolink.data.get(yolink.dOnline, False)
-        else:
+
+        logging.debug(f'check_system_online: {json.dumps(yolink.data, indent=2)}' )
+
+        yolink.online = yolink.data.get(yolink.dOnline, False)
+        online2 = yolink.Status(yolink.data)
+        if yolink.online is None:
             yolink.online = False
+        
+        logging.debug(f'check_system_online: {yolink.online} {online2}')
         return(yolink.online)
 
 
@@ -592,7 +597,8 @@ class YoLinkMQTTDevice(object):
         if 'code' in dataPacket:
             logging.debug('code selected')
             if dataPacket['code'] == '000000':
-                    yolink.online = True
+                yolink.online = True
+                yolink.suspended= False
             elif dataPacket['code'].find('00020') == 0: # Offline
                 yolink.online = False
             elif  dataPacket['code'] == '010301': # need to add a wait
@@ -625,6 +631,7 @@ class YoLinkMQTTDevice(object):
                 logging.debug('Method detected')
                 yolink.online = yolink.Status(data)
                 if data['code'] == '000000':
+
                     yolink.noconnect = 0
                     if  '.getState' in data['method'] :
                         #if int(data['time']) > int(yolink.getLastUpdate()):
