@@ -68,6 +68,7 @@ class udiYoThermostat(udi_interface.Node):
         self.devInfo = deviceInfo
         self.yoThermostat = None
         self.node_ready = False
+        self.system_ready = False
         self.temp_unit = self.yoAccess.get_temp_unit()
         self.n_queue = []
 
@@ -94,16 +95,17 @@ class udiYoThermostat(udi_interface.Node):
     def start(self):
         """Initialize and start the thermostat device"""
         logging.info('Start udiYoThermostat')
+        while not self.node_ready:
+            time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         self.yoThermostat = YoLinkThermostat(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(1)
-        while not self.node_ready:
-            time.sleep(0.5)
         self.yoThermostat.initDevice()
         time.sleep(1)
         while not self.yoThermostat.check_system_online():
             logging.info('Waiting for thermostat to come online...')
             time.sleep(2)
+        self.system_ready = True
         logging.info('Thermostat online and ready')
 
     def stop(self):
@@ -124,7 +126,7 @@ class udiYoThermostat(udi_interface.Node):
         """Parse device state and update drivers"""
         logging.info('udiYoThermostat - updateData')
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             
             message_type, message_action = self.yoThermostat.get_message_type()
@@ -133,7 +135,7 @@ class udiYoThermostat(udi_interface.Node):
             unix_time = self.yoThermostat.get_report_time('time')
             self.my_setDriver('TIME', unix_time, 151)
             
-            if self.yoThermostat.status():
+            if self.yoThermostat.check_system_online():
                 self.my_setDriver('GV30', 1)
                 
                 # Current readings from state

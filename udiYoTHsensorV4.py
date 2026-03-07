@@ -79,6 +79,7 @@ class udiYoTHsensor(udi_interface.Node):
         self.devInfo =  deviceInfo
         self.yoTHsensor  = None
         self.node_ready = False
+        self.system_ready = False
         self.poly = polyglot
         self.temp_unit = self.yoAccess.get_temp_unit()   
 
@@ -138,7 +139,7 @@ class udiYoTHsensor(udi_interface.Node):
             time.sleep(2)
 
         self.temp_unit = self.yoAccess.get_temp_unit()
-        
+        self.system_ready = True
         #self.my_setDriver('GV30', 1)
 
     def initNode(self):
@@ -175,7 +176,7 @@ class udiYoTHsensor(udi_interface.Node):
         #alarms = self.yoTHsensor.getAlarms()
         #limits = self.yoTHsensor.getLimits()
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             logging.info('yoTHsensor -  updateData')
             alarm_det = False 
