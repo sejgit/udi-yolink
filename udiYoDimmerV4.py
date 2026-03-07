@@ -105,10 +105,13 @@ class udiYoDimmer(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
+        self.node_ready = True
 
 
     def start(self):
         logging.info('start - udiYoDimmer')
+        while not self.node_ready:
+            time.sleep(0.5)
         #self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
         self.yoDimmer  = YoLinkDim(self.yoAccess, self.devInfo, self.updateStatus)
@@ -129,7 +132,6 @@ class udiYoDimmer(udi_interface.Node):
         #self.my_setDriver('ST', 1)
         self.yoDimmer.delayTimerCallback (self.updateDelayCountdown, self.timer_update )
         self.yoDimmer.refreshSchedules()
-        self.node_ready = True
 
 
     def updateDelayCountdown (self, timeRemaining ) :

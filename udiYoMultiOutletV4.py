@@ -495,6 +495,8 @@ class udiYoMultiOutlet(udi_interface.Node):
         #self.node_fully_config = False
         #self.usbExists = True
         logging.debug('start - udiYoMultiOutlet: {}'.format(self.devInfo['name']))
+        while not self.node_ready:
+            time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         self.yoMultiOutlet  = YoLinkMultiOutlet(self.yoAccess, self.devInfo, self.updateStatus)
         self.yoMultiOutlet.nbrOutlets = self.nbrOutlets
@@ -566,7 +568,6 @@ class udiYoMultiOutlet(udi_interface.Node):
         time.sleep(3)
         self.yoMultiOutlet.refreshMultiOutlet()
         self.yoMultiOutlet.refreshSchedules()
-        self.node_ready = True
         logging.debug('Finished  MultiOutlet start')
 
 

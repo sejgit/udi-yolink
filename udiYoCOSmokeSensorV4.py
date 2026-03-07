@@ -91,18 +91,20 @@ class udiYoCOSmokeSensor(udi_interface.Node):
         self.temp_unit = self.yoAccess.get_temp_unit()
         self.adr_list = []
         self.adr_list.append(address)
-
+        self.node_ready = True
         
 
 
     def start(self):
         logging.info('start - YoLinkCOSmokeSensor')
+        while not self.node_ready:  
+            time.sleep(0.5)
         #self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
         self.yoCOSmokeSensor  = YoLinkCOSmokeSensor(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoCOSmokeSensor.initNode()
-        self.node_ready = True
+
         #self.my_setDriver('ST', 1)
 
         #time.sleep(3)

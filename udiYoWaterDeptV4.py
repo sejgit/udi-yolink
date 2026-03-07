@@ -89,19 +89,21 @@ class udiYoWaterDept(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
+        self.node_ready = True
 
 
   
 
     def start(self):
         logging.info('Start udiYoWaterDept')
+        while not self.node_ready:
+            time.sleep(0.5)
         self.node.setDriver('GV30', 0, True, True)
         self.yoWaterDept  = YoLinkWaterDeptSensor(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoWaterDept.initNode()
         time.sleep(2)
         self.temp_unit = self.yoAccess.get_temp_unit()
-        self.node_ready = True
         #self.node.setDriver('GV30', 1, True, True)
 
     def initNode(self):

@@ -69,6 +69,7 @@ class udiYoDoorSensor(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)        
+        self.node_ready = True
 
 
 
@@ -76,12 +77,13 @@ class udiYoDoorSensor(udi_interface.Node):
 
     def start(self):
         logging.info('start - udiYoDoorSensor')
+        while not self.node_ready:
+            time.sleep(0.5)
         #self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
         self.yoDoorSensor  = YoLinkDoorSensor(self.yoAccess, self.devInfo, self.updateStatus)   
         time.sleep(2)
         self.yoDoorSensor.initNode()
-        self.node_ready = True
 
         #self.my_setDriver('ST', 1)
         #if not self.yoDoorSensor.online:

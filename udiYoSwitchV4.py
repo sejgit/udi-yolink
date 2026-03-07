@@ -101,11 +101,14 @@ class udiYoSwitch(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
+        self.node_ready = True
         
             
 
     def start(self):
         logging.info('start - udiYoSwitch')
+        while not self.node_ready:
+            time.sleep(0.5)
         #self.my_setDriver('GV30', 0)
         self.yoSwitch  = YoLinkSwitch(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(3)
@@ -132,7 +135,6 @@ class udiYoSwitch(udi_interface.Node):
         sch_address = self.poly.getValidAddress(sch_address)
         self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
         self.adr_list.append(sch_address)
-        self.node_ready = True
 
 
     def updateDelayCountdown (self, timeRemaining ) :

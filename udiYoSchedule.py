@@ -264,6 +264,7 @@ class BaseScheduleNode(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
+        self.node_ready = True
 
     def _create_yolink_schedule(self):
         """
@@ -282,7 +283,6 @@ class BaseScheduleNode(udi_interface.Node):
     def start(self):
         """Start schedule node and initialize drivers."""
         logging.info(f'start - {self.__class__.__name__}')
-        self.node_ready = True
     
     def stop(self):
         """Stop schedule node cleanup."""

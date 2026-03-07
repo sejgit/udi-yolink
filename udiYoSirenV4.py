@@ -70,10 +70,13 @@ class udiYoSiren(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
+        self.node_ready = True
 
 
     def start(self):
         logging.info('Start - udiYoSiren')
+        while not self.node_ready:
+            time.sleep(0.5)
         self.my_setDriver('GV30', 0, True, True)
 
         self.yoSiren = YoLinkSiren(self.yoAccess, self.devInfo, self.updateStatus)
@@ -81,7 +84,6 @@ class udiYoSiren(udi_interface.Node):
         time.sleep(2)
         self.yoSiren.initNode()
         time.sleep(2)
-        self.node_ready = True
 
     def stop (self):
         logging.info('Stop udiYoSiren')

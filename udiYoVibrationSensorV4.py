@@ -80,17 +80,19 @@ class udiYoVibrationSensor(udi_interface.Node):
         
         self.adr_list = []
         self.adr_list.append(address)
+        self.node_ready = True
         logging.debug(f'udiYoVibrationSensor INIT- DONE {self.id}n  {self.name} {self.address} {self.temp_unit}')
 
 
     def start(self):
         logging.info('start - udiYoVibrationSensor')
+        while not self.node_ready:
+            time.sleep(0.5)
         #self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
         self.yoVibrationSensor  = YoLinkVibrationSensor(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoVibrationSensor.initNode()
-        self.node_ready = True
         #self.my_setDriver('ST', 1)
 
     

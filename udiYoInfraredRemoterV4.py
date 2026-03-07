@@ -185,10 +185,12 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.adr_list.append(address)   
         self.codes_used = []
         self.code_nodes = {}
-
+        self.node_ready = True
 
     def start(self):
         logging.info('start - udiIRremote')
+        while not self.node_ready:
+            time.sleep(0.5)
         self.my_setDriver('ST', 0)
         self.yoIRrem  = YoLinkInfraredRem(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
@@ -232,7 +234,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.updateData()
 
 
-        self.node_ready = True
+        
 
     
     def stop (self):

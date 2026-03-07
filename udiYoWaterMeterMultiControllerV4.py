@@ -82,10 +82,13 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         self.adr_list = []
         self.adr_list.append(address)
         self.wm_nodes= {}
+        self.node_ready = True
 
 
     def start(self):
         logging.info('Start - udiYoWaterMeterMultiController')
+        while not self.node_ready:
+            time.sleep(0.5)
         self.my_setDriver('GV30', 1)
         self.my_setDriver('GV20', 0)
         self.yoWaterCtrl= YoLinkWaterMeter(self.yoAccess, self.devInfo, self.updateStatus)
@@ -144,7 +147,6 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         
         #self.my_setDriver('GV30', 1)
         #self.yoWaterCtrl.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
-        self.node_ready = True
         self.updateData()
 
 
@@ -314,11 +316,14 @@ class udiYoSubWaterMeter(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
+        self.node_ready = True
 
 
 
     def start(self):
         logging.info('Start - udiYoWaterMeterMultiController')
+        while not self.node_ready:
+            time.sleep(0.5)
 
         #self.yoWaterCtrl= YoLinkWaterMultiMeter(self.yoAccess, self.yoWaterCtrl.devInfo, self.updateStatus)
         
@@ -332,7 +337,6 @@ class udiYoSubWaterMeter(udi_interface.Node):
         logging.debug(f'meter unit : { self.meter_unit} ISY unit: { self.ISYwater_unit} uom: {self.ISYmeter_uom}')
         #self.yoWaterCtrl.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
         self.my_setDriver('GV1', 0,  self.ISYmeter_uom)
-        self.node_ready = True
         self.updateData()
 
     def stop (self):

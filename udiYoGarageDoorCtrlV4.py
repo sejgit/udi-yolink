@@ -60,6 +60,7 @@ class udiYoGarageDoor(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
+        self.node_ready = True
 
 
     def start(self):
@@ -71,7 +72,6 @@ class udiYoGarageDoor(udi_interface.Node):
         self.my_setDriver('ST', 1)
         self.my_setDriver('GV30', 1)
         #time.sleep(3)
-        self.node_ready = True
 
     def initNode(self):
         self.yoDoorControl.online = True

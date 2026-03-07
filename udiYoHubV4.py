@@ -67,16 +67,18 @@ class udiYoBatteryHub(udi_interface.Node):
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
         self.adr_list = []
-        self.adr_list.append(address)        
+        self.adr_list.append(address)
+        self.node_ready = True
     
  
 
     def start(self):
         logging.info('start - udiYoBatteryHub')
+        while not self.node_ready:
+            time.sleep(0.5)
         self.yoHub  = YoLinkHub(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoHub.initNode()
-        self.node_ready = True
         time.sleep(1)
         self.yoHub.refreshDevice()
 
@@ -194,12 +196,15 @@ class udiYoHub(udi_interface.Node):
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
         self.adr_list = []
-        self.adr_list.append(address)        
+        self.adr_list.append(address)
+        self.node_ready = True
     
  
 
     def start(self):
         logging.info('start - udiYoHub')
+        while not self.node_ready:
+            time.sleep(0.5)
         self.yoHub  = YoLinkHub(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.my_setDriver('ST', 1)
@@ -210,7 +215,6 @@ class udiYoHub(udi_interface.Node):
         #    logging.warning('Device {} not on-line'.format(self.devInfo['name']))            
         #else:
         #    self.node.setDriver('ST', 1, True, True)
-        self.node_ready = True
 
     def updateDelayCountdown (self, delayRemaining ) :
         logging.debug('updateDelayCountdown {}'.format(delayRemaining))

@@ -295,6 +295,7 @@ class udiYoSmartRemoter(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
+        self.node_ready = True
         
         self.nodesOK = False
 
@@ -312,6 +313,8 @@ class udiYoSmartRemoter(udi_interface.Node):
     def start(self):
 
         logging.info('start - udiYoSmartRemoter')
+        while not self.node_ready:
+            time.sleep(0.5)
         self.node.setDriver('GV30', 0, True, True)
         self.yoSmartRemote  = YoLinkSmartRemoter(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
@@ -330,7 +333,6 @@ class udiYoSmartRemoter(udi_interface.Node):
             self.adr_list.append(k_address)
         self.wait_for_node_done()
         self.nodesOK = True
-        self.node_ready = True
 
     def stop (self):
         logging.info('Stop udiYoSmartRemoter')

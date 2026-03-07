@@ -85,12 +85,15 @@ class udiYoManipulator(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
+        self.node_ready = True
 
 
 
 
     def start(self):
         logging.info('Start - udiYoManipulator')
+        while not self.node_ready:
+            time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         self.yoManipulator = YoLinkManipulator(self.yoAccess, self.devInfo, self.updateStatus)
         
@@ -105,7 +108,6 @@ class udiYoManipulator(udi_interface.Node):
         time.sleep(2)
         self.yoManipulator.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
         self.yoManipulator.refreshSchedules()
-        self.node_ready = True
 
     def stop (self):
         logging.info('Stop udiYoManipulator')

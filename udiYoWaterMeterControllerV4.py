@@ -133,11 +133,14 @@ class udiYoWaterMeterController(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
+        self.node_ready = True
         logging.debug('udiYoWaterMeterController INIT done- {}'.format(self.commands))
 
 
     def start(self):
         logging.info('Start - udiYoWaterMeterController')
+        while not self.node_ready:
+            time.sleep(0.5)
         self.my_setDriver('GV30', 1)
         self.my_setDriver('GV20', 0)
         self.yoWaterCtrl= YoLinkWaterMeter(self.yoAccess, self.devInfo, self.updateStatus)
@@ -171,8 +174,6 @@ class udiYoWaterMeterController(udi_interface.Node):
 
         # Prime schedule data for both child schedule nodes.
         self.yoWaterCtrl.refreshSchedules()
-
-        self.node_ready = True
         self.updateData()
 
 

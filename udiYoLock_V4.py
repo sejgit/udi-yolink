@@ -75,16 +75,18 @@ class udiYoLockV2(udi_interface.Node):
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
         self.adr_list = []
-        self.adr_list.append(address)        
+        self.adr_list.append(address)
+        self.node_ready = True
 
 
 
     def start(self):
         logging.info('start - YoLinkLock')
+        while not self.node_ready:
+            time.sleep(0.5)
         self.yoLock  = YoLinkLock(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoLock.initNode()
-        self.node_ready = True
         self.my_setDriver('GV30', 1)
 
 
@@ -304,16 +306,18 @@ class udiYoLock(udi_interface.Node):
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
         self.adr_list = []
-        self.adr_list.append(address)        
+        self.adr_list.append(address)
+        self.node_ready = True
 
 
 
     def start(self):
         logging.info('start - YoLinkLock')
+        while not self.node_ready:
+            time.sleep(0.5)
         self.yoLock  = YoLinkLock(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoLock.initNode()
-        self.node_ready = True
         self.my_setDriver('GV30', 1)
 
 

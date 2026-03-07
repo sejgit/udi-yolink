@@ -81,14 +81,16 @@ class udiYoPowerFailSenor(udi_interface.Node):
         #self.my_setDriver('GV30', 0)
         self.adr_list = []
         self.adr_list.append(address)
+        self.node_ready = True
 
     def start(self):
         logging.info('start - udiYoPowerFailSenor')
+        while not self.node_ready:
+            time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         self.yoPowerFail  = YoLinkPowerFailSensor(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoPowerFail.initNode()
-        self.node_ready = True
         #self.my_setDriver('GV30', 1)
 
     
