@@ -119,7 +119,7 @@ class udiYoTHsensor(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
-
+        self.node_ready = True
 
   
 
@@ -135,7 +135,7 @@ class udiYoTHsensor(udi_interface.Node):
             time.sleep(2)
 
         self.temp_unit = self.yoAccess.get_temp_unit()
-        self.node_ready = True
+        
         #self.my_setDriver('GV30', 1)
 
     def initNode(self):
