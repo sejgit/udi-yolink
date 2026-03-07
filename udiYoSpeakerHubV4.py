@@ -73,15 +73,15 @@ class udiYoSpeakerHub(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
-            self.node_ready = True
+        self.node_ready = True
 
 
 
 
     def start(self):
         logging.info('start - udiYoSpeakerHub')
-            while not self.node_ready:
-                time.sleep(0.5)
+        while not self.node_ready:
+            time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         self.my_setDriver('ST', 0)
         self.yoSpeakerHub  = YoLinkSpeakerH(self.yoAccess, self.devInfo, self.updateStatus)
