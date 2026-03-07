@@ -25,23 +25,23 @@ class YoLinkThermostat(YoLinkMQTTDevice):
         logging.debug(f'YoLinkThermostat updateStatus: {data}')
         yolink.updateCallbackStatus(data, False)
 
-    def refreshDevice(yolink):
-        """Request current device state via getState method"""
-        logging.debug(f'{yolink.type} - refreshDevice')
-        data = {'method': 'Thermostat.getState', 'targetDevice': yolink.deviceInfo['deviceId'], 'token': yolink.deviceInfo['token']}
-        return yolink.setDevice(data)
+   # def refreshDevice(yolink):
+   #     """Request current device state via getState method"""
+   #     logging.debug(f'{yolink.type} - refreshDevice')
+   #     data={}
+   #     return yolink.getDevice(data)
 
     def setLowTemp(yolink, lowTemp):
         """Set lower temperature setpoint (Celsius)"""
         logging.debug(f'{yolink.type} - setLowTemp: {lowTemp}')
-        data = {'method': 'Thermostat.setState', 'targetDevice': yolink.deviceInfo['deviceId'], 'token': yolink.deviceInfo['token']}
+        data={}
         data['params'] = {'lowTemp': float(lowTemp)}
         return yolink.setDevice(data)
 
     def setHighTemp(yolink, highTemp):
         """Set upper temperature setpoint (Celsius)"""
         logging.debug(f'{yolink.type} - setHighTemp: {highTemp}')
-        data = {'method': 'Thermostat.setState', 'targetDevice': yolink.deviceInfo['deviceId'], 'token': yolink.deviceInfo['token']}
+        data={}
         data['params'] = {'highTemp': float(highTemp)}
         return yolink.setDevice(data)
 
@@ -51,7 +51,7 @@ class YoLinkThermostat(YoLinkMQTTDevice):
         if mode.lower() not in ['cool', 'heat', 'auto', 'off']:
             logging.error(f'Invalid mode: {mode}')
             return False
-        data = {'method': 'Thermostat.setState', 'targetDevice': yolink.deviceInfo['deviceId'], 'token': yolink.deviceInfo['token']}
+        data={}
         data['params'] = {'mode': mode.lower()}
         return yolink.setDevice(data)
 
@@ -61,7 +61,7 @@ class YoLinkThermostat(YoLinkMQTTDevice):
         if fan.lower() not in ['on', 'auto']:
             logging.error(f'Invalid fan mode: {fan}')
             return False
-        data = {'method': 'Thermostat.setState', 'targetDevice': yolink.deviceInfo['deviceId'], 'token': yolink.deviceInfo['token']}
+        data={}
         data['params'] = {'fan': fan.lower()}
         return yolink.setDevice(data)
 
@@ -71,7 +71,7 @@ class YoLinkThermostat(YoLinkMQTTDevice):
         if sche.lower() not in ['run', 'hold']:
             logging.error(f'Invalid schedule mode: {sche}')
             return False
-        data = {'method': 'Thermostat.setState', 'targetDevice': yolink.deviceInfo['deviceId'], 'token': yolink.deviceInfo['token']}
+        data={}
         data['params'] = {'sche': sche.lower()}
         return yolink.setDevice(data)
 
@@ -98,7 +98,7 @@ class YoLinkThermostat(YoLinkMQTTDevice):
             logging.warning('setECO called with no valid parameters')
             return False
         
-        return yolink.setDevice(data)
+        return yolink.yoAccess.publish_data(data)
 
     def setProperties(yolink, minRuntime=None, coolLimit=None, heatLimit=None, mute=None, 
                       menuLock=None, auxStandby=None, auxMaxSpan=None, auxThreshold=None,

@@ -269,11 +269,40 @@ class YoLinkMQTTDevice(object):
     #@measure_time
     def check_system_online(yolink):
         #return(yolink.yoAccess.online)
-     
-        yolink.online = yolink.data.get(yolink.dOnline, False)
-        if  yolink.online is None:
+        logging.debug(f'check_system_online : {yolink.data}')
+        yolink.online = True
+        if 'lastStateTime' in yolink.data:
+            logging.debug('lastStateTime selected')
+            if isinstance(yolink.data['lastStateTime'], (int, float)):
+                if yolink.data['lastStateTime'] + 60*60*4 <= time.time(): # if no update for 4 hours then assume offline
+                    yolink.online = False
+                    logging.error('Status {} - Off line detected: {}'.format(yolink.deviceInfo['name'], yolink.data))
+                else:
+                    yolink.online = True
+            return(yolink.online)
+        
+        if 'code' in yolink.data:
+            logging.debug('code selected')
+            if yolink.data['code'] == '000000':
+                    yolink.online = True
+            elif yolink.data['code'].find('00020') == 0: # Offline
+                yolink.online = False
+        elif 'event' in yolink.data:
+            logging.debug('event selected')
+            if 'data' in yolink.data:
+                if 'online' in yolink.data['data']:
+                    yolink.online = yolink.data['data']['online']
+
+        else:
             yolink.online = False
+            logging.debug(f'OFFLINE STRANGE {yolink.data}')
+
+        
+        if not yolink.online:
+            logging.error('Status {} - Off line detected: {}'.format(yolink.deviceInfo['name'], yolink.data))
         return(yolink.online)
+
+
 
 
     #@measure_time

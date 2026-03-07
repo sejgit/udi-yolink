@@ -131,7 +131,7 @@ class udiYoThermostat(udi_interface.Node):
             unix_time = self.yoThermostat.get_report_time('time')
             self.my_setDriver('TIME', unix_time, 151)
             
-            if self.yoThermostat.check_system_online():
+            if self.yoThermostat.status():
                 self.my_setDriver('GV30', 1)
                 
                 # Current readings from state
