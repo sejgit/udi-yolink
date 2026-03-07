@@ -97,12 +97,13 @@ class udiYoThermostat(udi_interface.Node):
         self.my_setDriver('GV30', 0)
         self.yoThermostat = YoLinkThermostat(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(1)
+        while not self.node_ready:
+            time.sleep(0.5)
         self.yoThermostat.initDevice()
         time.sleep(1)
         while not self.yoThermostat.check_system_online():
             logging.info('Waiting for thermostat to come online...')
             time.sleep(2)
-        self.node_ready = True
         logging.info('Thermostat online and ready')
 
     def stop(self):

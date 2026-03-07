@@ -128,6 +128,9 @@ class udiYoTHsensor(udi_interface.Node):
         self.my_setDriver('GV30', 0)
         self.yoTHsensor  = YoLinkTHSensor(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(1)
+        while not self.node_ready:
+            time.sleep(0.5)
+
         self.yoTHsensor.initNode()
         time.sleep(1)
         while not self.yoTHsensor.check_system_online():
