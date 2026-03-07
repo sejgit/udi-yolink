@@ -98,9 +98,9 @@ class udiYoThermostat(udi_interface.Node):
         time.sleep(1)
         self.yoThermostat.initDevice()
         time.sleep(1)
-        while not self.yoThermostat.check_system_online():
-            logging.info('Waiting for thermostat to come online...')
-            time.sleep(2)
+        #while not self.yoThermostat.check_system_online():
+        #    logging.info('Waiting for thermostat to come online...')
+        #    time.sleep(2)
         self.node_ready = True
         logging.info('Thermostat online and ready')
 
