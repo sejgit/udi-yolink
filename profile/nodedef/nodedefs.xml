@@ -2475,7 +2475,7 @@
       <editors />
       <sts>
          <st id="ST" editor="I_TSTAT_HCS" />
-         <st id="CLITEMP" editor="I_TEMP_DEG" />
+         <st id="CLITEMP" editor="celsius" />
          <st id="CLIHUM" editor="I_HUMIDITY" />
          <st id="CLISPH" editor="I_CLISPH_DEG" />
          <st id="CLISPC" editor="I_CLISPC_DEG" />
@@ -2484,23 +2484,23 @@
          <st id="CLISMD" editor="I_CLISMD_DEG" />
          <st id="CLIHCS" editor="I_TSTAT_HCS" />
          <st id="CLIFRS" editor="I_CLIFRS" />
-         <st id="GV0" editor="I_TEMP_DEG" />
-         <st id="GV1" editor="I_TEMP_DEG" />
+         <st id="GV0" editor="celsius" />
+         <st id="GV1" editor="celsius" />
          <st id="GV2" editor="I_AUX_HEAT" />
          <st id="GV3" editor="I_STAGE2" />
          <st id="GV4" editor="I_ECO_MODE" />
          <st id="GV5" editor="I_DR_RUNNING" />
          <st id="GV6" editor="I_MINRUNTIME" />
-         <st id="GV7" editor="I_TEMP_DEG" />
-         <st id="GV8" editor="I_TEMP_DEG" />
+         <st id="GV7" editor="celsius" />
+         <st id="GV8" editor="celsius" />
          <st id="GV9" editor="I_MUTE" />
          <st id="GV10" editor="I_MENULOCK" />
          <st id="GV11" editor="I_MINRUNTIME" />
          <st id="GV12" editor="I_HOURS" />
-         <st id="GV13" editor="I_TEMP_DEG" />
+         <st id="GV13" editor="celsius" />
          <st id="GV14" editor="I_MINRUNTIME" />
          <st id="GV15" editor="I_HOURS" />
-         <st id="GV16" editor="I_TEMP_DEG" />
+         <st id="GV16" editor="celsius" />
          <st id="GV17" editor="I_MASTER_SRC" />
          <st id="GV20" editor="I_SUSPENDED_ST" />
          <st id="GV30" editor="I_ONLINE_ST" />
@@ -2512,50 +2512,54 @@
          <accepts>
             <cmd id="UPDATE" />
             <cmd id="SETLOWTEMP">
-               <p id="value" editor="I_CLISPH_DEG" />
+               <p id="" editor="celsiusSet" />
             </cmd>
             <cmd id="SETHIGHTEMP">
-               <p id="value" editor="I_CLISPC_DEG" />
+               <p id="" editor="celsiusSet" />
             </cmd>
             <cmd id="SETMODE">
-               <p id="value" editor="I_TSTAT_MODE" />
+               <p id="" editor="I_TSTAT_MODE" />
             </cmd>
             <cmd id="SETFAN">
-               <p id="value" editor="I_TSTAT_FAN" />
+               <p id="" editor="I_TSTAT_FAN" />
             </cmd>
             <cmd id="SETSCHE">
-               <p id="value" editor="I_CLISMD_DEG" />
+               <p id="" editor="I_CLISMD_DEG" />
             </cmd>
             <cmd id="SETECO">
-               <p id="value" editor="I_ECO_MODE" />
+               <p id="ecomode" editor="I_ECO_MODE" />                           
+               <p id="ecoLow" editor="ecoSet" />       
+               <p id="ecoHigh" editor="ecoSet" />                                              
+
             </cmd>
             <cmd id="SETMINRUNTIME">
-               <p id="value" editor="I_MINRUNTIME" />
+               <p id="" editor="I_MINRUNTIME" />
             </cmd>
             <cmd id="SETCOOLLIMIT">
-               <p id="value" editor="I_TEMP_DEG" />
+               <p id="" editor="celsiusSet" />
             </cmd>
             <cmd id="SETHEATLIMIT">
-               <p id="value" editor="I_TEMP_DEG" />
+               <p id="" editor="celsiusSet" />
             </cmd>
             <cmd id="SETMUTE">
-               <p id="value" editor="I_MUTE" />
+               <p id="" editor="I_MUTE" />
             </cmd>
             <cmd id="SETMENULOCK">
-               <p id="value" editor="I_MENULOCK" />
+               <p id="" editor="I_MENULOCK" />
             </cmd>
             <cmd id="SETMASTER">
-               <p id="value" editor="I_MASTER_SRC" />
+               <p id="" editor="I_MASTER_SRC" />
             </cmd>
          </accepts>
       </cmds>
    </nodeDef>
 
-   <nodeDef id="yothermostatf" nls="nlsthermostatf">
+   <nodeDef id="yothermostatf" nls="nlsthermostat">
       <editors />
       <sts>
          <st id="ST" editor="I_TSTAT_HCS" />
-         <st id="CLITEMP" editor="I_TEMP_F" />
+         <st id="CLITEMP" editor="farenheit
+" />
          <st id="CLIHUM" editor="I_HUMIDITY" />
          <st id="CLISPH" editor="I_CLISPH_F" />
          <st id="CLISPC" editor="I_CLISPC_F" />
@@ -2564,23 +2568,29 @@
          <st id="CLISMD" editor="I_CLISMD_DEG" />
          <st id="CLIHCS" editor="I_TSTAT_HCS" />
          <st id="CLIFRS" editor="I_CLIFRS" />
-         <st id="GV0" editor="I_TEMP_F" />
-         <st id="GV1" editor="I_TEMP_F" />
+         <st id="GV0" editor="farenheit
+" />
+         <st id="GV1" editor="farenheit
+" />
          <st id="GV2" editor="I_AUX_HEAT" />
          <st id="GV3" editor="I_STAGE2" />
          <st id="GV4" editor="I_ECO_MODE" />
          <st id="GV5" editor="I_DR_RUNNING" />
          <st id="GV6" editor="I_MINRUNTIME" />
-         <st id="GV7" editor="I_TEMP_F" />
-         <st id="GV8" editor="I_TEMP_F" />
+         <st id="GV7" editor="farenheit
+" />
+         <st id="GV8" editor="farenheit
+" />
          <st id="GV9" editor="I_MUTE" />
          <st id="GV10" editor="I_MENULOCK" />
          <st id="GV11" editor="I_MINRUNTIME" />
          <st id="GV12" editor="I_HOURS" />
-         <st id="GV13" editor="I_TEMP_F" />
+         <st id="GV13" editor="farenheit
+" />
          <st id="GV14" editor="I_MINRUNTIME" />
          <st id="GV15" editor="I_HOURS" />
-         <st id="GV16" editor="I_TEMP_F" />
+         <st id="GV16" editor="farenheit
+" />
          <st id="GV17" editor="I_MASTER_SRC" />
          <st id="GV20" editor="I_SUSPENDED_ST" />
          <st id="GV30" editor="I_ONLINE_ST" />
@@ -2592,40 +2602,42 @@
          <accepts>
             <cmd id="UPDATE" />
             <cmd id="SETLOWTEMP">
-               <p id="value" editor="I_CLISPH_F" />
+               <p id="" editor="farenheitSet" />
             </cmd>
             <cmd id="SETHIGHTEMP">
-               <p id="value" editor="I_CLISPC_F" />
+               <p id="" editor="farenheitSet" />
             </cmd>
             <cmd id="SETMODE">
-               <p id="value" editor="I_TSTAT_MODE" />
+               <p id="" editor="I_TSTAT_MODE" />
             </cmd>
             <cmd id="SETFAN">
-               <p id="value" editor="I_TSTAT_FAN" />
+               <p id="" editor="I_TSTAT_FAN" />
             </cmd>
             <cmd id="SETSCHE">
-               <p id="value" editor="I_CLISMD_DEG" />
+               <p id="" editor="I_CLISMD_DEG" />
             </cmd>
             <cmd id="SETECO">
-               <p id="value" editor="I_ECO_MODE" />
+               <p id="ecomode" editor="I_ECO_MODE" />                           
+               <p id="ecoLow" editor="ecoSetF" />       
+               <p id="ecoHigh" editor="ecoSetF" />     
             </cmd>
             <cmd id="SETMINRUNTIME">
-               <p id="value" editor="I_MINRUNTIME" />
+               <p id="" editor="I_MINRUNTIME" />
             </cmd>
             <cmd id="SETCOOLLIMIT">
-               <p id="value" editor="I_TEMP_F" />
+               <p id="" editor="farenheitSet" />
             </cmd>
             <cmd id="SETHEATLIMIT">
-               <p id="value" editor="I_TEMP_F" />
+               <p id="" editor="farenheitSet" />
             </cmd>
             <cmd id="SETMUTE">
-               <p id="value" editor="I_MUTE" />
+               <p id="" editor="I_MUTE" />
             </cmd>
             <cmd id="SETMENULOCK">
-               <p id="value" editor="I_MENULOCK" />
+               <p id="" editor="I_MENULOCK" />
             </cmd>
             <cmd id="SETMASTER">
-               <p id="value" editor="I_MASTER_SRC" />
+               <p id="" editor="I_MASTER_SRC" />
             </cmd>
          </accepts>
       </cmds>

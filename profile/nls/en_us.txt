@@ -1442,37 +1442,6 @@ ST-nlsthermostat-GV20-NAME=Suspended
 ST-nlsthermostat-GV30-NAME=Online
 ST-nlsthermostat-TIME-NAME=Last Update
 
-ST-nlsthermostatf-ST-NAME=Running State
-ST-nlsthermostatf-CLITEMP-NAME=Temperature
-ST-nlsthermostatf-CLIHUM-NAME=Humidity
-ST-nlsthermostatf-CLISPH-NAME=Heat Setpoint
-ST-nlsthermostatf-CLISPC-NAME=Cool Setpoint
-ST-nlsthermostatf-CLIMD-NAME=Mode
-ST-nlsthermostatf-CLIFS-NAME=Fan Setting
-ST-nlsthermostatf-CLISMD-NAME=Schedule Mode
-ST-nlsthermostatf-CLIHCS-NAME=Heat/Cool State
-ST-nlsthermostatf-CLIFRS-NAME=Fan Running
-ST-nlsthermostatf-GV0-NAME=Sensor 1 Temp
-ST-nlsthermostatf-GV1-NAME=Sensor 2 Temp
-ST-nlsthermostatf-GV2-NAME=Aux Heat Running
-ST-nlsthermostatf-GV3-NAME=Stage 2 Running
-ST-nlsthermostatf-GV4-NAME=ECO Mode
-ST-nlsthermostatf-GV5-NAME=DR Running
-ST-nlsthermostatf-GV6-NAME=Min Runtime
-ST-nlsthermostatf-GV7-NAME=Cool Limit
-ST-nlsthermostatf-GV8-NAME=Heat Limit
-ST-nlsthermostatf-GV9-NAME=Mute
-ST-nlsthermostatf-GV10-NAME=Menu Lock
-ST-nlsthermostatf-GV11-NAME=Aux Standby
-ST-nlsthermostatf-GV12-NAME=Aux Max Span
-ST-nlsthermostatf-GV13-NAME=Aux Threshold
-ST-nlsthermostatf-GV14-NAME=Stage2 Standby
-ST-nlsthermostatf-GV15-NAME=Stage2 Max Span
-ST-nlsthermostatf-GV16-NAME=Stage2 Threshold
-ST-nlsthermostatf-GV17-NAME=Master Source
-ST-nlsthermostatf-GV20-NAME=Suspended
-ST-nlsthermostatf-GV30-NAME=Online
-ST-nlsthermostatf-TIME-NAME=Last Update
 
 # Thermostat Command Names
 CMD-nlsthermostat-UPDATE-NAME=Update
@@ -1489,19 +1458,6 @@ CMD-nlsthermostat-SETMUTE-NAME=Set Mute
 CMD-nlsthermostat-SETMENULOCK-NAME=Set Menu Lock
 CMD-nlsthermostat-SETMASTER-NAME=Set Master Source
 
-CMD-nlsthermostatf-UPDATE-NAME=Update
-CMD-nlsthermostatf-SETLOWTEMP-NAME=Set Heat Setpoint
-CMD-nlsthermostatf-SETHIGHTEMP-NAME=Set Cool Setpoint
-CMD-nlsthermostatf-SETMODE-NAME=Set Mode
-CMD-nlsthermostatf-SETFAN-NAME=Set Fan
-CMD-nlsthermostatf-SETSCHE-NAME=Set Schedule Mode
-CMD-nlsthermostatf-SETECO-NAME=Set ECO Mode
-CMD-nlsthermostatf-SETMINRUNTIME-NAME=Set Min Runtime
-CMD-nlsthermostatf-SETCOOLLIMIT-NAME=Set Cool Limit
-CMD-nlsthermostatf-SETHEATLIMIT-NAME=Set Heat Limit
-CMD-nlsthermostatf-SETMUTE-NAME=Set Mute
-CMD-nlsthermostatf-SETMENULOCK-NAME=Set Menu Lock
-CMD-nlsthermostatf-SETMASTER-NAME=Set Master Source
 
 # Thermostat Value NLS
 tstat_mode-0=Off

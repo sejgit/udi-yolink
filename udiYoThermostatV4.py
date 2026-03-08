@@ -398,15 +398,49 @@ class udiYoThermostat(udi_interface.Node):
             logging.error(f'setScheduleMode invalid value: {e}')
 
     def setEco(self, command):
-        """Set ECO mode (0=off, 1=on)"""
+        """Set ECO mode and optional low/high ECO offsets."""
         try:
-            eco_val = int(command.get('value'))
-            eco_mode = 'on' if eco_val == 1 else 'off'
-            logging.info(f'udiYoThermostat setEco - {eco_mode}')
+            query = command.get('query') or {}
+
+            # Parse ECO mode from query first (3-parameter nodedef), fallback to value.
+            eco_raw = None
+            for key in query:
+                if key.lower().startswith('ecomode'):
+                    eco_raw = query.get(key)
+                    break
+            if eco_raw is None:
+                eco_raw = command.get('value')
+
+            eco_mode = None
+            if eco_raw is not None:
+                eco_str = str(eco_raw).strip().lower()
+                if eco_str in ['on', 'off']:
+                    eco_mode = eco_str
+                else:
+                    eco_mode = 'on' if int(float(eco_raw)) == 1 else 'off'
+
+            # Parse optional low/high ECO adjustments from query payload.
+            eco_low = None
+            eco_high = None
+            for key, raw in query.items():
+                key_l = key.lower()
+                if key_l.startswith('ecolow'):
+                    eco_low = float(raw)
+                elif key_l.startswith('ecohigh'):
+                    eco_high = float(raw)
+
+            # API expects Celsius values; these are relative offsets, not absolute temps.
+            if self.temp_unit == 1:
+                if eco_low is not None:
+                    eco_low = round(eco_low * 5 / 9, 1)
+                if eco_high is not None:
+                    eco_high = round(eco_high * 5 / 9, 1)
+
+            logging.info(f'udiYoThermostat setEco - mode={eco_mode}, low={eco_low}, high={eco_high}')
             if self.yoThermostat:
-                self.yoThermostat.setECO(mode=eco_mode)
+                self.yoThermostat.setECO(mode=eco_mode, lowTemp=eco_low, highTemp=eco_high)
         except (ValueError, TypeError) as e:
-            logging.error(f'setEco invalid value: {e}')
+            logging.error(f'setEco invalid value: {e} | command={command}')
 
     def setMinRuntime(self, command):
         """Set minimum runtime in minutes"""

@@ -515,4 +515,11 @@
   <editor id="I_ONLINE_ST">
     <range uom="25" subset="0,1,99" nls="online" />
   </editor>
+  <editor id="ecoSet">
+    <range uom="4" min="0" max="5" prec="1" />
+  </editor>
+  <editor id="ecoSetF">
+    <range uom="17" min="0" max="9" prec="1" />
+  </editor>
+
 </editors>
