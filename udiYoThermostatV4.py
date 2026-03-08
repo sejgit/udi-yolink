@@ -400,8 +400,8 @@ class udiYoThermostat(udi_interface.Node):
 
     commands = {
         'UPDATE': update,
-        'SETLOWTEMP': setLowTemp,
-        'SETHIGHTEMP': setHighTemp,
+        'SETHEATTEMP': setLowTemp,
+        'SETCOOLTEMP': setHighTemp,
         'SETMODE': setMode,
         'SETFAN': setFan,
         'SETSCHE': setScheduleMode,

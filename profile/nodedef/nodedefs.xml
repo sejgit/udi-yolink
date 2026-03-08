@@ -22,10 +22,10 @@
       <editors />
       <sts>
          <st id="GV13" editor="schIndex" />      
-         <st id="GV14" editor="schActive" />    
+         <st id="GV14" editor="schActive" />
          <st id="GV23" editor="schCount" />
          <st id="GV15" editor="stHour" />      
-         <st id="GV16" editor="stMin" />    
+         <st id="GV16" editor="stMin" />
          <st id="GV21" editor="stSec" />              
          <st id="GV17" editor="stHour" />      
          <st id="GV18" editor="stMin" />    
@@ -64,10 +64,10 @@
       <editors />
       <sts>
          <st id="GV12" editor="nbrcodes" />
-         <st id="GV13" editor="schIndex" />      
+         <st id="GV13" editor="schIndex" />
          <st id="GV14" editor="schActive" />    
          <st id="GV23" editor="schCount" />
-         <st id="GV15" editor="stHour" />      
+         <st id="GV15" editor="stHour" />
          <st id="GV16" editor="stMin" />    
          <st id="GV21" editor="stSec" />              
          <st id="GV17" editor="stHour" />      
@@ -2477,8 +2477,8 @@
          <st id="ST" editor="I_TSTAT_HCS" />
          <st id="CLITEMP" editor="celsius" />
          <st id="CLIHUM" editor="I_HUMIDITY" />
-         <st id="CLISPH" editor="I_CLISPH_DEG" />
-         <st id="CLISPC" editor="I_CLISPC_DEG" />
+         <st id="CLISPH" editor="celsius" />
+         <st id="CLISPC" editor="celsius" />
          <st id="CLIMD" editor="I_TSTAT_MODE" />
          <st id="CLIFS" editor="I_TSTAT_FAN" />
          <st id="CLISMD" editor="celsius" />
@@ -2499,11 +2499,11 @@
          </sends>
          <accepts>
             <cmd id="UPDATE" />
-            <cmd id="SETLOWTEMP">
-               <p id="" editor="celsiusSet" init="GV0"/>
+            <cmd id="SETHEATTEMP">
+               <p id="" editor="celsiusSet" init="CLISPH"/>
             </cmd>
-            <cmd id="SETHIGHTEMP">
-               <p id="" editor="celsiusSet" init="GV1"/>
+            <cmd id="SETCOOLTEMP">
+               <p id="" editor="celsiusSet" init="CLISPC"/>
             </cmd>
             <cmd id="SETMODE">
                <p id="" editor="I_TSTAT_MODE" init="CLIMD"/>
@@ -2531,8 +2531,8 @@
          <st id="CLITEMP" editor="farenheit
 " />
          <st id="CLIHUM" editor="I_HUMIDITY" />
-         <st id="CLISPH" editor="I_CLISPH_F" />
-         <st id="CLISPC" editor="I_CLISPC_F" />
+         <st id="CLISPH" editor="farenheit" />
+         <st id="CLISPC" editor="farenheit" />
          <st id="CLIMD" editor="I_TSTAT_MODE" />
          <st id="CLIFS" editor="I_TSTAT_FAN" />
          <st id="CLISMD" editor="I_CLISMD_DEG" />
@@ -2554,11 +2554,11 @@
          </sends>
          <accepts>
             <cmd id="UPDATE" />
-            <cmd id="SETLOWTEMP">
-               <p id="" editor="farenheitSet" init="GV0"/>
+            <cmd id="SETHEATTEMP">
+               <p id="" editor="farenheitSet" init="CLISPH"/>
             </cmd>
-            <cmd id="SETHIGHTEMP">
-               <p id="" editor="farenheitSet" init="GV1"/>
+            <cmd id="SETCOOLTEMP">
+               <p id="" editor="farenheitSet" init="CLISPC"/>
             </cmd>
             <cmd id="SETMODE">
                <p id="" editor="I_TSTAT_MODE"  init="CLIMD"/>

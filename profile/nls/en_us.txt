@@ -1450,8 +1450,8 @@ ST-nlsthermostatprop-GV17-NAME=Master Source
 
 # Thermostat Command Names
 CMD-nlsthermostat-UPDATE-NAME=Update
-CMD-nlsthermostat-SETLOWTEMP-NAME=Set Heat Setpoint
-CMD-nlsthermostat-SETHIGHTEMP-NAME=Set Cool Setpoint
+CMD-nlsthermostat-SETHEATTEMP-NAME=Set Heat Setpoint
+CMD-nlsthermostat-SETCOOLTEMP-NAME=Set Cool Setpoint
 CMD-nlsthermostat-SETMODE-NAME=Set Mode
 CMD-nlsthermostat-SETFAN-NAME=Set Fan
 CMD-nlsthermostat-SETSCHE-NAME=Set Schedule Mode
