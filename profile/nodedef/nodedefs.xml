@@ -2481,7 +2481,7 @@
          <st id="CLISPC" editor="I_CLISPC_DEG" />
          <st id="CLIMD" editor="I_TSTAT_MODE" />
          <st id="CLIFS" editor="I_TSTAT_FAN" />
-         <st id="CLISMD" editor="I_CLISMD_DEG" />
+         <st id="CLISMD" editor="celsius" />
          <st id="CLIHCS" editor="I_TSTAT_HCS" />
          <st id="CLIFRS" editor="I_CLIFRS" />
          <st id="GV0" editor="celsius" />
@@ -2512,43 +2512,43 @@
          <accepts>
             <cmd id="UPDATE" />
             <cmd id="SETLOWTEMP">
-               <p id="" editor="celsiusSet" />
+               <p id="" editor="celsiusSet" init="GV0"/>
             </cmd>
             <cmd id="SETHIGHTEMP">
-               <p id="" editor="celsiusSet" />
+               <p id="" editor="celsiusSet" init="GV1"/>
             </cmd>
             <cmd id="SETMODE">
-               <p id="" editor="I_TSTAT_MODE" />
+               <p id="" editor="I_TSTAT_MODE" init="CLIMD"/>
             </cmd>
             <cmd id="SETFAN">
-               <p id="" editor="I_TSTAT_FAN" />
+               <p id="" editor="I_TSTAT_FAN" init="CLIFS"/>
             </cmd>
             <cmd id="SETSCHE">
                <p id="" editor="I_CLISMD_DEG" />
             </cmd>
             <cmd id="SETECO">
-               <p id="ecomode" editor="I_ECO_MODE" />                           
+               <p id="ecomode" editor="I_ECO_MODE" init="GV4"/>                           
                <p id="ecoLow" editor="ecoSet" />       
-               <p id="ecoHigh" editor="ecoSet" />                                              
+               <p id="ecoHigh" editor="ecoSet"/>                                              
 
             </cmd>
             <cmd id="SETMINRUNTIME">
-               <p id="" editor="I_MINRUNTIME" />
+               <p id="" editor="I_MINRUNTIME" init="GV6"/>
             </cmd>
             <cmd id="SETCOOLLIMIT">
-               <p id="" editor="celsiusSet" />
+               <p id="" editor="celsiusSet" init="GV7"/>
             </cmd>
             <cmd id="SETHEATLIMIT">
-               <p id="" editor="celsiusSet" />
+               <p id="" editor="celsiusSet" init="GV8"/>
             </cmd>
             <cmd id="SETMUTE">
-               <p id="" editor="I_MUTE" />
+               <p id="" editor="I_MUTE" init="GV9"/>
             </cmd>
             <cmd id="SETMENULOCK">
-               <p id="" editor="I_MENULOCK" />
+               <p id="" editor="I_MENULOCK" init="GV10"/>
             </cmd>
             <cmd id="SETMASTER">
-               <p id="" editor="I_MASTER_SRC" />
+               <p id="" editor="I_MASTER_SRC" init="GV17"/>
             </cmd>
          </accepts>
       </cmds>
@@ -2568,29 +2568,23 @@
          <st id="CLISMD" editor="I_CLISMD_DEG" />
          <st id="CLIHCS" editor="I_TSTAT_HCS" />
          <st id="CLIFRS" editor="I_CLIFRS" />
-         <st id="GV0" editor="farenheit
-" />
-         <st id="GV1" editor="farenheit
-" />
+         <st id="GV0" editor="farenheit" />
+         <st id="GV1" editor="farenheit" />
          <st id="GV2" editor="I_AUX_HEAT" />
          <st id="GV3" editor="I_STAGE2" />
          <st id="GV4" editor="I_ECO_MODE" />
          <st id="GV5" editor="I_DR_RUNNING" />
          <st id="GV6" editor="I_MINRUNTIME" />
-         <st id="GV7" editor="farenheit
-" />
-         <st id="GV8" editor="farenheit
-" />
+         <st id="GV7" editor="farenheit" />
+         <st id="GV8" editor="farenheit" />
          <st id="GV9" editor="I_MUTE" />
          <st id="GV10" editor="I_MENULOCK" />
          <st id="GV11" editor="I_MINRUNTIME" />
          <st id="GV12" editor="I_HOURS" />
-         <st id="GV13" editor="farenheit
-" />
+         <st id="GV13" editor="farenheit" />
          <st id="GV14" editor="I_MINRUNTIME" />
          <st id="GV15" editor="I_HOURS" />
-         <st id="GV16" editor="farenheit
-" />
+         <st id="GV16" editor="farenheit" />
          <st id="GV17" editor="I_MASTER_SRC" />
          <st id="GV20" editor="I_SUSPENDED_ST" />
          <st id="GV30" editor="I_ONLINE_ST" />
