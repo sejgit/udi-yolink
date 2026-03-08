@@ -2490,18 +2490,6 @@
          <st id="GV18" editor="celsius" />
          <st id="GV19" editor="celsius" />         
          <st id="GV5" editor="I_DR_RUNNING" />
-         <st id="GV6" editor="I_MINRUNTIME" />
-         <st id="GV7" editor="celsius" />
-         <st id="GV8" editor="celsius" />
-         <st id="GV9" editor="I_MUTE" />
-         <st id="GV10" editor="I_MENULOCK" />
-         <st id="GV11" editor="I_MINRUNTIME" />
-         <st id="GV12" editor="I_HOURS" />
-         <st id="GV13" editor="celsius" />
-         <st id="GV14" editor="I_MINRUNTIME" />
-         <st id="GV15" editor="I_HOURS" />
-         <st id="GV16" editor="celsius" />
-         <st id="GV17" editor="I_MASTER_SRC" />
          <st id="GV20" editor="I_SUSPENDED_ST" />
          <st id="GV30" editor="I_ONLINE_ST" />
          <st id="TIME" editor="unixtime" />
@@ -2532,24 +2520,6 @@
                <p id="ecoHigh" editor="ecoSet" init="GV19"/>                                              
 
             </cmd>
-            <cmd id="SETMINRUNTIME">
-               <p id="" editor="I_MINRUNTIME" init="GV6"/>
-            </cmd>
-            <cmd id="SETCOOLLIMIT">
-               <p id="" editor="celsiusSet" init="GV7"/>
-            </cmd>
-            <cmd id="SETHEATLIMIT">
-               <p id="" editor="celsiusSet" init="GV8"/>
-            </cmd>
-            <cmd id="SETMUTE">
-               <p id="" editor="I_MUTE" init="GV9"/>
-            </cmd>
-            <cmd id="SETMENULOCK">
-               <p id="" editor="I_MENULOCK" init="GV10"/>
-            </cmd>
-            <cmd id="SETMASTER">
-               <p id="" editor="I_MASTER_SRC" init="GV17"/>
-            </cmd>
          </accepts>
       </cmds>
    </nodeDef>
@@ -2574,18 +2544,6 @@
          <st id="GV18" editor="farenheit" />
          <st id="GV19" editor="farenheit" />         
          <st id="GV5" editor="I_DR_RUNNING" />
-         <st id="GV6" editor="I_MINRUNTIME" />
-         <st id="GV7" editor="farenheit" />
-         <st id="GV8" editor="farenheit" />
-         <st id="GV9" editor="I_MUTE" />
-         <st id="GV10" editor="I_MENULOCK" />
-         <st id="GV11" editor="I_MINRUNTIME" />
-         <st id="GV12" editor="I_HOURS" />
-         <st id="GV13" editor="farenheit" />
-         <st id="GV14" editor="I_MINRUNTIME" />
-         <st id="GV15" editor="I_HOURS" />
-         <st id="GV16" editor="farenheit" />
-         <st id="GV17" editor="I_MASTER_SRC" />
 
          <st id="GV20" editor="I_SUSPENDED_ST" />
          <st id="GV30" editor="I_ONLINE_ST" />
@@ -2616,6 +2574,74 @@
                <p id="ecoLow" editor="ecoSetF" init="GV18"/>       
                <p id="ecoHigh" editor="ecoSetF" init="GV19" />     
             </cmd>
+         </accepts>
+      </cmds>
+   </nodeDef>
+
+   <nodeDef id="yothermprop" nls="nlsthermostatprop">
+      <editors />
+      <sts>
+         <st id="GV6" editor="I_MINRUNTIME" />
+         <st id="GV7" editor="celsius" />
+         <st id="GV8" editor="celsius" />
+         <st id="GV9" editor="I_MUTE" />
+         <st id="GV10" editor="I_MENULOCK" />
+         <st id="GV11" editor="I_MINRUNTIME" />
+         <st id="GV12" editor="I_HOURS" />
+         <st id="GV13" editor="celsius" />
+         <st id="GV14" editor="I_MINRUNTIME" />
+         <st id="GV15" editor="I_HOURS" />
+         <st id="GV16" editor="celsius" />
+         <st id="GV17" editor="I_MASTER_SRC" />
+      </sts>
+      <cmds>
+         <sends>
+         </sends>
+         <accepts>
+            <cmd id="UPDATE" />
+            <cmd id="SETMINRUNTIME">
+               <p id="" editor="I_MINRUNTIME" init="GV6"/>
+            </cmd>
+            <cmd id="SETCOOLLIMIT">
+               <p id="" editor="celsiusSet" init="GV7"/>
+            </cmd>
+            <cmd id="SETHEATLIMIT">
+               <p id="" editor="celsiusSet" init="GV8"/>
+            </cmd>
+            <cmd id="SETMUTE">
+               <p id="" editor="I_MUTE" init="GV9"/>
+            </cmd>
+            <cmd id="SETMENULOCK">
+               <p id="" editor="I_MENULOCK" init="GV10"/>
+            </cmd>
+            <cmd id="SETMASTER">
+               <p id="" editor="I_MASTER_SRC" init="GV17"/>
+            </cmd>
+         </accepts>
+      </cmds>
+   </nodeDef>
+
+   <nodeDef id="yothermpropf" nls="nlsthermostatprop">
+      <editors />
+      <sts>
+         <st id="GV6" editor="I_MINRUNTIME" />
+         <st id="GV7" editor="farenheit" />
+         <st id="GV8" editor="farenheit" />
+         <st id="GV9" editor="I_MUTE" />
+         <st id="GV10" editor="I_MENULOCK" />
+         <st id="GV11" editor="I_MINRUNTIME" />
+         <st id="GV12" editor="I_HOURS" />
+         <st id="GV13" editor="farenheit" />
+         <st id="GV14" editor="I_MINRUNTIME" />
+         <st id="GV15" editor="I_HOURS" />
+         <st id="GV16" editor="farenheit" />
+         <st id="GV17" editor="I_MASTER_SRC" />
+      </sts>
+      <cmds>
+         <sends>
+         </sends>
+         <accepts>
+            <cmd id="UPDATE" />
             <cmd id="SETMINRUNTIME">
                <p id="" editor="I_MINRUNTIME" init="GV6"/>
             </cmd>

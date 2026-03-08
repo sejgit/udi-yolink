@@ -40,18 +40,6 @@ class udiYoThermostat(udi_interface.Node):
         {'driver': 'GV18', 'value': 99, 'uom': 4},        # ECO low temp offset (Celsius)
         {'driver': 'GV19', 'value': 99, 'uom': 4},        # ECO high temp offset (Celsius)        
         {'driver': 'GV5', 'value': 99, 'uom': 25},        # DR running (UoM 25: 0=no, 1=yes)
-        {'driver': 'GV6', 'value': 99, 'uom': 44},        # minRuntime (minutes)
-        {'driver': 'GV7', 'value': 99, 'uom': 4},         # coolLimit (Celsius)
-        {'driver': 'GV8', 'value': 99, 'uom': 4},         # heatLimit (Celsius)
-        {'driver': 'GV9', 'value': 99, 'uom': 25},        # mute (0=no, 1=yes)
-        {'driver': 'GV10', 'value': 99, 'uom': 25},       # menuLock (0=no, 1=yes)
-        {'driver': 'GV11', 'value': 99, 'uom': 44},       # auxStandby (minutes)
-        {'driver': 'GV12', 'value': 99, 'uom': 20},       # auxMaxSpan (hours)
-        {'driver': 'GV13', 'value': 99, 'uom': 4},        # auxThreshold (Celsius)
-        {'driver': 'GV14', 'value': 99, 'uom': 44},       # stage2Standby (minutes)
-        {'driver': 'GV15', 'value': 99, 'uom': 20},       # stage2MaxSpan (hours)
-        {'driver': 'GV16', 'value': 99, 'uom': 4},        # stage2Threshold (Celsius)
-        {'driver': 'GV17', 'value': 99, 'uom': 25},       # master temp source (0=local, 1=sensor1, 2=sensor2)
 
         {'driver': 'GV20', 'value': 99, 'uom': 25},       # Suspended state (UoM 25: 0=not suspended, 1=suspended, 2=error)
         {'driver': 'GV30', 'value': 99, 'uom': 25},       # Online status (UoM 25: 0=offline, 1=online)
@@ -71,6 +59,7 @@ class udiYoThermostat(udi_interface.Node):
         self.node_ready = False
         self.system_ready = False
         self.temp_unit = self.yoAccess.get_temp_unit()
+        self.properties_node = None
         self.n_queue = []
 
         # Set node ID based on temperature unit
@@ -107,6 +96,18 @@ class udiYoThermostat(udi_interface.Node):
             logging.info('Waiting for thermostat to come online...')
             time.sleep(2)
             tries += 1
+
+        # Create child node that owns thermostat properties and related controls.
+        prop_address = self.poly.getValidAddress(f'{self.address[4:14]}_TPR'[:14])
+        self.properties_node = udiYoThermostatProperties(
+            self.poly,
+            self.address,
+            prop_address,
+            f'{self.name} Properties',
+            self,
+        )
+        self.adr_list.append(prop_address)
+
         self.system_ready = True
         logging.info('Thermostat online and ready')
 
@@ -164,7 +165,9 @@ class udiYoThermostat(udi_interface.Node):
                 drRunning = self.yoThermostat.get_data('drRunning', 'other')
 
                 # Eco mode
-                eco = self.yoThermostat.get_data('eco','state')
+                eco_mode = self.yoThermostat.get_data('mode','eco')
+                eco_highTemp = self.yoThermostat.get_data('highTemp','eco')
+                eco_lowTemp = self.yoThermostat.get_data('lowTemp','eco')
 
                 # Current temperature
                 if isinstance(currentTemp, (int, float)):
@@ -237,24 +240,21 @@ class udiYoThermostat(udi_interface.Node):
                     self.my_setDriver('GV3', 1 if stage2 else 0, 25, type=message_type)
 
                 # ECO mode (UoM 25 = index)
-                logging.debug(f'Parsing ECO data: {eco}')
-                if eco and isinstance(eco, dict):
-                    eco_mode = eco.get('mode')
+                logging.debug(f'Parsing ECO data: mode={eco_mode}, low={eco_lowTemp}, high={eco_highTemp}')
+                if eco_mode and isinstance(eco_mode, str):
                     self.my_setDriver('GV4', 1 if eco_mode.lower() == 'on' else 0, 25, type=message_type)
 
-                    eco_low = eco.get('lowTemp')
-                    if isinstance(eco_low, (int, float)):
-                        if self.temp_unit == 1:
-                            self.my_setDriver('GV18', round(eco_low * 9/5, 1), 17, type=message_type)
-                        else:
-                            self.my_setDriver('GV18', round(eco_low, 1), 4, type=message_type)
+                if eco_lowTemp is not None and isinstance(eco_lowTemp, (int, float)):
+                    if self.temp_unit == 1:
+                        self.my_setDriver('GV18', round(eco_lowTemp * 9/5, 1), 17, type=message_type)
+                    else:
+                        self.my_setDriver('GV18', round(eco_lowTemp, 1), 4, type=message_type)
 
-                    eco_high = eco.get('highTemp')
-                    if isinstance(eco_high, (int, float)):
-                        if self.temp_unit == 1:
-                            self.my_setDriver('GV19', round(eco_high * 9/5, 1), 17, type=message_type)
-                        else:
-                            self.my_setDriver('GV19', round(eco_high, 1), 4, type=message_type)
+                if eco_highTemp is not None and isinstance(eco_highTemp, (int, float)):
+                    if self.temp_unit == 1:
+                        self.my_setDriver('GV19', round(eco_highTemp * 9/5, 1), 17, type=message_type)
+                    else:
+                        self.my_setDriver('GV19', round(eco_highTemp, 1), 4, type=message_type)
 
                 # DR running state (UoM 25: 0=no, 1=yes)
                 if drRunning is not None:
@@ -263,67 +263,8 @@ class udiYoThermostat(udi_interface.Node):
                 # Properties
                 properties = self.yoThermostat.get_data('properties','state')
                 logging.debug(f'Parsing properties data: {properties}')
-                if properties and isinstance(properties, dict):
-                    minRuntime = properties.get('minRuntime')
-                    if isinstance(minRuntime, (int, float)):
-                        self.my_setDriver('GV6', int(minRuntime), 44, type=message_type)
-                    
-                    coolLimit = properties.get('coolLimit')
-                    if isinstance(coolLimit, (int, float)):
-                        if self.temp_unit == 1:
-                            self.my_setDriver('GV7', round(coolLimit * 9/5 + 32, 1), 17, type=message_type)
-                        else:
-                            self.my_setDriver('GV7', round(coolLimit, 1), 4, type=message_type)
-                    
-                    heatLimit = properties.get('heatLimit')
-                    if isinstance(heatLimit, (int, float)):
-                        if self.temp_unit == 1:
-                            self.my_setDriver('GV8', round(heatLimit * 9/5 + 32, 1), 17, type=message_type)
-                        else:
-                            self.my_setDriver('GV8', round(heatLimit, 1), 4, type=message_type)
-                    
-                    mute = properties.get('mute')
-                    if mute is not None:
-                        self.my_setDriver('GV9', 1 if mute else 0, 25, type=message_type)
-                    
-                    menuLock = properties.get('menuLock')
-                    if menuLock is not None:
-                        self.my_setDriver('GV10', 1 if menuLock else 0, 25, type=message_type)
-                    
-                    auxStandby = properties.get('auxStandby')
-                    if isinstance(auxStandby, (int, float)):
-                        self.my_setDriver('GV11', int(auxStandby), 44, type=message_type)
-                    
-                    auxMaxSpan = properties.get('auxMaxSpan')
-                    if isinstance(auxMaxSpan, (int, float)):
-                        self.my_setDriver('GV12', int(auxMaxSpan), 20, type=message_type)
-                    
-                    auxThreshold = properties.get('auxThreshold')
-                    if isinstance(auxThreshold, (int, float)):
-                        if self.temp_unit == 1:
-                            self.my_setDriver('GV13', round(auxThreshold * 9/5 + 32, 1), 17, type=message_type)
-                        else:
-                            self.my_setDriver('GV13', round(auxThreshold, 1), 4, type=message_type)
-                    
-                    stage2Standby = properties.get('stage2Standby')
-                    if isinstance(stage2Standby, (int, float)):
-                        self.my_setDriver('GV14', int(stage2Standby), 44, type=message_type)
-                    
-                    stage2MaxSpan = properties.get('stage2MaxSpan')
-                    if isinstance(stage2MaxSpan, (int, float)):
-                        self.my_setDriver('GV15', int(stage2MaxSpan), 20, type=message_type)
-                    
-                    stage2Threshold = properties.get('stage2Threshold')
-                    if isinstance(stage2Threshold, (int, float)):
-                        if self.temp_unit == 1:
-                            self.my_setDriver('GV16', round(stage2Threshold * 9/5 + 32, 1), 17, type=message_type)
-                        else:
-                            self.my_setDriver('GV16', round(stage2Threshold, 1), 4, type=message_type)
-                    
-                    master = properties.get('master')
-                    if master:
-                        master_map = {'local': 0, 'sensor1': 1, 'sensor2': 2}
-                        self.my_setDriver('GV17', master_map.get(master.lower(), 99), 25, type=message_type)
+                if properties and isinstance(properties, dict) and self.properties_node is not None:
+                    self.properties_node.updateProperties(properties, message_type)
 
                 # Suspended state check
                 if self.yoThermostat.suspended:
@@ -455,82 +396,6 @@ class udiYoThermostat(udi_interface.Node):
         except (ValueError, TypeError) as e:
             logging.error(f'setEco invalid value: {e} | command={command}')
 
-    def setMinRuntime(self, command):
-        """Set minimum runtime in minutes"""
-        try:
-            minutes = int(command.get('value'))
-            logging.info(f'udiYoThermostat setMinRuntime - {minutes}')
-            if self.yoThermostat:
-                self.yoThermostat.setProperties(minRuntime=minutes)
-        except (ValueError, TypeError) as e:
-            logging.error(f'setMinRuntime invalid value: {e}')
-
-    def setCoolLimit(self, command):
-        """Set cool limit temperature"""
-        try:
-            temp = float(command.get('value'))
-            if self.temp_unit == 1:
-                temp_celsius = round((temp - 32) * 5/9, 1)
-                logging.info(f'udiYoThermostat setCoolLimit - {temp}°F ({temp_celsius}°C)')
-                if self.yoThermostat:
-                    self.yoThermostat.setProperties(coolLimit=temp_celsius)
-            else:
-                logging.info(f'udiYoThermostat setCoolLimit - {temp}°C')
-                if self.yoThermostat:
-                    self.yoThermostat.setProperties(coolLimit=temp)
-        except (ValueError, TypeError) as e:
-            logging.error(f'setCoolLimit invalid value: {e}')
-
-    def setHeatLimit(self, command):
-        """Set heat limit temperature"""
-        try:
-            temp = float(command.get('value'))
-            if self.temp_unit == 1:
-                temp_celsius = round((temp - 32) * 5/9, 1)
-                logging.info(f'udiYoThermostat setHeatLimit - {temp}°F ({temp_celsius}°C)')
-                if self.yoThermostat:
-                    self.yoThermostat.setProperties(heatLimit=temp_celsius)
-            else:
-                logging.info(f'udiYoThermostat setHeatLimit - {temp}°C')
-                if self.yoThermostat:
-                    self.yoThermostat.setProperties(heatLimit=temp)
-        except (ValueError, TypeError) as e:
-            logging.error(f'setHeatLimit invalid value: {e}')
-
-    def setMute(self, command):
-        """Set mute setting (0=off, 1=on)"""
-        try:
-            mute_val = int(command.get('value'))
-            mute = True if mute_val == 1 else False
-            logging.info(f'udiYoThermostat setMute - {mute}')
-            if self.yoThermostat:
-                self.yoThermostat.setProperties(mute=mute)
-        except (ValueError, TypeError) as e:
-            logging.error(f'setMute invalid value: {e}')
-
-    def setMenuLock(self, command):
-        """Set menu lock (0=off, 1=on)"""
-        try:
-            lock_val = int(command.get('value'))
-            lock = True if lock_val == 1 else False
-            logging.info(f'udiYoThermostat setMenuLock - {lock}')
-            if self.yoThermostat:
-                self.yoThermostat.setProperties(menuLock=lock)
-        except (ValueError, TypeError) as e:
-            logging.error(f'setMenuLock invalid value: {e}')
-
-    def setMaster(self, command):
-        """Set master temperature source (0=local, 1=sensor1, 2=sensor2)"""
-        try:
-            master_val = int(command.get('value'))
-            master_map = {0: 'local', 1: 'sensor1', 2: 'sensor2'}
-            master = master_map.get(master_val, 'local')
-            logging.info(f'udiYoThermostat setMaster - {master}')
-            if self.yoThermostat:
-                self.yoThermostat.setProperties(master=master)
-        except (ValueError, TypeError) as e:
-            logging.error(f'setMaster invalid value: {e}')
-
     commands = {
         'UPDATE': update,
         'SETLOWTEMP': setLowTemp,
@@ -539,6 +404,179 @@ class udiYoThermostat(udi_interface.Node):
         'SETFAN': setFan,
         'SETSCHE': setScheduleMode,
         'SETECO': setEco,
+    }
+
+
+class udiYoThermostatProperties(udi_interface.Node):
+    from udiYolinkLib import my_setDriver, node_queue, wait_for_node_done
+
+    id = 'yothermprop'
+
+    drivers = [
+        {'driver': 'GV6', 'value': 99, 'uom': 44},        # minRuntime (minutes)
+        {'driver': 'GV7', 'value': 99, 'uom': 4},         # coolLimit (Celsius)
+        {'driver': 'GV8', 'value': 99, 'uom': 4},         # heatLimit (Celsius)
+        {'driver': 'GV9', 'value': 99, 'uom': 25},        # mute (0=no, 1=yes)
+        {'driver': 'GV10', 'value': 99, 'uom': 25},       # menuLock (0=no, 1=yes)
+        {'driver': 'GV11', 'value': 99, 'uom': 44},       # auxStandby (minutes)
+        {'driver': 'GV12', 'value': 99, 'uom': 20},       # auxMaxSpan (hours)
+        {'driver': 'GV13', 'value': 99, 'uom': 4},        # auxThreshold (Celsius)
+        {'driver': 'GV14', 'value': 99, 'uom': 44},       # stage2Standby (minutes)
+        {'driver': 'GV15', 'value': 99, 'uom': 20},       # stage2MaxSpan (hours)
+        {'driver': 'GV16', 'value': 99, 'uom': 4},        # stage2Threshold (Celsius)
+        {'driver': 'GV17', 'value': 99, 'uom': 25},       # master temp source (0=local, 1=sensor1, 2=sensor2)
+    ]
+
+    def __init__(self, polyglot, primary, address, name, thermostat_node):
+        super().__init__(polyglot, primary, address, name)
+        self.poly = polyglot
+        self.parent_node = thermostat_node
+        self.temp_unit = thermostat_node.temp_unit
+        self.node_ready = False
+        self.n_queue = []
+
+        if self.temp_unit == 1:
+            self.id = 'yothermpropf'
+
+        self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+        self.poly.addNode(self, conn_status=None, rename=True)
+        self.wait_for_node_done()
+        self.node_ready = True
+
+    def _yo(self):
+        return self.parent_node.yoThermostat if self.parent_node else None
+
+    def updateProperties(self, properties, message_type=None):
+        if not isinstance(properties, dict):
+            return
+
+        minRuntime = properties.get('minRuntime')
+        if isinstance(minRuntime, (int, float)):
+            self.my_setDriver('GV6', int(minRuntime), 44, type=message_type)
+
+        coolLimit = properties.get('coolLimit')
+        if isinstance(coolLimit, (int, float)):
+            if self.temp_unit == 1:
+                self.my_setDriver('GV7', round(coolLimit * 9/5 + 32, 1), 17, type=message_type)
+            else:
+                self.my_setDriver('GV7', round(coolLimit, 1), 4, type=message_type)
+
+        heatLimit = properties.get('heatLimit')
+        if isinstance(heatLimit, (int, float)):
+            if self.temp_unit == 1:
+                self.my_setDriver('GV8', round(heatLimit * 9/5 + 32, 1), 17, type=message_type)
+            else:
+                self.my_setDriver('GV8', round(heatLimit, 1), 4, type=message_type)
+
+        mute = properties.get('mute')
+        if mute is not None:
+            self.my_setDriver('GV9', 1 if mute else 0, 25, type=message_type)
+
+        menuLock = properties.get('menuLock')
+        if menuLock is not None:
+            self.my_setDriver('GV10', 1 if menuLock else 0, 25, type=message_type)
+
+        auxStandby = properties.get('auxStandby')
+        if isinstance(auxStandby, (int, float)):
+            self.my_setDriver('GV11', int(auxStandby), 44, type=message_type)
+
+        auxMaxSpan = properties.get('auxMaxSpan')
+        if isinstance(auxMaxSpan, (int, float)):
+            self.my_setDriver('GV12', int(auxMaxSpan), 20, type=message_type)
+
+        auxThreshold = properties.get('auxThreshold')
+        if isinstance(auxThreshold, (int, float)):
+            if self.temp_unit == 1:
+                self.my_setDriver('GV13', round(auxThreshold * 9/5 + 32, 1), 17, type=message_type)
+            else:
+                self.my_setDriver('GV13', round(auxThreshold, 1), 4, type=message_type)
+
+        stage2Standby = properties.get('stage2Standby')
+        if isinstance(stage2Standby, (int, float)):
+            self.my_setDriver('GV14', int(stage2Standby), 44, type=message_type)
+
+        stage2MaxSpan = properties.get('stage2MaxSpan')
+        if isinstance(stage2MaxSpan, (int, float)):
+            self.my_setDriver('GV15', int(stage2MaxSpan), 20, type=message_type)
+
+        stage2Threshold = properties.get('stage2Threshold')
+        if isinstance(stage2Threshold, (int, float)):
+            if self.temp_unit == 1:
+                self.my_setDriver('GV16', round(stage2Threshold * 9/5 + 32, 1), 17, type=message_type)
+            else:
+                self.my_setDriver('GV16', round(stage2Threshold, 1), 4, type=message_type)
+
+        master = properties.get('master')
+        if master:
+            master_map = {'local': 0, 'sensor1': 1, 'sensor2': 2}
+            self.my_setDriver('GV17', master_map.get(str(master).lower(), 99), 25, type=message_type)
+
+    def update(self, command=None):
+        yo = self._yo()
+        if yo:
+            yo.refreshDevice()
+
+    def setMinRuntime(self, command):
+        try:
+            minutes = int(command.get('value'))
+            yo = self._yo()
+            if yo:
+                yo.setProperties(minRuntime=minutes)
+        except (ValueError, TypeError) as e:
+            logging.error(f'setMinRuntime invalid value: {e}')
+
+    def setCoolLimit(self, command):
+        try:
+            temp = float(command.get('value'))
+            yo = self._yo()
+            if yo:
+                if self.temp_unit == 1:
+                    temp = round((temp - 32) * 5/9, 1)
+                yo.setProperties(coolLimit=temp)
+        except (ValueError, TypeError) as e:
+            logging.error(f'setCoolLimit invalid value: {e}')
+
+    def setHeatLimit(self, command):
+        try:
+            temp = float(command.get('value'))
+            yo = self._yo()
+            if yo:
+                if self.temp_unit == 1:
+                    temp = round((temp - 32) * 5/9, 1)
+                yo.setProperties(heatLimit=temp)
+        except (ValueError, TypeError) as e:
+            logging.error(f'setHeatLimit invalid value: {e}')
+
+    def setMute(self, command):
+        try:
+            mute_val = int(command.get('value'))
+            yo = self._yo()
+            if yo:
+                yo.setProperties(mute=(mute_val == 1))
+        except (ValueError, TypeError) as e:
+            logging.error(f'setMute invalid value: {e}')
+
+    def setMenuLock(self, command):
+        try:
+            lock_val = int(command.get('value'))
+            yo = self._yo()
+            if yo:
+                yo.setProperties(menuLock=(lock_val == 1))
+        except (ValueError, TypeError) as e:
+            logging.error(f'setMenuLock invalid value: {e}')
+
+    def setMaster(self, command):
+        try:
+            master_val = int(command.get('value'))
+            master_map = {0: 'local', 1: 'sensor1', 2: 'sensor2'}
+            yo = self._yo()
+            if yo:
+                yo.setProperties(master=master_map.get(master_val, 'local'))
+        except (ValueError, TypeError) as e:
+            logging.error(f'setMaster invalid value: {e}')
+
+    commands = {
+        'UPDATE': update,
         'SETMINRUNTIME': setMinRuntime,
         'SETCOOLLIMIT': setCoolLimit,
         'SETHEATLIMIT': setHeatLimit,

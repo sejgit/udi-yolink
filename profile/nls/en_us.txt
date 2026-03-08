@@ -1408,6 +1408,10 @@ ND-yothermostat-NAME=YoLink Thermostat (C)
 ND-yothermostat-ICON=Thermostat
 ND-yothermostatf-NAME=YoLink Thermostat (F)
 ND-yothermostatf-ICON=Thermostat
+ND-yothermprop-NAME=Thermostat Properties (C)
+ND-yothermprop-ICON=Thermostat
+ND-yothermpropf-NAME=Thermostat Properties (F)
+ND-yothermpropf-ICON=Thermostat
 
 # Thermostat Status Names
 ST-nlsthermostat-ST-NAME=Running State
@@ -1424,23 +1428,24 @@ ST-nlsthermostat-GV2-NAME=Aux Heat Running
 ST-nlsthermostat-GV3-NAME=Stage 2 Running
 ST-nlsthermostat-GV4-NAME=ECO Mode
 ST-nlsthermostat-GV5-NAME=Demand Response Running
-ST-nlsthermostat-GV6-NAME=Min Runtime
-ST-nlsthermostat-GV7-NAME=Cool Limit
-ST-nlsthermostat-GV8-NAME=Heat Limit
-ST-nlsthermostat-GV9-NAME=Mute
-ST-nlsthermostat-GV10-NAME=Menu Lock
-ST-nlsthermostat-GV11-NAME=Aux Standby
-ST-nlsthermostat-GV12-NAME=Aux Max Span
-ST-nlsthermostat-GV13-NAME=Aux Threshold
-ST-nlsthermostat-GV14-NAME=Stage2 Standby
-ST-nlsthermostat-GV15-NAME=Stage2 Max Span
-ST-nlsthermostat-GV16-NAME=Stage2 Threshold
-ST-nlsthermostat-GV17-NAME=Master Source
 ST-nlsthermostat-GV18-NAME=ECO Low Temp
 ST-nlsthermostat-GV19-NAME=ECO High Temp
 ST-nlsthermostat-GV20-NAME=Suspended
 ST-nlsthermostat-GV30-NAME=Online
 ST-nlsthermostat-TIME-NAME=Last Update
+
+ST-nlsthermostatprop-GV6-NAME=Min Runtime
+ST-nlsthermostatprop-GV7-NAME=Cool Limit
+ST-nlsthermostatprop-GV8-NAME=Heat Limit
+ST-nlsthermostatprop-GV9-NAME=Mute
+ST-nlsthermostatprop-GV10-NAME=Menu Lock
+ST-nlsthermostatprop-GV11-NAME=Aux Standby
+ST-nlsthermostatprop-GV12-NAME=Aux Max Span
+ST-nlsthermostatprop-GV13-NAME=Aux Threshold
+ST-nlsthermostatprop-GV14-NAME=Stage2 Standby
+ST-nlsthermostatprop-GV15-NAME=Stage2 Max Span
+ST-nlsthermostatprop-GV16-NAME=Stage2 Threshold
+ST-nlsthermostatprop-GV17-NAME=Master Source
 
 
 # Thermostat Command Names
@@ -1451,12 +1456,14 @@ CMD-nlsthermostat-SETMODE-NAME=Set Mode
 CMD-nlsthermostat-SETFAN-NAME=Set Fan
 CMD-nlsthermostat-SETSCHE-NAME=Set Schedule Mode
 CMD-nlsthermostat-SETECO-NAME=Set ECO Mode
-CMD-nlsthermostat-SETMINRUNTIME-NAME=Set Min Runtime
-CMD-nlsthermostat-SETCOOLLIMIT-NAME=Set Cool Limit
-CMD-nlsthermostat-SETHEATLIMIT-NAME=Set Heat Limit
-CMD-nlsthermostat-SETMUTE-NAME=Set Mute
-CMD-nlsthermostat-SETMENULOCK-NAME=Set Menu Lock
-CMD-nlsthermostat-SETMASTER-NAME=Set Master Source
+
+CMD-nlsthermostatprop-UPDATE-NAME=Update
+CMD-nlsthermostatprop-SETMINRUNTIME-NAME=Set Min Runtime
+CMD-nlsthermostatprop-SETCOOLLIMIT-NAME=Set Cool Limit
+CMD-nlsthermostatprop-SETHEATLIMIT-NAME=Set Heat Limit
+CMD-nlsthermostatprop-SETMUTE-NAME=Set Mute
+CMD-nlsthermostatprop-SETMENULOCK-NAME=Set Menu Lock
+CMD-nlsthermostatprop-SETMASTER-NAME=Set Master Source
 
 
 # Thermostat Value NLS
