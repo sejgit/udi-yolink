@@ -37,6 +37,8 @@ class udiYoThermostat(udi_interface.Node):
         {'driver': 'GV2', 'value': 99, 'uom': 25},        # Aux heat running (UoM 25: 0=no, 1=yes)
         {'driver': 'GV3', 'value': 99, 'uom': 25},        # Second stage running (UoM 25: 0=no, 1=yes)
         {'driver': 'GV4', 'value': 99, 'uom': 25},        # ECO mode (UoM 25: 0=off, 1=on)
+        {'driver': 'GV18', 'value': 99, 'uom': 4},        # ECO low temp offset (Celsius)
+        {'driver': 'GV19', 'value': 99, 'uom': 4},        # ECO high temp offset (Celsius)        
         {'driver': 'GV5', 'value': 99, 'uom': 25},        # DR running (UoM 25: 0=no, 1=yes)
         {'driver': 'GV6', 'value': 99, 'uom': 44},        # minRuntime (minutes)
         {'driver': 'GV7', 'value': 99, 'uom': 4},         # coolLimit (Celsius)
@@ -50,8 +52,7 @@ class udiYoThermostat(udi_interface.Node):
         {'driver': 'GV15', 'value': 99, 'uom': 20},       # stage2MaxSpan (hours)
         {'driver': 'GV16', 'value': 99, 'uom': 4},        # stage2Threshold (Celsius)
         {'driver': 'GV17', 'value': 99, 'uom': 25},       # master temp source (0=local, 1=sensor1, 2=sensor2)
-        {'driver': 'GV18', 'value': 99, 'uom': 4},        # ECO low temp offset (Celsius)
-        {'driver': 'GV19', 'value': 99, 'uom': 4},        # ECO high temp offset (Celsius)
+
         {'driver': 'GV20', 'value': 99, 'uom': 25},       # Suspended state (UoM 25: 0=not suspended, 1=suspended, 2=error)
         {'driver': 'GV30', 'value': 99, 'uom': 25},       # Online status (UoM 25: 0=offline, 1=online)
         {'driver': 'TIME', 'value': int(time.time()), 'uom': 151},  # Last update time (UoM 151=Unix Timestamp)
@@ -163,7 +164,7 @@ class udiYoThermostat(udi_interface.Node):
                 drRunning = self.yoThermostat.get_data('drRunning', 'other')
 
                 # Eco mode
-                eco = self.yoThermostat.get_data('eco')
+                eco = self.yoThermostat.get_data('eco','state')
 
                 # Current temperature
                 if isinstance(currentTemp, (int, float)):
@@ -212,16 +213,22 @@ class udiYoThermostat(udi_interface.Node):
 
                 # Optional sensors
                 if isinstance(sensor1, (int, float)):
-                    if self.temp_unit == 1:
-                        self.my_setDriver('GV0', round(sensor1 * 9/5 + 32, 1), 17, type=message_type)
+                    if sensor1<=-100 or sensor1>=200:  # Invalid reading, set to error value
+                        self.my_setDriver('GV0', 99, 25, type=message_type)
                     else:
-                        self.my_setDriver('GV0', round(sensor1, 1), 4, type=message_type)
+                        if self.temp_unit == 1:
+                            self.my_setDriver('GV0', round(sensor1 * 9/5 + 32, 1), 17, type=message_type)
+                        else:
+                            self.my_setDriver('GV0', round(sensor1, 1), 4, type=message_type)
 
                 if isinstance(sensor2, (int, float)):
-                    if self.temp_unit == 1:
-                        self.my_setDriver('GV1', round(sensor2 * 9/5 + 32, 1), 17, type=message_type)
+                    if sensor2<=-100 or sensor2>=200:  # Invalid reading, set to error value
+                        self.my_setDriver('GV1', 99, 25, type=message_type)
                     else:
-                        self.my_setDriver('GV1', round(sensor2, 1), 4, type=message_type)
+                        if self.temp_unit == 1:
+                            self.my_setDriver('GV1', round(sensor2 * 9/5 + 32, 1), 17, type=message_type)
+                        else:
+                            self.my_setDriver('GV1', round(sensor2, 1), 4, type=message_type)
 
                 # Optional other states (UoM 25 = index)
                 if auxHeat is not None:
@@ -230,8 +237,9 @@ class udiYoThermostat(udi_interface.Node):
                     self.my_setDriver('GV3', 1 if stage2 else 0, 25, type=message_type)
 
                 # ECO mode (UoM 25 = index)
+                logging.debug(f'Parsing ECO data: {eco}')
                 if eco and isinstance(eco, dict):
-                    eco_mode = eco.get('mode', 'off')
+                    eco_mode = eco.get('mode')
                     self.my_setDriver('GV4', 1 if eco_mode.lower() == 'on' else 0, 25, type=message_type)
 
                     eco_low = eco.get('lowTemp')
@@ -253,7 +261,8 @@ class udiYoThermostat(udi_interface.Node):
                     self.my_setDriver('GV5', 1 if drRunning else 0, 25, type=message_type)
 
                 # Properties
-                properties = self.yoThermostat.get_data('properties')
+                properties = self.yoThermostat.get_data('properties','state')
+                logging.debug(f'Parsing properties data: {properties}')
                 if properties and isinstance(properties, dict):
                     minRuntime = properties.get('minRuntime')
                     if isinstance(minRuntime, (int, float)):

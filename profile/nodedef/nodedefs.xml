@@ -2487,6 +2487,8 @@
          <st id="GV2" editor="I_AUX_HEAT" />
          <st id="GV3" editor="I_STAGE2" />
          <st id="GV4" editor="I_ECO_MODE" />
+         <st id="GV18" editor="celsius" />
+         <st id="GV19" editor="celsius" />         
          <st id="GV5" editor="I_DR_RUNNING" />
          <st id="GV6" editor="I_MINRUNTIME" />
          <st id="GV7" editor="celsius" />
@@ -2500,8 +2502,6 @@
          <st id="GV15" editor="I_HOURS" />
          <st id="GV16" editor="celsius" />
          <st id="GV17" editor="I_MASTER_SRC" />
-         <st id="GV18" editor="celsius" />
-         <st id="GV19" editor="celsius" />
          <st id="GV20" editor="I_SUSPENDED_ST" />
          <st id="GV30" editor="I_ONLINE_ST" />
          <st id="TIME" editor="unixtime" />
@@ -2571,6 +2571,8 @@
          <st id="GV2" editor="I_AUX_HEAT" />
          <st id="GV3" editor="I_STAGE2" />
          <st id="GV4" editor="I_ECO_MODE" />
+         <st id="GV18" editor="farenheit" />
+         <st id="GV19" editor="farenheit" />         
          <st id="GV5" editor="I_DR_RUNNING" />
          <st id="GV6" editor="I_MINRUNTIME" />
          <st id="GV7" editor="farenheit" />
@@ -2584,8 +2586,7 @@
          <st id="GV15" editor="I_HOURS" />
          <st id="GV16" editor="farenheit" />
          <st id="GV17" editor="I_MASTER_SRC" />
-         <st id="GV18" editor="farenheit" />
-         <st id="GV19" editor="farenheit" />
+
          <st id="GV20" editor="I_SUSPENDED_ST" />
          <st id="GV30" editor="I_ONLINE_ST" />
          <st id="TIME" editor="unixtime" />
