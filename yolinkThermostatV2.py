@@ -152,7 +152,7 @@ class YoLinkThermostat(YoLinkMQTTDevice):
             logging.warning('setProperties called with no valid parameters')
             return False
         
-        return yolink.setDevice(data)
+        return yolink.yoAccess.publish_data(data)
 
     def setCorrection(yolink, temperature=None, humidity=None):
         """Set temperature and humidity sensor corrections
