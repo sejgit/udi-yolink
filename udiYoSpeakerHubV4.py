@@ -56,6 +56,7 @@ class udiYoSpeakerHub(udi_interface.Node):
         self.yoAccess = yoAccess
         self.yoSpeakerHub = None
         self.node_ready = False
+        self.system_ready=False
         self.n_queue = []
 
         #self.Parameters = Custom(polyglot, 'customparams')
@@ -101,8 +102,8 @@ class udiYoSpeakerHub(udi_interface.Node):
         self.updateData()
         #self.my_setDriver('GV30', 1)
         #time.sleep(3)
+        self.system_ready=True
 
- 
     def bool2nbr (self, boolean):
         if boolean:
             return(1)
@@ -141,7 +142,7 @@ class udiYoSpeakerHub(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             self.my_setDriver('TIME', self.yoSpeakerHub.getLastUpdateTime(), 151)
             logging.debug(f'TIME {self.yoSpeakerHub.getLastUpdateTime()}')

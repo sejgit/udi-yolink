@@ -134,6 +134,7 @@ class udiYoLeakSensor(udi_interface.Node):
         
         self.yoLeakSensor  = None
         self.node_ready = False
+        self.system_ready=False
         self.last_state = 99
         self.cmd_state = self.retrieve_cmd_state()
         self.n_queue = []   
@@ -167,6 +168,8 @@ class udiYoLeakSensor(udi_interface.Node):
         #time.sleep(3)
     
     '''
+        self.system_ready=True
+
     def initNode(self):
         self.yoLeakSensor.refreshSensor()
     '''
@@ -191,7 +194,7 @@ class udiYoLeakSensor(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             message_type, action_type = self.yoLeakSensor.get_message_type() # if event some data may not be updated 
             unix_time = self.yoLeakSensor.get_report_time('reportAt')

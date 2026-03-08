@@ -56,6 +56,7 @@ class udiYoLockV2(udi_interface.Node):
         self.devInfo =  deviceInfo
         self.yoLock = None
         self.node_ready = False
+        self.system_ready=False
         self.last_state = ''
         self.powerSupported = True # assume
         if deviceInfo.get('type') in ['LockV2']:
@@ -88,7 +89,7 @@ class udiYoLockV2(udi_interface.Node):
         time.sleep(2)
         self.yoLock.initNode()
         self.my_setDriver('GV30', 1)
-
+        self.system_ready=True
 
     def stop (self):
         logging.info('Stop udiYoLock')
@@ -126,7 +127,7 @@ class udiYoLockV2(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             message_type = self.yoLock.get_message_type() # if event some data may not be updated 
             unix_time = self.yoLock.get_report_time('reportAt')
@@ -287,6 +288,7 @@ class udiYoLock(udi_interface.Node):
         self.devInfo =  deviceInfo
         self.yoLock = None
         self.node_ready = False
+        self.system_ready=False
         self.last_state = ''
         self.powerSupported = True # assume
         if deviceInfo.get('type') in ['LockV2']:
@@ -319,7 +321,7 @@ class udiYoLock(udi_interface.Node):
         time.sleep(2)
         self.yoLock.initNode()
         self.my_setDriver('GV30', 1)
-
+        self.system_ready=True
 
     def stop (self):
         logging.info('Stop udiYoLock')
@@ -335,7 +337,7 @@ class udiYoLock(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             message_type = self.yoLock.get_message_type() # if event some data may not be updated 
             unix_time = self.yoLock.get_report_time('reportAt')

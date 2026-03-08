@@ -51,6 +51,7 @@ class udiYoSiren(udi_interface.Node):
         self.devInfo =  deviceInfo
         self.yoSiren = None
         self.node_ready = False
+        self.system_ready=False
         self.last_state = ''
         self.timer_cleared = True
         self.timer_update = 5
@@ -84,7 +85,9 @@ class udiYoSiren(udi_interface.Node):
         time.sleep(2)
         self.yoSiren.initNode()
         time.sleep(2)
+        self.system_ready=True
 
+        
     def stop (self):
         logging.info('Stop udiYoSiren')
         self.my_setDriver('GV30', 0, True, True)
@@ -109,7 +112,7 @@ class udiYoSiren(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             message_type = self.yoSiren.get_message_type() # if event some data may not be updated 
             unix_time = self.yoSiren.get_report_time('reportAt')

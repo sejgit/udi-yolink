@@ -59,6 +59,7 @@ class udiYoVibrationSensor(udi_interface.Node):
             self.id = 'yovibrasensF'
         self.yoVibrationSensor  = None
         self.node_ready = False
+        self.system_ready=False
         self.last_state = 99
         self.cmd_state = self.retrieve_cmd_state()
         self.n_queue = []
@@ -94,8 +95,8 @@ class udiYoVibrationSensor(udi_interface.Node):
         time.sleep(2)
         self.yoVibrationSensor.initNode()
         #self.my_setDriver('ST', 1)
+        self.system_ready=True
 
-    
     def stop (self):
         logging.info('Stop udiYoVibrationSensor')
         #self.my_setDriver('ST', 0)
@@ -114,7 +115,7 @@ class udiYoVibrationSensor(udi_interface.Node):
 
     def updateData(self):
             if self.node is not None:
-                while not self.node_ready:
+                while not self.node_ready or not self.system_ready:
                     time.sleep(0.5)
             message_type = self.yoVibrationSensor.get_message_type() # if event some data may not be updated 
             unix_time = self.yoVibrationSensor.get_report_time('reportAt')

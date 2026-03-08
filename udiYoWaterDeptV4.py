@@ -68,6 +68,7 @@ class udiYoWaterDept(udi_interface.Node):
         self.devInfo =  deviceInfo
         self.yoWaterDept  = None
         self.node_ready = False
+        self.system_ready=False
         #self.temp_unit = self.yoAccess.get_temp_unit()
         #self.cmd_state = self.retrieve_cmd_state()
         #self.address = address
@@ -105,7 +106,9 @@ class udiYoWaterDept(udi_interface.Node):
         time.sleep(2)
         self.temp_unit = self.yoAccess.get_temp_unit()
         #self.node.setDriver('GV30', 1, True, True)
+        self.system_ready=True
 
+        
     def initNode(self):
         self.yoWaterDept.refreshSensor()
 
@@ -130,7 +133,7 @@ class udiYoWaterDept(udi_interface.Node):
         #limits = self.yoWaterDept.getLimits()
         try:
             if self.node is not None:
-                while not self.node_ready:
+                while not self.node_ready or not self.system_ready:
                     time.sleep(0.5)
                 message_type = self.yoWaterDept.get_message_type() # if event some data may not be updated 
                 unix_time = self.yoWaterDept.get_report_time('reportAt')

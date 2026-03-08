@@ -107,6 +107,7 @@ class udiYoWaterMeterController(udi_interface.Node):
         self.schedule_valve = None
         self.schedule_leak = None
         self.node_ready = False
+        self.system_ready=False
         self.last_state = ''
         self.timer_cleared = True
         self.timer_update = 5
@@ -175,10 +176,7 @@ class udiYoWaterMeterController(udi_interface.Node):
         # Prime schedule data for both child schedule nodes.
         self.yoWaterCtrl.refreshSchedules()
         self.updateData()
-
-
-    
-
+        self.system_ready=True
 
     def stop (self):
         logging.info('Stop udiYoWaterMeterController')
@@ -217,7 +215,7 @@ class udiYoWaterMeterController(udi_interface.Node):
     def updateData(self):
         try:
             if self.node is not None:
-                while not self.node_ready:
+                while not self.node_ready or not self.system_ready:
                     time.sleep(0.5)
                 message_type = self.yoWaterCtrl.get_message_type()
                 unix_time = self.yoWaterCtrl.get_report_time('time')

@@ -46,6 +46,7 @@ class udiYoGarageFinger(udi_interface.Node):
         self.yoAccess=yoAccess
         self.devInfo =  deviceInfo
         self.node_ready = False
+        self.system_ready=False
         self.yoDoorControl  = None
         logging.debug('udiYoGarageFinger INIT - {}'.format(deviceInfo['name']))
         self.n_queue = []
@@ -74,6 +75,7 @@ class udiYoGarageFinger(udi_interface.Node):
         self.my_setDriver('ST', 1)
         self.my_setDriver('GV30', 1)
         #time.sleep(3)
+        self.system_ready=True
 
     def initNode(self):
         self.yoDoorControl.online = True

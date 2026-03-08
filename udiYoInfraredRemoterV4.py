@@ -65,7 +65,7 @@ class udiYoInfraredCode(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             logging.debug('updateData - {}'.format(self.yoIRrem.check_system_online()))
             self.my_setDriver('TIME', self.yoIRrem.getLastUpdateTime(), 151)
@@ -168,6 +168,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.yoIRrem = None
         self.schedule = None
         self.node_ready = False
+        self.system_ready=False
         self.powerSupported = True # assume 
         self.n_queue = []     
 
@@ -232,11 +233,8 @@ class udiYoInfraredRemoter(udi_interface.Node):
         #self.poly.addCustomProfile(self.id, 'YoLink Infrared Remoter', 'YoLink Infrared Remoter', 'YoLink Infrared Remoter')
         logging.info('YoLink Infrared Remoter Node Ready')
         self.updateData()
+        self.system_ready=True
 
-
-        
-
-    
     def stop (self):
         logging.info('Stop udiIRremote')
         self.my_setDriver('ST', 0)
@@ -262,7 +260,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             logging.debug('updateData - {}'.format(self.yoIRrem.check_system_online()))
             message_type = self.yoIRrem.get_message_type()

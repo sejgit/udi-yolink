@@ -94,7 +94,8 @@ class udiYoSubOutlet(udi_interface.Node):
                 self.portState = 0
         except Exception as e:
             logging.debug('Exception: {}'.format(e))
-            self.my_setDriver('GV30', 0) 
+            self.my_setDriver('GV30', 0)
+        self.system_ready=True
 
     def stop (self):
         logging.debug('udiYoSubOutlet - stop')
@@ -336,6 +337,7 @@ class udiYoSubUSB(udi_interface.Node):
         except Exception as e:
             logging.debug('Exception: {}'.format(e))
             #self.my_setDriver('GV30', 0)
+        self.system_ready=True
 
     def stop (self):
         logging.info('udiYoSubUSB - stop')
@@ -466,6 +468,7 @@ class udiYoMultiOutlet(udi_interface.Node):
         self.devInfo =  deviceInfo
         self.yoMultiOutlet = None
         self.node_ready = False
+        self.system_ready=False
         self.subUsb = []
         self.subOutlet = []
         self.schedule_setected = 0
@@ -569,10 +572,7 @@ class udiYoMultiOutlet(udi_interface.Node):
         self.yoMultiOutlet.refreshMultiOutlet()
         self.yoMultiOutlet.refreshSchedules()
         logging.debug('Finished  MultiOutlet start')
-
-
-
-
+        self.system_ready=True
 
     def updateDelayCountdown(self, timeRemaining):
         logging.debug('updateDelayCountdown - time: {}'.format(timeRemaining))

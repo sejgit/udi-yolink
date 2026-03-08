@@ -64,6 +64,7 @@ class udiYoManipulator(udi_interface.Node):
         self.devInfo =  deviceInfo
         self.yoManipulator = None
         self.node_ready = False
+        self.system_ready=False
         self.last_state = ''
         self.timer_cleared = True
         self.timer_update = 5
@@ -108,6 +109,7 @@ class udiYoManipulator(udi_interface.Node):
         time.sleep(2)
         self.yoManipulator.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
         self.yoManipulator.refreshSchedules()
+        self.system_ready=True
 
     def stop (self):
         logging.info('Stop udiYoManipulator')
@@ -130,7 +132,7 @@ class udiYoManipulator(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             message_type, message_action  = self.yoManipulator.get_message_type()
             if message_action in ['getSchedules', 'setSchedules']:

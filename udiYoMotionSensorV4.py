@@ -64,6 +64,7 @@ class udiYoMotionSensor(udi_interface.Node):
 
         self.yoMotionsSensor  = None
         self.node_ready = False
+        self.system_ready=False
         self.cmd_state = self.retrieve_cmd_state()
         self.last_state = 99        
         self.n_queue = []
@@ -96,8 +97,8 @@ class udiYoMotionSensor(udi_interface.Node):
         time.sleep(2)
         self.yoMotionsSensor.initNode()
         #self.my_setDriver('GV30', 1)
+        self.system_ready=True
 
-    
     def stop (self):
         logging.info('Stop udiYoMotionSensor')
         self.my_setDriver('GV30', 0)
@@ -128,7 +129,7 @@ class udiYoMotionSensor(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             message_type = self.yoMotionsSensor.get_message_type()
             unix_time = self.yoMotionsSensor.get_report_time('reportAt')

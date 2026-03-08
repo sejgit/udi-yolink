@@ -83,6 +83,7 @@ class udiYoSprinkler2(udi_interface.Node):
         self.yoSprinkler= None
         self.schedule = None
         self.node_ready = False
+        self.system_ready=False
         self.last_state = ''
         self.timer_cleared = True
         self.timer_update = 5
@@ -140,6 +141,7 @@ class udiYoSprinkler2(udi_interface.Node):
         self.yoSprinkler.refreshSchedules()
         
         self.updateData()
+        self.system_ready=True
 
     def stop (self):
         logging.info('Stop udiYoSprinkler2')
@@ -178,7 +180,7 @@ class udiYoSprinkler2(udi_interface.Node):
     def updateData(self):
         try:
             if self.node is not None:
-                while not self.node_ready:
+                while not self.node_ready or not self.system_ready:
                     time.sleep(0.5)
                 message_type = self.yoSprinkler.get_message_type()
                 unix_time = self.yoSprinkler.get_report_time('time')

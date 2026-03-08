@@ -73,6 +73,7 @@ class udiYoCOSmokeSensor(udi_interface.Node):
         
         self.yoCOSmokeSensor  = None
         self.node_ready = False
+        self.system_ready=False
         self.last_state = 99
         self.cmd_state = self.retrieve_cmd_state()
         self.last_alert = False
@@ -110,6 +111,8 @@ class udiYoCOSmokeSensor(udi_interface.Node):
         #time.sleep(3)
     
     '''
+        self.system_ready=True
+
     def initNode(self):
         self.yoCOSmokeSensor.refreshSensor()
     '''
@@ -136,7 +139,7 @@ class udiYoCOSmokeSensor(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             message_type = self.yoCOSmokeSensor.get_message_type()
             unix_time = self.yoCOSmokeSensor.get_report_time('reportAt')

@@ -50,6 +50,7 @@ class udiYoBatteryHub(udi_interface.Node):
         self.yoAccess = yoAccess
         self.yoHub = None
         self.node_ready = False
+        self.system_ready=False
         self.n_queue = [] 
         
         #self.Parameters = Custom(polyglot, 'customparams')
@@ -81,7 +82,7 @@ class udiYoBatteryHub(udi_interface.Node):
         self.yoHub.initNode()
         time.sleep(1)
         self.yoHub.refreshDevice()
-
+        self.system_ready=True
 
     def updateDelayCountdown (self, delayRemaining ) :
         logging.debug('updateDelayCountdown {}'.format(delayRemaining))
@@ -106,7 +107,7 @@ class udiYoBatteryHub(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
 
             if self.yoHub.check_system_online():
@@ -179,6 +180,7 @@ class udiYoHub(udi_interface.Node):
         self.yoAccess = yoAccess
         self.yoHub = None
         self.node_ready = False
+        self.system_ready=False
         self.n_queue = [] 
         
         #self.Parameters = Custom(polyglot, 'customparams')
@@ -215,6 +217,7 @@ class udiYoHub(udi_interface.Node):
         #    logging.warning('Device {} not on-line'.format(self.devInfo['name']))            
         #else:
         #    self.node.setDriver('ST', 1, True, True)
+        self.system_ready=True
 
     def updateDelayCountdown (self, delayRemaining ) :
         logging.debug('updateDelayCountdown {}'.format(delayRemaining))
@@ -238,7 +241,7 @@ class udiYoHub(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             if self.yoHub.check_system_online():
                 message_type = self.yoHub.get_message_type()

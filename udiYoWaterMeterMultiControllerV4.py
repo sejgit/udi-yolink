@@ -63,6 +63,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         self.schedule_valve = None
         self.schedule_leak = None
         self.node_ready = False
+        self.system_ready=False
         self.last_state = ''
         self.ISYmeter_uom= None
         known_meters = ['']
@@ -148,7 +149,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         #self.my_setDriver('GV30', 1)
         #self.yoWaterCtrl.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
         self.updateData()
-
+        self.system_ready=True
 
     def stop (self):
         logging.info('Stop udiYoWaterMeterMultiController')
@@ -170,7 +171,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
     def updateData(self):
         try:
             if self.node is not None:
-                while not self.node_ready:
+                while not self.node_ready or not self.system_ready:
                     time.sleep(0.5)
                 message_type = self.yoWaterCtrl.get_message_type()
                 unix_time = self.yoWaterCtrl.get_report_time('time')
@@ -297,6 +298,7 @@ class udiYoSubWaterMeter(udi_interface.Node):
         
         self.yoWaterCtrl= wmAccess
         self.node_ready = False
+        self.system_ready=False
         self.last_state = ''
         self.ISYmeter_uom= None
         self.valveState = 99 # needed as class c device - keep value until online again 
@@ -338,6 +340,7 @@ class udiYoSubWaterMeter(udi_interface.Node):
         #self.yoWaterCtrl.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
         self.my_setDriver('GV1', 0,  self.ISYmeter_uom)
         self.updateData()
+        self.system_ready=True
 
     def stop (self):
         logging.info('Stop udiYoWaterMeterMultiController')
@@ -358,7 +361,7 @@ class udiYoSubWaterMeter(udi_interface.Node):
     def updateData(self):
         try:
             if self.node is not None:
-                while not self.node_ready:
+                while not self.node_ready or not self.system_ready:
                     time.sleep(0.5)
                 message_type = self.yoWaterCtrl.get_message_type()
                 if self.yoWaterCtrl.check_system_online():

@@ -72,6 +72,7 @@ class udiYoOutlet(udi_interface.Node):
         self.devInfo =  deviceInfo   
         self.yoOutlet = None
         self.node_ready = False
+        self.system_ready=False
         self.powerSupported = False # assume 
         model = str(deviceInfo['modelName'][:6])        
         if model in ['YS6803','YS6602','YS5716', 'YS6614']:
@@ -119,8 +120,8 @@ class udiYoOutlet(udi_interface.Node):
 
         self.yoOutlet.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
         self.yoOutlet.refreshSchedules()
-        
-    
+        self.system_ready=True
+
     def stop (self):
         logging.info('Stop udiYoOutlet')
         self.my_setDriver('GV30', 0)
@@ -140,7 +141,7 @@ class udiYoOutlet(udi_interface.Node):
     def updateData(self):
         logging.info('udiYoOutlet updateData - ')
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             message_type, message_action = self.yoOutlet.get_message_type()
             if message_action in ['getSchedules', 'setSchedules']:

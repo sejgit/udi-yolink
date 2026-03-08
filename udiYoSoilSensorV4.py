@@ -79,7 +79,7 @@ class udiYoSoilSensor(udi_interface.Node):
         self.devInfo =  deviceInfo
         self.yoSoilSensor  = None
         self.node_ready = False
-
+        self.system_ready=False
         self.temp_unit = self.yoAccess.get_temp_unit()   
         if self.temp_unit == 1:
             self.id = 'yosoilsensorF'
@@ -129,6 +129,7 @@ class udiYoSoilSensor(udi_interface.Node):
 
         self.temp_unit = self.yoAccess.get_temp_unit()
         #self.my_setDriver('GV30', 1)
+        self.system_ready=True
 
     def initNode(self):
         self.yoSoilSensor.refreshSensor()
@@ -166,7 +167,7 @@ class udiYoSoilSensor(udi_interface.Node):
         logging.info('yoSoilSensor -  updateData')
         alarm_det = False 
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
                 
             message_type = self.yoSoilSensor.get_message_type() # if event some data may not be updated 

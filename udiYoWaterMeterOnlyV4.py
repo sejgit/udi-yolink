@@ -85,6 +85,7 @@ class udiYoWaterMeterOnly(udi_interface.Node):
         self.devInfo =  deviceInfo
         self.yoWaterCtrl= None
         self.node_ready = False
+        self.system_ready=False
         self.last_state = ''
         self.timer_cleared = True
         self.timer_update = 5
@@ -133,6 +134,7 @@ class udiYoWaterMeterOnly(udi_interface.Node):
         self.meter_ISYuom = self.water_meter_unit2uom(self.ISYwater_unit)
         logging.debug(f'meter unit : {self.yoWaterCtrl.meter_unit} ISY unit: {self.ISYwater_unit} uom: {self.meter_ISYuom}')
         self.updateData()
+        self.system_ready=True
 
     def stop (self):
         logging.info('Stop udiYoWaterMeterController')
@@ -157,7 +159,7 @@ class udiYoWaterMeterOnly(udi_interface.Node):
     def updateData(self):
         try:
             if self.node is not None:
-                while not self.node_ready:
+                while not self.node_ready or not self.system_ready:
                     time.sleep(0.5)
                 message_type = self.yoWaterCtrl.get_message_type() # if event some data may not be updated 
                 unix_time = self.yoWaterCtrl.get_report_time('reportAt')

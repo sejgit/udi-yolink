@@ -90,7 +90,7 @@ class udiRemoteKey(udi_interface.Node):
         self.node.setDriver('ST', 99)
         self.node.setDriver('GV1', self.cmd_struct['short_press'])
         self.node.setDriver('GV2', self.cmd_struct['long_press'])
-
+        self.system_ready=True
 
     def stop(self):
         logging.debug('stop smremotekey : {}'.format(self.key))
@@ -270,6 +270,7 @@ class udiYoSmartRemoter(udi_interface.Node):
         self.devInfo =  deviceInfo   
         self.yoSmartRemote  = None
         self.node_ready = False
+        self.system_ready=False
         self.last_state = 99
         self.n_queue = []
         self.max_remote_keys = 8
@@ -333,6 +334,7 @@ class udiYoSmartRemoter(udi_interface.Node):
             self.adr_list.append(k_address)
         self.wait_for_node_done()
         self.nodesOK = True
+        self.system_ready=True
 
     def stop (self):
         logging.info('Stop udiYoSmartRemoter')
@@ -361,7 +363,7 @@ class udiYoSmartRemoter(udi_interface.Node):
     def updateData(self):
         try:
             if self.node is not None:
-                while not self.node_ready:
+                while not self.node_ready or not self.system_ready:
                     time.sleep(0.5)
                 if self.yoSmartRemote.check_system_online():               
                     event_data = self.yoSmartRemote.getEventData()

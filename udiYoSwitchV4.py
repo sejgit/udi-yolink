@@ -62,6 +62,7 @@ class udiYoSwitch(udi_interface.Node):
         self.name = name
         self.yoSwitch = None
         self.node_ready = False
+        self.system_ready=False
         self.timer_cleared = True
         self.n_queue = [] 
         self.last_state = ''
@@ -135,7 +136,7 @@ class udiYoSwitch(udi_interface.Node):
         sch_address = self.poly.getValidAddress(sch_address)
         self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
         self.adr_list.append(sch_address)
-
+        self.system_ready=True
 
     def updateDelayCountdown (self, timeRemaining ) :
         logging.debug('updateDelayCountdown {}'.format(timeRemaining))
@@ -172,7 +173,7 @@ class udiYoSwitch(udi_interface.Node):
  
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             message_type, message_action = self.yoSwitch.get_message_type()
             if message_action in ['getSchedules', 'setSchedules']:

@@ -71,6 +71,7 @@ class udiYoDimmer(udi_interface.Node):
         self.yoAccess = yoAccess
         self.yoDimmer = None
         self.node_ready = False
+        self.system_ready=False
         self.timer_cleared = True
         self.n_queue = [] # one queue for all
         self.last_state = ''
@@ -120,8 +121,6 @@ class udiYoDimmer(udi_interface.Node):
 
         time.sleep(2)
         self.yoDimmer.get_attributes()
-
-
         sch_address = self.address[4:14] + '_SCH'
         sch_address = self.poly.getValidAddress(sch_address)
         self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
@@ -132,7 +131,7 @@ class udiYoDimmer(udi_interface.Node):
         #self.my_setDriver('ST', 1)
         self.yoDimmer.delayTimerCallback (self.updateDelayCountdown, self.timer_update )
         self.yoDimmer.refreshSchedules()
-
+        self.system_ready=True
 
     def updateDelayCountdown (self, timeRemaining ) :
         logging.debug('updateDelayCountdown {}'.format(timeRemaining))
@@ -173,7 +172,7 @@ class udiYoDimmer(udi_interface.Node):
         logging.info('udiYoDimmer -  updateData{}'.format(self.schedule_selected))
 
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             message_type = self.yoDimmer.get_message_type()
             self.my_setDriver('TIME', self.yoDimmer.getLastUpdateTime(), 151)

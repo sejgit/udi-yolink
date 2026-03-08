@@ -218,6 +218,7 @@ class BaseScheduleNode(udi_interface.Node):
         self.devInfo = deviceInfo   
         self.yoSchedule = None
         self.node_ready = False
+        self.system_ready=False
         self.schedule_selected = 0
         self.poly = polyglot
         self._support_seconds_source = 'unresolved'
@@ -283,7 +284,8 @@ class BaseScheduleNode(udi_interface.Node):
     def start(self):
         """Start schedule node and initialize drivers."""
         logging.info(f'start - {self.__class__.__name__}')
-    
+        self.system_ready=True
+
     def stop(self):
         """Stop schedule node cleanup."""
         logging.info(f'Stop {self.__class__.__name__}')
@@ -437,7 +439,7 @@ class BaseScheduleNode(udi_interface.Node):
         """
         if self.node is None:
             return
-        while not self.node_ready:
+        while not self.node_ready or not self.system_ready:
             time.sleep(0.5)
 
         raw_schedule = None

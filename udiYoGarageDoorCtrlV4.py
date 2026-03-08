@@ -46,6 +46,7 @@ class udiYoGarageDoor(udi_interface.Node):
         self.devInfo =  deviceInfo   
         self.yoDoorControl  = None
         self.node_ready = False
+        self.system_ready=False
         logging.debug('udiYoGarageDoor INIT - {}'.format(deviceInfo['name']))
         self.n_queue = []
         #polyglot.subscribe(polyglot.POLL, self.poll)
@@ -72,6 +73,7 @@ class udiYoGarageDoor(udi_interface.Node):
         self.my_setDriver('ST', 1)
         self.my_setDriver('GV30', 1)
         #time.sleep(3)
+        self.system_ready=True
 
     def initNode(self):
         self.yoDoorControl.online = True
