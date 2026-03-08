@@ -1100,7 +1100,7 @@ class WaterMeterScheduleNode(OnOffScheduleNode):
 
             leak_limit = None
             for key, value in query.items():
-                if isinstance(key, str) and key.startswith('L_LIMIT.uom'):
+                if isinstance(key, str) and key.startswith('LLIMIT.uom'):
                     try:
                         leak_limit = float(value)
                     except (TypeError, ValueError):
