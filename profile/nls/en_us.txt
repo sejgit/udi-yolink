@@ -1456,6 +1456,9 @@ CMD-nlsthermostat-SETMODE-NAME=Set Mode
 CMD-nlsthermostat-SETFAN-NAME=Set Fan
 CMD-nlsthermostat-SETSCHE-NAME=Set Schedule Mode
 CMD-nlsthermostat-SETECO-NAME=Set ECO Mode
+CMDP-ecomode-NAME=ECO Mode (Off/On)
+CMDP-ecoLow-NAME=ECO Low Offset
+CMDP-ecoHigh-NAME=ECO High Offset
 
 CMD-nlsthermostatprop-UPDATE-NAME=Update
 CMD-nlsthermostatprop-SETMINRUNTIME-NAME=Set Min Runtime

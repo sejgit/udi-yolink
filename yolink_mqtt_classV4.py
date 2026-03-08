@@ -1354,9 +1354,20 @@ class YoLinkMQTTDevice(object):
                 if yolink.data[yolink.dData] is {}:
                     logging.info(f'No data exists (no data returned)')
                     return("no data")
-                if key in yolink.data[yolink.dData] and not isinstance(yolink.data[yolink.dData][key], dict): # MAy need to add list in future if it exists
-                        logging.debug(f'ret_val0  {key} {yolink.data[yolink.dData][key]}')
-                        return(yolink.data[yolink.dData][key])
+
+                data_root = yolink.data[yolink.dData]
+
+                # Direct category lookup first: get_data('temperature', 'state')
+                # and get_data('properties', 'state') when nested under state.
+                if isinstance(category, str) and category in data_root and isinstance(data_root[category], dict):
+                    if key in data_root[category]:
+                        return data_root[category][key]
+
+                # Direct top-level lookup: returns both scalars and dicts/lists,
+                # e.g. get_data('properties') when properties is at data root.
+                if key in data_root:
+                    logging.debug(f'ret_val0  {key} {data_root[key]}')
+                    return data_root[key]
                         
                 res = yolink.extract_two_level(category, key)
                 logging.debug(f'extract_two_level result: {res}')

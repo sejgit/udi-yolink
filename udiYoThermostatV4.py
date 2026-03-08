@@ -261,7 +261,9 @@ class udiYoThermostat(udi_interface.Node):
                     self.my_setDriver('GV5', 1 if drRunning else 0, 25, type=message_type)
 
                 # Properties
-                properties = self.yoThermostat.get_data('properties','state')
+                properties = self.yoThermostat.get_data('properties')
+                if not isinstance(properties, dict):
+                    properties = self.yoThermostat.get_data('properties', 'state')
                 logging.debug(f'Parsing properties data: {properties}')
                 if properties and isinstance(properties, dict) and self.properties_node is not None:
                     self.properties_node.updateProperties(properties, message_type)
