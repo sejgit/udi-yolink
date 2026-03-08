@@ -2528,8 +2528,7 @@
       <editors />
       <sts>
          <st id="ST" editor="I_TSTAT_HCS" />
-         <st id="CLITEMP" editor="farenheit
-" />
+         <st id="CLITEMP" editor="farenheit" />
          <st id="CLIHUM" editor="I_HUMIDITY" />
          <st id="CLISPH" editor="farenheit" />
          <st id="CLISPC" editor="farenheit" />
