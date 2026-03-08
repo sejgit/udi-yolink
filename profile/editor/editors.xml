@@ -475,9 +475,6 @@
   <editor id="I_TSTAT_HCS">
     <range uom="66" subset="0,1,2,99" nls="tstat_hcs" />
   </editor>
-  <editor id="I_CLIFRS">
-    <range uom="80" subset="0,1,99" nls="tstat_fan_running" />
-  </editor>
   <editor id="I_HUMIDITY">
     <range uom="51" min="0" max="100" prec="1" />
     <range uom="25" subset="98,99" nls="error" />

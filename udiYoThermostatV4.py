@@ -32,8 +32,6 @@ class udiYoThermostat(udi_interface.Node):
         {'driver': 'CLIMD', 'value': 99, 'uom': 67},      # Thermostat mode (UoM 67: 0=Off, 1=Heat, 2=Cool, 3=Auto)
         {'driver': 'CLIFS', 'value': 99, 'uom': 68},      # Fan setting (UoM 68: 0=Auto, 1=On)
         {'driver': 'CLISMD', 'value': 99, 'uom': 25},     # Schedule mode (UoM 25: 0=run, 1=hold)
-        {'driver': 'CLIHCS', 'value': 99, 'uom': 66},     # Heat/Cool state (UoM 66: 0=Idle, 1=Heating, 2=Cooling)
-        {'driver': 'CLIFRS', 'value': 99, 'uom': 80},     # Fan running state (UoM 80: 0=Off, 1=On)
         {'driver': 'GV0', 'value': 99, 'uom': 4},         # Sensor 1 temp (optional, UoM 4=C)
         {'driver': 'GV1', 'value': 99, 'uom': 4},         # Sensor 2 temp (optional, UoM 4=C)
         {'driver': 'GV2', 'value': 99, 'uom': 25},        # Aux heat running (UoM 25: 0=no, 1=yes)
@@ -52,6 +50,8 @@ class udiYoThermostat(udi_interface.Node):
         {'driver': 'GV15', 'value': 99, 'uom': 20},       # stage2MaxSpan (hours)
         {'driver': 'GV16', 'value': 99, 'uom': 4},        # stage2Threshold (Celsius)
         {'driver': 'GV17', 'value': 99, 'uom': 25},       # master temp source (0=local, 1=sensor1, 2=sensor2)
+        {'driver': 'GV18', 'value': 99, 'uom': 4},        # ECO low temp offset (Celsius)
+        {'driver': 'GV19', 'value': 99, 'uom': 4},        # ECO high temp offset (Celsius)
         {'driver': 'GV20', 'value': 99, 'uom': 25},       # Suspended state (UoM 25: 0=not suspended, 1=suspended, 2=error)
         {'driver': 'GV30', 'value': 99, 'uom': 25},       # Online status (UoM 25: 0=offline, 1=online)
         {'driver': 'TIME', 'value': int(time.time()), 'uom': 151},  # Last update time (UoM 151=Unix Timestamp)
@@ -152,16 +152,15 @@ class udiYoThermostat(udi_interface.Node):
                 fan = self.yoThermostat.get_data('fan', 'state')
                 sche = self.yoThermostat.get_data('sche', 'state')
                 running = self.yoThermostat.get_data('running', 'state')
-                fanRunning = self.yoThermostat.get_data('fanRunning', 'state')
 
                 # Sensors (optional)
-                sensor1 = self.yoThermostat.get_data('sensor1', 'state')
-                sensor2 = self.yoThermostat.get_data('sensor2', 'state')
+                sensor1 = self.yoThermostat.get_data('temperature', 'sensor1')
+                sensor2 = self.yoThermostat.get_data('temperature', 'sensor2')
 
                 # Optional states in 'other'
-                auxHeat = self.yoThermostat.get_data('auxiliaryHeat', ('state', 'other'))
-                stage2 = self.yoThermostat.get_data('secondStage', ('state', 'other'))
-                drRunning = self.yoThermostat.get_data('drRunning', ('state', 'other'))
+                auxHeat = self.yoThermostat.get_data('auxiliaryHeat',  'other')
+                stage2 = self.yoThermostat.get_data('secondStage', 'other')
+                drRunning = self.yoThermostat.get_data('drRunning', 'other')
 
                 # Eco mode
                 eco = self.yoThermostat.get_data('eco')
@@ -209,16 +208,7 @@ class udiYoThermostat(udi_interface.Node):
                 # Running state: UoM 66: 0=Idle, 1=Heating, 2=Cooling
                 if running:
                     running_map = {'idle': 0, 'heat': 1, 'cool': 2}
-                    self.my_setDriver('CLIHCS', running_map.get(running.lower(), 99), 66, type=message_type)
                     self.my_setDriver('ST', running_map.get(running.lower(), 99), 66, type=message_type)
-
-                # Fan running state: UoM 80: 0=Off, 1=On
-                if fanRunning is not None:
-                    fan_running_map = {'off': 0, 'on': 1}
-                    if isinstance(fanRunning, str):
-                        self.my_setDriver('CLIFRS', fan_running_map.get(fanRunning.lower(), 99), 80, type=message_type)
-                    else:
-                        self.my_setDriver('CLIFRS', 1 if fanRunning else 0, 80, type=message_type)
 
                 # Optional sensors
                 if isinstance(sensor1, (int, float)):
@@ -243,6 +233,20 @@ class udiYoThermostat(udi_interface.Node):
                 if eco and isinstance(eco, dict):
                     eco_mode = eco.get('mode', 'off')
                     self.my_setDriver('GV4', 1 if eco_mode.lower() == 'on' else 0, 25, type=message_type)
+
+                    eco_low = eco.get('lowTemp')
+                    if isinstance(eco_low, (int, float)):
+                        if self.temp_unit == 1:
+                            self.my_setDriver('GV18', round(eco_low * 9/5, 1), 17, type=message_type)
+                        else:
+                            self.my_setDriver('GV18', round(eco_low, 1), 4, type=message_type)
+
+                    eco_high = eco.get('highTemp')
+                    if isinstance(eco_high, (int, float)):
+                        if self.temp_unit == 1:
+                            self.my_setDriver('GV19', round(eco_high * 9/5, 1), 17, type=message_type)
+                        else:
+                            self.my_setDriver('GV19', round(eco_high, 1), 4, type=message_type)
 
                 # DR running state (UoM 25: 0=no, 1=yes)
                 if drRunning is not None:

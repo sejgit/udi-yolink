@@ -2482,8 +2482,6 @@
          <st id="CLIMD" editor="I_TSTAT_MODE" />
          <st id="CLIFS" editor="I_TSTAT_FAN" />
          <st id="CLISMD" editor="celsius" />
-         <st id="CLIHCS" editor="I_TSTAT_HCS" />
-         <st id="CLIFRS" editor="I_CLIFRS" />
          <st id="GV0" editor="celsius" />
          <st id="GV1" editor="celsius" />
          <st id="GV2" editor="I_AUX_HEAT" />
@@ -2502,6 +2500,8 @@
          <st id="GV15" editor="I_HOURS" />
          <st id="GV16" editor="celsius" />
          <st id="GV17" editor="I_MASTER_SRC" />
+         <st id="GV18" editor="celsius" />
+         <st id="GV19" editor="celsius" />
          <st id="GV20" editor="I_SUSPENDED_ST" />
          <st id="GV30" editor="I_ONLINE_ST" />
          <st id="TIME" editor="unixtime" />
@@ -2528,8 +2528,8 @@
             </cmd>
             <cmd id="SETECO">
                <p id="ecomode" editor="I_ECO_MODE" init="GV4"/>                           
-               <p id="ecoLow" editor="ecoSet" />       
-               <p id="ecoHigh" editor="ecoSet"/>                                              
+               <p id="ecoLow" editor="ecoSet" init="GV18"/>       
+               <p id="ecoHigh" editor="ecoSet" init="GV19"/>                                              
 
             </cmd>
             <cmd id="SETMINRUNTIME">
@@ -2566,8 +2566,6 @@
          <st id="CLIMD" editor="I_TSTAT_MODE" />
          <st id="CLIFS" editor="I_TSTAT_FAN" />
          <st id="CLISMD" editor="I_CLISMD_DEG" />
-         <st id="CLIHCS" editor="I_TSTAT_HCS" />
-         <st id="CLIFRS" editor="I_CLIFRS" />
          <st id="GV0" editor="farenheit" />
          <st id="GV1" editor="farenheit" />
          <st id="GV2" editor="I_AUX_HEAT" />
@@ -2586,6 +2584,8 @@
          <st id="GV15" editor="I_HOURS" />
          <st id="GV16" editor="farenheit" />
          <st id="GV17" editor="I_MASTER_SRC" />
+         <st id="GV18" editor="farenheit" />
+         <st id="GV19" editor="farenheit" />
          <st id="GV20" editor="I_SUSPENDED_ST" />
          <st id="GV30" editor="I_ONLINE_ST" />
          <st id="TIME" editor="unixtime" />
@@ -2612,8 +2612,8 @@
             </cmd>
             <cmd id="SETECO">
                <p id="ecomode" editor="I_ECO_MODE" init="GV4"/>                           
-               <p id="ecoLow" editor="ecoSetF" />       
-               <p id="ecoHigh" editor="ecoSetF" />     
+               <p id="ecoLow" editor="ecoSetF" init="GV18"/>       
+               <p id="ecoHigh" editor="ecoSetF" init="GV19" />     
             </cmd>
             <cmd id="SETMINRUNTIME">
                <p id="" editor="I_MINRUNTIME" init="GV6"/>
