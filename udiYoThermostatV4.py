@@ -101,10 +101,11 @@ class udiYoThermostat(udi_interface.Node):
         self.yoThermostat = YoLinkThermostat(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(1)
         self.yoThermostat.initDevice()
-        time.sleep(1)
-        while not self.yoThermostat.check_system_online():
+        tries = 1
+        while not self.yoThermostat.check_system_online() and tries <= 5:
             logging.info('Waiting for thermostat to come online...')
             time.sleep(2)
+            tries += 1
         self.system_ready = True
         logging.info('Thermostat online and ready')
 
