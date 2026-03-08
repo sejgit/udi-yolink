@@ -443,6 +443,7 @@ class udiYoThermostatProperties(udi_interface.Node):
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.addNode(self, conn_status=None, rename=True)
         self.wait_for_node_done()
+        self.node = self.poly.getNode(address)
         self.node_ready = True
 
     def _yo(self):

@@ -19,7 +19,7 @@ import math
 from yolinkSmartRemoterV3 import YoLinkSmartRemoter
 
 class udiRemoteKey(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_struct, retrieve_cmd_struct, bool2ISY, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import save_cmd_struct, retrieve_cmd_struct, node_queue, wait_for_node_done, mask2key
 
     id = 'smremotekey'
     drivers = [
