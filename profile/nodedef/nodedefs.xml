@@ -2596,42 +2596,42 @@
          <accepts>
             <cmd id="UPDATE" />
             <cmd id="SETLOWTEMP">
-               <p id="" editor="farenheitSet" />
+               <p id="" editor="farenheitSet" init="GV0"/>
             </cmd>
             <cmd id="SETHIGHTEMP">
-               <p id="" editor="farenheitSet" />
+               <p id="" editor="farenheitSet" init="GV1"/>
             </cmd>
             <cmd id="SETMODE">
-               <p id="" editor="I_TSTAT_MODE" />
+               <p id="" editor="I_TSTAT_MODE"  init="CLIMD"/>
             </cmd>
             <cmd id="SETFAN">
-               <p id="" editor="I_TSTAT_FAN" />
+               <p id="" editor="I_TSTAT_FAN" init="CLIFS"/>
             </cmd>
             <cmd id="SETSCHE">
                <p id="" editor="I_CLISMD_DEG" />
             </cmd>
             <cmd id="SETECO">
-               <p id="ecomode" editor="I_ECO_MODE" />                           
+               <p id="ecomode" editor="I_ECO_MODE" init="GV4"/>                           
                <p id="ecoLow" editor="ecoSetF" />       
                <p id="ecoHigh" editor="ecoSetF" />     
             </cmd>
             <cmd id="SETMINRUNTIME">
-               <p id="" editor="I_MINRUNTIME" />
+               <p id="" editor="I_MINRUNTIME" init="GV6"/>
             </cmd>
             <cmd id="SETCOOLLIMIT">
-               <p id="" editor="farenheitSet" />
+               <p id="" editor="farenheitSet" init="GV7"/>
             </cmd>
             <cmd id="SETHEATLIMIT">
-               <p id="" editor="farenheitSet" />
+               <p id="" editor="farenheitSet" init="GV8"/>
             </cmd>
             <cmd id="SETMUTE">
-               <p id="" editor="I_MUTE" />
+               <p id="" editor="I_MUTE" init="GV9"/>
             </cmd>
             <cmd id="SETMENULOCK">
-               <p id="" editor="I_MENULOCK" />
+               <p id="" editor="I_MENULOCK" init="GV10"/>
             </cmd>
             <cmd id="SETMASTER">
-               <p id="" editor="I_MASTER_SRC" />
+               <p id="" editor="I_MASTER_SRC" init="GV17" />
             </cmd>
          </accepts>
       </cmds>
