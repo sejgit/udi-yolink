@@ -21,7 +21,7 @@ from yolinkTHsensorV2 import YoLinkTHSensor
 
 
 class udiYoTHsensor(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, state2Nbr, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, node_queue, wait_for_node_done
 
     id = 'yothsens'
     
@@ -79,7 +79,7 @@ class udiYoTHsensor(udi_interface.Node):
         self.devInfo =  deviceInfo
         self.yoTHsensor  = None
         self.node_ready = False
-        self.system_ready=False
+        self.system_ready = False
         self.poly = polyglot
         self.temp_unit = self.yoAccess.get_temp_unit()   
 
@@ -122,25 +122,27 @@ class udiYoTHsensor(udi_interface.Node):
         self.adr_list.append(address)
         self.node_ready = True
 
-
   
 
     def start(self):
         logging.info('Start udiYoTHsensor')
-        while not self.node_ready:
-            time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         self.yoTHsensor  = YoLinkTHSensor(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(1)
+        while not self.node_ready:
+            time.sleep(0.5)
+
         self.yoTHsensor.initNode()
         time.sleep(1)
-        #while not self.yoTHsensor.check_system_online():
-        #    logging.info('Waiting for TH sensor to come online...')
-        #    time.sleep(2)
+        tries = 1
+        while not self.yoTHsensor.check_system_online() and tries <= 5:
+            logging.info('Waiting for TH sensor to come online...')
+            time.sleep(2)
+            tries += 1
 
         self.temp_unit = self.yoAccess.get_temp_unit()
+        self.system_ready = True
         #self.my_setDriver('GV30', 1)
-        self.system_ready=True
 
     def initNode(self):
         self.yoTHsensor.refreshSensor()

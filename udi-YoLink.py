@@ -151,7 +151,7 @@ class YoLinkSetup (udi_interface.Node):
         logging.debug('{} devices detected : {}'.format(len(self.deviceList), self.deviceList) )
         if self.yoAccess:
             self.my_setDriver('ST', 1)
-            self.my_setDriver('GV1', 1)            
+            self.my_setDriver('GV1', 1)
             self.deviceList = self.addNodes(self.deviceList)
         else:
             self.my_setDriver('ST', 0)

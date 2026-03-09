@@ -21,7 +21,7 @@ from yolinkMotionSensorV3 import YoLinkMotionSensor
 
 
 class udiYoMotionSensor(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_state, convert_timestr_to_epoch, state2ISY, bool2ISY, retrieve_cmd_state, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, node_queue, wait_for_node_done
 
     id = 'yomotionsens'
     

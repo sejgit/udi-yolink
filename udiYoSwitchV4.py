@@ -22,7 +22,7 @@ from udiYoSmartRemoterV4 import udiRemoteKey
 from udiYoSchedule import udiYoSchedule
 
 class udiYoSwitch(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, prep_schedule, state2ISY, bool2ISY, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, prep_schedule, state2ISY, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
     id = 'yoswitch'
 
     drivers = [

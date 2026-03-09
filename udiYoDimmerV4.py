@@ -26,7 +26,7 @@ from yolinkDimmerV3 import YoLinkDim
 from udiYoSchedule import udiYoSchedule
 
 class udiYoDimmer(udi_interface.Node):
-    from  udiYolinkLib import  my_setDriver, save_cmd_struct, retrieve_cmd_struct, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import  my_setDriver, save_cmd_struct, retrieve_cmd_struct, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done
     id = 'yodimmer'
     drivers = [
             {'driver': 'ST', 'value': 0, 'uom': 51},

@@ -22,7 +22,7 @@ from udiYoSchedule import udiYoSchedule
 
 
 class udiYoSprinkler2(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, w_unit2ISY, water_meter_unit2uom, calculate_water_volume, state2ISY, bool2ISY, state2Nbr, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, water_meter_unit2uom, calculate_water_volume, state2ISY, update_schedule_data, node_queue, wait_for_node_done
 
     id = 'yosprinklerv2'
     '''
@@ -83,7 +83,6 @@ class udiYoSprinkler2(udi_interface.Node):
         self.yoSprinkler= None
         self.schedule = None
         self.node_ready = False
-        self.system_ready=False
         self.last_state = ''
         self.timer_cleared = True
         self.timer_update = 5
@@ -106,23 +105,19 @@ class udiYoSprinkler2(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
-        self.node_ready = True
         logging.debug('udiYoSprinkler2 INIT done- {}'.format(self.commands))
 
 
     def start(self):
         logging.info('Start - udiYoSprinkler2')
-        while not self.node_ready:
-            time.sleep(0.5)
         self.my_setDriver('GV30', 1)
         self.my_setDriver('GV20', 0)
         self.yoSprinkler= YoLinkSprinkler(self.yoAccess, self.devInfo, self.updateStatus)
-        time.sleep(1)
         self.yoSprinkler.initNode()
         #while not self.yoSprinkler.check_system_online():
         #    logging.info('waiting for watermeter to be online')
         #    time.sleep(5)
-        time.sleep(2)
+      
         self.meter_unit = self.yoSprinkler.get_data('meterUnit', 'attributes')
         self.step_factor = self.yoSprinkler.get_data('meterStepFactor', 'attributes')
         #self.my_setDriver('GV30', 1)
@@ -140,8 +135,8 @@ class udiYoSprinkler2(udi_interface.Node):
         # Prime schedule node values immediately after startup.
         self.yoSprinkler.refreshSchedules()
         
+        self.node_ready = True
         self.updateData()
-        self.system_ready=True
 
     def stop (self):
         logging.info('Stop udiYoSprinkler2')
@@ -180,7 +175,7 @@ class udiYoSprinkler2(udi_interface.Node):
     def updateData(self):
         try:
             if self.node is not None:
-                while not self.node_ready or not self.system_ready:
+                while not self.node_ready:
                     time.sleep(0.5)
                 message_type = self.yoSprinkler.get_message_type()
                 unix_time = self.yoSprinkler.get_report_time('time')
@@ -357,7 +352,6 @@ class udiYoSprinkler2(udi_interface.Node):
     def update(self, command = None):
         logging.info('Update Status Executed')
         self.yoSprinkler.refreshDevice()
-        time.sleep(2)
         # Keep schedule child node in sync when user requests UPDATE.
         self.yoSprinkler.refreshSchedules()
         

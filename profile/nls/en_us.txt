@@ -836,12 +836,12 @@ ST-nlswatermeter-BATLVL-NAME=Battery Level
 ST-nlswatermeter-CLITEMP-NAME=Water Temperature
 ST-nlswatermeter-TIME-NAME=Last device update
 
-CMDP-L_LIMIT-NAME=Leak Limit
-CMDP-L_OFF-NAME=Leak Auto Off
-CMDP-OR_LIMIT-NAME=Overrun Limit
-CMDP-OR_OFF-NAME=Overrun Auto Off
-CMDP-ORT_LIMIT-NAME=Overrun Time Limit
-CMDP-ORT_OFF-NAME=Overrun Time Auto Off
+CMDP-LLIMIT-NAME=Leak Limit
+CMDP-LOFF-NAME=Leak Auto Off
+CMDP-ORLIMIT-NAME=Overrun Limit
+CMDP-OROFF-NAME=Overrun Auto Off
+CMDP-ORTLIMIT-NAME=Overrun Time Limit
+CMDP-ORTOFF-NAME=Overrun Time Auto Off
 
 
 
@@ -972,8 +972,8 @@ runningmode-0=Fixed Water Amount
 runningmode-1=Fixed Run Time
 runningmode-99=Uknown
 
-wl_state-99=Unknown
-wl_state-98=Updating (may take up to 1 hour)
+wlstate-99=Unknown
+wlstate-98=Updating (may take up to 1 hour)
 
 nosupport-0=No Support
 nosupport-98=No Support
@@ -991,11 +991,11 @@ outport-1=port2
 outport-2=port3
 outport-3=port4
 
-sch_active-0=Disabled
-sch_active-1=Active
-sch_active-2=Not Defined
-sch_active-98=No Schedules
-sch_active-99=Unknown
+schactive-0=Disabled
+schactive-1=Active
+schactive-2=Not Defined
+schactive-98=No Schedules
+schactive-99=Unknown
 
 pwrmode-0=Ext Supply
 pwrmode-1=Battery
@@ -1281,26 +1281,26 @@ portlist-99=Unknown
 notdefined-98=Not used
 notdefined-99=Unknown
 
-sch_indexM-0=Schedule 0
-sch_indexM-1=Schedule 1
-sch_indexM-2=Schedule 2
-sch_indexM-3=Schedule 3
-sch_indexM-4=Schedule 4
-sch_indexM-5=Schedule 5
-sch_indexM-6=Schedule 6
-sch_indexM-7=Schedule 7
-sch_indexM-8=Schedule 8
-sch_indexM-9=Schedule 9
-sch_indexM-99=No Schedules
+schindexM-0=Schedule 0
+schindexM-1=Schedule 1
+schindexM-2=Schedule 2
+schindexM-3=Schedule 3
+schindexM-4=Schedule 4
+schindexM-5=Schedule 5
+schindexM-6=Schedule 6
+schindexM-7=Schedule 7
+schindexM-8=Schedule 8
+schindexM-9=Schedule 9
+schindexM-99=No Schedules
 
 
-sch_indexS-0=Schedule 0
-sch_indexS-1=Schedule 1
-sch_indexS-2=Schedule 2
-sch_indexS-3=Schedule 3
-sch_indexS-4=Schedule 4
-sch_indexS-5=Schedule 5
-sch_indexS-99=No Schedules
+schindexS-0=Schedule 0
+schindexS-1=Schedule 1
+schindexS-2=Schedule 2
+schindexS-3=Schedule 3
+schindexS-4=Schedule 4
+schindexS-5=Schedule 5
+schindexS-99=No Schedules
 
 
 bindays-0=Not defined
@@ -1441,3 +1441,120 @@ sphtts-2=Messa3
 sphtts-3=Messag4
 sphtts-4=Message 5
 sphtts-5=mes77
+
+
+# Thermostat Node Definitions
+ND-yothermostat-NAME=YoLink Thermostat (C)
+ND-yothermostat-ICON=Thermostat
+ND-yothermostatf-NAME=YoLink Thermostat (F)
+ND-yothermostatf-ICON=Thermostat
+ND-yothermprop-NAME=Thermostat Properties (C)
+ND-yothermprop-ICON=Thermostat
+ND-yothermpropf-NAME=Thermostat Properties (F)
+ND-yothermpropf-ICON=Thermostat
+
+# Thermostat Status Names
+ST-nlsthermostat-ST-NAME=Running State
+ST-nlsthermostat-CLITEMP-NAME=Temperature
+ST-nlsthermostat-CLIHUM-NAME=Humidity
+ST-nlsthermostat-CLISPH-NAME=Heat Setpoint
+ST-nlsthermostat-CLISPC-NAME=Cool Setpoint
+ST-nlsthermostat-CLIMD-NAME=Mode
+ST-nlsthermostat-CLIFS-NAME=Fan Setting
+ST-nlsthermostat-CLISMD-NAME=Schedule Mode
+ST-nlsthermostat-GV0-NAME=Sensor 1 Temp
+ST-nlsthermostat-GV1-NAME=Sensor 2 Temp
+ST-nlsthermostat-GV2-NAME=Aux Heat Running
+ST-nlsthermostat-GV3-NAME=Stage 2 Running
+ST-nlsthermostat-GV4-NAME=ECO Mode
+ST-nlsthermostat-GV5-NAME=Demand Response Running
+ST-nlsthermostat-GV18-NAME=ECO Low Temp
+ST-nlsthermostat-GV19-NAME=ECO High Temp
+ST-nlsthermostat-GV20-NAME=Suspended
+ST-nlsthermostat-GV30-NAME=Online
+ST-nlsthermostat-TIME-NAME=Last Update
+
+ST-nlsthermostatprop-GV6-NAME=Min Runtime
+ST-nlsthermostatprop-GV7-NAME=Cool Limit
+ST-nlsthermostatprop-GV8-NAME=Heat Limit
+ST-nlsthermostatprop-GV9-NAME=Mute
+ST-nlsthermostatprop-GV10-NAME=Menu Lock
+ST-nlsthermostatprop-GV11-NAME=Aux Standby
+ST-nlsthermostatprop-GV12-NAME=Aux Max Span
+ST-nlsthermostatprop-GV13-NAME=Aux Threshold
+ST-nlsthermostatprop-GV14-NAME=Stage2 Standby
+ST-nlsthermostatprop-GV15-NAME=Stage2 Max Span
+ST-nlsthermostatprop-GV16-NAME=Stage2 Threshold
+ST-nlsthermostatprop-GV17-NAME=Master Source
+
+
+# Thermostat Command Names
+CMD-nlsthermostat-UPDATE-NAME=Update
+CMD-nlsthermostat-SETHEATTEMP-NAME=Set Heat Setpoint
+CMD-nlsthermostat-SETCOOLTEMP-NAME=Set Cool Setpoint
+CMD-nlsthermostat-SETMODE-NAME=Set Mode
+CMD-nlsthermostat-SETFAN-NAME=Set Fan
+CMD-nlsthermostat-SETSCHE-NAME=Set Schedule Mode
+CMD-nlsthermostat-SETECO-NAME=Set ECO Mode
+CMDP-ecomode-NAME=ECO Mode (Off/On)
+CMDP-ecoLow-NAME=ECO Low Offset
+CMDP-ecoHigh-NAME=ECO High Offset
+
+CMD-nlsthermostatprop-UPDATE-NAME=Update
+CMD-nlsthermostatprop-SETMINRUNTIME-NAME=Set Min Runtime
+CMD-nlsthermostatprop-SETCOOLLIMIT-NAME=Set Cool Limit
+CMD-nlsthermostatprop-SETHEATLIMIT-NAME=Set Heat Limit
+CMD-nlsthermostatprop-SETMUTE-NAME=Set Mute
+CMD-nlsthermostatprop-SETMENULOCK-NAME=Set Menu Lock
+CMD-nlsthermostatprop-SETMASTER-NAME=Set Master Source
+
+
+# Thermostat Value NLS
+tstatmode-0=Off
+tstatmode-1=Heat
+tstatmode-2=Cool
+tstatmode-3=Auto
+tstatmode-99=Unknown
+
+tstatfan-0=Auto
+tstatfan-1=On
+tstatfan-99=Unknown
+
+tstatsche-0=Run
+tstatsche-1=Hold
+tstatsche-99=Unknown
+
+tstathcs-0=Idle
+tstathcs-1=Heating
+tstathcs-2=Cooling
+tstathcs-99=Unknown
+
+
+auxheat-0=No
+auxheat-1=Yes
+auxheat-99=Unknown
+
+stage2-0=No
+stage2-1=Yes
+stage2-99=Unknown
+
+ecomode-0=Off
+ecomode-1=On
+ecomode-99=Unknown
+
+drrunning-0=No
+drrunning-1=Yes
+drrunning-99=Unknown
+
+mutesetting-0=Off
+mutesetting-1=On
+mutesetting-99=Unknown
+
+menulock-0=Unlocked
+menulock-1=Locked
+menulock-99=Unknown
+
+mastersrc-0=Local
+mastersrc-1=Sensor 1
+mastersrc-2=Sensor 2
+mastersrc-99=Unknown

@@ -3,8 +3,7 @@
 Yolink Control Main Node  program 
 MIT License
 """
-version = '1.8.7'
-''
+version = '1.8.9'
 import sys
 import re
 import time
@@ -21,7 +20,7 @@ from udiYoSwitchV4 import udiYoSwitch
 from udiYoTHsensorV4 import udiYoTHsensor 
 from udiYoWaterDeptV4 import udiYoWaterDept 
 from udiYoGarageDoorCtrlV4 import udiYoGarageDoor
-from udiYoGarageFingerCtrlV2 import udiYoGarageFinger
+from udiYoGarageFingerCtrlV4 import udiYoGarageFinger
 from udiYoMotionSensorV4 import udiYoMotionSensor
 from udiYoLeakSensorV4 import udiYoLeakSensor
 from udiYoCOSmokeSensorV4 import udiYoCOSmokeSensor
@@ -156,7 +155,7 @@ def addNodes (self, deviceList) -> list:
     #                    'WaterDepthSensor', ]    'WaterMeterController', 
     
     supportedYoTypes = ['SprinklerV2', 'Sprinkler', 'Thermostat', 'SoilThcSensor' ]     
-    supportedYoTypes = ['Switch', 'LeakSensor', 'Thermostat', 'SprinklerV2', 'Outlet', 'WaterMeterMultiController']   
+    supportedYoTypes = ['Thermostat', 'THSensor']   
       
     remove_list= []
     for dev in deviceList:

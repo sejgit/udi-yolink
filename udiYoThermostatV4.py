@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Polyglot TEST v3 node server 
+Polyglot v3 node server for YoLink Thermostat
 
-
+Supports Thermostat.getState, setState, setECO, setProperties, setCorrection
 MIT License
 """
-from os import truncate
+
 try:
     import udi_interface
     logging = udi_interface.LOGGER
@@ -13,303 +13,580 @@ try:
 except ImportError:
     import logging
     logging.basicConfig(level=logging.INFO)
-#import sys
-import time
 
+import time
 from yolinkThermostatV2 import YoLinkThermostat
 
 
-
 class udiYoThermostat(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, state2Nbr, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from udiYolinkLib import my_setDriver, node_queue, wait_for_node_done
 
     id = 'yothermostat'
-    
-    '''
-       drivers = [
-            'GV0' = TempC
-            'GV1' = Low Temp Alarm
-            'GV2' = high Temp Alarm 
-            'GV3' = Humidity
-            'GV4' = Low Humidity Alarm
-            'GV5' = High Humidity Alarm
-            'GV6' = BatteryLevel
-            'GV7' = BatteryAlarm
-            'GV8' = ALARM
-            'GV9' = command setting 
-            'ST' = Online
-            ]
 
-    ''' 
-        
     drivers = [
+        {'driver': 'ST', 'value': 99, 'uom': 66},         # Running state (UoM 66: 0=Idle, 1=Heating, 2=Cooling)
+        {'driver': 'CLITEMP', 'value': 0, 'uom': 4},      # Current temperature (UoM 4=Celsius, 17=Fahrenheit)
+        {'driver': 'CLIHUM', 'value': 0, 'uom': 51},      # Current humidity (UoM 51=percent)
+        {'driver': 'CLISPH', 'value': 0, 'uom': 4},       # Heat setpoint (UoM 4=Celsius, 17=Fahrenheit)
+        {'driver': 'CLISPC', 'value': 0, 'uom': 4},       # Cool setpoint (UoM 4=Celsius, 17=Fahrenheit)
+        {'driver': 'CLIMD', 'value': 99, 'uom': 67},      # Thermostat mode (UoM 67: 0=Off, 1=Heat, 2=Cool, 3=Auto)
+        {'driver': 'CLIFS', 'value': 99, 'uom': 68},      # Fan setting (UoM 68: 0=Auto, 1=On)
+        {'driver': 'CLISMD', 'value': 99, 'uom': 25},     # Schedule mode (UoM 25: 0=run, 1=hold)
+        {'driver': 'GV0', 'value': 99, 'uom': 4},         # Sensor 1 temp (optional, UoM 4=C)
+        {'driver': 'GV1', 'value': 99, 'uom': 4},         # Sensor 2 temp (optional, UoM 4=C)
+        {'driver': 'GV2', 'value': 99, 'uom': 25},        # Aux heat running (UoM 25: 0=no, 1=yes)
+        {'driver': 'GV3', 'value': 99, 'uom': 25},        # Second stage running (UoM 25: 0=no, 1=yes)
+        {'driver': 'GV4', 'value': 99, 'uom': 25},        # ECO mode (UoM 25: 0=off, 1=on)
+        {'driver': 'GV18', 'value': 99, 'uom': 4},        # ECO low temp offset (Celsius)
+        {'driver': 'GV19', 'value': 99, 'uom': 4},        # ECO high temp offset (Celsius)        
+        {'driver': 'GV5', 'value': 99, 'uom': 25},        # DR running (UoM 25: 0=no, 1=yes)
 
-            {'driver': 'CLITEMP', 'value': 0, 'uom': 4},
-            {'driver': 'GV1', 'value': 2, 'uom': 25}, 
-            {'driver': 'GV2', 'value': 2, 'uom': 25},           
-            {'driver': 'CLIHUM', 'value': 0, 'uom': 51},
-            {'driver': 'GV4', 'value': 2, 'uom': 25},
-            {'driver': 'GV5', 'value': 2, 'uom': 25},
-            {'driver': 'BATLVL', 'value': 99, 'uom': 25},
-            {'driver': 'GV7', 'value': 2, 'uom': 25},
-            {'driver': 'GV8', 'value': 2, 'uom': 25},
-            {'driver': 'GV9', 'value': 99, 'uom': 25},
-            {'driver': 'GV10', 'value': 0, 'uom': 4},
-            {'driver': 'GV11', 'value': 0, 'uom': 4},
-            {'driver': 'GV12', 'value': 0, 'uom': 51},
-            {'driver': 'GV13', 'value': 0, 'uom': 51},
-            {'driver': 'ST', 'value': 0, 'uom': 25},
-            {'driver': 'GV30', 'value': 99, 'uom': 25},            
-            {'driver': 'GV20', 'value': 99, 'uom': 25},            
-             {'driver': 'TIME', 'value' :int(time.time()), 'uom': 151},    
-            ]
+        {'driver': 'GV20', 'value': 99, 'uom': 25},       # Suspended state (UoM 25: 0=not suspended, 1=suspended, 2=error)
+        {'driver': 'GV30', 'value': 99, 'uom': 25},       # Online status (UoM 25: 0=offline, 1=online)
+        {'driver': 'TIME', 'value': int(time.time()), 'uom': 151},  # Last update time (UoM 151=Unix Timestamp)
+    ]
 
-
-    def  __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
-        super().__init__( polyglot, primary, address, name)   
-        #super(YoLinkSW, self).__init__( csName, csid, csseckey, devInfo,  self.updateStatus, )
-        #  
-        logging.debug('udiYoThermostat INIT- {}'.format(deviceInfo['name']))
-        self.n_queue = []  
-        self.yoAccess = yoAccess
-        self.devInfo =  deviceInfo
-        self.yoTHsensor  = None
-        self.node_ready = False
-        self.system_ready=False
-        self.temp_unit = self.yoAccess.get_temp_unit()   
-
-        self.cmd_state = self.retrieve_cmd_state()
-        model = str(self.devInfo['modelName'][:6])
+    def __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
+        super().__init__(polyglot, primary, address, name)
+        logging.debug(f'udiYoThermostat INIT - {deviceInfo["name"]}')
         
-        '''        if model in ['YS8017', 'YS8014', 'YS8004', 'YS8008', 'YS8003']:
-            self.meas_support = ['temp']
-        else:
-            self.meas_support = ['temp', 'hum']
-        if self.temp_unit == 1:
-            if 'hum' not in self.meas_support:
-                self.id = 'yotsensF'
-            else:
-                self.id = 'yothsensF'   
-        else:
-            if 'hum' not in self.meas_support:
-                self.id = 'yotsens'  
-        '''
-        self.alarm_state = False
-        self.sensordata_24_hours = {}
-        #self.address = address
-        #self.poly = polyglot
+        self.poly = polyglot
+        self.address = address
+        self.name = name
+        self.yoAccess = yoAccess
+        self.devInfo = deviceInfo
+        self.yoThermostat = None
+        self.node_ready = False
+        self.system_ready = False
+        self.temp_unit = self.yoAccess.get_temp_unit()
+        self.properties_node = None
+        self.n_queue = []
 
-        #self.Parameters = Custom(polyglot, 'customparams')
-        # subscribe to the events we want
-        #polyglot.subscribe(polyglot.CUSTOMPARAMS, self.parameterHandler)
-        #polyglot.subscribe(polyglot.POLL, self.poll)
+        # Set node ID based on temperature unit
+        if self.temp_unit == 1:
+            self.id = 'yothermostatf'  # Fahrenheit variant
+        else:
+            self.id = 'yothermostat'   # Celsius variant (default)
+
+        # Subscribe to events
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-                     
-        # start processing events and create add our controller node
+
+        # Add node and wait
         polyglot.ready()
-        self.poly.addNode(self, conn_status = None, rename = True)
+        self.poly.addNode(self, conn_status=None, rename=True)
         self.wait_for_node_done()
 
         self.node = self.poly.getNode(address)
-        self.adr_list = []
-        self.adr_list.append(address)
+        self.adr_list = [address]
         self.node_ready = True
 
-
-  
-
     def start(self):
+        """Initialize and start the thermostat device"""
         logging.info('Start udiYoThermostat')
         while not self.node_ready:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0)
-        self.yoTHsensor  = YoLinkThermostat(self.yoAccess, self.devInfo, self.updateStatus)
+        self.yoThermostat = YoLinkThermostat(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(1)
-        self.yoTHsensor.initNode()
-        time.sleep(1)
-        #while not self.yoTHsensor.check_system_online():
-        #    logging.info('Waiting for TH sensor to come online...')
-        #    time.sleep(2)
+        self.yoThermostat.initDevice()
+        tries = 1
+        while not self.yoThermostat.check_system_online() and tries <= 5:
+            logging.info('Waiting for thermostat to come online...')
+            time.sleep(2)
+            tries += 1
 
-        self.temp_unit = self.yoAccess.get_temp_unit()
-        #self.my_setDriver('GV30', 1)
-        self.system_ready=True
+        # Create child node that owns thermostat properties and related controls.
+        prop_address = self.poly.getValidAddress(f'{self.address[4:14]}_TPR'[:14])
+        self.properties_node = udiYoThermostatProperties(
+            self.poly,
+            self.address,
+            prop_address,
+            f'{self.name} Properties',
+            self,
+        )
+        self.adr_list.append(prop_address)
 
-        
-    def initNode(self):
-        self.yoTHsensor.refreshSensor()
+        self.system_ready = True
+        logging.info('Thermostat online and ready')
 
-    
-    def stop (self):
+    def stop(self):
+        """Stop the thermostat device"""
         logging.info('Stop udiYoThermostat')
         self.my_setDriver('GV30', 0)
-        self.yoTHsensor.shut_down()
-        #if self.node:
-        #    self.poly.delNode(self.node.address)
+        if self.yoThermostat:
+            self.yoThermostat.shut_down()
 
-    def checkOnline(self):
-        self.yoTHsensor.refreshDevice()
-
-    def checkDataUpdate(self):
-        if self.yoTHsensor.data_updated():
+    def updateStatus(self, data):
+        """Handle MQTT status updates from the device"""
+        logging.debug('udiYoThermostat - updateStatus')
+        if self.yoThermostat:
+            self.yoThermostat.updateStatus(data)
             self.updateData()
 
-
-    def get_alarms_state (self):
-        alarm_on = False
-        alarms = self.yoTHsensor.getAlarms()
-        logging.debug(f'Alarms: {alarms}')
-        if alarms:
-            for a_type in alarms:
-                if alarms[a_type]:
-                    alarm_on = True
-        return(alarm_on)
-
-
     def updateData(self):
-        #alarms = self.yoTHsensor.getAlarms()
-        #limits = self.yoTHsensor.getLimits()
+        """Parse device state and update drivers"""
+        logging.info('udiYoThermostat - updateData')
         if self.node is not None:
             while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
-            logging.info('yoTHsensor -  updateData')
-            alarm_det = False 
-
-            message_type = self.yoTHsensor.get_message_type() # if event some data may not be updated 
-            unix_time = self.yoTHsensor.get_report_time('reportAt')
-            self.my_setDriver('TIME', unix_time, 151)
-            if self.yoTHsensor.check_system_online():
-                tempC = self.yoTHsensor.get_data('temperature', 'state')
-                tempLimMin = self.yoTHsensor.get_data('min', 'tempLimit')
-                tempLimMax = self.yoTHsensor.get_data('max', 'tempLimit')    
-                lowTempAlarm = self.yoTHsensor.get_data('lowTemp', 'alarms')
-                highTempAlarm = self.yoTHsensor.get_data('highTemp', 'alarms')     
-                alarm_det = alarm_det or lowTempAlarm or highTempAlarm        
-                hum = None
-                if 'hum' in self.meas_support:
-                    hum = self.yoTHsensor.get_data('humidity', 'state')
-                    humLimMin = self.yoTHsensor.get_data('min', 'humidityLimit')
-                    humLimMax = self.yoTHsensor.get_data('max', 'humidityLimit') 
-                    lowHumAlarm = self.yoTHsensor.get_data('lowHumidity', 'alarms')
-                    highHumAlarm = self.yoTHsensor.get_data('highHumidity', 'alarms')  
-                    alarm_det = alarm_det or lowHumAlarm or highHumAlarm
-                tempMeasMin, tempMeasMax, humMeasMin, humMeasMax = self.yoTHsensor.update_data_24_hours(unix_time, tempC, hum)
-                bat_lvl = self.yoTHsensor.get_data('battery', 'state')
-                bat_alarm = self.yoTHsensor.get_data('batteryLow', 'alarms')
-                #tempMeas = self.yoTHsensor.get_data('temperature', 'statistics')
-                #if isinstance(tempMeas, dict):
-                #    tempMeasMin = tempMeas.get('min', None)
-                ##    tempMeasMax = tempMeas.get('max', None)
-                #else:
-
-                #    tempMeasMin = None
-                #    tempMeasMax = None
-                
-                if isinstance(tempC, (int, float)):
-                    if self.temp_unit == 0:
-                        self.my_setDriver('CLITEMP', round(tempC,1),  4, type=message_type)
-                        self.my_setDriver('ST', round(tempC,1),  4)
-                        #if 'tempLimit' in limits:
-                        self.my_setDriver('GV10', tempLimMin,  4, type=message_type)
-                        self.my_setDriver('GV11', tempLimMax,  4, type=message_type)
-                        self.my_setDriver('GV14', tempMeasMin,  4, type=message_type)
-                        self.my_setDriver('GV15', tempMeasMax,  4, type=message_type)                        
-
-                    elif self.temp_unit == 1:
-                        self.my_setDriver('CLITEMP', round(tempC*9/5+32,1),  17, type=message_type)
-                        self.my_setDriver('ST', round(tempC*9/5+32,1),  17, type=message_type)
-                        if isinstance(tempLimMin, (int, float)):
-                            self.my_setDriver('GV10', round(tempLimMin*9/5+32,1),  17, type=message_type)
-                        if isinstance(tempLimMax, (int, float)):
-                            self.my_setDriver('GV11', round(tempLimMax*9/5+32,1),  17, type=message_type) 
-                        if isinstance(tempMeasMin, (int, float)):   
-                            self.my_setDriver('GV14', round(tempMeasMin*9/5+32,1),  17, type=message_type)
-                        if isinstance(tempMeasMax, (int, float)):   
-                            self.my_setDriver('GV15', round(tempMeasMax*9/5+32,1),  17, type=message_type)      
-                else:
-                    self.my_setDriver('CLITEMP', 99,  25)
-                    self.my_setDriver('ST', 99,  25)
-                    self.my_setDriver('GV10', 99, 25)
-                    self.my_setDriver('GV11', 99, 25)
-                    self.my_setDriver('GV14', 99, 25)
-                    self.my_setDriver('GV15', 99, 25)
-   
-                
             
-                self.my_setDriver('GV1', self.yoTHsensor.bool2Nbr(lowTempAlarm), type=message_type)
-                self.my_setDriver('GV2', self.yoTHsensor.bool2Nbr(highTempAlarm), type=message_type)
-
-                if 'hum' in self.meas_support:
-                    if isinstance(hum,(int,float)):
-                        self.my_setDriver('CLIHUM', hum, 51, type=message_type )
-        
-                        self.my_setDriver('GV12', humLimMin, 51, type=message_type)
-                        self.my_setDriver('GV13', humLimMax, 51, type=message_type)
-                        self.my_setDriver('GV16', humMeasMin, 51, type=message_type)
-                        self.my_setDriver('GV17', humMeasMax, 51, type=message_type)
-                    self.my_setDriver('GV4', self.yoTHsensor.bool2Nbr(lowHumAlarm), type=message_type)
-                    self.my_setDriver('GV5', self.yoTHsensor.bool2Nbr(highHumAlarm), type=message_type)
-                    if alarm_det or lowHumAlarm or highHumAlarm:
-                        alarm_det = True
-                else:
-                    self.my_setDriver('CLIHUM', 98, 25)
-                    self.my_setDriver('GV12', 98, 25)
-                    self.my_setDriver('GV13', 98, 25)
-                    self.my_setDriver('GV16', 98, 25)
-                    self.my_setDriver('GV17', 98, 25)   
-                    self.my_setDriver('GV4', 98, 25)
-                    self.my_setDriver('GV5', 98, 25)
-
-
-                self.my_setDriver('BATLVL', bat_lvl, 25, type=message_type)
-                self.my_setDriver('GV7', self.yoTHsensor.bool2Nbr(bat_alarm))
-                alarm_det = alarm_det or bat_alarm
-
-                if alarm_det != self.alarm_state:
-                    if alarm_det and self.cmd_state in [0,1]:
-                        self.node.reportCmd('DON')
-                    if not alarm_det and self.cmd_state in [0,2]:  
-                        self.node.reportCmd('DOF')
-                    self.alarm_state = alarm_det                
-
-
-                    self.my_setDriver('GV8', self.yoTHsensor.bool2Nbr(self.alarm_state))
-                    self.my_setDriver('GV9', self.cmd_state)
-
+            message_type, message_action = self.yoThermostat.get_message_type()
+            
+            # Update timestamp
+            unix_time = self.yoThermostat.get_report_time('time')
+            self.my_setDriver('TIME', unix_time, 151)
+            
+            if self.yoThermostat.check_system_online():
                 self.my_setDriver('GV30', 1)
+                
+                # Current readings from state
+                currentTemp = self.yoThermostat.get_data('temperature', 'state')
+                humidity = self.yoThermostat.get_data('humidity', 'state')
+                
+                # Setpoints
+                lowTemp = self.yoThermostat.get_data('lowTemp', 'state')
+                highTemp = self.yoThermostat.get_data('highTemp', 'state')
+                
+                # Operating mode
+                mode = self.yoThermostat.get_data('mode', 'state')
+                fan = self.yoThermostat.get_data('fan', 'state')
+                sche = self.yoThermostat.get_data('sche', 'state')
+                running = self.yoThermostat.get_data('running', 'state')
 
-                if self.yoTHsensor.suspended:
+                # Sensors (optional)
+                sensor1 = self.yoThermostat.get_data('temperature', 'sensor1')
+                sensor2 = self.yoThermostat.get_data('temperature', 'sensor2')
+
+                # Optional states in 'other'
+                auxHeat = self.yoThermostat.get_data('auxiliaryHeat',  'other')
+                stage2 = self.yoThermostat.get_data('secondStage', 'other')
+                drRunning = self.yoThermostat.get_data('drRunning', 'other')
+
+                # Eco mode
+                eco_mode = self.yoThermostat.get_data('mode','eco')
+                eco_highTemp = self.yoThermostat.get_data('highTemp','eco')
+                eco_lowTemp = self.yoThermostat.get_data('lowTemp','eco')
+
+                # Current temperature
+                if isinstance(currentTemp, (int, float)):
+                    if self.temp_unit == 1:  # Fahrenheit
+                        self.my_setDriver('CLITEMP', round(currentTemp * 9/5 + 32, 1), 17, type=message_type)
+                    else:
+                        self.my_setDriver('CLITEMP', round(currentTemp, 1), 4, type=message_type)
+
+                # Humidity
+                if isinstance(humidity, (int, float)):
+                    self.my_setDriver('CLIHUM', round(humidity, 1), 51, type=message_type)
+
+                # Heat setpoint (low temp = heat setpoint)
+                if isinstance(lowTemp, (int, float)):
+                    if self.temp_unit == 1:
+                        self.my_setDriver('CLISPH', round(lowTemp * 9/5 + 32, 1), 17, type=message_type)
+                    else:
+                        self.my_setDriver('CLISPH', round(lowTemp, 1), 4, type=message_type)
+
+                # Cool setpoint (high temp = cool setpoint)
+                if isinstance(highTemp, (int, float)):
+                    if self.temp_unit == 1:
+                        self.my_setDriver('CLISPC', round(highTemp * 9/5 + 32, 1), 17, type=message_type)
+                    else:
+                        self.my_setDriver('CLISPC', round(highTemp, 1), 4, type=message_type)
+
+                # Mode: UoM 67: 0=Off, 1=Heat, 2=Cool, 3=Auto
+                if mode:
+                    mode_map = {'off': 0, 'heat': 1, 'cool': 2, 'auto': 3}
+                    self.my_setDriver('CLIMD', mode_map.get(mode.lower(), 99), 67, type=message_type)
+
+                # Fan setting: UoM 68: 0=Auto, 1=On
+                if fan:
+                    fan_map = {'auto': 0, 'on': 1}
+                    self.my_setDriver('CLIFS', fan_map.get(fan.lower(), 99), 68, type=message_type)
+
+                # Schedule mode: 0=run, 1=hold
+                if sche:
+                    sche_map = {'run': 0, 'hold': 1}
+                    self.my_setDriver('CLISMD', sche_map.get(sche.lower(), 99), 25, type=message_type)
+
+                # Running state: UoM 66: 0=Idle, 1=Heating, 2=Cooling
+                if running:
+                    running_map = {'idle': 0, 'heat': 1, 'cool': 2}
+                    self.my_setDriver('ST', running_map.get(running.lower(), 99), 66, type=message_type)
+
+                # Optional sensors
+                if isinstance(sensor1, (int, float)):
+                    if sensor1<=-100 or sensor1>=200:  # Invalid reading, set to error value
+                        self.my_setDriver('GV0', 99, 25, type=message_type)
+                    else:
+                        if self.temp_unit == 1:
+                            self.my_setDriver('GV0', round(sensor1 * 9/5 + 32, 1), 17, type=message_type)
+                        else:
+                            self.my_setDriver('GV0', round(sensor1, 1), 4, type=message_type)
+
+                if isinstance(sensor2, (int, float)):
+                    if sensor2<=-100 or sensor2>=200:  # Invalid reading, set to error value
+                        self.my_setDriver('GV1', 99, 25, type=message_type)
+                    else:
+                        if self.temp_unit == 1:
+                            self.my_setDriver('GV1', round(sensor2 * 9/5 + 32, 1), 17, type=message_type)
+                        else:
+                            self.my_setDriver('GV1', round(sensor2, 1), 4, type=message_type)
+
+                # Optional other states (UoM 25 = index)
+                if auxHeat is not None:
+                    self.my_setDriver('GV2', 1 if auxHeat else 0, 25, type=message_type)
+                if stage2 is not None:
+                    self.my_setDriver('GV3', 1 if stage2 else 0, 25, type=message_type)
+
+                # ECO mode (UoM 25 = index)
+                logging.debug(f'Parsing ECO data: mode={eco_mode}, low={eco_lowTemp}, high={eco_highTemp}')
+                if eco_mode and isinstance(eco_mode, str):
+                    self.my_setDriver('GV4', 1 if eco_mode.lower() == 'on' else 0, 25, type=message_type)
+
+                if eco_lowTemp is not None and isinstance(eco_lowTemp, (int, float)):
+                    if self.temp_unit == 1:
+                        self.my_setDriver('GV18', round(eco_lowTemp * 9/5, 1), 17, type=message_type)
+                    else:
+                        self.my_setDriver('GV18', round(eco_lowTemp, 1), 4, type=message_type)
+
+                if eco_highTemp is not None and isinstance(eco_highTemp, (int, float)):
+                    if self.temp_unit == 1:
+                        self.my_setDriver('GV19', round(eco_highTemp * 9/5, 1), 17, type=message_type)
+                    else:
+                        self.my_setDriver('GV19', round(eco_highTemp, 1), 4, type=message_type)
+
+                # DR running state (UoM 25: 0=no, 1=yes)
+                if drRunning is not None:
+                    self.my_setDriver('GV5', 1 if drRunning else 0, 25, type=message_type)
+
+                # Properties
+                properties = self.yoThermostat.get_data('properties')
+                if not isinstance(properties, dict):
+                    properties = self.yoThermostat.get_data('properties', 'state')
+                logging.debug(f'Parsing properties data: {properties}')
+                if properties and isinstance(properties, dict) and self.properties_node is not None:
+                    self.properties_node.updateProperties(properties, message_type)
+
+                # Suspended state check
+                if self.yoThermostat.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
-                    self.my_setDriver('GV20', 0)                
+                    self.my_setDriver('GV20', 0)
             else:
                 self.my_setDriver('GV30', 0)
                 self.my_setDriver('GV20', 2)
 
+    def update(self, command=None):
+        """Refresh device state"""
+        logging.info('udiYoThermostat update')
+        if self.yoThermostat:
+            self.yoThermostat.refreshDevice()
 
+    def setLowTemp(self, command):
+        """Set low temperature setpoint"""
+        try:
+            temp = float(command.get('value'))
+            # Convert from Fahrenheit to Celsius if needed (API expects Celsius)
+            if self.temp_unit == 1:
+                temp_celsius = round((temp - 32) * 5/9, 1)
+                logging.info(f'udiYoThermostat setLowTemp - {temp}°F ({temp_celsius}°C)')
+                if self.yoThermostat:
+                    self.yoThermostat.setLowTemp(temp_celsius)
+            else:
+                logging.info(f'udiYoThermostat setLowTemp - {temp}°C')
+                if self.yoThermostat:
+                    self.yoThermostat.setLowTemp(temp)
+        except (ValueError, TypeError) as e:
+            logging.error(f'setLowTemp invalid value: {e}')
 
-    def updateStatus(self, data):
-        logging.debug('udiYoThermostat - updateStatus')
-        self.yoTHsensor.updateStatus(data)
-        self.updateData()
+    def setHighTemp(self, command):
+        """Set high temperature setpoint"""
+        try:
+            temp = float(command.get('value'))
+            # Convert from Fahrenheit to Celsius if needed (API expects Celsius)
+            if self.temp_unit == 1:
+                temp_celsius = round((temp - 32) * 5/9, 1)
+                logging.info(f'udiYoThermostat setHighTemp - {temp}°F ({temp_celsius}°C)')
+                if self.yoThermostat:
+                    self.yoThermostat.setHighTemp(temp_celsius)
+            else:
+                logging.info(f'udiYoThermostat setHighTemp - {temp}°C')
+                if self.yoThermostat:
+                    self.yoThermostat.setHighTemp(temp)
+        except (ValueError, TypeError) as e:
+            logging.error(f'setHighTemp invalid value: {e}')
 
-    def set_cmd(self, command):
-        ctrl = int(command.get('value'))   
-        logging.info('udiYoThermostat  set_cmd - {}'.format(ctrl))
-        self.cmd_state = ctrl
-        self.my_setDriver('GV9', self.cmd_state)
-        self.save_cmd_state(self.cmd_state)
+    def setMode(self, command):
+        """Set operating mode (UoM 67: 0=Off, 1=Heat, 2=Cool, 3=Auto)"""
+        try:
+            mode_val = int(command.get('value'))
+            mode_map = {0: 'off', 1: 'heat', 2: 'cool', 3: 'auto'}
+            mode = mode_map.get(mode_val, 'off')
+            logging.info(f'udiYoThermostat setMode - {mode}')
+            if self.yoThermostat:
+                self.yoThermostat.setMode(mode)
+        except (ValueError, TypeError) as e:
+            logging.error(f'setMode invalid value: {e}')
 
-    def update(self, command = None):
-        logging.info('THsensor Update')
-        self.yoTHsensor.refreshDevice()
-       
+    def setFan(self, command):
+        """Set fan mode (UoM 68: 0=Auto, 1=On)"""
+        try:
+            fan_val = int(command.get('value'))
+            fan_map = {0: 'auto', 1: 'on'}
+            fan = fan_map.get(fan_val, 'auto')
+            logging.info(f'udiYoThermostat setFan - {fan}')
+            if self.yoThermostat:
+                self.yoThermostat.setFan(fan)
+        except (ValueError, TypeError) as e:
+            logging.error(f'setFan invalid value: {e}')
+
+    def setScheduleMode(self, command):
+        """Set schedule mode (run/hold)"""
+        try:
+            sche_val = int(command.get('value'))
+            sche_map = {0: 'run', 1: 'hold'}
+            sche = sche_map.get(sche_val, 'run')
+            logging.info(f'udiYoThermostat setScheduleMode - {sche}')
+            if self.yoThermostat:
+                self.yoThermostat.setScheduleMode(sche)
+        except (ValueError, TypeError) as e:
+            logging.error(f'setScheduleMode invalid value: {e}')
+
+    def setEco(self, command):
+        """Set ECO mode and optional low/high ECO offsets."""
+        try:
+            query = command.get('query') or {}
+
+            # Parse ECO mode from query first (3-parameter nodedef), fallback to value.
+            eco_raw = None
+            for key in query:
+                if key.lower().startswith('ecomode'):
+                    eco_raw = query.get(key)
+                    break
+            if eco_raw is None:
+                eco_raw = command.get('value')
+
+            eco_mode = None
+            if eco_raw is not None:
+                eco_str = str(eco_raw).strip().lower()
+                if eco_str in ['on', 'off']:
+                    eco_mode = eco_str
+                else:
+                    eco_mode = 'on' if int(float(eco_raw)) == 1 else 'off'
+
+            # Parse optional low/high ECO adjustments from query payload.
+            eco_low = None
+            eco_high = None
+            for key, raw in query.items():
+                key_l = key.lower()
+                if key_l.startswith('ecolow'):
+                    eco_low = float(raw)
+                elif key_l.startswith('ecohigh'):
+                    eco_high = float(raw)
+
+            # API expects Celsius values; these are relative offsets, not absolute temps.
+            if self.temp_unit == 1:
+                if eco_low is not None:
+                    eco_low = round(eco_low * 5 / 9, 1)
+                if eco_high is not None:
+                    eco_high = round(eco_high * 5 / 9, 1)
+
+            logging.info(f'udiYoThermostat setEco - mode={eco_mode}, low={eco_low}, high={eco_high}')
+            if self.yoThermostat:
+                self.yoThermostat.setECO(mode=eco_mode, lowTemp=eco_low, highTemp=eco_high)
+        except (ValueError, TypeError) as e:
+            logging.error(f'setEco invalid value: {e} | command={command}')
+
     commands = {
-                'SETCMD': set_cmd,             
-                'UPDATE': update,
-                }
+        'UPDATE': update,
+        'SETHEATTEMP': setLowTemp,
+        'SETCOOLTEMP': setHighTemp,
+        'SETMODE': setMode,
+        'SETFAN': setFan,
+        'SETSCHE': setScheduleMode,
+        'SETECO': setEco,
+    }
+
+
+class udiYoThermostatProperties(udi_interface.Node):
+    from udiYolinkLib import my_setDriver, node_queue, wait_for_node_done
+
+    id = 'yothermprop'
+
+    drivers = [
+        {'driver': 'GV6', 'value': 99, 'uom': 44},        # minRuntime (minutes)
+        {'driver': 'GV7', 'value': 99, 'uom': 4},         # coolLimit (Celsius)
+        {'driver': 'GV8', 'value': 99, 'uom': 4},         # heatLimit (Celsius)
+        {'driver': 'GV9', 'value': 99, 'uom': 25},        # mute (0=no, 1=yes)
+        {'driver': 'GV10', 'value': 99, 'uom': 25},       # menuLock (0=no, 1=yes)
+        {'driver': 'GV11', 'value': 99, 'uom': 44},       # auxStandby (minutes)
+        {'driver': 'GV12', 'value': 99, 'uom': 20},       # auxMaxSpan (hours)
+        {'driver': 'GV13', 'value': 99, 'uom': 4},        # auxThreshold (Celsius)
+        {'driver': 'GV14', 'value': 99, 'uom': 44},       # stage2Standby (minutes)
+        {'driver': 'GV15', 'value': 99, 'uom': 20},       # stage2MaxSpan (hours)
+        {'driver': 'GV16', 'value': 99, 'uom': 4},        # stage2Threshold (Celsius)
+        {'driver': 'GV17', 'value': 99, 'uom': 25},       # master temp source (0=local, 1=sensor1, 2=sensor2)
+    ]
+
+    def __init__(self, polyglot, primary, address, name, thermostat_node):
+        super().__init__(polyglot, primary, address, name)
+        self.poly = polyglot
+        self.parent_node = thermostat_node
+        self.temp_unit = thermostat_node.temp_unit
+        self.node_ready = False
+        self.n_queue = []
+
+        if self.temp_unit == 1:
+            self.id = 'yothermpropf'
+
+        self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+        self.poly.addNode(self, conn_status=None, rename=True)
+        self.wait_for_node_done()
+        self.node = self.poly.getNode(address)
+        self.node_ready = True
+
+    def _yo(self):
+        return self.parent_node.yoThermostat if self.parent_node else None
+
+    def updateProperties(self, properties, message_type=None):
+        if not isinstance(properties, dict):
+            return
+
+        minRuntime = properties.get('minRuntime')
+        if isinstance(minRuntime, (int, float)):
+            self.my_setDriver('GV6', int(minRuntime), 44, type=message_type)
+
+        coolLimit = properties.get('coolLimit')
+        if isinstance(coolLimit, (int, float)):
+            if self.temp_unit == 1:
+                self.my_setDriver('GV7', round(coolLimit * 9/5 + 32, 1), 17, type=message_type)
+            else:
+                self.my_setDriver('GV7', round(coolLimit, 1), 4, type=message_type)
+
+        heatLimit = properties.get('heatLimit')
+        if isinstance(heatLimit, (int, float)):
+            if self.temp_unit == 1:
+                self.my_setDriver('GV8', round(heatLimit * 9/5 + 32, 1), 17, type=message_type)
+            else:
+                self.my_setDriver('GV8', round(heatLimit, 1), 4, type=message_type)
+
+        mute = properties.get('mute')
+        if mute is not None:
+            self.my_setDriver('GV9', 1 if mute else 0, 25, type=message_type)
+
+        menuLock = properties.get('menuLock')
+        if menuLock is not None:
+            self.my_setDriver('GV10', 1 if menuLock else 0, 25, type=message_type)
+
+        auxStandby = properties.get('auxStandby')
+        if isinstance(auxStandby, (int, float)):
+            self.my_setDriver('GV11', int(auxStandby), 44, type=message_type)
+
+        auxMaxSpan = properties.get('auxMaxSpan')
+        if isinstance(auxMaxSpan, (int, float)):
+            self.my_setDriver('GV12', int(auxMaxSpan), 20, type=message_type)
+
+        auxThreshold = properties.get('auxThreshold')
+        if isinstance(auxThreshold, (int, float)):
+            if self.temp_unit == 1:
+                self.my_setDriver('GV13', round(auxThreshold * 9/5 + 32, 1), 17, type=message_type)
+            else:
+                self.my_setDriver('GV13', round(auxThreshold, 1), 4, type=message_type)
+
+        stage2Standby = properties.get('stage2Standby')
+        if isinstance(stage2Standby, (int, float)):
+            self.my_setDriver('GV14', int(stage2Standby), 44, type=message_type)
+
+        stage2MaxSpan = properties.get('stage2MaxSpan')
+        if isinstance(stage2MaxSpan, (int, float)):
+            self.my_setDriver('GV15', int(stage2MaxSpan), 20, type=message_type)
+
+        stage2Threshold = properties.get('stage2Threshold')
+        if isinstance(stage2Threshold, (int, float)):
+            if self.temp_unit == 1:
+                self.my_setDriver('GV16', round(stage2Threshold * 9/5 + 32, 1), 17, type=message_type)
+            else:
+                self.my_setDriver('GV16', round(stage2Threshold, 1), 4, type=message_type)
+
+        master = properties.get('master')
+        if master:
+            master_map = {'local': 0, 'sensor1': 1, 'sensor2': 2}
+            self.my_setDriver('GV17', master_map.get(str(master).lower(), 99), 25, type=message_type)
+
+    def update(self, command=None):
+        yo = self._yo()
+        if yo:
+            yo.refreshDevice()
+
+    def setMinRuntime(self, command):
+        try:
+            minutes = int(command.get('value'))
+            yo = self._yo()
+            if yo:
+                yo.setProperties(minRuntime=minutes)
+        except (ValueError, TypeError) as e:
+            logging.error(f'setMinRuntime invalid value: {e}')
+
+    def setCoolLimit(self, command):
+        try:
+            temp = float(command.get('value'))
+            yo = self._yo()
+            if yo:
+                if self.temp_unit == 1:
+                    temp = round((temp - 32) * 5/9, 1)
+                yo.setProperties(coolLimit=temp)
+        except (ValueError, TypeError) as e:
+            logging.error(f'setCoolLimit invalid value: {e}')
+
+    def setHeatLimit(self, command):
+        try:
+            temp = float(command.get('value'))
+            yo = self._yo()
+            if yo:
+                if self.temp_unit == 1:
+                    temp = round((temp - 32) * 5/9, 1)
+                yo.setProperties(heatLimit=temp)
+        except (ValueError, TypeError) as e:
+            logging.error(f'setHeatLimit invalid value: {e}')
+
+    def setMute(self, command):
+        try:
+            mute_val = int(command.get('value'))
+            yo = self._yo()
+            if yo:
+                yo.setProperties(mute=(mute_val == 1))
+        except (ValueError, TypeError) as e:
+            logging.error(f'setMute invalid value: {e}')
+
+    def setMenuLock(self, command):
+        try:
+            lock_val = int(command.get('value'))
+            yo = self._yo()
+            if yo:
+                yo.setProperties(menuLock=(lock_val == 1))
+        except (ValueError, TypeError) as e:
+            logging.error(f'setMenuLock invalid value: {e}')
+
+    def setMaster(self, command):
+        try:
+            master_val = int(command.get('value'))
+            master_map = {0: 'local', 1: 'sensor1', 2: 'sensor2'}
+            yo = self._yo()
+            if yo:
+                yo.setProperties(master=master_map.get(master_val, 'local'))
+        except (ValueError, TypeError) as e:
+            logging.error(f'setMaster invalid value: {e}')
+
+    commands = {
+        'UPDATE': update,
+        'SETMINRUNTIME': setMinRuntime,
+        'SETCOOLLIMIT': setCoolLimit,
+        'SETHEATLIMIT': setHeatLimit,
+        'SETMUTE': setMute,
+        'SETMENULOCK': setMenuLock,
+        'SETMASTER': setMaster,
+    }
 
 
 

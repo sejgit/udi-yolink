@@ -21,7 +21,7 @@ from yolinkWaterMeterControllerV3 import YoLinkWaterMeter
 
 
 class udiYoWaterMeterOnly(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, w_unit2ISY, water_meter_unit2uom, calculate_water_volume, save_cmd_state, retrieve_cmd_state, bool2ISY, state2Nbr, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key
+    from  udiYolinkLib import my_setDriver, water_meter_unit2uom, calculate_water_volume, bool2ISY, node_queue, wait_for_node_done
 
     id = 'yowatermeterOnly'
     '''
@@ -353,36 +353,36 @@ class udiYoWaterMeterOnly(udi_interface.Node):
         data['attributes'] = {}
         leak_lim = None
         or_lim = None
-        if 'L_LIMIT.uom69' in query:
-            leak_lim = float(query.get('L_LIMIT.uom69'))
-        elif 'L_LIMIT.uom6' in query:
-            leak_lim = float(query.get('L_LIMIT.uom6'))
-        elif 'L_LIMIT.uom8' in query:
-            leak_lim = float(query.get('L_LIMIT.uom8'))
-        elif 'L_LIMIT.uom35' in query:
-            leak_lim = float(query.get('L_LIMIT.uom35'))
+        if 'LLIMIT.uom69' in query:
+            leak_lim = float(query.get('LLIMIT.uom69'))
+        elif 'LLIMIT.uom6' in query:
+            leak_lim = float(query.get('LLIMIT.uom6'))
+        elif 'LLIMIT.uom8' in query:
+            leak_lim = float(query.get('LLIMIT.uom8'))
+        elif 'LLIMIT.uom35' in query:
+            leak_lim = float(query.get('LLIMIT.uom35'))
         if leak_lim:
             data['attributes'] ['leakLimit'] = leak_lim
 
-        #if 'L_OFF.uom25' in query:
-        #    data['attributes'] ['autoCloseValve'] = bool(query.get('L_OFF.uom25'))
+        #if 'LOFF.uom25' in query:
+        #    data['attributes'] ['autoCloseValve'] = bool(query.get('LOFF.uom25'))
 
-        if 'OR_LIMIT.uom69' in query:
-            or_lim = float(query.get('OR_LIMIT.uom69'))
-        elif 'OR_LIMIT.uom6' in query:
-            or_lim = float(query.get('OR_LIMIT.uom6'))
-        elif 'OR_LIMIT.uom8' in query:
-            or_lim = float(query.get('OR_LIMIT.uom8'))
-        elif 'OR_LIMIT.uom35' in query:
-            or_lim = float(query.get('OR_LIMIT.uom35'))   
+        if 'ORLIMIT.uom69' in query:
+            or_lim = float(query.get('ORLIMIT.uom69'))
+        elif 'ORLIMIT.uom6' in query:
+            or_lim = float(query.get('ORLIMIT.uom6'))
+        elif 'ORLIMIT.uom8' in query:
+            or_lim = float(query.get('ORLIMIT.uom8'))
+        elif 'ORLIMIT.uom35' in query:
+            or_lim = float(query.get('ORLIMIT.uom35'))   
         if or_lim:
             data['attributes'] ['overrunAmount'] = or_lim     
-        #if 'OR_OFF.uom25' in query:
-        #    data['attributes'] ['overrunAmountACV'] = bool(query.get('OR_OFF.uom25')) 
-        if 'ORT_LIMIT.uom44' in query:
-            data['attributes'] ['overrunDuration']  = int(query.get('ORT_LIMIT.uom44'))
-        #if 'ORT_OFF' in query:
-        #    data['attributes'] ['overrunDurationACV']  = bool(query.get('ORT_OFF.uom25'))
+        #if 'OROFF.uom25' in query:
+        #    data['attributes'] ['overrunAmountACV'] = bool(query.get('OROFF.uom25')) 
+        if 'ORTLIMIT.uom44' in query:
+            data['attributes'] ['overrunDuration']  = int(query.get('ORTLIMIT.uom44'))
+        #if 'ORTOFF' in query:
+        #    data['attributes'] ['overrunDurationACV']  = bool(query.get('ORTOFF.uom25'))
 
         self.yoWaterCtrl.setAttributes(data)
         

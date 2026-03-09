@@ -269,16 +269,40 @@ class YoLinkMQTTDevice(object):
     #@measure_time
     def check_system_online(yolink):
         #return(yolink.yoAccess.online)
-
-        logging.debug(f'check_system_online: {json.dumps(yolink.data, indent=2)}' )
-
-        yolink.online = yolink.data.get(yolink.dOnline, False)
-        online2 = yolink.Status(yolink.data)
-        if yolink.online is None:
-            yolink.online = False
+        logging.debug(f'check_system_online : {yolink.data}')
+        yolink.online = True
+        if 'lastStateTime' in yolink.data:
+            logging.debug('lastStateTime selected')
+            if isinstance(yolink.data['lastStateTime'], (int, float)):
+                if yolink.data['lastStateTime'] + 60*60*4 <= time.time(): # if no update for 4 hours then assume offline
+                    yolink.online = False
+                    logging.error('Status {} - Off line detected: {}'.format(yolink.deviceInfo['name'], yolink.data))
+                else:
+                    yolink.online = True
+            return(yolink.online)
         
-        logging.debug(f'check_system_online: {yolink.online} {online2}')
+        if 'code' in yolink.data:
+            logging.debug('code selected')
+            if yolink.data['code'] == '000000':
+                    yolink.online = True
+            elif yolink.data['code'].find('00020') == 0: # Offline
+                yolink.online = False
+        elif 'event' in yolink.data:
+            logging.debug('event selected')
+            if 'data' in yolink.data:
+                if 'online' in yolink.data['data']:
+                    yolink.online = yolink.data['data']['online']
+
+        else:
+            yolink.online = False
+            logging.debug(f'OFFLINE STRANGE {yolink.data}')
+
+        
+        if not yolink.online:
+            logging.error('Status {} - Off line detected: {}'.format(yolink.deviceInfo['name'], yolink.data))
         return(yolink.online)
+
+
 
 
     #@measure_time
@@ -597,8 +621,7 @@ class YoLinkMQTTDevice(object):
         if 'code' in dataPacket:
             logging.debug('code selected')
             if dataPacket['code'] == '000000':
-                yolink.online = True
-                yolink.suspended= False
+                    yolink.online = True
             elif dataPacket['code'].find('00020') == 0: # Offline
                 yolink.online = False
             elif  dataPacket['code'] == '010301': # need to add a wait
@@ -631,7 +654,6 @@ class YoLinkMQTTDevice(object):
                 logging.debug('Method detected')
                 yolink.online = yolink.Status(data)
                 if data['code'] == '000000':
-
                     yolink.noconnect = 0
                     if  '.getState' in data['method'] :
                         #if int(data['time']) > int(yolink.getLastUpdate()):
@@ -931,29 +953,17 @@ class YoLinkMQTTDevice(object):
     
     def refreshSchedules(yolink):
         logging.debug(yolink.type + '- refreshSchedules')
+        attempt = 1
+        maxAttempts = 3
+        #if 'getSchedules' in yolink.methodList:
+        methodStr = yolink.type+'.getSchedules'
+        #logging.debug(methodStr)  
         data = {}
-        
-        # WaterMeterController supports both valve and leak schedules
-        if yolink.type == 'WaterMeterController':
-            # Refresh valve schedules
-            data['method'] = 'WaterMeterController.getValveSchedules'
-            data["targetDevice"] = yolink.deviceInfo['deviceId']
-            data["token"] = yolink.deviceInfo['token']
-            yolink.yoAccess.publish_data(data)
-            
-            # Refresh leak schedules
-            data = {}
-            data['method'] = 'WaterMeterController.getLeakSchedules'
-            data["targetDevice"] = yolink.deviceInfo['deviceId']
-            data["token"] = yolink.deviceInfo['token']
-            yolink.yoAccess.publish_data(data)
-        else:
-            # Standard getSchedules for other device types
-            methodStr = yolink.type + '.getSchedules'
-            data['method'] = methodStr
-            data["targetDevice"] = yolink.deviceInfo['deviceId']
-            data["token"] = yolink.deviceInfo['token']
-            yolink.yoAccess.publish_data(data) 
+        #data['time'] = str(int(time.time_ns()//1e6))
+        data['method'] = methodStr
+        data["targetDevice"] =  yolink.deviceInfo['deviceId']
+        data["token"]= yolink.deviceInfo['token']
+        yolink.yoAccess.publish_data(data) 
             
     
     '''
@@ -1005,20 +1015,11 @@ class YoLinkMQTTDevice(object):
    
 
 
-    def setSchedule(yolink, index, params, schedule_method=None):
+    def setSchedule(yolink, index, params):
         logging.debug(yolink.type + '- setSchedule')
         indexS = str(index)
         data = {}
-        
-        # For WaterMeterController, use specific valve or leak schedule methods
-        if yolink.type == 'WaterMeterController' and schedule_method in ['valve', 'leak']:
-            if schedule_method == 'valve':
-                data['method'] = 'WaterMeterController.setValveSchedules'
-            else:  # leak
-                data['method'] = 'WaterMeterController.setLeakSchedules'
-        else:
-            data['method'] = yolink.type+'.setSchedules'
-            
+        data['method'] = yolink.type+'.setSchedules'
         data["targetDevice"] =  yolink.deviceInfo['deviceId']
         data["token"]= yolink.deviceInfo['token']
         data['params'] = {}
@@ -1353,9 +1354,20 @@ class YoLinkMQTTDevice(object):
                 if yolink.data[yolink.dData] is {}:
                     logging.info(f'No data exists (no data returned)')
                     return("no data")
-                if key in yolink.data[yolink.dData] and not isinstance(yolink.data[yolink.dData][key], dict): # MAy need to add list in future if it exists
-                        logging.debug(f'ret_val0  {key} {yolink.data[yolink.dData][key]}')
-                        return(yolink.data[yolink.dData][key])
+
+                data_root = yolink.data[yolink.dData]
+
+                # Direct category lookup first: get_data('temperature', 'state')
+                # and get_data('properties', 'state') when nested under state.
+                if isinstance(category, str) and category in data_root and isinstance(data_root[category], dict):
+                    if key in data_root[category]:
+                        return data_root[category][key]
+
+                # Direct top-level lookup: returns both scalars and dicts/lists,
+                # e.g. get_data('properties') when properties is at data root.
+                if key in data_root:
+                    logging.debug(f'ret_val0  {key} {data_root[key]}')
+                    return data_root[key]
                         
                 res = yolink.extract_two_level(category, key)
                 logging.debug(f'extract_two_level result: {res}')
