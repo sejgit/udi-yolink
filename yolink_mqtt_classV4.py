@@ -655,14 +655,14 @@ class YoLinkMQTTDevice(object):
                 yolink.online = yolink.Status(data)
                 if data['code'] == '000000':
                     yolink.noconnect = 0
-                    if  '.getState' in data['method'] :
+                    #if  '.getState' in data['method'] :
                         #if int(data['time']) > int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data) 
+                    #    yolink.updatePacketData(data) 
                         
-                    elif  '.setState' in data['method'] :
+                    #elif  '.setState' in data['method'] :
                         #if int(data['time']) > int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data)                          
-                    elif  '.setDelay'  in data['method']:
+                    #    yolink.updatePacketData(data)                          
+                    if  '.setDelay'  in data['method']:
                         #if int(data['time']) > int(yolink.getLastUpdate()):
                         yolink.updateDelayData(data)       
                     elif  '.getSchedules'  in data['method'] :
@@ -677,37 +677,37 @@ class YoLinkMQTTDevice(object):
                     #elif  '.getVersion' in data['method']:
                     #    #if int(data['time']) > int(yolink.getLastUpdate()):
                     #    yolink.updateFWStatus(data)
-                    elif  '.toggle' in data['method']:
+                    #elif  '.toggle' in data['method']:
                         #if int(data['time']) > int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data)          
-                    elif  '.setWiFi' in data['method'] :
+                    #    yolink.updatePacketData(data)          
+                    #elif  '.setWiFi' in data['method'] :
                         #if int(data['time']) > int(yolink.getLastUpdate()):
                         #yolink.updateStatusData(data)       
-                        logging.debug('Do Nothing for now')
+                    #    logging.debug('Do Nothing for now')
                     elif  '.playAudio' in data['method'] :
                         #if int(data['time']) > int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data)   
+                    #    yolink.updatePacketData(data)   
                         logging.debug('playAudio No data returned - just update time')
                             #yolink.updateStatusData(data)    
                             #yolink.updateMessageInfo(data)  
                     elif  '.setOption' in data['method'] :
                         #if int(data['time']) > int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data)   
+                    #    yolink.updatePacketData(data)   
                         logging.debug('setOption No data returned - just update time')
                         #yolink.updateStatusData(data)    
                         yolink.updateMessageInfo(data)  
                         #yolink.updateStatusData(data)   
-                    elif  '.StatusChange' in data['method']:
+                    #elif  '.StatusChange' in data['method']:
                         #if int(data['time']) > int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data)     
-                    elif  '.send' in data['method']:
+                    #    yolink.updatePacketData(data)     
+                    #elif  '.send' in data['method']:
                         #if int(data['time']) > int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data)     
-                    elif  '.learn' in data['method']:
+                    #    yolink.updatePacketData(data)     
+                    #elif  '.learn' in data['method']:
                         #if int(data['time']) > int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data)   
-                    else:
-                        logging.debug('Unsupported Method passed' + str(json.dumps(data))) 
+                    #    yolink.updatePacketData(data)   
+                    #else:
+                    #    logging.debug('Unsupported Method passed' + str(json.dumps(data))) 
                 #elif data['code'] == '000201': #Cannot connect to device - retry
                 #    if yolink.noconnect < yolink.max_noconnect:
                 #        time.sleep(1)
@@ -720,45 +720,45 @@ class YoLinkMQTTDevice(object):
                 #logging.debug('Event deteced')
                 yolink.online = True # Event generated so it must be online 
                 #yolink.online = True #
-                if '.StatusChange' in data['event']:
-                    if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data)              
-                elif '.Report' in data['event']:
-                    if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data)  
-                elif '.getState' in data['event']:
-                    if int(data['time']) >= int(yolink.getLastUpdate()):
-                       yolink.updatePacketData(data)  
-                elif '.setState' in data['event']:
-                    if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data)                      
-                elif '.getSchedules' in data['event']:
+                #if '.StatusChange' in data['event']:
+                #    if int(data['time']) >= int(yolink.getLastUpdate()):
+                #        yolink.updatePacketData(data)              
+                #elif '.Report' in data['event']:
+                #    if int(data['time']) >= int(yolink.getLastUpdate()):
+                #        yolink.updatePacketData(data)  
+                #elif '.getState' in data['event']:
+                #    if int(data['time']) >= int(yolink.getLastUpdate()):
+                #       yolink.updatePacketData(data)  
+                #elif '.setState' in data['event']:
+                #    if int(data['time']) >= int(yolink.getLastUpdate()):
+                #        yolink.updatePacketData(data)                      
+                if '.getSchedules' in data['event']:
                     if int(data['time']) >= int(yolink.getLastUpdate()):
                         yolink.updateScheduleStatus(data)   
                 elif '.setSchedules' in data['event']:
                     if int(data['time']) >= int(yolink.getLastUpdate()):
                         yolink.updateScheduleStatus(data)   
-                elif '.Alert' in data['event']:         
-                    if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data)  
-                elif '.StatusChange' in data['event']:         
-                    if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data)                          
-                elif '.setDelay' in data['event']:         
-                    if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data)     
-                elif '.openReminder' in data['event']:         
-                    if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data)
-                elif '.DataRecord' in  data['event']:
-                    if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data)
-                elif '.powerReport' in  data['event']:
-                    if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data)
-                elif '.DevEvent' in  data['event']:
-                    if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data)
+                #elif '.Alert' in data['event']:         
+                #    if int(data['time']) >= int(yolink.getLastUpdate()):
+                #        yolink.updatePacketData(data)  
+                #elif '.StatusChange' in data['event']:         
+                #    if int(data['time']) >= int(yolink.getLastUpdate()):
+                #        yolink.updatePacketData(data)                          
+                #elif '.setDelay' in data['event']:         
+                #    if int(data['time']) >= int(yolink.getLastUpdate()):
+                #        yolink.updatePacketData(data)     
+                #elif '.openReminder' in data['event']:         
+                #    if int(data['time']) >= int(yolink.getLastUpdate()):
+                #        yolink.updatePacketData(data)
+                #elif '.DataRecord' in  data['event']:
+                #    if int(data['time']) >= int(yolink.getLastUpdate()):
+                #        yolink.updatePacketData(data)
+                #elif '.powerReport' in  data['event']:
+                #    if int(data['time']) >= int(yolink.getLastUpdate()):
+                #        yolink.updatePacketData(data)
+                #elif '.DevEvent' in  data['event']:
+                #    if int(data['time']) >= int(yolink.getLastUpdate()):
+                #        yolink.updatePacketData(data)
                 elif '.HourlyUsageReport' in  data['event']:
                     if int(data['time']) >= int(yolink.getLastUpdate()):
                         yolink.updateHourlyData(data)
@@ -768,10 +768,10 @@ class YoLinkMQTTDevice(object):
                         #yolink.updateStatusData(data)
                         yolink.initData(data)
                         yolink.updateScheduleStatus(data)   
-                else:
-                    logging.debug('Unsupported Event passed - trying anyway; {}'.format(data) )
-                    if int(data['time']) >= int(yolink.getLastUpdate()):
-                        yolink.updatePacketData(data)
+                #else:
+                #    logging.debug('Unsupported Event passed - trying anyway; {}'.format(data) )
+                #    if int(data['time']) >= int(yolink.getLastUpdate()):
+                #        yolink.updatePacketData(data)
                         '''
                         try:
                             if int(data['time']) >= int(yolink.getLastUpdate()) and data['data'] != {}:
