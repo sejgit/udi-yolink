@@ -1349,7 +1349,7 @@ class YoLinkMQTTDevice(object):
         try:
             ret_val = None  
             if yolink.online and yolink.dData in yolink.data:
-                logging.debug(yolink.type+f' - getData key {key} category {json.dumps(yolink.data[yolink.dData], indent=4)}')
+                #logging.debug(yolink.type+f' - getData key {key} category {json.dumps(yolink.data[yolink.dData], indent=4)}')
 
                 if yolink.data[yolink.dData] is {}:
                     logging.info(f'No data exists (no data returned)')
@@ -1415,7 +1415,7 @@ class YoLinkMQTTDevice(object):
 
     def get_message_type(yolink):
         try:
-            logging.debug(f'get_message_type - data: {json.dumps(yolink.data, indent=4)}')
+            #logging.debug(f'get_message_type - data: {json.dumps(yolink.data, indent=4)}')
             msg_type = None
             msg_action = None
             if 'event' in yolink.data:

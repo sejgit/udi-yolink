@@ -496,7 +496,7 @@ class YoLinkInitPAC(object):
             #if payload['msgid'] in yoAccess.pendingDict:
             #    yoAccess.pendingDict.pop(payload['msgid'] )
             if  msg.topic == yoAccess.mqttList[deviceId]['report']: 
-                logging.debug('processing report: {}'.format(json.dumps(payload, indent=4, separators=(',', ': ') )))   
+                logging.debug('processing report: ')   
                 yoAccess.send_to_callback(deviceId, payload)
                 # Remove device from retry queue if event received from device (when device comes back on-line )
                 yoAccess._clean_retry_queue(payload['deviceId'], payload['event'])#####
@@ -522,11 +522,11 @@ class YoLinkInitPAC(object):
                     yoAccess.finishQueue.put(return_msg)
                     logging.debug(f'finishQueue PUT size: {yoAccess.finishQueue.qsize()}') 
 
-                logging.debug('processing response: {}'.format(json.dumps(payload, indent=4, separators=(',', ': ') )))
+                logging.debug('processing response: ')
                 if 'code' in payload and payload['code'] == '000000':
                     tempCallback(payload)
                 else:
-                    logging.error('Non-000000 code {} : {}'.format(payload['desc'], str(json.dumps(payload))))
+                    logging.error('Non-000000 code {} '.format(payload['desc']))
                     tempCallback(payload)
                 if yoAccess.debug:
                     fileData= {}
@@ -539,7 +539,7 @@ class YoLinkInitPAC(object):
                     logging.debug('resp_fileThread - starting')
                     
             elif msg.topic == yoAccess.mqttList[deviceId]['request']:
-                logging.debug('processing request - no action: {}'.format(json.dumps(payload, indent=4, separators=(',', ': ') )))                   
+                logging.debug('processing request - no action: ')                   
                 #transmitted message
                 if yoAccess.debug:
                     fileData= {}
@@ -551,7 +551,7 @@ class YoLinkInitPAC(object):
                     logging.debug('req_fileThread - starting')
 
             else:
-                logging.error('Topic not matching: {}  {}'.format(msg.topic, json.dumps(payload, indent=4, separators=(',', ': ') )))
+                logging.error('Topic not matching: {} '.format(msg.topic))
                 if yoAccess.debug:
                     fileData= {}
                     fileData['type'] = 'MISC'
@@ -599,7 +599,7 @@ class YoLinkInitPAC(object):
                 #if payload['msgid'] in yoAccess.pendingDict:
                 #    yoAccess.pendingDict.pop(payload['msgid'] )
                 if  msg.topic == yoAccess.mqttList[deviceId]['report']: 
-                    logging.debug('processing report: {}'.format(json.dumps(payload, indent=4, separators=(',', ': ') )))   
+                    logging.debug('processing report')   
                     tempCallback(payload)
                     # Remove device from retry queue if event received from device (when device comes back on-line )
                     yoAccess._clean_retry_queue(payload['deviceId'], payload['event'])#####
@@ -625,11 +625,11 @@ class YoLinkInitPAC(object):
                         yoAccess.finishQueue.put(return_msg)
                         logging.debug(f'finishQueue PUT size: {yoAccess.finishQueue.qsize()}') 
 
-                    logging.debug('processing response: {}'.format(json.dumps(payload, indent=4, separators=(',', ': ') )))
+                    logging.debug('processing response:')
                     if 'code' in payload and payload['code'] == '000000':
                         tempCallback(payload)
                     else:
-                        logging.error('Non-000000 code {} : {}'.format(payload['desc'], str(json.dumps(payload))))
+                        logging.error('Non-000000 code {}'.format(payload['desc']))
                         tempCallback(payload)
                     if yoAccess.debug:
                         fileData= {}
@@ -642,7 +642,7 @@ class YoLinkInitPAC(object):
                         logging.debug('resp_fileThread - starting')
                         
                 elif msg.topic == yoAccess.mqttList[deviceId]['request']:
-                    logging.debug('processing request - no action: {}'.format(json.dumps(payload, indent=4, separators=(',', ': ') )))                   
+                    logging.debug('processing request - no action:')                   
                     #transmitted message
                     if yoAccess.debug:
                         fileData= {}
@@ -654,7 +654,7 @@ class YoLinkInitPAC(object):
                         logging.debug('req_fileThread - starting')
 
                 else:
-                    logging.error('Topic not matching: {}  {}'.format(msg.topic, json.dumps(payload, indent=4, separators=(',', ': ') )))
+                    logging.error('Topic not matching: {}'.format(msg.topic))
                     if yoAccess.debug:
                         fileData= {}
                         fileData['type'] = 'MISC'
