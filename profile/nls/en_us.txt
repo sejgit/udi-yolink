@@ -367,7 +367,7 @@ ST-nlsthsens-BATLVL-NAME=Battery Level
 ST-nlsthsens-TIME-NAME=Last device update
 ST-nlsthsens-CLITEMP-NAME=Sensor Temperature
 ST-nlsthsens-CLIHUM-NAME=Current Rel Humidity (%)
-CMD-nlsthsens-SETCMD-NAME=Select Command Action
+CMD-nlsthsens-SETCMD-NAME=Select Command (Alert) Action
 CMD-nlsthsens-UPDATE-NAME=Update Status
 
 ND-yotsens-NAME=YoLink T Sensor
@@ -396,7 +396,7 @@ ST-nlstsens-BATLVL-NAME=Battery Level
 ST-nlstsens-TIME-NAME=Last device update
 ST-nlstsens-CLITEMP-NAME=Sensor Temperature
 ST-nlstsens-CLIHUM-NAME=Current Rel Humidity (%)
-CMD-nlstsens-SETCMD-NAME=Select Command Action
+CMD-nlstsens-SETCMD-NAME=Select Command (Alert) Action
 CMD-nlstsens-UPDATE-NAME=Update Status
 
 ND-yosoilsensor-NAME=YoLink Soil Sensor
@@ -427,7 +427,7 @@ ST-nlssoilsensor-GV15-NAME=High Conductivity Alarm Limit (mS/cm)
 ST-nlssoilsensor-GV20-NAME=Connection State
 ST-nlssoilsensor-GV30-NAME=Online State
 ST-nlssoilsensor-TIME-NAME=Last device update
-CMD-nlssoilsensor-SETCMD-NAME=Select Command Action
+CMD-nlssoilsensor-SETCMD-NAME=Select Command (Alert)Action
 CMD-nlssoilsensor-UPDATE-NAME=Update Status
 
 

@@ -3,7 +3,7 @@
 Yolink Control Main Node  program 
 MIT License
 """
-version = '1.8.9'
+version = '1.8.10'
 import sys
 import re
 import time
@@ -146,7 +146,7 @@ def addNodes (self, deviceList) -> list:
                         'MotionSensor', 'Outlet', 'GarageDoor', 'LeakSensor', 'Hub', 
                         'SpeakerHub', 'VibrationSensor', 'Finger', 'Lock' , 'LockV2', 'Dimmer', 'InfraredRemoter',
                         'PowerFailureAlarm', 'SmartRemoter', 'COSmokeSensor', 'Siren', 'WaterMeterController',
-                        'WaterDepthSensor', 'WaterMeterMultiController', 'SprinklerV2', 'Sprinkler', 'Thermostat',
+                        'WaterDepthSensor', 'WaterMeterMultiController', 'SprinklerV2', 'Thermostat',
                         'SoilThcSensor']
     #supportedYoTypes = ['Switch', 'THSensor', 'MultiOutlet', 'DoorSensor','Manipulator', 
     #                    'MotionSensor', 'Outlet', 'GarageDoor', 'LeakSensor', 'Hub', 
@@ -154,7 +154,7 @@ def addNodes (self, deviceList) -> list:
     #                    'PowerFailureAlarm', 'SmartRemoter', 'COSmokeSensor', 'Siren', 'WaterMeterController',
     #                    'WaterDepthSensor', ]    'WaterMeterController', 
     
-    supportedYoTypes = ['SprinklerV2', 'Sprinkler', 'Thermostat', 'SoilThcSensor', 'THSensor' ]     
+    #supportedYoTypes = ['SprinklerV2', 'Sprinkler', 'Thermostat', 'SoilThcSensor', 'THSensor' ]     
     #supportedYoTypes = ['Thermostat', 'THSensor']   
       
     remove_list= []
