@@ -834,7 +834,7 @@ class YoLinkInitPAC(object):
 
     #@measure_time
     def publish_data(yoAccess, data):
-        logging.debug( f'{yoAccess.access_mode} Publish Data to Queue: {data}')
+        logging.debug( f'{yoAccess.access_mode} Publish Data to Queue: {json.dumps(data, indent=4, separators=(",", ": "))}')
         sleeping = False
         while not yoAccess.connectedToBroker:
             logging.debug('Connection to Broker not established - waiting')
