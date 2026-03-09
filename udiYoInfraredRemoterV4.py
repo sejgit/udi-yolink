@@ -205,7 +205,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
             logging.warning('System offline - need to obtain learned codes before continuing - trying again')
             time.sleep(5)
             self.yoIRrem.refreshDevice()
-            #time.sleep(2)  
+            time.sleep(1)  
         code_dict_temp = self.yoIRrem.get_code_dict()
         logging.debug(f'Code dict temp: {code_dict_temp}')
         sch_address = self.address[4:14] + '_SCH'
