@@ -1162,10 +1162,18 @@ class WaterMeterScheduleNode(OnOffScheduleNode):
 
         self.yoSchedule.setSchedule(schedule_selected, raw, schedule_method=self.schedule_type)
 
+    def define_schedule(self, command):
+        """Define WaterMeter schedule using valve/leak-specific API method."""
+        logging.info('WaterMeter define_schedule')
+        query = command.get("query")
+        schedule_selected, params = self.prep_schedule(query)
+        if schedule_selected is not None and params:
+            self.yoSchedule.setSchedule(schedule_selected, params, schedule_method=self.schedule_type)
+
     commands = {
         'UPDATE': BaseScheduleNode.update,
         'LOOKUPSCH': BaseScheduleNode.lookup_schedule,
-        'DEFINESCH': OnOffScheduleNode.define_schedule,
+        'DEFINESCH': define_schedule,
         'CTRLSCH': control_schedule,
     }
 
