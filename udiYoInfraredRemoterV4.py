@@ -232,7 +232,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.poly.updateProfile()
         #self.poly.addCustomProfile(self.id, 'YoLink Infrared Remoter', 'YoLink Infrared Remoter', 'YoLink Infrared Remoter')
         logging.info('YoLink Infrared Remoter Node Ready')
-        self.updateData()
+        #self.updateData()
         self.system_ready=True
 
     def stop (self):

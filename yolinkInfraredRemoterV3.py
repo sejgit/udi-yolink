@@ -68,7 +68,8 @@ class YoLinkInfraredRem(YoLinkMQTTDevice):
         try:
             # NEEDS UPDATE 
             logging.debug('{} - updateStatus: {}'.format(yolink.type, data))
-            yolink.updateCallbackStatus(data, False)
+            
+            #yolink.updateCallbackStatus(data, False)
             data_section = yolink.data.setdefault(yolink.dData, {})
             logging.debug(f'updateStatus 1 {data}')
             #yolink.data[yolink.dData]['key'] = None
