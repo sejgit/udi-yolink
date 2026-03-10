@@ -667,12 +667,12 @@ class YoLinkMQTTDevice(object):
                     if  '.setDelay'  in data['method']:
                         #if int(data['time']) > int(yolink.getLastUpdate()):
                         yolink.updateDelayData(data)       
-                    elif  '.getSchedules'  in data['method'] :
+                    elif  '.getSchedules'  in data['method'] or '.getValveSchedules' in data['method'] or '.getLeakSchedules' in data['method']:
                         logging.debug('callback getSchedules {}'.format(data ))
                         #logging.debug('callback getSchedules t={} lu={} d={}'.format(data['time'],  int(yolink.getLastUpdate(), data )))
                         #if int(data['time']) > int(yolink.getLastUpdate()):
                         yolink.updateScheduleStatus(data)
-                    elif  '.setSchedules' in data['method'] :
+                    elif  '.setSchedules' in data['method'] or '.setValveSchedules' in data['method'] or '.setLeakSchedules' in data['method']:
                         logging.debug('callback setSchedules t={} lu={} d={}'.format(data['time'],  int(yolink.getLastUpdate(),data )))
                         #if int(data['time']) > int(yolink.getLastUpdate()):
                         yolink.updateScheduleStatus(data)
@@ -734,10 +734,10 @@ class YoLinkMQTTDevice(object):
                 #elif '.setState' in data['event']:
                 #    if int(data['time']) >= int(yolink.getLastUpdate()):
                 #        yolink.updatePacketData(data)                      
-                if '.getSchedules' in data['event']:
+                if '.getSchedules' in data['event'] or '.getValveSchedules' in data['event'] or '.getLeakSchedules' in data['event']:
                     if int(data['time']) >= int(yolink.getLastUpdate()):
                         yolink.updateScheduleStatus(data)   
-                elif '.setSchedules' in data['event']:
+                elif '.setSchedules' in data['event'] or '.setValveSchedules' in data['event'] or '.setLeakSchedules' in data['event']:
                     if int(data['time']) >= int(yolink.getLastUpdate()):
                         yolink.updateScheduleStatus(data)   
                 #elif '.Alert' in data['event']:         
