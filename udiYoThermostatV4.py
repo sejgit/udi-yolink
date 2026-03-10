@@ -24,8 +24,8 @@ class udiYoThermostat(udi_interface.Node):
     id = 'yothermostat'
 
     drivers = [
-        {'driver': 'ST', 'value': 99, 'uom': 66},         # Running state (UoM 66: 0=Idle, 1=Heating, 2=Cooling)
-        {'driver': 'CLITEMP', 'value': 0, 'uom': 4},      # Current temperature (UoM 4=Celsius, 17=Fahrenheit)
+        {'driver': 'ST', 'value': 0, 'uom': 4},           # Current temperature (UoM 4=Celsius, 17=Fahrenheit)
+        {'driver': 'CLIHCS', 'value': 99, 'uom': 66},     # Running state (UoM 66: 0=Idle, 1=Heating, 2=Cooling)
         {'driver': 'CLIHUM', 'value': 0, 'uom': 51},      # Current humidity (UoM 51=percent)
         {'driver': 'CLISPH', 'value': 0, 'uom': 4},       # Heat setpoint (UoM 4=Celsius, 17=Fahrenheit)
         {'driver': 'CLISPC', 'value': 0, 'uom': 4},       # Cool setpoint (UoM 4=Celsius, 17=Fahrenheit)
@@ -36,7 +36,7 @@ class udiYoThermostat(udi_interface.Node):
         {'driver': 'GV1', 'value': 99, 'uom': 4},         # Sensor 2 temp (optional, UoM 4=C)
         {'driver': 'GV2', 'value': 99, 'uom': 25},        # Aux heat running (UoM 25: 0=no, 1=yes)
         {'driver': 'GV3', 'value': 99, 'uom': 25},        # Second stage running (UoM 25: 0=no, 1=yes)
-        {'driver': 'GV4', 'value': 99, 'uom': 25},        # ECO mode (UoM 25: 0=off, 1=on)
+        {'driver': 'CLIEMD', 'value': 99, 'uom': 25},     # ECO mode (UoM 25: 0=off, 1=on)
         {'driver': 'GV18', 'value': 99, 'uom': 4},        # ECO low temp offset (Celsius)
         {'driver': 'GV19', 'value': 99, 'uom': 4},        # ECO high temp offset (Celsius)        
         {'driver': 'GV5', 'value': 99, 'uom': 25},        # DR running (UoM 25: 0=no, 1=yes)
@@ -172,9 +172,9 @@ class udiYoThermostat(udi_interface.Node):
                 # Current temperature
                 if isinstance(currentTemp, (int, float)):
                     if self.temp_unit == 1:  # Fahrenheit
-                        self.my_setDriver('CLITEMP', round(currentTemp * 9/5 + 32, 1), 17, type=message_type)
+                        self.my_setDriver('ST', round(currentTemp * 9/5 + 32, 1), 17, type=message_type)
                     else:
-                        self.my_setDriver('CLITEMP', round(currentTemp, 1), 4, type=message_type)
+                        self.my_setDriver('ST', round(currentTemp, 1), 4, type=message_type)
 
                 # Humidity
                 if isinstance(humidity, (int, float)):
@@ -212,7 +212,7 @@ class udiYoThermostat(udi_interface.Node):
                 # Running state: UoM 66: 0=Idle, 1=Heating, 2=Cooling
                 if running:
                     running_map = {'idle': 0, 'heat': 1, 'cool': 2}
-                    self.my_setDriver('ST', running_map.get(running.lower(), 99), 66, type=message_type)
+                    self.my_setDriver('CLIHCS', running_map.get(running.lower(), 99), 66, type=message_type)
 
                 # Optional sensors
                 if isinstance(sensor1, (int, float)):
@@ -242,7 +242,7 @@ class udiYoThermostat(udi_interface.Node):
                 # ECO mode (UoM 25 = index)
                 logging.debug(f'Parsing ECO data: mode={eco_mode}, low={eco_lowTemp}, high={eco_highTemp}')
                 if eco_mode and isinstance(eco_mode, str):
-                    self.my_setDriver('GV4', 1 if eco_mode.lower() == 'on' else 0, 25, type=message_type)
+                    self.my_setDriver('CLIEMD', 1 if eco_mode.lower() == 'on' else 0, 25, type=message_type)
 
                 if eco_lowTemp is not None and isinstance(eco_lowTemp, (int, float)):
                     if self.temp_unit == 1:

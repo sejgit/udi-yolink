@@ -1454,8 +1454,8 @@ ND-yothermpropf-NAME=Thermostat Properties (F)
 ND-yothermpropf-ICON=Thermostat
 
 # Thermostat Status Names
-ST-nlsthermostat-ST-NAME=Running State
-ST-nlsthermostat-CLITEMP-NAME=Temperature
+ST-nlsthermostat-ST-NAME=Temperature
+ST-nlsthermostat-CLIHCS-NAME=Running State
 ST-nlsthermostat-CLIHUM-NAME=Humidity
 ST-nlsthermostat-CLISPH-NAME=Heat Setpoint
 ST-nlsthermostat-CLISPC-NAME=Cool Setpoint
@@ -1466,7 +1466,7 @@ ST-nlsthermostat-GV0-NAME=Sensor 1 Temp
 ST-nlsthermostat-GV1-NAME=Sensor 2 Temp
 ST-nlsthermostat-GV2-NAME=Aux Heat Running
 ST-nlsthermostat-GV3-NAME=Stage 2 Running
-ST-nlsthermostat-GV4-NAME=ECO Mode
+ST-nlsthermostat-CLIEMD-NAME=ECO Mode
 ST-nlsthermostat-GV5-NAME=Demand Response Running
 ST-nlsthermostat-GV18-NAME=ECO Low Temp
 ST-nlsthermostat-GV19-NAME=ECO High Temp
@@ -1499,6 +1499,9 @@ CMD-nlsthermostat-SETECO-NAME=Set ECO Mode
 CMDP-ecomode-NAME=ECO Mode (Off/On)
 CMDP-ecoLow-NAME=ECO Low Offset
 CMDP-ecoHigh-NAME=ECO High Offset
+CMDP-ecomodeth-NAME=ECO Mode (Off/On)
+CMDP-ecoLowth-NAME=ECO Low
+CMDP-ecoHighth-NAME=ECO High
 
 CMD-nlsthermostatprop-UPDATE-NAME=Update
 CMD-nlsthermostatprop-SETMINRUNTIME-NAME=Set Min Runtime

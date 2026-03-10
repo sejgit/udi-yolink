@@ -2645,8 +2645,8 @@
    <nodeDef id="yothermostat" nls="nlsthermostat">
       <editors />
       <sts>
-         <st id="ST" editor="ITSTATHCS" />
-         <st id="CLITEMP" editor="celsius" />
+         <st id="ST" editor="celsius" />
+         <st id="CLIHCS" editor="ITSTATHCS" />
          <st id="CLIHUM" editor="IHUMIDITY" />
          <st id="CLISPH" editor="celsius" />
          <st id="CLISPC" editor="celsius" />
@@ -2657,7 +2657,7 @@
          <st id="GV1" editor="celsius" />
          <st id="GV2" editor="IAUXHEAT" />
          <st id="GV3" editor="ISTAGE2" />
-         <st id="GV4" editor="IECOMODE" />
+         <st id="CLIEMD" editor="IECOMODE" />
          <st id="GV18" editor="celsius" />
          <st id="GV19" editor="celsius" />         
          <st id="GV5" editor="IDRRUNNING" />
@@ -2686,9 +2686,9 @@
                <p id="" editor="ICLISMDDEG" />
             </cmd>
             <cmd id="SETECO">
-               <p id="ecomode" editor="IECOMODE" init="GV4"/>                           
-               <p id="ecoLow" editor="ecoSet" init="GV18"/>       
-               <p id="ecoHigh" editor="ecoSet" init="GV19"/>                                              
+               <p id="ecomodeth" editor="IECOMODE" init="CLIEMD"/>                           
+               <p id="ecoLowth" editor="ecoSet" init="GV18"/>       
+               <p id="ecoHighth" editor="ecoSet" init="GV19"/>                                              
 
             </cmd>
          </accepts>
@@ -2698,8 +2698,8 @@
    <nodeDef id="yothermostatf" nls="nlsthermostat">
       <editors />
       <sts>
-         <st id="ST" editor="ITSTATHCS" />
-         <st id="CLITEMP" editor="farenheit" />
+         <st id="ST" editor="farenheit" />
+         <st id="CLIHCS" editor="ITSTATHCS" />
          <st id="CLIHUM" editor="IHUMIDITY" />
          <st id="CLISPH" editor="farenheit" />
          <st id="CLISPC" editor="farenheit" />
@@ -2710,7 +2710,7 @@
          <st id="GV1" editor="farenheit" />
          <st id="GV2" editor="IAUXHEAT" />
          <st id="GV3" editor="ISTAGE2" />
-         <st id="GV4" editor="IECOMODE" />
+         <st id="CLIEMD" editor="IECOMODE" />
          <st id="GV18" editor="farenheit" />
          <st id="GV19" editor="farenheit" />         
          <st id="GV5" editor="IDRRUNNING" />
@@ -2740,9 +2740,9 @@
                <p id="" editor="ICLISMDDEG" />
             </cmd>
             <cmd id="SETECO">
-               <p id="ecomode" editor="IECOMODE" init="GV4"/>                           
-               <p id="ecoLow" editor="ecoSetF" init="GV18"/>       
-               <p id="ecoHigh" editor="ecoSetF" init="GV19" />     
+               <p id="ecomodeth" editor="IECOMODE" init="CLIEMD"/>                           
+               <p id="ecoLowth" editor="ecoSetF" init="GV18"/>       
+               <p id="ecoHighth" editor="ecoSetF" init="GV19" />     
             </cmd>
          </accepts>
       </cmds>
