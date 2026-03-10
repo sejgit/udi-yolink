@@ -79,7 +79,7 @@ class YoLinkInfraredRem(YoLinkMQTTDevice):
             time.sleep(0.5)
             #logging.debug(f'updateStatus 2 {data}')
             if 'method' in data:
-                logging.debug(f'method detected {json.dumps(data, sort_keys=True, indent=4, separators=(",", ": "))}')
+                logging.debug(f'method detected`')
                 if '.learn' in data['method']:
                     logging.debug('.learn detected')
                     if 'data' in data:
