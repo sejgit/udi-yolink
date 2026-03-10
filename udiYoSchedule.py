@@ -114,6 +114,11 @@ class BaseScheduleNode(udi_interface.Node):
             if isinstance(schedules_block, dict) and 'supportSeconds' in schedules_block:
                 return False
 
+            # If successful response contains schedule entries but no
+            # supportSeconds field, resolve as False immediately.
+            if len(data_block) > 0:
+                return True
+
             return True
         except Exception:
             return False
@@ -188,10 +193,10 @@ class BaseScheduleNode(udi_interface.Node):
         try:
             parent_node = self.poly.getNode(self.primary)
         except Exception:
-            return
+            return False
 
         if parent_node is None:
-            return
+            return False
 
         candidate_attrs = (
             'yoSwitch', 'yoOutlet', 'yoDimmer', 'yoManipulator',
@@ -202,16 +207,22 @@ class BaseScheduleNode(udi_interface.Node):
             source = getattr(parent_node, attr, None)
             if source is not None and hasattr(source, 'refreshSchedules'):
                 try:
-                    logging
                     source.refreshSchedules()
+                    return True
                 except Exception:
                     pass
+
+        return False
 
     def _resolve_support_seconds(self):
         """Best-effort detection of supportSeconds before node profile binding."""
         parent_val = self._resolve_support_seconds_from_parent_node()
         if isinstance(parent_val, bool):
             return parent_val
+
+        if self._success_without_support_seconds(self.yoSchedule):
+            self._support_seconds_source = 'schedule_wrapper.code00000000.no_supportSeconds'
+            return False
 
         if not self._is_schedule_message(self.yoSchedule):
             return None
@@ -252,10 +263,6 @@ class BaseScheduleNode(udi_interface.Node):
         except Exception:
             pass
 
-        if self._success_without_support_seconds(self.yoSchedule):
-            self._support_seconds_source = 'schedule_wrapper.code00000000.no_supportSeconds'
-            return False
-
         return None
     
     def __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
@@ -279,12 +286,13 @@ class BaseScheduleNode(udi_interface.Node):
         support_seconds = self._resolve_support_seconds()
         logging.debug(f'Initial supportSeconds resolution: {support_seconds} (source: {self._support_seconds_source})')
         attempts = 0
-        while not isinstance(support_seconds, bool) and attempts < 8:
+        # IR remoter often omits supportSeconds. Avoid noisy retries there.
+        max_attempts = 1 if self.devInfo.get('type') == 'InfraredRemoter' else 3
+        while not isinstance(support_seconds, bool) and attempts < max_attempts:
             logging.debug(f'Attempt {attempts+1}: supportSeconds not resolved, retrying after refreshing schedules')
-            self._refresh_parent_schedules()
-            time.sleep(1)
-            logging.debug('Attempting to resolve supportSeconds again after refresh')
-            self.yoSchedule.refreshSchedules()
+            refreshed = self._refresh_parent_schedules()
+            if not refreshed:
+                self.yoSchedule.refreshSchedules()
             time.sleep(1)
             support_seconds = self._resolve_support_seconds()
             attempts += 1
