@@ -65,9 +65,9 @@ class udiYoInfraredCode(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready or not self.system_ready:
-                time.sleep(0.5)
-            logging.debug('updateData - {}'.format(self.yoIRrem.check_system_online()))
+            #while not self.node_ready or not self.system_ready:
+            #    time.sleep(0.5)
+            #logging.debug('updateData - {}'.format(self.yoIRrem.check_system_online()))
             self.my_setDriver('TIME', self.yoIRrem.getLastUpdateTime(), 151)
             #self.my_setDriver('ST', 0)
             if self.yoIRrem.suspended:
