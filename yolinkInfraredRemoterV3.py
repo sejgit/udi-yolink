@@ -68,8 +68,8 @@ class YoLinkInfraredRem(YoLinkMQTTDevice):
         try:
             # NEEDS UPDATE 
             logging.debug('{} - updateStatus: {}'.format(yolink.type, data))
-            
-            #yolink.updateCallbackStatus(data, False)
+
+            yolink.updateCallbackStatus(data, False)
             data_section = yolink.data.setdefault(yolink.dData, {})
             logging.debug(f'updateStatus 1 {data}')
             #yolink.data[yolink.dData]['key'] = None
@@ -77,12 +77,11 @@ class YoLinkInfraredRem(YoLinkMQTTDevice):
             #yolink.data[yolink.dData]['errorCode'] = None
             #yolink.data[yolink.dData]['IRtype'] = None
             time.sleep(0.5)
-            logging.debug(f'updateStatus 2 {data}')
+            #logging.debug(f'updateStatus 2 {data}')
             if 'method' in data:
-                logging.debug(f'method detected {data}')
-
+                logging.debug(f'method detected {json.dumps(data, sort_keys=True, indent=4, separators=(",", ": "))}')
                 if '.learn' in data['method']:
-                    logging.debug(f'.learn detected {data}')
+                    logging.debug('.learn detected')
                     if 'data' in data:
                         if 'success' in data['data']:
                             data_section['success'] = data['data']['success']
@@ -94,6 +93,7 @@ class YoLinkInfraredRem(YoLinkMQTTDevice):
                         
                         #yolink.learn_started = False  ## Not sure 
                 if 'getState' in data['method']:
+                    logging.debug('.getState detected')
                     if 'data' in data:
                         if 'battery' in data['data']:
                             data_section['battery'] = data['data']['battery']
@@ -108,6 +108,7 @@ class YoLinkInfraredRem(YoLinkMQTTDevice):
                             logging.debug('keys: {} - {}'.format( yolink.nbr_codes, data_section['keys']))
                         #yolink.data[yolink.dData]['IRtype'] = None
                 if 'send' in data['method']:
+                    logging.debug('.send detected')
                     if 'data' in data:
                         if 'success' in data['data']:
                             data_section['success']  = data['data']['success']
@@ -118,6 +119,7 @@ class YoLinkInfraredRem(YoLinkMQTTDevice):
                         #yolink.data[yolink.dData]['IRtype'] = 'send'        
 
             if 'event' in data:
+                logging.debug(f'event detected {json.dumps(data, sort_keys=True, indent=4, separators=(",", ": "))}')
                 if '.learn' in data['event']:
                     if 'data' in data:
                         if 'success' in data['data']:
