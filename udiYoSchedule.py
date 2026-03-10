@@ -157,6 +157,7 @@ class BaseScheduleNode(udi_interface.Node):
             source = getattr(parent_node, attr, None)
             if source is not None and hasattr(source, 'refreshSchedules'):
                 try:
+                    logging
                     source.refreshSchedules()
                 except Exception:
                     pass
@@ -172,6 +173,7 @@ class BaseScheduleNode(udi_interface.Node):
 
         try:
             val = self.yoSchedule.get_data('supportSeconds')
+            logging.debug(f'Checked schedule_wrapper.get_data(supportSeconds): {val}')
             if isinstance(val, bool):
                 self._support_seconds_source = 'schedule_wrapper.get_data(supportSeconds)'
                 return val
@@ -226,10 +228,13 @@ class BaseScheduleNode(udi_interface.Node):
         # Create yoSchedule wrapper and determine support_seconds BEFORE node initialization
         self.yoSchedule = self._create_yolink_schedule()               
         support_seconds = self._resolve_support_seconds()
+        logging.debug(f'Initial supportSeconds resolution: {support_seconds} (source: {self._support_seconds_source})')
         attempts = 0
         while not isinstance(support_seconds, bool) and attempts < 8:
+            logging.debug(f'Attempt {attempts+1}: supportSeconds not resolved, retrying after refreshing schedules')
             self._refresh_parent_schedules()
             time.sleep(1)
+            logging.debug('Attempting to resolve supportSeconds again after refresh')
             self.yoSchedule.refreshSchedules()
             time.sleep(1)
             support_seconds = self._resolve_support_seconds()
