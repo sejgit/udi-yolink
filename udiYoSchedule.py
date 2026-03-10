@@ -77,6 +77,47 @@ class BaseScheduleNode(udi_interface.Node):
 
         return False
 
+    def _success_without_support_seconds(self, source):
+        """
+        True when schedule response succeeded but omitted supportSeconds.
+
+        YoLink responses with code 00000000 indicate valid data was returned.
+        If supportSeconds is absent in that successful payload, treat it as False
+        and stop retrying.
+        """
+        try:
+            if source is None:
+                return False
+
+            raw_data = getattr(source, 'data', {})
+            if not isinstance(raw_data, dict):
+                return False
+
+            code = raw_data.get('code')
+            if code is None:
+                data_block = raw_data.get('data', {})
+                if isinstance(data_block, dict):
+                    code = data_block.get('code')
+
+            code_str = str(code).zfill(8) if code is not None else ''
+            if code_str != '00000000':
+                return False
+
+            data_block = raw_data.get('data', {})
+            if not isinstance(data_block, dict):
+                return False
+
+            if 'supportSeconds' in data_block:
+                return False
+
+            schedules_block = data_block.get('schedules')
+            if isinstance(schedules_block, dict) and 'supportSeconds' in schedules_block:
+                return False
+
+            return True
+        except Exception:
+            return False
+
     def _resolve_support_seconds_from_parent_node(self):
         """Check the already-created parent device node for supportSeconds."""
         try:
@@ -135,6 +176,10 @@ class BaseScheduleNode(udi_interface.Node):
                                 return val
             except Exception:
                 pass
+
+            if self._success_without_support_seconds(source):
+                self._support_seconds_source = f'parent.{attr}.code00000000.no_supportSeconds'
+                return False
 
         return None
 
@@ -206,6 +251,10 @@ class BaseScheduleNode(udi_interface.Node):
                 return val
         except Exception:
             pass
+
+        if self._success_without_support_seconds(self.yoSchedule):
+            self._support_seconds_source = 'schedule_wrapper.code00000000.no_supportSeconds'
+            return False
 
         return None
     
