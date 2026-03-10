@@ -286,8 +286,8 @@ class BaseScheduleNode(udi_interface.Node):
         support_seconds = self._resolve_support_seconds()
         logging.debug(f'Initial supportSeconds resolution: {support_seconds} (source: {self._support_seconds_source})')
         attempts = 0
-        # IR remoter often omits supportSeconds. Avoid noisy retries there.
-        max_attempts = 1 if self.devInfo.get('type') == 'InfraredRemoter' else 3
+        # Use the same supportSeconds resolution behavior for all schedule-capable nodes.
+        max_attempts = 3
         while not isinstance(support_seconds, bool) and attempts < max_attempts:
             logging.debug(f'Attempt {attempts+1}: supportSeconds not resolved, retrying after refreshing schedules')
             refreshed = self._refresh_parent_schedules()
