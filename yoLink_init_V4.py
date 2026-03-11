@@ -41,9 +41,11 @@ class YoLinkInitPAC(object):
         yoAccess.fileLock = Lock()
         yoAccess.TimeTableLock = Lock()
         yoAccess.processing_access = Lock()
+        yoAccess.retryLock = Lock()
         yoAccess.publishQueue = Queue()
         yoAccess.finishQueue = Queue()
         yoAccess.retryQueue = Queue()
+        yoAccess.retryIndex = {}
         #yoAccess.delayQueue = Queue()
         yoAccess.messageQueue = Queue()
         yoAccess.fileQueue = Queue()
@@ -954,19 +956,52 @@ class YoLinkInitPAC(object):
         retryThread = Thread(target = yoAccess.check_retry_queue )
         retryThread.start()
 
+    def _retry_key(yoAccess, data):
+        try:
+            return(data['targetDevice'], data['method'])
+        except Exception:
+            return(None)
+
+    def _enqueue_retry(yoAccess, data):
+        """Add/merge retry item by (targetDevice, method) to avoid duplicates."""
+        key = yoAccess._retry_key(data)
+        if key is None:
+            logging.error('Cannot enqueue retry - missing targetDevice/method: {}'.format(data))
+            return(False)
+
+        try:
+            yoAccess.retryLock.acquire()
+            if key in yoAccess.retryIndex:
+                existing = yoAccess.retryIndex[key]
+                merged_retry = max(existing.get('retry', 0), data.get('retry', 0))
+                merged_last = max(existing.get('last_retry_time', 0), data.get('last_retry_time', 0))
+                existing.update(data)
+                existing['retry'] = merged_retry
+                existing['last_retry_time'] = merged_last
+                return(False)
+
+            yoAccess.retryIndex[key] = data
+            yoAccess.retryQueue.put(data, timeout = 5)
+            return(True)
+        finally:
+            yoAccess.retryLock.release()
+
     def check_retry_queue(yoAccess):
         '''check_retry_queue'''
         while not yoAccess.stop_queues:
+            temp_list = []
             try:    
                 if not yoAccess.retryQueue.empty():
                     logging.debug(f'{yoAccess.access_mode} - Checking retry - queue size {yoAccess.retryQueue.qsize()}  ')                
-                    temp_list = []
                     while not yoAccess.retryQueue.empty():
                         temp_list.append(yoAccess.retryQueue.get(timeout = 5))
+                    yoAccess.retryLock.acquire()
+                    yoAccess.retryIndex = {}
+                    yoAccess.retryLock.release()
                     logging.debug(f'temp_retry_list {temp_list}')
                     time_now = int(time.time())
-                    selected_retry = 0 # time now - no need to retry unless delay time is less than 0 (passed delay)
                     selected_data_list = []
+                    pending_data_list = []
                     for retry_data in temp_list:
                         #selected_data = None ###
                         if 'retry' in retry_data:
@@ -980,28 +1015,30 @@ class YoLinkInitPAC(object):
                         logging.debug('{} - target device - {}'.format( yoAccess.access_mode, retry_data['targetDevice'] ))
                                                 
                         if int(retry_data['last_retry_time']/1000+delay) - time_now < 0:
-                            #selected_retry = int(retry_data['last_retry_time'])+delay - time_now 
                             selected_data_list.append(retry_data)
+                        else:
+                            pending_data_list.append(retry_data)
+
+                    for retry_data in pending_data_list:
+                        yoAccess._enqueue_retry(retry_data)
+
                     if selected_data_list: # found data the needs to retried  
-                        for retry_data in selected_data_list:                            
-                            for data in temp_list: # remove other pending retried of this device            
-                                if data['targetDevice'] == retry_data['targetDevice'] and data['method'] == retry_data['method'] :                    
-                                    logging.debug('Removing {} from retry queue as publish was successful'.format(retry_data))                    
-                                else:
-                                    yoAccess.retryQueue.put(data, timeout = 5)
+                        seen_keys = set()
+                        for retry_data in selected_data_list:
+                            key = yoAccess._retry_key(retry_data)
+                            if key in seen_keys:
+                                continue
+                            seen_keys.add(key)
                             logging.debug(f'{yoAccess.access_mode} ADDING RETRY TO PUBLISH QUEUE {retry_data}')
                             yoAccess.publish_data(retry_data) # place selected_data in publishQueue
                             time.sleep(2) # give some time to process the publish before waiting for response
-                    else:
-                        for retry_data in temp_list:  # return data to retryQueue
-                            yoAccess.retryQueue.put(retry_data, timeout = 5)
                     logging.debug(f'{yoAccess.access_mode} temp_retry_list {list (yoAccess.retryQueue.queue)}')
 
                 time.sleep(10)   
             except Exception as e:
                 logging.error('Exception check_retry_queue - {}'.format(e))
                 for temp in temp_list: # restore what was processed until now
-                    yoAccess.retryQueue.put(temp, timeout = 5) 
+                    yoAccess._enqueue_retry(temp)
                 time.sleep(5) 
                 pass
 
@@ -1038,8 +1075,13 @@ class YoLinkInitPAC(object):
                     logging.debug('Removing {} from retry queue as publish was successful'.format(data))                    
                 else:
                     temp_list.append(data)
+
+            yoAccess.retryLock.acquire()
+            yoAccess.retryIndex = {}
+            yoAccess.retryLock.release()
+
             for data in temp_list:
-                yoAccess.retryQueue.put(data, timeout = 5)
+                yoAccess._enqueue_retry(data)
         except Exception as e:
             logging.error('Exception _clean_retry_queue - {}'.format(e))
     
@@ -1121,17 +1163,17 @@ class YoLinkInitPAC(object):
                 else:
                     data['retry'] = 0 # starting retry
                     data['last_retry_time'] = int(data['time'])
-                yoAccess.retryQueue.put(data, timeout = 5)
+                yoAccess._enqueue_retry(data)
             elif msg_code in ['0000000'] :
                 if data is None: 
                     logging.error('No data received - device not ready - initiating retry'.format( data))
                     data['retry'] = 0 # starting retry
                     data['last_retry_time'] = int(data['time'])
-                    yoAccess.retryQueue.put(data, timeout = 5)
+                    yoAccess._enqueue_retry(data)
                 elif 'retry' in data and len(data) == 1:
                     data['retry']= data['retry']+1
                     data['last_retry_time'] = int(data['time'])
-                    yoAccess.retryQueue.put(data, timeout = 5)
+                    yoAccess._enqueue_retry(data)
                 else:
                     yoAccess._clean_retry_queue(deviceId, method) # remove pending retries for this call 
                 '''
