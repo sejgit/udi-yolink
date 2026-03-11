@@ -270,7 +270,7 @@ class YoLinkMQTTDevice(object):
             return(0)
     
     def throttled(yolink) -> bool:
-        logging.debug(f"Checking if throttled for {json.dumps(yolink.deviceInfo, indent=2)")
+        logging.debug(f"Checking if throttled for {json.dumps(yolink.deviceInfo, indent=2)}")
         targetId = yolink.deviceInfo['targetDevice']
         delay_s = yolink.yoAccess.time_tracking(targetId)
         logging.debug(f"Throttled check for {targetId}, delay_s: {delay_s}")
