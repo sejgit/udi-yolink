@@ -131,7 +131,7 @@ class udiYoMotionSensor(udi_interface.Node):
         if self.node is not None:
             while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
-            message_type = self.yoMotionsSensor.get_message_type()
+            message_type, message_action = self.yoMotionsSensor.get_message_type()
             unix_time = self.yoMotionsSensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
             if self.yoMotionsSensor.check_system_online():
