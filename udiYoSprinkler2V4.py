@@ -139,7 +139,7 @@ class udiYoSprinkler2(udi_interface.Node):
         #self.yoSprinkler.refreshSchedules()
         
         self.node_ready = True
-        self.updateData()
+        #self.updateData()
 
     def stop (self):
         logging.info('Stop udiYoSprinkler2')
