@@ -46,6 +46,7 @@ class YoLinkMQTTDevice(object):
         yolinkDelaySupport = ['']
         yolink.yoAccess = yoAccess
         yolink.deviceInfo = deviceInfo
+        yolink.data = None
         #yolink.deviceId = yolink.deviceInfo['deviceId']
         yolink.type = yolink.deviceInfo['type']
         yolink.methodList = []
@@ -272,6 +273,9 @@ class YoLinkMQTTDevice(object):
     def check_system_online(yolink):
         #return(yolink.yoAccess.online)
         logging.debug(f'check_system_online : {yolink.data}')
+        if yolink.data is None: 
+            yolink.online = False
+            return(yolink.online)
         yolink.online = True
         if 'lastStateTime' in yolink.data:
             logging.debug('lastStateTime selected')

@@ -103,6 +103,11 @@ class udiYoWaterDept(udi_interface.Node):
         self.yoWaterDept  = YoLinkWaterDeptSensor(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoWaterDept.initNode()
+        tries = 1
+        while not self.yoWaterDept.check_system_online() and tries <= 5:
+            logging.info('Waiting for device to come online...')
+            time.sleep(2)
+            tries += 1
         time.sleep(2)
         self.temp_unit = self.yoAccess.get_temp_unit()
         #self.node.setDriver('GV30', 1, True, True)

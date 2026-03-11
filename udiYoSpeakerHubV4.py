@@ -99,6 +99,11 @@ class udiYoSpeakerHub(udi_interface.Node):
         self.yoSpeakerHub.setMessageNbr(self.messageNbr )
         self.tone_list=['none','Emergency','Alert','Warn','Tip'] 
         self.yoSpeakerHub.initNode()
+        tries = 1
+        while not self.yoSpeakerHub.check_system_online() and tries <= 5:
+            logging.info('Waiting for device to come online...')
+            time.sleep(2)
+            tries += 1
         self.updateData()
         #self.my_setDriver('GV30', 1)
         #time.sleep(3)

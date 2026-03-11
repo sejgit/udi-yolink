@@ -114,6 +114,11 @@ class udiYoSwitch(udi_interface.Node):
         self.yoSwitch  = YoLinkSwitch(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(3)
         self.yoSwitch.initNode()
+        tries = 1
+        while not self.yoSwitch.check_system_online() and tries <= 5:
+            logging.info('Waiting for device to come online...')
+            time.sleep(2)
+            tries += 1
         time.sleep(2)
         self.yoSwitch.refreshSchedules()
         time.sleep(1)

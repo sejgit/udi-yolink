@@ -118,6 +118,11 @@ class udiYoDimmer(udi_interface.Node):
         self.yoDimmer  = YoLinkDim(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoDimmer.initNode()
+        tries = 1
+        while not self.yoDimmer.check_system_online() and tries <= 5:
+            logging.info('Waiting for device to come online...')
+            time.sleep(2)
+            tries += 1
 
         time.sleep(2)
         self.yoDimmer.get_attributes()

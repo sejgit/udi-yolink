@@ -139,7 +139,6 @@ class udiYoTHsensor(udi_interface.Node):
             logging.info('Waiting for TH sensor to come online...')
             time.sleep(2)
             tries += 1
-
         self.temp_unit = self.yoAccess.get_temp_unit()
         self.system_ready = True
         #self.my_setDriver('GV30', 1)

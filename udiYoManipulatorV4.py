@@ -100,6 +100,11 @@ class udiYoManipulator(udi_interface.Node):
         
         time.sleep(4)
         self.yoManipulator.initNode()
+        tries = 1
+        while not self.yoManipulator.check_system_online() and tries <= 5:
+            logging.info('Waiting for device to come online...')
+            time.sleep(2)
+            tries += 1
 
         sch_address = self.address[4:14] + '_SCH'
         sch_address = self.poly.getValidAddress(sch_address)

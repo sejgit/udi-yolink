@@ -332,6 +332,11 @@ class udiYoSubWaterMeter(udi_interface.Node):
         #time.sleep(4)
         #self.yoWaterCtrl.initNode()
         time.sleep(2)
+        tries = 1
+        while not self.yoWaterCtrl.check_system_online() and tries <= 5:
+            logging.info('Waiting for device to come online...')
+            time.sleep(2)
+            tries += 1
         
         self.meter_unit =  self.yoWaterCtrl.getMeterUnit()
         self.ISYwater_unit = self.yoAccess.get_water_unit()     

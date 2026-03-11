@@ -163,6 +163,11 @@ class udiYoLeakSensor(udi_interface.Node):
         self.yoLeakSensor  = YoLinkLeakSensor(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoLeakSensor.initNode()
+        tries = 1
+        while not self.yoLeakSensor.check_system_online() and tries <= 5:
+            logging.info('Waiting for device to come online...')
+            time.sleep(2)
+            tries += 1
         #self.my_setDriver('ST', 1)
 
         #time.sleep(3)

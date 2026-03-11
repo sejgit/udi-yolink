@@ -88,6 +88,11 @@ class udiYoLockV2(udi_interface.Node):
         self.yoLock  = YoLinkLock(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoLock.initNode()
+        tries = 1
+        while not self.yoLock.check_system_online() and tries <= 5:
+            logging.info('Waiting for device to come online...')
+            time.sleep(2)
+            tries += 1
         self.my_setDriver('GV30', 1)
         self.system_ready=True
 
@@ -320,6 +325,11 @@ class udiYoLock(udi_interface.Node):
         self.yoLock  = YoLinkLock(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoLock.initNode()
+        tries = 1
+        while not self.yoLock.check_system_online() and tries <= 5:
+            logging.info('Waiting for device to come online...')
+            time.sleep(2)
+            tries += 1
         self.my_setDriver('GV30', 1)
         self.system_ready=True
 

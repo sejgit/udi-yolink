@@ -80,6 +80,11 @@ class udiYoBatteryHub(udi_interface.Node):
         self.yoHub  = YoLinkHub(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoHub.initNode()
+        tries = 1
+        while not self.yoHub.check_system_online() and tries <= 5:
+            logging.info('Waiting for device to come online...')
+            time.sleep(2)
+            tries += 1
         time.sleep(1)
         self.yoHub.refreshDevice()
         self.system_ready=True
@@ -211,6 +216,11 @@ class udiYoHub(udi_interface.Node):
         time.sleep(2)
         self.my_setDriver('ST', 1)
         self.yoHub.initNode()
+        tries = 1
+        while not self.yoHub.check_system_online() and tries <= 5:
+            logging.info('Waiting for device to come online...')
+            time.sleep(2)
+            tries += 1
 
         
         #if not self.yoHub.online:
