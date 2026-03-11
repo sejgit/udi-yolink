@@ -118,8 +118,9 @@ class udiYoDimmer(udi_interface.Node):
         self.yoDimmer  = YoLinkDim(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoDimmer.initNode()
+        time.sleep(1)
         tries = 1
-        while not self.yoDimmer.check_system_online() and tries <= 5:
+        while not self.yoDimmer.check_system_online() and (tries <= 5 or self.yoDimmer.throttled()):
             logging.info('Waiting for device to come online...')
             time.sleep(2)
             tries += 1
@@ -439,6 +440,7 @@ class udiYoDimmer(udi_interface.Node):
                 'FDDOWN'        : scene_dim,
                 'FDSTOP'        : scene_dim
                 }
+
 
 
 

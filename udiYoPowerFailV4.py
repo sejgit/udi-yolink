@@ -92,8 +92,9 @@ class udiYoPowerFailSenor(udi_interface.Node):
         self.yoPowerFail  = YoLinkPowerFailSensor(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoPowerFail.initNode()
+        time.sleep(1)
         tries = 1
-        while not self.yoPowerFail.check_system_online() and tries <= 5:
+        while not self.yoPowerFail.check_system_online() and (tries <= 5 or self.yoPowerFail.throttled()):
             logging.info('Waiting for device to come online...')
             time.sleep(2)
             tries += 1
@@ -196,6 +197,7 @@ class udiYoPowerFailSenor(udi_interface.Node):
                 #'DON'   : noop,
                 #'DOF'   : noop
                 }
+
 
 
 

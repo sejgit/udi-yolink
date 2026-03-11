@@ -268,7 +268,15 @@ class YoLinkMQTTDevice(object):
             return(yolink.data.get('time'))
         else:
             return(0)
-        
+    
+    def throttled(yolink) -> bool:
+        targetId = yolink.deviceInfo['targetDevice']
+        delay_s = yolink.yoAccess.time_tracking(targetId)
+        logging.debug(f"Throttled check for {targetId}, delay_s: {delay_s}")
+        if delay_s is not None and delay_s >0:  # Assuming a 60-second throttle period
+            return True
+        return False
+
     #@measure_time
     def check_system_online(yolink):
         #return(yolink.yoAccess.online)

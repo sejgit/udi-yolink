@@ -99,9 +99,12 @@ class udiYoWaterMeterMulti(udi_interface.Node):
             return
         else:
             self.yoWaterCtrl.initNode()
-            #while not self.yoWaterCtrl.check_system_online():
-            #    logging.info('waiting for watermeter to be online')
-            #    time.sleep(5)
+            time.sleep(1)
+            tries = 1
+            while not self.yoWaterCtrl.check_system_online() and (tries <= 5 or self.yoWaterCtrl.throttled()):
+                logging.info('Waiting for device to come online...')
+                time.sleep(2)
+                tries += 1
             self.meter_count = self.yoWaterCtrl.getMeterCount()
             self.meter_unit = self.yoWaterCtrl.getMeterUnit()
             logging.debug(f'Meter count: {self.meter_count}')
@@ -140,7 +143,12 @@ class udiYoWaterMeterMulti(udi_interface.Node):
             self.adr_list.append(sch_address_leak)
             
         time.sleep(4)
-        self.yoWaterCtrl.initNode()
+
+        tries = 1
+        while not self.yoWaterCtrl.check_system_online() and (tries <= 5 or self.yoWaterCtrl.throttled()):
+            logging.info('Waiting for device to come online...')
+            time.sleep(2)
+            tries += 1
         time.sleep(2)
         
         # Prime schedule data for both child schedule nodes.
@@ -333,7 +341,7 @@ class udiYoSubWaterMeter(udi_interface.Node):
         #self.yoWaterCtrl.initNode()
         time.sleep(2)
         tries = 1
-        while not self.yoWaterCtrl.check_system_online() and tries <= 5:
+        while not self.yoWaterCtrl.check_system_online() and (tries <= 5 or self.yoWaterCtrl.throttled()):
             logging.info('Waiting for device to come online...')
             time.sleep(2)
             tries += 1
@@ -632,6 +640,7 @@ class udiYoSubWaterMeter(udi_interface.Node):
                 'DOF'   : set_close,
                 'SETATTRIB' : set_attributes,
                 }
+
 
 
 

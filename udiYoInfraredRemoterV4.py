@@ -196,18 +196,17 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.yoIRrem  = YoLinkInfraredRem(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoIRrem.initNode()
-        time.sleep(2)
+        time.sleep(1)
+
+        while not self.yoIRrem.check_system_online() and ( self.yoIRrem.throttled()):
+            logging.info('Waiting for device to come online.. Must be online to get learned codes')
+            time.sleep(2)
+    
         #self.my_setDriver('ST', 1)
         self.my_setDriver('GV30', 1)
         code_dict_temp = self.yoIRrem.get_code_dict()
         logging.debug(f'Code dict temp: {code_dict_temp}')
-        while not self.yoIRrem.check_system_online():
-            logging.warning('System offline - need to obtain learned codes before continuing - trying again')
-            time.sleep(5)
-            self.yoIRrem.refreshDevice()
-            time.sleep(1)  
-        code_dict_temp = self.yoIRrem.get_code_dict()
-        logging.debug(f'Code dict temp: {code_dict_temp}')
+
         sch_address = self.address[4:14] + '_SCH'
         sch_address = self.poly.getValidAddress(sch_address)
         self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)

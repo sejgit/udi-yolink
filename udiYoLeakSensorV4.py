@@ -163,8 +163,9 @@ class udiYoLeakSensor(udi_interface.Node):
         self.yoLeakSensor  = YoLinkLeakSensor(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoLeakSensor.initNode()
+        time.sleep(1)
         tries = 1
-        while not self.yoLeakSensor.check_system_online() and tries <= 5:
+        while not self.yoLeakSensor.check_system_online() and (tries <= 5 or self.yoLeakSensor.throttled()):
             logging.info('Waiting for device to come online...')
             time.sleep(2)
             tries += 1
@@ -317,6 +318,7 @@ class udiYoLeakSensor(udi_interface.Node):
                 #'DON'   : noop,
                 #'DOF'   : noop
                 }
+
 
 
 

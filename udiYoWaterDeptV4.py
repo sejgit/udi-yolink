@@ -103,8 +103,9 @@ class udiYoWaterDept(udi_interface.Node):
         self.yoWaterDept  = YoLinkWaterDeptSensor(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoWaterDept.initNode()
+        time.sleep(1)
         tries = 1
-        while not self.yoWaterDept.check_system_online() and tries <= 5:
+        while not self.yoWaterDept.check_system_online() and (tries <= 5 or self.yoWaterDept.throttled()):
             logging.info('Waiting for device to come online...')
             time.sleep(2)
             tries += 1
@@ -209,6 +210,7 @@ class udiYoWaterDept(udi_interface.Node):
                 'SETATTR': set_attributes,             
                 'UPDATE': update,
                 }
+
 
 
 

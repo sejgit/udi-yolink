@@ -85,8 +85,9 @@ class udiYoDoorSensor(udi_interface.Node):
         self.yoDoorSensor  = YoLinkDoorSensor(self.yoAccess, self.devInfo, self.updateStatus)   
         time.sleep(2)
         self.yoDoorSensor.initNode()
+        time.sleep(1)
         tries = 1
-        while not self.yoDoorSensor.check_system_online() and tries <= 5:
+        while not self.yoDoorSensor.check_system_online() and (tries <= 5 or self.yoDoorSensor.throttled()):
             logging.info('Waiting for device to come online...')
             time.sleep(2)
             tries += 1
@@ -202,6 +203,7 @@ class udiYoDoorSensor(udi_interface.Node):
                 'SETCMD': set_cmd,
                 'UPDATE': update,
                 }
+
 
 
 

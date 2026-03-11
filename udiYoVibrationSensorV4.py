@@ -95,8 +95,9 @@ class udiYoVibrationSensor(udi_interface.Node):
         time.sleep(2)
         self.yoVibrationSensor.initNode()
         #self.my_setDriver('ST', 1)
+        time.sleep(1)
         tries = 1
-        while not self.yoVibrationSensor.check_system_online() and tries <= 5:
+        while not self.yoVibrationSensor.check_system_online() and (tries <= 5 or self.yoVibrationSensor.throttled()):
             logging.info('Waiting for vibration sensor to come online...')
             time.sleep(2)
             tries += 1
@@ -193,6 +194,7 @@ class udiYoVibrationSensor(udi_interface.Node):
                 'SETCMD': set_cmd,        
                 'UPDATE': update,
                 }
+
 
 
 

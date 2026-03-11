@@ -568,6 +568,12 @@ class udiYoMultiOutlet(udi_interface.Node):
             #logging.debug(self.subnodeAdr)
         time.sleep(1)
         self.yoMultiOutlet.initNode()
+        
+        tries = 1
+        while not self.yoMultiOutlet.check_system_online() and (tries <= 5 or self.yoMultiOutlet.throttled()):
+            logging.info('Waiting for device to come online...')
+            time.sleep(2)
+            tries += 1
         time.sleep(3)
         self.yoMultiOutlet.refreshMultiOutlet()
         self.yoMultiOutlet.refreshSchedules()

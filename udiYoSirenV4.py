@@ -84,8 +84,9 @@ class udiYoSiren(udi_interface.Node):
         
         time.sleep(2)
         self.yoSiren.initNode()
+        time.sleep(1)
         tries = 1
-        while not self.yoSiren.check_system_online() and tries <= 5:
+        while not self.yoSiren.check_system_online() and (tries <= 5 or self.yoSiren.throttled()):
             logging.info('Waiting for device to come online...')
             time.sleep(2)
             tries += 1
@@ -208,6 +209,7 @@ class udiYoSiren(udi_interface.Node):
                 'UPDATE': update,
                 'SIRENCTRL': sirenControl, 
                 }
+
 
 
 

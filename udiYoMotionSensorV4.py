@@ -96,8 +96,9 @@ class udiYoMotionSensor(udi_interface.Node):
         self.yoMotionsSensor  = YoLinkMotionSensor(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoMotionsSensor.initNode()
+        time.sleep(1)
         tries = 1
-        while not self.yoMotionsSensor.check_system_online() and tries <= 5:
+        while not self.yoMotionsSensor.check_system_online() and (tries <= 5 or self.yoMotionsSensor.throttled()):
             logging.info('Waiting for device to come online...')
             time.sleep(2)
             tries += 1
@@ -212,6 +213,7 @@ class udiYoMotionSensor(udi_interface.Node):
                 #'DON'   : noop,
                 #'DOF'   : noop
                 }
+
 
 
 

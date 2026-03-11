@@ -110,8 +110,9 @@ class udiYoOutlet(udi_interface.Node):
         self.yoOutlet = YoLinkOutlet(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoOutlet.initNode()
+        time.sleep(1)
         tries = 1
-        while not self.yoOutlet.check_system_online() and tries <= 5:
+        while not self.yoOutlet.check_system_online() and (tries <= 5 or self.yoOutlet.throttled()):
             logging.info('Waiting for device to come online...')
             time.sleep(2)
             tries += 1
@@ -356,6 +357,7 @@ class udiYoOutlet(udi_interface.Node):
                 #'DEFINESCH'    : define_schedule,
                 #'CTRLSCH'      : control_schedule,
                 }
+
 
 
 

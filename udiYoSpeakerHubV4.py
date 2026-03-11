@@ -99,8 +99,9 @@ class udiYoSpeakerHub(udi_interface.Node):
         self.yoSpeakerHub.setMessageNbr(self.messageNbr )
         self.tone_list=['none','Emergency','Alert','Warn','Tip'] 
         self.yoSpeakerHub.initNode()
+        time.sleep(1)
         tries = 1
-        while not self.yoSpeakerHub.check_system_online() and tries <= 5:
+        while not self.yoSpeakerHub.check_system_online() and (tries <= 5 or self.yoSpeakerHub.throttled()):
             logging.info('Waiting for device to come online...')
             time.sleep(2)
             tries += 1
@@ -288,5 +289,6 @@ class udiYoSpeakerHub(udi_interface.Node):
                 'PLAY'      : playMessageNew,
 
     }
+
 
 

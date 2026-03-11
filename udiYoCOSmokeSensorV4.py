@@ -105,8 +105,9 @@ class udiYoCOSmokeSensor(udi_interface.Node):
         self.yoCOSmokeSensor  = YoLinkCOSmokeSensor(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoCOSmokeSensor.initNode()
+        time.sleep(1)
         tries = 1
-        while not self.yoCOSmokeSensor.check_system_online() and tries <= 5:
+        while not self.yoCOSmokeSensor.check_system_online() and (tries <= 5 or self.yoCOSmokeSensor.throttled()):
             logging.info('Waiting for device to come online...')
             time.sleep(2)
             tries += 1

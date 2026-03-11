@@ -321,8 +321,9 @@ class udiYoSmartRemoter(udi_interface.Node):
         time.sleep(2)
         self.temp_unit = self.yoAccess.get_temp_unit()
         self.yoSmartRemote.initNode()
+        time.sleep(1)
         tries = 1
-        while not self.yoSmartRemote.check_system_online() and tries <= 5:
+        while not self.yoSmartRemote.check_system_online() and (tries <= 5 or self.yoSmartRemote.throttled()):
             logging.info('Waiting for device to come online...')
             time.sleep(2)
             tries += 1
@@ -433,6 +434,7 @@ class udiYoSmartRemoter(udi_interface.Node):
                 'UPDATE'    : update,
   
                 }
+
 
 
 

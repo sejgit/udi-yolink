@@ -100,8 +100,9 @@ class udiYoManipulator(udi_interface.Node):
         
         time.sleep(4)
         self.yoManipulator.initNode()
+        time.sleep(1)
         tries = 1
-        while not self.yoManipulator.check_system_online() and tries <= 5:
+        while not self.yoManipulator.check_system_online() and (tries <= 5 or self.yoManipulator.throttled()):
             logging.info('Waiting for device to come online...')
             time.sleep(2)
             tries += 1
@@ -328,6 +329,7 @@ class udiYoManipulator(udi_interface.Node):
                 #'DEFINESCH'    : define_schedule,
                 #'CTRLSCH'      : control_schedule,                
                 }
+
 
 
 
