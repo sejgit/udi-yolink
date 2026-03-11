@@ -130,10 +130,8 @@ class udiYoThermostat(udi_interface.Node):
         logging.info('udiYoThermostat - updateData')
         if self.node is not None:
             while not self.node_ready or not self.system_ready:
-                time.sleep(0.5)
-            
+                time.sleep(0.5)            
             message_type, message_action = self.yoThermostat.get_message_type()
-            
             # Update timestamp
             unix_time = self.yoThermostat.get_report_time('time')
             self.my_setDriver('TIME', unix_time, 151)

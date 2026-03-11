@@ -144,18 +144,19 @@ class udiYoSpeakerHub(udi_interface.Node):
         if self.node is not None:
             while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
+            message_type, message_action = self.yoSpeakerHub.get_message_type()
             self.my_setDriver('TIME', self.yoSpeakerHub.getLastUpdateTime(), 151)
             logging.debug(f'TIME {self.yoSpeakerHub.getLastUpdateTime()}')
             if self.yoSpeakerHub.check_system_online():
-                self.my_setDriver('GV0', self.volume)
-                self.my_setDriver('GV1', self.bool2ISY(self.beepEnabled))
-                self.my_setDriver('GV2', self.bool2ISY(self.mute))
-                self.my_setDriver('GV3', self.tone_list.index(self.tone))
-                self.my_setDriver('GV4', self.messageNbr)
-                self.my_setDriver('ST', self.messageNbr)
-                self.my_setDriver('GV5', self.repeat)
-                self.my_setDriver('GV30', 1)
-                self.my_setDriver('ST', 1)
+                self.my_setDriver('GV0', self.volume, type=message_type )
+                self.my_setDriver('GV1', self.bool2ISY(self.beepEnabled), type=message_type )
+                self.my_setDriver('GV2', self.bool2ISY(self.mute), type=message_type )
+                self.my_setDriver('GV3', self.tone_list.index(self.tone), type=message_type )
+                self.my_setDriver('GV4', self.messageNbr, type=message_type )
+                self.my_setDriver('ST', self.messageNbr, type=message_type )
+                self.my_setDriver('GV5', self.repeat, type=message_type )
+                self.my_setDriver('GV30', 1 )
+                self.my_setDriver('ST', 1, type=message_type )
                 if self.yoSpeakerHub.suspended:
                     self.my_setDriver('GV20', 1)
                 else:

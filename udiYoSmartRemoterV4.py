@@ -365,6 +365,7 @@ class udiYoSmartRemoter(udi_interface.Node):
             if self.node is not None:
                 while not self.node_ready or not self.system_ready:
                     time.sleep(0.5)
+                message_type, message_action = self.yoSmartRemote.get_message_type()
                 if self.yoSmartRemote.check_system_online():               
                     event_data = self.yoSmartRemote.getEventData()
                     logging.debug('updateData - event data {}'.format(event_data))
@@ -384,20 +385,18 @@ class udiYoSmartRemoter(udi_interface.Node):
                             self.keys[remote_key].send_command(press)
                             self.yoSmartRemote.clearEventData()
                             logging.debug('clearEventData')
-                        self.node.setDriver('GV0', remote_key + press)
-                        self.node.setDriver('ST', remote_key + press)
-                        self.node.setDriver('GV1', remote_key)
-                        self.node.setDriver('GV2', press)                        
-                    self.node.setDriver('GV3', self.yoSmartRemote.getBattery())
+                        self.node.setDriver('GV0', remote_key + press, type=message_type)
+                        self.node.setDriver('ST', remote_key + press, type=message_type)
+                        self.node.setDriver('GV1', remote_key, type=message_type)
+                        self.node.setDriver('GV2', press, type=message_type)                        
+                    self.node.setDriver('GV3', self.yoSmartRemote.getBattery(), type=message_type)
                     logging.debug("udiYoSmartRemoter temp: {}".format(self.yoSmartRemote.getDevTemperature()))
                     if self.temp_unit == 0:
-                        self.node.setDriver('CLITEMP', round(self.yoSmartRemote.getDevTemperature(),1), True, True, 4)
+                        self.node.setDriver('CLITEMP', round(self.yoSmartRemote.getDevTemperature(),1), True, True, 4, type=message_type)
                     elif self.temp_unit == 1:
-                        self.node.setDriver('CLITEMP', round(self.yoSmartRemote.getDevTemperature()*9/5+32,1), True, True, 17)
-                    elif self.temp_unit == 2:
-                        self.node.setDriver('CLITEMP', round(self.yoSmartRemote.getDevTemperature()+273.15,1), True, True, 26)
+                        self.node.setDriver('CLITEMP', round(self.yoSmartRemote.getDevTemperature()*9/5+32,1), True, True, 17, type=message_type)
                     else:
-                        self.node.setDriver('CLITEMP', 99, True, True, 25)
+                        self.node.setDriver('CLITEMP', 99, True, True, 25, type=message_type)
                     self.node.setDriver('GV30', 1)
                     if self.yoSmartRemote.suspended:
                         self.node.setDriver('GV20', 1)
