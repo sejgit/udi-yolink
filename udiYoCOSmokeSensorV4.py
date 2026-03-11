@@ -11,6 +11,7 @@ from yolinkCOSmokeSensorV3 import YoLinkCOSmokeSensor
 try:
     import udi_interface
     logging = udi_interface.LOGGER
+    logging = getlogger('udiYoCOSmokeSensor')
     Custom = udi_interface.Custom
 except ImportError:
     import logging
