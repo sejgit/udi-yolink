@@ -11,9 +11,7 @@ from yoLink_init_V4 import YoLinkInitPAC
 
 try:
     import udi_interface
-    loggingi = udi_interface.LOGGER
-    loggingi.setLevel(30)
-    logging = udi_interface.NLOGGER
+    logging = udi_interface.LOGGER
     Custom = udi_interface.Custom
 except ImportError:
     import logging
@@ -59,7 +57,7 @@ class YoLinkSetup (udi_interface.Node):
         self.local_URL = ''
         self.local_MQTT_port = 18080
         
-        logging.setLevel(10)
+        #logging.setLevel(10)
         logging.info(f'Version {version}')
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.START, self.start, address)
