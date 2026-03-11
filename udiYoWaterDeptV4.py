@@ -135,7 +135,7 @@ class udiYoWaterDept(udi_interface.Node):
             if self.node is not None:
                 while not self.node_ready or not self.system_ready:
                     time.sleep(0.5)
-                message_type = self.yoWaterDept.get_message_type() # if event some data may not be updated 
+            message_type, message_action = self.yoWaterDept.get_message_type() # if event some data may not be updated 
                 unix_time = self.yoWaterDept.get_report_time('reportAt')
                 self.my_setDriver('TIME', unix_time, 151)
 
@@ -204,6 +204,7 @@ class udiYoWaterDept(udi_interface.Node):
                 'SETATTR': set_attributes,             
                 'UPDATE': update,
                 }
+
 
 
 

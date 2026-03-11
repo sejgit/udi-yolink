@@ -141,7 +141,7 @@ class udiYoCOSmokeSensor(udi_interface.Node):
         if self.node is not None:
             while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
-            message_type = self.yoCOSmokeSensor.get_message_type()
+            message_type, message_action = self.yoCOSmokeSensor.get_message_type()
             unix_time = self.yoCOSmokeSensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 
@@ -231,6 +231,7 @@ class udiYoCOSmokeSensor(udi_interface.Node):
                 #'DON'   : noop,
                 #'DOF'   : noop
                 }
+
 
 
 

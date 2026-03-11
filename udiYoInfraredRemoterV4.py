@@ -263,7 +263,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
             while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             logging.debug('updateData - {}'.format(self.yoIRrem.check_system_online()))
-            message_type = self.yoIRrem.get_message_type()
+            message_type, message_action = self.yoIRrem.get_message_type()
             unix_time = self.yoIRrem.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 
@@ -364,6 +364,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
                 'LEARNCODE' : learn_IRcode,
                 #'TXCODE': send_IRcode,                'LEARNCODE' : learn_IRcode,
                 }
+
 
 
 

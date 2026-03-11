@@ -217,7 +217,7 @@ class udiYoWaterMeterController(udi_interface.Node):
             if self.node is not None:
                 while not self.node_ready or not self.system_ready:
                     time.sleep(0.5)
-                message_type = self.yoWaterCtrl.get_message_type()
+                message_type, message_action = self.yoWaterCtrl.get_message_type()
                 unix_time = self.yoWaterCtrl.get_report_time('time')
                 self.my_setDriver('TIME', unix_time, 151)
 
@@ -505,6 +505,7 @@ class udiYoWaterMeterController(udi_interface.Node):
                 #'DELAYCTRL' : program_delays,
                 #'OFFDELAY' : prepOffDelay 
                 }
+
 
 
 

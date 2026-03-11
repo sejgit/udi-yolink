@@ -111,7 +111,7 @@ class udiYoBatteryHub(udi_interface.Node):
                 time.sleep(0.5)
 
             if self.yoHub.check_system_online():
-                message_type = self.yoHub.get_message_type()
+            message_type, message_action = self.yoHub.get_message_type()
                 #pwr_info = self.yoHub.getPowerInfo()
                 dc_power = self.yoHub.get_data('dc', 'power')
                 #battery_exists = self.yoHub.get_data('battery', 'power')
@@ -244,7 +244,7 @@ class udiYoHub(udi_interface.Node):
             while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             if self.yoHub.check_system_online():
-                message_type = self.yoHub.get_message_type()
+            message_type, message_action = self.yoHub.get_message_type()
                 #if state == 'ON':
                 #    self.node.setDriver('GV0', 1, True, True)
                 #elif  state == 'OFF':
@@ -279,3 +279,4 @@ class udiYoHub(udi_interface.Node):
     commands = {
                 'UPDATE': update,
                 }
+

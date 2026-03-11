@@ -161,7 +161,7 @@ class udiYoWaterMeterOnly(udi_interface.Node):
             if self.node is not None:
                 while not self.node_ready or not self.system_ready:
                     time.sleep(0.5)
-                message_type = self.yoWaterCtrl.get_message_type() # if event some data may not be updated 
+                message_type, message_action = self.yoWaterCtrl.get_message_type() # if event some data may not be updated 
                 unix_time = self.yoWaterCtrl.get_report_time('reportAt')
                 self.my_setDriver('TIME', unix_time, 151)
                 if self.yoWaterCtrl.check_system_online():
@@ -410,6 +410,7 @@ class udiYoWaterMeterOnly(udi_interface.Node):
                 #'DELAY_CTRL' : program_delays,
                 #'OFFDELAY' : prepOffDelay 
                 }
+
 
 
 

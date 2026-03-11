@@ -125,7 +125,7 @@ class udiYoDoorSensor(udi_interface.Node):
         if self.node is not None:
             while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
-            message_type = self.yoDoorSensor.get_message_type() # if event some data may not be updated 
+            message_type, message_action = self.yoDoorSensor.get_message_type() # if event some data may not be updated 
             unix_time = self.yoDoorSensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 
@@ -197,6 +197,7 @@ class udiYoDoorSensor(udi_interface.Node):
                 'SETCMD': set_cmd,
                 'UPDATE': update,
                 }
+
 
 
 

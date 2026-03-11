@@ -177,7 +177,7 @@ class udiYoSprinkler2(udi_interface.Node):
             if self.node is not None:
                 while not self.node_ready:
                     time.sleep(0.5)
-                message_type = self.yoSprinkler.get_message_type()
+                message_type, message_action = self.yoSprinkler.get_message_type()
                 unix_time = self.yoSprinkler.get_report_time('time')
                 self.my_setDriver('TIME', unix_time, 151)
                 if message_type and 'Schedules' in str(message_type):
@@ -371,6 +371,7 @@ class udiYoSprinkler2(udi_interface.Node):
                 'WDELAY' : set_delay,
 
                 }
+
 
 
 

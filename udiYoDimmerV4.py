@@ -174,7 +174,7 @@ class udiYoDimmer(udi_interface.Node):
         if self.node is not None:
             while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
-            message_type = self.yoDimmer.get_message_type()
+            message_type, message_action = self.yoDimmer.get_message_type()
             self.my_setDriver('TIME', self.yoDimmer.getLastUpdateTime(), 151)
             state = self.yoDimmer.get_data('state')
             if message_type == 'setAttributes':

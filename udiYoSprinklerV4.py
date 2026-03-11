@@ -177,7 +177,7 @@ class udiYoSprinkler(udi_interface.Node):
             while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
                 
-            message_type = self.yoTHsensor.get_message_type() # if event some data may not be updated 
+            message_type, message_action = self.yoTHsensor.get_message_type() # if event some data may not be updated 
             unix_time = self.yoTHsensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
             if self.yoTHsensor.check_system_online():
@@ -310,6 +310,7 @@ class udiYoSprinkler(udi_interface.Node):
                 'SETCMD': set_cmd,             
                 'UPDATE': update,
                 }
+
 
 
 
