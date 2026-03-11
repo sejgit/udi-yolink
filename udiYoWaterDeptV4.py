@@ -136,40 +136,40 @@ class udiYoWaterDept(udi_interface.Node):
                 while not self.node_ready or not self.system_ready:
                     time.sleep(0.5)
             message_type, message_action = self.yoWaterDept.get_message_type() # if event some data may not be updated 
-                unix_time = self.yoWaterDept.get_report_time('reportAt')
-                self.my_setDriver('TIME', unix_time, 151)
+            unix_time = self.yoWaterDept.get_report_time('reportAt')
+            self.my_setDriver('TIME', unix_time, 151)
 
 
-                if self.yoWaterDept.check_system_online():
-                    water_dept = self.yoWaterDept.get_data('waterDepth', 'state')
-                    logging.debug(f"yoWaterDept : {water_dept}")
-                
-                    self.my_setDriver('GV0', water_dept, type=message_type)
-                    self.my_setDriver('ST', water_dept, type=message_type)
-                    settings_low  = self.yoWaterDept.get_data('low', 'alarmSettings')
-                    settings_high  = self.yoWaterDept.get_data('high', 'alarmSettings')
-                    self.my_setDriver('GV1', settings_low, 56)
-                    self.my_setDriver('GV2', settings_high, 56)
-                    alarms =  self.yoWaterDept.getAlarms()
-                    alarm_low = self.yoWaterDept.get_data('lowAlarm', 'alarm')
-                    alarm_high = self.yoWaterDept.get_data('highAlarm', 'alarm')
-                    alarm_error = self.yoWaterDept.get_data('detectorError', 'alarm')
-                    self.my_setDriver('GV3', self.bool2ISY(alarm_low), type=message_type)
-                    self.my_setDriver('GV4', self.bool2ISY(alarm_high), type=message_type)
-                    self.my_setDriver('GV5', self.bool2ISY(alarm_error), type=message_type)
+            if self.yoWaterDept.check_system_online():
+                water_dept = self.yoWaterDept.get_data('waterDepth', 'state')
+                logging.debug(f"yoWaterDept : {water_dept}")
+            
+                self.my_setDriver('GV0', water_dept, type=message_type)
+                self.my_setDriver('ST', water_dept, type=message_type)
+                settings_low  = self.yoWaterDept.get_data('low', 'alarmSettings')
+                settings_high  = self.yoWaterDept.get_data('high', 'alarmSettings')
+                self.my_setDriver('GV1', settings_low, 56)
+                self.my_setDriver('GV2', settings_high, 56)
+                alarms =  self.yoWaterDept.getAlarms()
+                alarm_low = self.yoWaterDept.get_data('lowAlarm', 'alarm')
+                alarm_high = self.yoWaterDept.get_data('highAlarm', 'alarm')
+                alarm_error = self.yoWaterDept.get_data('detectorError', 'alarm')
+                self.my_setDriver('GV3', self.bool2ISY(alarm_low), type=message_type)
+                self.my_setDriver('GV4', self.bool2ISY(alarm_high), type=message_type)
+                self.my_setDriver('GV5', self.bool2ISY(alarm_error), type=message_type)
 
-                    self.my_setDriver('BATLVL', self.yoWaterDept.get_data('battery', 'state'), type=message_type)
-                    #logging.debug('Last  tamp {}'.format(int(self.yoWaterDept.lastUpdate()/60)))
-                    #logging.debug('date tamp {}'.format(int(self.yoWaterDept.getDataTimestamp()/60)))
-                    #self.my_setDriver('TIME', int(self.yoWaterDept.getDataTimestamp()/60), 44)
-                    self.my_setDriver('GV30', 1)
-                    if self.yoWaterDept.suspended:
-                        self.my_setDriver('GV20', 1)
-                    else:
-                        self.my_setDriver('GV20', 0)                    
+                self.my_setDriver('BATLVL', self.yoWaterDept.get_data('battery', 'state'), type=message_type)
+                #logging.debug('Last  tamp {}'.format(int(self.yoWaterDept.lastUpdate()/60)))
+                #logging.debug('date tamp {}'.format(int(self.yoWaterDept.getDataTimestamp()/60)))
+                #self.my_setDriver('TIME', int(self.yoWaterDept.getDataTimestamp()/60), 44)
+                self.my_setDriver('GV30', 1)
+                if self.yoWaterDept.suspended:
+                    self.my_setDriver('GV20', 1)
                 else:
-                    self.my_setDriver('GV30', 0)
-                    self.my_setDriver('GV20', 0)  
+                    self.my_setDriver('GV20', 0)                    
+            else:
+                self.my_setDriver('GV30', 0)
+                self.my_setDriver('GV20', 0)  
         except Exception as e:
                     logging.error(f'Exception updateData {e}')
                     self.my_setDriver('TIME', int(self.yoWaterDept.getDataTimestamp()/60))       

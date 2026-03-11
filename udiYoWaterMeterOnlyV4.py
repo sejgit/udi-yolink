@@ -92,6 +92,8 @@ class udiYoWaterMeterOnly(udi_interface.Node):
         self.timer_expires = 0
         self.onDelay = 0
         self.offDelay = 0
+        self.ISYmeter_uom = None
+        self.ISYwater_unit = None
         self.valveState = 99 # needed as class c device - keep value until online again 
         #polyglot.subscribe(polyglot.POLL, self.poll)
         polyglot.subscribe(polyglot.START, self.start, self.address)
@@ -120,6 +122,15 @@ class udiYoWaterMeterOnly(udi_interface.Node):
         #while not self.yoWaterCtrl.check_system_online():
         #    logging.info('waiting for watermeter to be online')
         #    time.sleep(5)
+        self.meter_unit = self.yoWaterCtrl.getMeterUnit()
+        #self.my_setDriver('GV30', 1)
+        #self.yoWaterCtrl.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
+
+        self.ISYwater_unit = self.yoAccess.get_water_unit()
+        #self.my_setDriver('GV4',  self.meter_unit, 25)          
+        self.ISYmeter_uom = self.water_meter_unit2uom( self.ISYwater_unit)
+        logging.debug(f'meter unit : { self.meter_unit} ISY unit: { self.ISYwater_unit} uom: {self.ISYmeter_uom}')
+
 
         time.sleep(2)
         #self.my_setDriver('ST', 1)
@@ -166,23 +177,10 @@ class udiYoWaterMeterOnly(udi_interface.Node):
                 self.my_setDriver('TIME', unix_time, 151)
                 if self.yoWaterCtrl.check_system_online():
                     self.my_setDriver('GV30', 1)
-                    '''
-                    state =  self.yoWaterCtrl.getValveState()
-                    if state != None:
-                        if state.upper() == 'OPEN':
-                            self.valveState = 1
-                            self.my_setDriver('GV0', self.valveState)
-                            if self.last_state != state:
-                                self.node.reportCmd('DON')
-                        elif state.upper() == 'CLOSED':
-                            self.valveState = 0
-                            self.my_setDriver('GV0', self.valveState)
-                            if self.last_state != state:
-                                self.node.reportCmd('DOF')
-                        elif state.upper() == 'UNKNOWN':
-                            self.my_setDriver('GV0', 99)                        
-                        self.last_state = state
-                    '''
+                    if self.ISYmeter_uom is None:
+                        logging.debug(f'meter unit : { self.meter_unit}')
+                        #self.my_setDriver('GV4',  self.meter_unit, 25)          
+                        self.ISYmeter_uom = self.water_meter_unit2uom( self.meter_unit)
 
                     #meter  = self.yoWaterCtrl.getMeterReading()
                     #logging.debug(f'meter: {meter}')
@@ -197,18 +195,21 @@ class udiYoWaterMeterOnly(udi_interface.Node):
                     self.my_setDriver('GV1', total_meter,  self.ISYmeter_uom, type=message_type)
 
                     
-                    if 'daily_usage' in meter:
-                        self.my_setDriver('GV10', meter['daily_usage'],   self.meter_ISYuom )
-                    else:
-                        self.my_setDriver('GV10', None)
-                    if 'recent_amount' in meter:
-                        self.my_setDriver('GV2', meter['recent_amount'],   self.meter_ISYuom )
-                    else:
-                        self.my_setDriver('GV2', None)
-                    if 'recent_duration' in meter:
-                        self.my_setDriver('GV3', meter['recent_duration'],  44)
-                    else:
-                        self.my_setDriver('GV3', None)
+                    daily_use = self.yoWaterCtrl.get_data('amount', 'dailyUsage')
+                    if isinstance(daily_use, (int,float)):   
+                        daily_use =round(float(self.calculate_water_volume(daily_use,  self.meter_unit,  self.ISYwater_unit)), 1)
+                    logging.debug(f'daily use : {daily_use}')
+                    self.my_setDriver('GV10', daily_use,  self.ISYmeter_uom, type=message_type   )
+                    recent_amount = self.yoWaterCtrl.get_data('amount','recentUsage')
+                    if isinstance(recent_amount, (int,float)):
+                        recent_amount = round(float(self.calculate_water_volume(recent_amount,  self.meter_unit,  self.ISYwater_unit)), 1)
+                    logging.debug(f'recent amount : {recent_amount}')
+                    self.my_setDriver('GV2', recent_amount,  self.ISYmeter_uom, type=message_type)
+
+                    recent_duration = self.yoWaterCtrl.get_data('duration','recentUsage')
+                    logging.debug(f'recent duration : {recent_duration}')
+                    self.my_setDriver('GV3', recent_duration,  44, type=message_type)   
+
 
                     pwr_mode, bat_lvl =  self.yoWaterCtrl.getBattery()  
                     logging.debug('udiYoWaterMeterController - getBattery: {},  {}  '.format(pwr_mode, bat_lvl))
