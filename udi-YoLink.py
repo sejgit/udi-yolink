@@ -13,7 +13,10 @@ from yoLink_init_V4 import YoLinkInitPAC
 
 try:
     import udi_interface
-    logging = udi_interface.LOGGER
+    loggingn = udi_interface.LOGGER
+    loggingn.setLevel(30)
+    logging = udi_interface.node.NLOGGER
+    
     Custom = udi_interface.Custom
 except ImportError:
     import logging
