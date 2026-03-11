@@ -136,7 +136,7 @@ class udiYoSprinkler2(udi_interface.Node):
         #self.adr_list.append(sch_address)
         #time.sleep(2)
         # Prime schedule node values immediately after startup.
-        self.yoSprinkler.refreshSchedules()
+        #self.yoSprinkler.refreshSchedules()
         
         self.node_ready = True
         self.updateData()
