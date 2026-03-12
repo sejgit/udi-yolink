@@ -1268,7 +1268,7 @@ def udiYoSchedule(polyglot, primary, address, name, yoAccess, deviceInfo, schedu
         return MultiOutletScheduleNode(polyglot, primary, address, name, yoAccess, deviceInfo)
     elif dev_type in ['SprinklerV2', 'Sprinkler']:
         return SprinklerScheduleNode(polyglot, primary, address, name, yoAccess, deviceInfo)
-    elif dev_type in ['WaterMeterController']:
+    elif dev_type in ['WaterMeterController', 'WaterMeterMultiController']:
         return WaterMeterScheduleNode(polyglot, primary, address, name, yoAccess, deviceInfo, schedule_type=schedule_type or 'valve')
     else:  # Default to OnOff for Switch, Outlet, Dimmer, Manipulator, etc.
         return OnOffScheduleNode(polyglot, primary, address, name, yoAccess, deviceInfo)
