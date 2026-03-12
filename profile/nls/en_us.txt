@@ -71,14 +71,14 @@ ND-yoWMLkSchedule-NAME=Water Meter Leak Schedules
 ND-yoWMLkSchedule-ICON=GenericCtl
 ST-nlsschedule-GV12-NAME=Selected code/port
 ST-nlsschedule-GV13-NAME=Schedule Index
-ST-nlsschedule-GV14-NAME=Activated
+CMD-nlssoilsensor-SETCMD-NAME=Select Command (Alert) Action
 ST-nlsschedule-GV15-NAME=On Hour
 ST-nlsschedule-GV16-NAME=On Minute
 ST-nlsschedule-GV21-NAME=On Sec
 ST-nlsschedule-GV17-NAME=Off Hour
 ST-nlsschedule-GV18-NAME=Off Minute
 ST-nlsschedule-GV22-NAME=Off Sec
-ST-nlsschedule-GV19-NAME=Active Days
+ST-nlssoilsensor-ST-NAME=Soil Conductivity (mS/cm)
 ST-nlsschedule-GV23-NAME=Total Schedules
 CMD-nlsschedule-CTRLSCH-NAME=Set Schedule
 CMD-nlsschedule-LOOKUPSCH-NAME=Lookup Schedule
@@ -87,7 +87,7 @@ CMD-nlsschedule-UPDATE-NAME=Update Status
 CMDP-key-NAME=Ir code Number (1-64)
 CMDP-ch-NAME=Output port(0-3)
 CMDP-index-NAME=Schedule Index
-CMDP-active-NAME=Schedule Active
+ST-nlssmremote-GV1-NAME=Key Press Type
 CMDP-onH-NAME=On Hour
 CMDP-onM-NAME=On Min
 CMDP-onS-NAME=On Seconds
@@ -100,48 +100,48 @@ ST-nlswmschedule-GV12-NAME=Leak Limit
 ST-nlswmschedule-GV13-NAME=Schedule Index
 ST-nlswmschedule-GV14-NAME=Activated
 ST-nlswmschedule-GV15-NAME=On Hour
-ST-nlswmschedule-GV16-NAME=On Minute
+ST-nlswatermeter-GV12-NAME=Valve Error Alarm
 ST-nlswmschedule-GV21-NAME=On Sec
 ST-nlswmschedule-GV17-NAME=Off Hour
 ST-nlswmschedule-GV18-NAME=Off Minute
 ST-nlswmschedule-GV22-NAME=Off Sec
 ST-nlswmschedule-GV19-NAME=Active Days
-ST-nlswmschedule-GV23-NAME=Total Schedules
+ST-nlssprinkler-GV1-NAME=Current No Water Alarm
 CMD-nlswmschedule-CTRLSCH-NAME=Set Schedule
 CMD-nlswmschedule-LOOKUPSCH-NAME=Lookup Schedule
 CMD-nlswmschedule-DEFINESCH-NAME=Define Schedule
 CMD-nlswmschedule-UPDATE-NAME=Update Status
-
+LED-99=Unknown
 ST-nlswmvalveschedule-GV12-NAME=Reserved
 ST-nlswmvalveschedule-GV13-NAME=Schedule Index
 ST-nlswmvalveschedule-GV14-NAME=Activated
 ST-nlswmvalveschedule-GV15-NAME=On Hour
-ST-nlswmvalveschedule-GV16-NAME=On Minute
+runningmode-99=Unknown
 ST-nlswmvalveschedule-GV21-NAME=On Sec
 ST-nlswmvalveschedule-GV17-NAME=Off Hour
 ST-nlswmvalveschedule-GV18-NAME=Off Minute
 ST-nlswmvalveschedule-GV22-NAME=Off Sec
 ST-nlswmvalveschedule-GV19-NAME=Active Days
-ST-nlswmvalveschedule-GV23-NAME=Total Schedules
+COAlert-1=CO Alert
 CMD-nlswmvalveschedule-CTRLSCH-NAME=Set Schedule
 CMD-nlswmvalveschedule-LOOKUPSCH-NAME=Lookup Schedule
 CMD-nlswmvalveschedule-DEFINESCH-NAME=Define Schedule
 CMD-nlswmvalveschedule-UPDATE-NAME=Update Status
 
-ST-nlswmleakschedule-GV12-NAME=Leak Limit
+BatteryAlert-1=Low Battery Alert
 ST-nlswmleakschedule-GV13-NAME=Schedule Index
 ST-nlswmleakschedule-GV14-NAME=Activated
 ST-nlswmleakschedule-GV15-NAME=On Hour
 ST-nlswmleakschedule-GV16-NAME=On Minute
 ST-nlswmleakschedule-GV21-NAME=On Sec
-ST-nlswmleakschedule-GV17-NAME=Off Hour
+sirenbatlvl-98=External Power
 ST-nlswmleakschedule-GV18-NAME=Off Minute
 ST-nlswmleakschedule-GV22-NAME=Off Sec
 ST-nlswmleakschedule-GV19-NAME=Active Days
 ST-nlswmleakschedule-GV23-NAME=Total Schedules
 CMD-nlswmleakschedule-CTRLSCH-NAME=Set Schedule
 CMD-nlswmleakschedule-LOOKUPSCH-NAME=Lookup Schedule
-CMD-nlswmleakschedule-DEFINESCH-NAME=Define Schedule
+powerstate-99=Unknown 
 CMD-nlswmleakschedule-UPDATE-NAME=Update Status
 
 
@@ -404,7 +404,7 @@ ND-yosoilsensor-ICON=Sensor
 ND-yosoilsensorF-NAME=YoLink Soil Sensor
 ND-yosoilsensorF-ICON=Sensor
 
-ST-nlssoilsensor-ST-NAME=Soil Conductuivity (mS/cm)
+ST-nlssoilsensor-ST-NAME=Soil Conductivity (mS/cm)
 ST-nlssoilsensor-CLITEMP-NAME=Sensor Temperature
 ST-nlssoilsensor-CLIHUM-NAME=Current Rel Humidity (%)
 ST-nlssoilsensor-GV1-NAME=Low Conductivity Alarm
@@ -427,7 +427,7 @@ ST-nlssoilsensor-GV15-NAME=High Conductivity Alarm Limit (mS/cm)
 ST-nlssoilsensor-GV20-NAME=Connection State
 ST-nlssoilsensor-GV30-NAME=Online State
 ST-nlssoilsensor-TIME-NAME=Last device update
-CMD-nlssoilsensor-SETCMD-NAME=Select Command (Alert)Action
+CMD-nlssoilsensor-SETCMD-NAME=Select Command (Alert) Action
 CMD-nlssoilsensor-UPDATE-NAME=Update Status
 
 
@@ -734,7 +734,7 @@ ND-yosmremoteF-NAME=YoLink Smart Remoter
 ND-yosmremoteF-ICON=Input
 ST-nlssmremote-ST-NAME=Press type
 ST-nlssmremote-GV0-NAME=ComboPress
-ST-nlssmremote-GV1-NAME=Key presstype
+ST-nlssmremote-GV1-NAME=Key Press Type
 ST-nlssmremote-GV2-NAME=Press type (legacy)
 ST-nlssmremote-GV3-NAME=Battery Level
 ST-nlssmremote-GV4-NAME=Remote Temperature
@@ -813,7 +813,7 @@ ST-nlswatermeter-GV7-NAME=Duration Overrun Alarm
 ST-nlswatermeter-GV8-NAME=Nbr Times Overrun 24H Alarm
 ST-nlswatermeter-GV9-NAME=Reminder Alarm
 ST-nlswatermeter-GV11-NAME=Open Reminder Alarm
-ST-nlswatermeter-GV12-NAME=Valve Error Alearm
+ST-nlswatermeter-GV12-NAME=Valve Error Alarm
 ST-nlswatermeter-GV13-NAME=High Temp Alarm
 ST-nlswatermeter-GV14-NAME=Low Temp Alarm
 ST-nlswatermeter-GV15-NAME=Overrun Volume Auto Shutoff
@@ -884,7 +884,7 @@ ND-yosprinklerv2-ICON=Irrigation
 ST-nlssprinkler-NAME=Nodeserver Status
 ST-nlssprinkler-ST-NAME=Current State
 #ST-nlssprinkler-GV0-NAME=Water Running
-ST-nlssprinkler-GV1-NAME=Curent No Water Alarm
+ST-nlssprinkler-GV1-NAME=Current No Water Alarm
 #ST-nlssprinkler-GV2-NAME=Water Mode Attrib (schedule/Manual)
 #ST-nlssprinkler-GV3-NAME=Water Amount Mode Attrib (Volume/Time)
 #ST-nlssprinkler-GV4-NAME=Water Amount Atttrib
@@ -918,7 +918,7 @@ CMDP-wdeltime-NAME=Set Delay
 
 LED-0=Off
 LED-1=On
-LED-99=Uknown
+LED-99=Unknown
 
 beeping-0=No Beep
 beeping-1=Beeping
@@ -932,8 +932,8 @@ sensitivity-0=Low
 sensitivity-1=High
 sensitivity-99=Unknown
 
-moveAlert-0=Not Moveed
-moveAlert-1=Sensor Moveed
+moveAlert-0=Not Moved
+moveAlert-1=Sensor Moved
 moveAlert-99=Unknown
 
 freezeAlert-0=No Alert
@@ -970,7 +970,7 @@ nowateralarm-99=Unknown
 
 runningmode-0=Fixed Water Amount
 runningmode-1=Fixed Run Time
-runningmode-99=Uknown
+runningmode-99=Unknown
 
 wlstate-99=Unknown
 wlstate-98=Updating (may take up to 1 hour)
@@ -1022,7 +1022,7 @@ SmokeAlert-98=No Support
 SmokeAlert-99=Unknown
 
 COAlert-0=Normal
-COAlert-1=CO Alret
+COAlert-1=CO Alert
 COAlert-98=No Support
 COAlert-99=Unknown
 
@@ -1032,7 +1032,7 @@ TempAlert-98=No Support
 TempAlert-99=Unknown
 
 BatteryAlert-0=Normal
-BatteryAlert-1=Low Bettery Alert
+BatteryAlert-1=Low Battery Alert
 BatteryAlert-98=No Support
 BatteryAlert-99=Unknown
 
@@ -1056,7 +1056,7 @@ sirenbatlvl-1=Medium Low
 sirenbatlvl-2=Medium
 sirenbatlvl-3=Medium High
 sirenbatlvl-4=High
-sirenbatlvl-98=Extrnal Power
+sirenbatlvl-98=External Power
 sirenbatlvl-99=Unknown
 
 sirenctrl-0=Normal
@@ -1069,7 +1069,7 @@ powerstate-0=TBD-Unknown?
 powerstate-1=Supplying?
 powerstate-2=Charging  
 powerstate-3=Full
-powerstate-99=Unknow 
+powerstate-99=Unknown 
 
 
 poweralert-0=No Alert (normal)
