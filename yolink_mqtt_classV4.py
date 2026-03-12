@@ -986,7 +986,7 @@ class YoLinkMQTTDevice(object):
 
         # Water meter controllers (single + multi) support valve and leak schedules.
         if yolink.type in ['WaterMeterController', 'WaterMeterMultiController']:
-            valve_method = 'WaterMeterController.getValveSchedules'
+            valve_method = yolink.type + '.getValveSchedules'
             if _can_send_schedule_request(valve_method):
                 data['method'] = valve_method
                 data["targetDevice"] = yolink.deviceInfo['deviceId']
@@ -994,7 +994,7 @@ class YoLinkMQTTDevice(object):
                 yolink.yoAccess.publish_data(data)
 
             data = {}
-            leak_method = 'WaterMeterController.getLeakSchedules'
+            leak_method = yolink.type + '.getLeakSchedules'
             if _can_send_schedule_request(leak_method):
                 data['method'] = leak_method
                 data["targetDevice"] = yolink.deviceInfo['deviceId']
@@ -1066,9 +1066,9 @@ class YoLinkMQTTDevice(object):
         # Water meter controllers (single + multi) use separate write methods per schedule type.
         if yolink.type in ['WaterMeterController', 'WaterMeterMultiController'] and schedule_method in ['valve', 'leak']:
             if schedule_method == 'valve':
-                data['method'] = 'WaterMeterController.setValveSchedules'
+                data['method'] = yolink.type + '.setValveSchedules'
             else:
-                data['method'] = 'WaterMeterController.setLeakSchedules'
+                data['method'] = yolink.type + '.setLeakSchedules'
         else:
             data['method'] = yolink.type + '.setSchedules'
 
