@@ -1115,7 +1115,7 @@ class YoLinkInitPAC(object):
                 #yoAccess.tmpData[deviceId] = dataStr
                 yoAccess.lastDataPacket[deviceId] = data
 
-                logging.debug( 'publish_data: {} - {}'.format(yoAccess.mqttList[deviceId]['request'], dataStr))
+                logging.debug( 'publish_data: {} - {}'.format(yoAccess.mqttList[deviceId]['request'], json.dumps(data, indent=4, separators=(",", ": "))))
                 result = yoAccess.client.publish(yoAccess.mqttList[deviceId]['request'], dataStr, yoAccess.QoS)
                 if yoAccess.retryQueue.qsize() > 0: 
                     logging.debug( 'Cleaning up retry queue if not empty: {}'.format(yoAccess.retryQueue.qsize()))
