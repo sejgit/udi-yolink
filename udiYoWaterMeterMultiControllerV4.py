@@ -130,6 +130,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                     self.adr_list.append(wm_address)
                     logging.info(f'Added Water Meter Node: {wm_name} at {wm_address}')
 
+            '''  CURRENTLY NO SCHEDULES ARE SUPORTTED FOR THIS DEVICE
             # Create valve schedule child node
             sch_address_valve = self.address[4:14] + '_VSC'
             sch_address_valve = self.poly.getValidAddress(sch_address_valve)
@@ -141,7 +142,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
             sch_address_leak = self.poly.getValidAddress(sch_address_leak)
             self.schedule_leak = udiYoSchedule(self.poly, self.address, sch_address_leak, 'Leak Schedules', self.yoAccess, self.devInfo, schedule_type='leak')
             self.adr_list.append(sch_address_leak)
-            
+            '''
         time.sleep(4)
 
         tries = 1
