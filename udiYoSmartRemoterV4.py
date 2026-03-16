@@ -377,10 +377,10 @@ class udiYoSmartRemoter(udi_interface.Node):
 
                     #event_data = self.yoSmartRemote.getEventData()
                     #logging.debug('updateData - event data {}'.format(event_data))
-                    event_data = self.get_data('event', 'state')
+                    event_data = self.yoSmartRemote.get_data('event', 'state')
                     if event_data is not None:
-                        key_mask = self.get_data('keyMask', 'event')
-                        press_type = self.get_data('type', 'event')
+                        key_mask = self.yoSmartRemote.get_data('keyMask', 'event')
+                        press_type = self.yoSmartRemote.get_data('type', 'event')
                         remote_key = self.mask2key(key_mask)
                         if press_type == 'LongPress':
                             press = self.max_remote_keys
