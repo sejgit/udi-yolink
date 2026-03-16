@@ -1789,7 +1789,7 @@ class YoLinkMQTTDevice(object):
                 temp = data['method']
                 if '.getState' in temp:
                     return(False)
-            if 'event' in data:
+            elif 'event' in data:
                 temp = data['event']
                 if 'StatusChange' in temp or '.Alert' in temp or'.DevEvent' in temp:
                     return(True)

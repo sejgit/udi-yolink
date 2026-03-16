@@ -134,14 +134,14 @@ class udiRemoteKey(udi_interface.Node):
     def send_command (self, press_type):
         logging.debug('send_command - press type : {}'.format(press_type))
         if press_type == 0 or press_type == 'Press' : #short press
-            self.short_press_state, isy_val = self. get_new_state(self.cmd_struct['short_press'], self.short_press_state)
+            self.short_press_state, isy_val = self.get_new_state(self.cmd_struct['short_press'], self.short_press_state)
             if self.short_press_state  != 'UNKNOWN':
                 self.node.reportCmd(self.short_press_state )
             self.node.setDriver('ST', isy_val)
 
             logging.debug('send short press command cmd:{} driver{}'.format(self.short_press_state, isy_val))
         else:
-            self.long_press_state, isy_val = self. get_new_state(self.cmd_struct['long_press'], self.long_press_state)
+            self.long_press_state, isy_val = self.get_new_state(self.cmd_struct['long_press'], self.long_press_state)
             if self.long_press_state  != 'UNKNOWN':
                 self.node.reportCmd(self.long_press_state )
             self.node.setDriver('ST', isy_val)
@@ -388,26 +388,29 @@ class udiYoSmartRemoter(udi_interface.Node):
                             press = 0
                         
                         logging.debug('remote key {} press {}'.format(remote_key, press))
-                    
-                        if self.yoSmartRemote.isControlEvent():
-                            self.keys[remote_key].send_command(press)
-                            #self.yoSmartRemote.clearEventData()
-                            #logging.debug('clearEventData')
-                        if isinstance(remote_key, int) and isinstance(press, int):
-                            self.node.setDriver('GV0', remote_key + press, type=message_type)
-                            self.node.setDriver('ST', remote_key + press, type=message_type)
                         if isinstance(remote_key, int):
-                            self.node.setDriver('GV1', remote_key, type=message_type)
+                            if self.yoSmartRemote.isControlEvent():
+                                self.keys[remote_key].send_command(press)
+                                #self.yoSmartRemote.clearEventData()
+                                #logging.debug('clearEventData')
+                            if isinstance(press, int):
+                                self.node.setDriver('GV0', remote_key + press, uom=25, type=message_type)
+                                self.node.setDriver('ST', remote_key + press, om=25, type=message_type)
+                            self.node.setDriver('GV1', remote_key, uom=25, type=message_type)
                         if isinstance(press, int):  
-                            self.node.setDriver('GV2', press, type=message_type)                        
-                    self.node.setDriver('GV3', self.yoSmartRemote.getBattery(), type=message_type)
-                    logging.debug("udiYoSmartRemoter temp: {}".format(self.yoSmartRemote.getDevTemperature()))
-                    if self.temp_unit == 0:
-                        self.node.setDriver('CLITEMP', round(self.yoSmartRemote.getDevTemperature(),1), True, True, 4, type=message_type)
-                    elif self.temp_unit == 1:
-                        self.node.setDriver('CLITEMP', round(self.yoSmartRemote.getDevTemperature()*9/5+32,1), True, True, 17, type=message_type)
-                    else:
-                        self.node.setDriver('CLITEMP', 99, True, True, 25, type=message_type)
+                            self.node.setDriver('GV2', press, uom=25, type=message_type)   
+
+                    battery = self.yoSmartRemote.get_data('battery', 'state')
+                    if isinstance(battery, int) or battery is None  :                
+                        self.node.setDriver('GV3', battery, uom=25,type=message_type)
+                    tempC = self.yoSmartRemote.get_data('devTemperature', 'state')
+                    logging.debug("udiYoSmartRemoter temp: {}".format(tempC))
+                    if isinstance(tempC, (int, float)) or tempC == None:
+                        if self.temp_unit == 0:
+                            self.node.setDriver('CLITEMP', round(tempC), uom=4, type=message_type)
+                        elif self.temp_unit == 1:
+                            self.node.setDriver('CLITEMP', round(tempC*9/5+32,1), uom=17, type=message_type)
+
                     self.node.setDriver('GV30', 1)
                     if self.yoSmartRemote.suspended:
                         self.node.setDriver('GV20', 1)
@@ -418,7 +421,7 @@ class udiYoSmartRemoter(udi_interface.Node):
                     self.node.setDriver('GV30', 0, True, True)
                     self.node.setDriver('GV20', 2)
         except Exception as e:
-            logging.error('Smart Remote  updateData exeption: {}'.format(e))
+            logging.error('Smart Remote updateData exeption: {}'.format(e))
 
 
 
