@@ -99,6 +99,11 @@ class udiYoWaterMeterController(udi_interface.Node):
             else:   
                 self.id = 'yowatermeterCtrl'
 
+        if model in ['YS5029','YS5009']:
+            self.scheduleSupport = False
+        else:
+            self.scheduleSupport = True
+
         if self.water_unit not in [0,3]:
             logging.error('Only Litere and Gallon supported for now')
 
@@ -162,20 +167,19 @@ class udiYoWaterMeterController(udi_interface.Node):
         #self.my_setDriver('GV4',  self.meter_unit, 25)          
         self.ISYmeter_uom = self.water_meter_unit2uom( self.ISYwater_unit)
         logging.debug(f'meter unit : { self.meter_unit} ISY unit: { self.ISYwater_unit} uom: {self.ISYmeter_uom}')
-
+        if self.scheduleSupport:
         # Create valve schedule child node
-        sch_address_valve = self.address[4:14] + '_VSC'
-        sch_address_valve = self.poly.getValidAddress(sch_address_valve)
-        self.schedule_valve = udiYoSchedule(self.poly, self.address, sch_address_valve, 'Valve Schedules', self.yoAccess, self.devInfo, schedule_type='valve')
-        self.adr_list.append(sch_address_valve)
-        
-        # Create leak schedule child node
-        sch_address_leak = self.address[4:14] + '_LSC'
-        sch_address_leak = self.poly.getValidAddress(sch_address_leak)
-        self.schedule_leak = udiYoSchedule(self.poly, self.address, sch_address_leak, 'Leak Schedules', self.yoAccess, self.devInfo, schedule_type='leak')
-        self.adr_list.append(sch_address_leak)
-        
-        time.sleep(2)
+            sch_address_valve = self.address[4:14] + '_VSC'
+            sch_address_valve = self.poly.getValidAddress(sch_address_valve)
+            self.schedule_valve = udiYoSchedule(self.poly, self.address, sch_address_valve, 'Valve Schedules', self.yoAccess, self.devInfo, schedule_type='valve')
+            self.adr_list.append(sch_address_valve)
+            
+            # Create leak schedule child node
+            sch_address_leak = self.address[4:14] + '_LSC'
+            sch_address_leak = self.poly.getValidAddress(sch_address_leak)
+            self.schedule_leak = udiYoSchedule(self.poly, self.address, sch_address_leak, 'Leak Schedules', self.yoAccess, self.devInfo, schedule_type='leak')
+            self.adr_list.append(sch_address_leak)        
+            time.sleep(2)
 
         # Prime schedule data for both child schedule nodes.
         #self.yoWaterCtrl.refreshSchedules()
