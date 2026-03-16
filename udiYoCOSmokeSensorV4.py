@@ -213,6 +213,9 @@ class udiYoCOSmokeSensor(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.debug('updateStatus - yoCOSmokeSensor')
+        if self.node is not None:
+            while not self.node_ready or not self.system_ready:
+                time.sleep(0.5)
         logging.debug('device oneline {}'.format(self.yoCOSmokeSensor.online))
         self.yoCOSmokeSensor.updateStatus(data)
         self.updateData()

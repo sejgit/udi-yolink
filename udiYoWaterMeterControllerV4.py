@@ -403,6 +403,9 @@ class udiYoWaterMeterController(udi_interface.Node):
             
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoWaterMeterController')
+        if self.node is not None:
+            while not self.node_ready or not self.system_ready:
+                time.sleep(0.5)
         self.yoWaterCtrl.updateStatus(data)
         self.updateData()
 

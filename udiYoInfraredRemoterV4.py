@@ -294,6 +294,9 @@ class udiYoInfraredRemoter(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('udiIRremote updateStatus')
+        if self.node is not None:
+            while not self.node_ready or not self.system_ready:
+                time.sleep(0.5)
         self.yoIRrem.updateStatus(data)
         self.updateData()
         #res = self.yoIRrem.getIRstatus_info()

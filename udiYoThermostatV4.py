@@ -122,6 +122,9 @@ class udiYoThermostat(udi_interface.Node):
     def updateStatus(self, data):
         """Handle MQTT status updates from the device"""
         logging.debug('udiYoThermostat - updateStatus')
+        if self.node is not None:
+            while not self.node_ready or not self.system_ready:
+                time.sleep(0.5)
         if self.yoThermostat:
             self.yoThermostat.updateStatus(data)
             self.updateData()

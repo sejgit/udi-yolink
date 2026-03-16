@@ -298,7 +298,7 @@ class udiYoSmartRemoter(udi_interface.Node):
         self.adr_list.append(address)
         self.node_ready = True
         
-        self.nodesOK = False
+  
 
     '''
     def node_queue(self, data):
@@ -339,7 +339,7 @@ class udiYoSmartRemoter(udi_interface.Node):
             self.keys[key] = udiRemoteKey(self.poly, self.address, k_address, k_name, key)
             self.adr_list.append(k_address)
         self.wait_for_node_done()
-        self.nodesOK = True
+
         self.system_ready=True
 
     def stop (self):
@@ -372,29 +372,34 @@ class udiYoSmartRemoter(udi_interface.Node):
                 while not self.node_ready or not self.system_ready:
                     time.sleep(0.5)
                 message_type, message_action = self.yoSmartRemote.get_message_type()
-                if self.yoSmartRemote.check_system_online():               
-                    event_data = self.yoSmartRemote.getEventData()
-                    logging.debug('updateData - event data {}'.format(event_data))
-                    if event_data:
-                        key_mask = event_data['keyMask']
-                        press_type = event_data['type']
+                if self.yoSmartRemote.check_system_online():      
+
+
+                    #event_data = self.yoSmartRemote.getEventData()
+                    #logging.debug('updateData - event data {}'.format(event_data))
+                    event_data = self.get_data('event', 'state')
+                    if event_data is not None:
+                        key_mask = self.get_data('keyMask', 'event')
+                        press_type = self.get_data('type', 'event')
                         remote_key = self.mask2key(key_mask)
                         if press_type == 'LongPress':
                             press = self.max_remote_keys
                         else:
                             press = 0
-                        logging.debug('remote key {} press {}'.format(remote_key, press))
                         
-                        while not self.nodesOK:
-                            time.sleep(1)
+                        logging.debug('remote key {} press {}'.format(remote_key, press))
+                    
                         if self.yoSmartRemote.isControlEvent():
                             self.keys[remote_key].send_command(press)
-                            self.yoSmartRemote.clearEventData()
-                            logging.debug('clearEventData')
-                        self.node.setDriver('GV0', remote_key + press, type=message_type)
-                        self.node.setDriver('ST', remote_key + press, type=message_type)
-                        self.node.setDriver('GV1', remote_key, type=message_type)
-                        self.node.setDriver('GV2', press, type=message_type)                        
+                            #self.yoSmartRemote.clearEventData()
+                            #logging.debug('clearEventData')
+                        if isinstance(remote_key, int) and isinstance(press, int):
+                            self.node.setDriver('GV0', remote_key + press, type=message_type)
+                            self.node.setDriver('ST', remote_key + press, type=message_type)
+                        if isinstance(remote_key, int):
+                            self.node.setDriver('GV1', remote_key, type=message_type)
+                        if isinstance(press, int):  
+                            self.node.setDriver('GV2', press, type=message_type)                        
                     self.node.setDriver('GV3', self.yoSmartRemote.getBattery(), type=message_type)
                     logging.debug("udiYoSmartRemoter temp: {}".format(self.yoSmartRemote.getDevTemperature()))
                     if self.temp_unit == 0:
@@ -419,6 +424,9 @@ class udiYoSmartRemoter(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoSmartRemoter')
+        if self.node is not None:
+            while not self.node_ready or not self.system_ready:
+                time.sleep(0.5)
         self.yoSmartRemote.updateStatus(data)
         self.updateData()
 

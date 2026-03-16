@@ -67,8 +67,8 @@ class udiYoBatteryHub(udi_interface.Node):
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
-        self.adr_list = []
-        self.adr_list.append(address)
+  
+        self.adr_list = [address]
         self.node_ready = True
     
  
@@ -142,6 +142,9 @@ class udiYoBatteryHub(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('updateStatus - Hub')
+        if self.node is not None:
+            while not self.node_ready or not self.system_ready:
+                time.sleep(0.5)
         self.yoHub.updateStatus(data)
         self.updateData()
            
@@ -202,8 +205,7 @@ class udiYoHub(udi_interface.Node):
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
-        self.adr_list = []
-        self.adr_list.append(address)
+        self.adr_list = [address]
         self.node_ready = True
     
  
@@ -278,6 +280,9 @@ class udiYoHub(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('updateStatus - Hub')
+        if self.node is not None:
+            while not self.node_ready or not self.system_ready:
+                time.sleep(0.5)        
         self.yoHub.updateStatus(data)
         self.updateData()
            

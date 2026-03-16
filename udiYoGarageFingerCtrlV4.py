@@ -99,7 +99,7 @@ class udiYoGarageFinger(udi_interface.Node):
 
         logging.debug(data)
         if self.node is not None:
-            while not self.node_ready:
+            while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
             self.yoDoorControl.updateCallbackStatus(data)
             self.my_setDriver('ST',1)
