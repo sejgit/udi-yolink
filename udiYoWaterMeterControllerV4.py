@@ -151,7 +151,7 @@ class udiYoWaterMeterController(udi_interface.Node):
         self.my_setDriver('GV20', 0)
         self.yoWaterCtrl= YoLinkWaterMeter(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
-        self.yoWaterCtrl.initNode()
+        self.yoWaterCtrl.initDevice()
         time.sleep(1)
         tries = 1
         while not self.yoWaterCtrl.check_system_online() and (tries <= 5 or self.yoWaterCtrl.throttled()):

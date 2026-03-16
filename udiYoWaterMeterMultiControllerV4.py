@@ -104,7 +104,8 @@ class udiYoWaterMeterMulti(udi_interface.Node):
             logging.error('YoLinkWaterMultiMeter not created')
             return
         else:
-            self.yoWaterCtrl.initNode()
+            time.sleep(2)
+            self.yoWaterCtrl.initDevice()
             time.sleep(1)
             tries = 1
             while not self.yoWaterCtrl.check_system_online() and (tries <= 5 or self.yoWaterCtrl.throttled()):
@@ -347,8 +348,8 @@ class udiYoSubWaterMeter(udi_interface.Node):
         #self.yoWaterCtrl= YoLinkWaterMultiMeter(self.yoAccess, self.yoWaterCtrl.devInfo, self.updateStatus)
         
         #time.sleep(4)
-        #self.yoWaterCtrl.initNode()
-        time.sleep(2)
+        #self.yoWaterCtrl.initDevice()
+        #time.sleep(2)
         tries = 1
         while not self.yoWaterCtrl.check_system_online() and (tries <= 5 or self.yoWaterCtrl.throttled()):
             logging.info('Waiting for device to come online...')

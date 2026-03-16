@@ -89,7 +89,7 @@ class udiYoThermostat(udi_interface.Node):
             time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         self.yoThermostat = YoLinkThermostat(self.yoAccess, self.devInfo, self.updateStatus)
-        time.sleep(1)
+        time.sleep(2)
         self.yoThermostat.initDevice()
         time.sleep(1)
         tries = 1

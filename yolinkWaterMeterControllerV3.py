@@ -32,17 +32,17 @@ class YoLinkWaterMeter(YoLinkMQTTDevice):
 
 
     
-    def initNode(yolink):
+    def initDevice (yolink):
         logging.debug('init node')
         yolink.WMcount = None
         yolink.meter_unit = None
         yolink.water_meter_count = 1 
         yolink.refreshDevice()
-        time.sleep(2)
-        logging.debug(f'Water Meter Controller - GV23 maxSchedules: {yolink.maxSchedules}')
+        #time.sleep(2)
+        #logging.debug(f'Water Meter Controller - GV23 maxSchedules: {yolink.maxSchedules}')
 
-        if not yolink.check_system_online():
-            logging.error('Water Meter Controller device not online')
+        #if not yolink.check_system_online():
+        #    logging.error('Water Meter Controller device not online')
         #    yolink.refreshSchedules()
         #else:
         #    

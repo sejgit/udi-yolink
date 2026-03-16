@@ -72,6 +72,7 @@ class udiYoSprinkler2(udi_interface.Node):
         self.n_queue = []
         self.yoAccess = yoAccess
         self.ValveSupported = True
+
         self.temp_unit = self.yoAccess.get_temp_unit()
         self.water_unit = self.yoAccess.get_water_unit()  
         model = str(deviceInfo['modelName'][:6])  
@@ -83,6 +84,7 @@ class udiYoSprinkler2(udi_interface.Node):
         self.yoSprinkler= None
         self.schedule = None
         self.node_ready = False
+        self.system_ready = False        
         self.last_state = ''
         self.timer_cleared = True
         self.timer_update = 5
