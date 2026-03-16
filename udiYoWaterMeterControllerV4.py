@@ -180,9 +180,10 @@ class udiYoWaterMeterController(udi_interface.Node):
             self.schedule_leak = udiYoSchedule(self.poly, self.address, sch_address_leak, 'Leak Schedules', self.yoAccess, self.devInfo, schedule_type='leak')
             self.adr_list.append(sch_address_leak)        
             time.sleep(2)
+            self.yoWaterCtrl.refreshSchedules()
 
         # Prime schedule data for both child schedule nodes.
-        #self.yoWaterCtrl.refreshSchedules()
+            
         #self.updateData()
         self.system_ready=True
 
@@ -493,7 +494,8 @@ class udiYoWaterMeterController(udi_interface.Node):
         self.yoWaterCtrl.refreshDevice()
         time.sleep(2)
         # Keep both schedule nodes synchronized on explicit UPDATE.
-        self.yoWaterCtrl.refreshSchedules()
+        if self.scheduleSupport:
+            self.yoWaterCtrl.refreshSchedules()
         
     def program_delays(self, command):
         logging.info('udiYoOutlet program_delays {}'.format(command))
