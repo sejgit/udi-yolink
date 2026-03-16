@@ -573,7 +573,7 @@ class YoLinkInitPAC(object):
             #pass
             #yoAccess.messageLock.release()
 
-
+    '''
     #@measure_time
     def process_messageORG(yoAccess):
         try:
@@ -673,7 +673,8 @@ class YoLinkInitPAC(object):
             logging.debug('message processing timeout - no new commands') 
             pass
             #yoAccess.messageLock.release()
-
+    '''
+    
     #@measure_time
     def on_message(yoAccess, client, userdata, msg):
         """

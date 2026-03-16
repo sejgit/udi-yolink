@@ -195,6 +195,7 @@ class YoLinkMQTTDevice(object):
         data['method'] = methodStr
         data["targetDevice"] =  yolink.deviceInfo['deviceId']
         data["token"]= yolink.deviceInfo['token']
+        data['params'] = {}
         #logging.debug  ('refreshDevice')
         yolink.yoAccess.publish_data(data) 
         #while not yolink.yoAccess.publish_data(data) and attempt <= maxAttempts:
@@ -991,6 +992,7 @@ class YoLinkMQTTDevice(object):
                 data['method'] = valve_method
                 data["targetDevice"] = yolink.deviceInfo['deviceId']
                 data["token"] = yolink.deviceInfo['token']
+                data['params'] = {}
                 yolink.yoAccess.publish_data(data)
 
             data = {}
@@ -999,6 +1001,7 @@ class YoLinkMQTTDevice(object):
                 data['method'] = leak_method
                 data["targetDevice"] = yolink.deviceInfo['deviceId']
                 data["token"] = yolink.deviceInfo['token']
+                data['params'] = {} 
                 yolink.yoAccess.publish_data(data)
         else:
             methodStr = yolink.type + '.getSchedules'
@@ -1006,6 +1009,7 @@ class YoLinkMQTTDevice(object):
                 data['method'] = methodStr
                 data["targetDevice"] = yolink.deviceInfo['deviceId']
                 data["token"] = yolink.deviceInfo['token']
+                data['params'] = {}
                 yolink.yoAccess.publish_data(data)
             
     
