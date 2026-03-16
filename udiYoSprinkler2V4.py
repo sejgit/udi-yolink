@@ -106,7 +106,7 @@ class udiYoSprinkler2(udi_interface.Node):
         self.adr_list = []
         self.adr_list.append(address)
         logging.debug('udiYoSprinkler2 INIT done- {}'.format(self.commands))
-
+        self.node_ready = True
 
     def start(self):
         logging.info('Start - udiYoSprinkler2')
@@ -136,9 +136,8 @@ class udiYoSprinkler2(udi_interface.Node):
         self.adr_list.append(sch_address)
         #time.sleep(2)
         # Prime schedule node values immediately after startup.
-        #self.yoSprinkler.refreshSchedules()
-        
-        self.node_ready = True
+        #self.yoSprinkler.refreshSchedules()        
+        self.system_ready = True
         #self.updateData()
 
     def stop (self):
