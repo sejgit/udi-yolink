@@ -680,7 +680,7 @@ class OnOffScheduleNode(BaseScheduleNode):
             self.yoSchedule.setSchedule(schedule_selected, params)
 
     def _get_schedule_type_name(self):
-        return 'OnOff'
+        return ('OnOff')
 
     commands = {
         'UPDATE': BaseScheduleNode.update,

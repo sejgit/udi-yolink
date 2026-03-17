@@ -259,10 +259,10 @@ class YoLinkMQTTDevice(object):
                 return(0)            
         elif 'reportAt' in yolink.data:
             timestamp = yolink.data.get('reportAt')
-            dt = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")
-            
-            logging.debug('lastUpdate reportAt {}'.format(int(dt.timestamp())))
-            return(dt.timestamp()*1000) # make in ms
+            if isinstance(timestamp, str):
+                dt = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")                
+                logging.debug('lastUpdate reportAt {}'.format(int(dt.timestamp())))
+                return(dt.timestamp()*1000) # make in ms
         elif 'time' in yolink.data:
             logging.debug('lastUpdate time {}'.format(yolink.data.get('time')))
 
@@ -685,7 +685,7 @@ class YoLinkMQTTDevice(object):
 
                         yolink.updateScheduleStatus(data)
                     elif  '.setSchedules' in data['method'] or '.setValveSchedules' in data['method'] or '.setLeakSchedules' in data['method']:
-                        logging.debug('callback setSchedules t={} lu={} d={}'.format(data['time'],  int(yolink.getLastUpdate(),data )))
+                        logging.debug('callback setSchedules t={} lu={} d={}'.format(data['time'],  yolink.getLastUpdate(),data ))
 
                         yolink.updateScheduleStatus(data)
 
@@ -1022,7 +1022,7 @@ class YoLinkMQTTDevice(object):
         data["targetDevice"] =  yolink.deviceInfo['deviceId']
         data["token"]= yolink.deviceInfo['token']
         data['params'] = {}
-        if isinstance (yolink.schedules, dict) and len(yolink.schedules != 0):
+        if isinstance (yolink.schedules, dict) and len(yolink.schedules) != 0:
             data['params']['sches'] = yolink.schedules
         else:
             yolink.getSchedules()
