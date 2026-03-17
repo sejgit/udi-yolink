@@ -230,7 +230,7 @@ class YoLinkInitPAC(object):
                 return(True)
 
             except Exception as e:
-                logging.error('Exeption occcured during request_new_token : {}'.format(e))
+                logging.error('Exception occcured during request_new_token : {}'.format(e))
                 return(False)
         else:
             yoAccess.refresh_token()  
@@ -285,7 +285,7 @@ class YoLinkInitPAC(object):
 
 
         except Exception as e:
-            logging.error(f'Exeption occcured during refresh_token {yoAccess.access_mode} : {e}')
+            logging.error(f'Exception occcured during refresh_token {yoAccess.access_mode} : {e}')
             #return(yoAccess.request_new_token())
 
    
@@ -674,7 +674,7 @@ class YoLinkInitPAC(object):
             pass
             #yoAccess.messageLock.release()
     '''
-    
+
     #@measure_time
     def on_message(yoAccess, client, userdata, msg):
         """
@@ -809,7 +809,7 @@ class YoLinkInitPAC(object):
 
 
             except Exception as e:
-                logging.error(f'Exeption occcured during on_ disconnect : {e}')
+                logging.error(f'Exception occcured during on_ disconnect : {e}')
                 if yoAccess:
                     yoAccess.refresh_token()
                 else:

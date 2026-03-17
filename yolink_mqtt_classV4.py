@@ -782,8 +782,11 @@ class YoLinkMQTTDevice(object):
 
                 elif '.setInitState' in  data['event']:
                         #yolink.updateStatusData(data)
-                        yolink.initData(data)
-                        yolink.updateScheduleStatus(data)   
+                        #yolink.initData(data)
+                        # there is no memery, so jet get the latest data from teh device 
+                        yolink.refreshDevice()
+                        yolink.refreshSchedules()
+                        #yolink.updateScheduleStatus(data)   
                 #else:
                 #    logging.debug('Unsupported Event passed - trying anyway; {}'.format(data) )
                 #    if int(data['time']) >= int(yolink.getLastUpdate()):
@@ -1285,12 +1288,16 @@ class YoLinkMQTTDevice(object):
                 yolink.data['lastStateTime'] = data[yolink.messageTime]
             if 'event' in data:
                 if ".initData" in data['event']:
-                    logging.debug("initData detected")               
+                    logging.debug("initData detected")
+                    state_cache = yolink.data.get(yolink.dData, {}).setdefault(yolink.dState, {})
                     for key in data[yolink.dData]:
                         #logging.debug('Adding data values {} {}'.format(key, data[yolink.dData][key]))
-                        yolink.data.get(yolink.dData, {})[yolink.dState][key] = data[yolink.dData][key]
+                        if key == yolink.dState:
+                            logging.debug('Skipping nested state copy during initData to avoid self-reference')
+                            continue
+                        state_cache[key] = data[yolink.dData][key]
                         if key == 'initState':
-                            yolink.data.get(yolink.dData, {})[yolink.dState]['state'] = data[yolink.dData][key]
+                            state_cache['state'] = data[yolink.dData][key]
                 else:
                     #logging.debug('adding event data {}'.format(data[yolink.dData]))
                     if yolink.dState not in  yolink.data.get(yolink.dData, {}):
@@ -1328,6 +1335,7 @@ class YoLinkMQTTDevice(object):
             A list of extracted values (empty if not found).
         """
         results = []
+        visited = set()
 
         #def safe_get(d: Any, k: str) -> Any:
         #    """Safely get a key from a dict, return None if not found."""
@@ -1335,6 +1343,11 @@ class YoLinkMQTTDevice(object):
 
         def traverse(obj: Any):
             """Recursively traverse dicts/lists to find matching keys."""
+            if isinstance(obj, (dict, list)):
+                obj_id = id(obj)
+                if obj_id in visited:
+                    return
+                visited.add(obj_id)
             if isinstance(obj, dict):
                 if key1 in obj and isinstance(obj[key1], dict):
                     if key2 in obj[key1]:
