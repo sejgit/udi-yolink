@@ -19,7 +19,7 @@ from yolinkThermostatV2 import YoLinkThermostat
 
 
 class udiYoThermostat(udi_interface.Node):
-    from udiYolinkLib import my_setDriver, node_queue, wait_for_node_done
+    from udiYolinkLib import my_setDriver, node_queue, wait_for_node_done, checkNameSync
 
     id = 'yothermostat'
 
@@ -412,7 +412,7 @@ class udiYoThermostat(udi_interface.Node):
 
 
 class udiYoThermostatProperties(udi_interface.Node):
-    from udiYolinkLib import my_setDriver, node_queue, wait_for_node_done
+    from udiYolinkLib import my_setDriver, node_queue, wait_for_node_done, checkNameSync
 
     id = 'yothermprop'
 

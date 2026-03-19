@@ -41,7 +41,7 @@ class BaseScheduleNode(udi_interface.Node):
     - Manage schedule activation/deactivation
     """
     
-    from  udiYolinkLib import my_setDriver, node_queue, wait_for_node_done
+    from  udiYolinkLib import my_setDriver, node_queue, wait_for_node_done, checkNameSync
 
     def _is_schedule_message(self, source):
         """True only when latest packet type/action is schedule-related."""

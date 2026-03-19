@@ -21,7 +21,7 @@ from yolinkWaterMeterControllerV3 import YoLinkWaterMeter
 
 
 class udiYoWaterMeterOnly(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, water_meter_unit2uom, calculate_water_volume, bool2ISY, node_queue, wait_for_node_done
+    from  udiYolinkLib import my_setDriver, water_meter_unit2uom, calculate_water_volume, bool2ISY, node_queue, wait_for_node_done, checkNameSync
 
     id = 'yowatermeterOnly'
     '''

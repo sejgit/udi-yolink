@@ -20,7 +20,7 @@ from yolinkInfraredRemoterV3 import YoLinkInfraredRem
 from udiYoSchedule import udiYoSchedule
 
 class udiYoInfraredCode(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, node_queue, wait_for_node_done
+    from  udiYolinkLib import my_setDriver, node_queue, wait_for_node_done, set_node_custom, get_node_custom
 
     '''
        drivers = [
@@ -42,6 +42,9 @@ class udiYoInfraredCode(udi_interface.Node):
         super().__init__( polyglot, primary, address, name)   
         self.yoIRrem = yoIRrem
         self.code = code_indx
+        self.saved_name = None
+        self.name_check_interval = 30
+        self.last_name_check = 0
         self.n_queue = []   
         self.poly.ready()
        
@@ -52,13 +55,48 @@ class udiYoInfraredCode(udi_interface.Node):
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
+        # persist current node name if not set, or restore saved name
+        try:
+            saved = get_node_custom(self, 'saved_name')
+            if saved:
+                self.saved_name = saved
+                if self.node.name != saved:
+                    try:
+                        self.node.rename(saved)
+                        logging.info(f'Restored node name for {self.address} to saved name {saved}')
+                    except Exception as e:
+                        logging.debug(f'Failed to restore node name for {self.address}: {e}')
+            else:
+                set_node_custom(self, 'saved_name', self.node.name)
+                self.saved_name = self.node.name
+        except Exception as e:
+            logging.debug(f'Error handling custom name for {self.address}: {e}')
         time.sleep(2)
         self.updateData()
 
     def checkDataUpdate(self):
         if self.yoIRrem.data_updated():
-
             self.updateData()
+
+    def checkNameSync(self):
+        # enforce persisted name during longPoll
+        try:
+            now = time.time()
+            if now - self.last_name_check >= self.name_check_interval:
+                self.last_name_check = now
+                if self.saved_name is None:
+                    self.saved_name = get_node_custom(self, 'saved_name')
+                if self.saved_name and self.node and self.node.name != self.saved_name:
+                    try:
+                        self.node.rename(self.saved_name)
+                        logging.info(f'Renamed node {self.address} to saved name {self.saved_name}')
+                    except Exception as e:
+                        logging.debug(f'Failed to rename node {self.address} to saved name: {e}')
+                elif not self.saved_name:
+                    set_node_custom(self, 'saved_name', self.node.name)
+                    self.saved_name = self.node.name
+        except Exception as e:
+            logging.debug(f'checkNameSync name handling error for {self.address}: {e}')
             
     def checkOnline(self):
         pass  #is it a sub node - do nothing
@@ -133,7 +171,7 @@ class udiYoInfraredCode(udi_interface.Node):
 
 
 class udiYoInfraredRemoter(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, update_schedule_data, node_queue, wait_for_node_done
+    from  udiYolinkLib import my_setDriver, update_schedule_data, node_queue, wait_for_node_done, set_node_custom, get_node_custom
 
 
     '''
@@ -167,6 +205,9 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.primary = primary
         self.yoIRrem = None
         self.schedule = None
+        self.saved_name = None
+        self.name_check_interval = 30
+        self.last_name_check = 0
         self.node_ready = False
         self.system_ready=False
         self.powerSupported = True # assume 
@@ -182,6 +223,22 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
+        # persist or restore parent node name
+        try:
+            saved = get_node_custom(self, 'saved_name')
+            if saved:
+                self.saved_name = saved
+                if self.node.name != saved:
+                    try:
+                        self.node.rename(saved)
+                        logging.info(f'Restored parent node name for {self.address} to saved name {saved}')
+                    except Exception as e:
+                        logging.debug(f'Failed to restore parent node name for {self.address}: {e}')
+            else:
+                set_node_custom(self, 'saved_name', self.node.name)
+                self.saved_name = self.node.name
+        except Exception as e:
+            logging.debug(f'Error handling parent custom name for {self.address}: {e}')
         self.adr_list = []
         self.adr_list.append(address)   
         self.codes_used = []
@@ -244,6 +301,30 @@ class udiYoInfraredRemoter(udi_interface.Node):
     def checkDataUpdate(self):
         if self.yoIRrem.data_updated():
             self.updateData()
+
+    def checkNameSync(self):
+        # enforce persisted parent and child names during longPoll
+        try:
+            now = time.time()
+            if now - self.last_name_check >= self.name_check_interval:
+                self.last_name_check = now
+                if self.saved_name is None:
+                    self.saved_name = get_node_custom(self, 'saved_name')
+                if self.saved_name and self.node and self.node.name != self.saved_name:
+                    try:
+                        self.node.rename(self.saved_name)
+                        logging.info(f'Renamed parent node {self.address} to saved name {self.saved_name}')
+                    except Exception as e:
+                        logging.debug(f'Failed to rename parent node {self.address} to saved name: {e}')
+                elif not self.saved_name:
+                    set_node_custom(self, 'saved_name', self.node.name)
+                    self.saved_name = self.node.name
+
+                for code_node in self.code_nodes.values():
+                    if hasattr(code_node, 'checkNameSync'):
+                        code_node.checkNameSync()
+        except Exception as e:
+            logging.debug(f'checkNameSync parent name handling error for {self.address}: {e}')
 
     def err_code2nbr(self, status_code):
         #if status_code == 'notLearn':

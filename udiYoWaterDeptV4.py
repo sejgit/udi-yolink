@@ -20,7 +20,7 @@ from yolinkWaterDeptV3 import YoLinkWaterDeptSensor
 
 
 class udiYoWaterDept(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, retrieve_cmd_state, bool2ISY, node_queue, wait_for_node_done
+    from  udiYolinkLib import my_setDriver, retrieve_cmd_state, bool2ISY, node_queue, wait_for_node_done, checkNameSync
 
     id = 'yowaterdept'
     

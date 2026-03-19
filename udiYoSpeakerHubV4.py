@@ -21,7 +21,7 @@ import time
 from yolinkSpeakerHubV3 import YoLinkSpeakerH
 
 class udiYoSpeakerHub(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, bool2ISY, node_queue, wait_for_node_done
+    from  udiYolinkLib import my_setDriver, bool2ISY, node_queue, wait_for_node_done, checkNameSync
     id = 'yospeakerh'
     drivers = [
             {'driver': 'ST', 'value': 0, 'uom': 25},

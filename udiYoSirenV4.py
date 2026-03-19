@@ -19,7 +19,7 @@ from yolinkSirenV3 import YoLinkSiren
 
 
 class udiYoSiren(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, node_queue, wait_for_node_done
+    from  udiYolinkLib import my_setDriver, node_queue, wait_for_node_done, checkNameSync
 
     id = 'yosiren'
     '''

@@ -19,7 +19,7 @@ from yolinkVibrationSensorV3 import YoLinkVibrationSensor
 
 
 class udiYoVibrationSensor(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, node_queue, wait_for_node_done
+    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, node_queue, wait_for_node_done, checkNameSync
 
     id = 'yovibrasens'
     

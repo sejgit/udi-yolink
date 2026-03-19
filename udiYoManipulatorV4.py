@@ -22,7 +22,7 @@ from udiYoSchedule import udiYoSchedule
 
 
 class udiYoManipulator(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done
+    from  udiYolinkLib import my_setDriver, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, checkNameSync
     id = 'yomanipu'
     '''
        drivers = [

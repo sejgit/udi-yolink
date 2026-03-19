@@ -570,6 +570,39 @@ def checkNodes(self):
             self.addNodes(devList)
 
 
+def saveNodeNames(self):
+    """Check all Polyglot nodes for ISY-side name changes and persist via
+    Polyglot customdata store (Custom(poly, 'customdata')).
+    Called from longPoll so saves happen promptly after a user renames on ISY.
+    """
+    try:
+        cd = Custom(self.poly, 'customdata')
+        nodes = self.poly.getNodes()
+        for addr, node in nodes.items():
+            if addr == 'setup':
+                continue
+            try:
+                current_name = getattr(node, 'name', None)
+                if not current_name:
+                    continue
+                node_key = f"{addr}_saved_name"
+                saved = cd.get(node_key)
+                if saved != current_name:
+                    cd[node_key] = current_name
+                    if saved is not None:
+                        logging.info(f'saveNodeNames: {addr} name changed \'{saved}\' -> \'{current_name}\' saved')
+                    else:
+                        logging.debug(f'saveNodeNames: {addr} name \'{current_name}\' saved for first time')
+                    # update in-memory cache on any matching yolink_node
+                    ynode = self.yolink_nodes.get(addr)
+                    if ynode is not None:
+                        ynode._name_sync_saved = current_name
+            except Exception as e:
+                logging.debug(f'saveNodeNames: error processing {addr}: {e}')
+    except Exception as e:
+        logging.error(f'saveNodeNames: unexpected error: {e}')
+
+
 def systemPoll (self, polltype):
     if self.pollStart:
         logging.debug('System Poll executing: {}'.format(polltype))
@@ -586,9 +619,12 @@ def systemPoll (self, polltype):
                     #logging.info('Updating device status')
                     #nodes = self.poly.getNodes()
                     
+                    self.saveNodeNames()
                     for nde in self.yolink_nodes:
                         if nde != 'setup':   # but not the controller node
                             self.yolink_nodes[nde].checkOnline()
+                            if hasattr(self.yolink_nodes[nde], 'checkNameSync'):
+                                self.yolink_nodes[nde].checkNameSync()
                             logging.debug('longpoll {}'.format(nde))
                             time.sleep(5) # need to limit calls to 100 per  5 min - using 5 to allow other calls - updating is not critical
                 except Exception as e:

@@ -267,6 +267,94 @@ def isy_value(self, value):
         return (99)
     else:
         return(value)
+
+
+def set_node_custom(self, key, value):
+    """Persist small node-level custom data using Polyglot customdata store,
+    with fallback to a per-node JSON file when running without Polyglot."""
+    try:
+        if hasattr(self, 'poly'):
+            try:
+                cd = Custom(self.poly, 'customdata')
+                cd[f"{self.address}_{key}"] = value
+                logging.debug(f'set_node_custom customdata: {self.address}_{key}={value}')
+                return
+            except Exception as e:
+                logging.debug(f'set_node_custom customdata failed: {e}')
+        # fallback to file per-address (e.g. when running without Polyglot)
+        fname = f"{self.address}_custom.json"
+        try:
+            try:
+                with open(fname, 'r') as fh:
+                    data = json.load(fh)
+            except Exception:
+                data = {}
+            data[key] = value
+            with open(fname, 'w') as fh:
+                json.dump(data, fh)
+            logging.debug(f'set_node_custom fallback file {fname} {key}={value}')
+        except Exception as e:
+            logging.error(f'Failed to write node custom data file {fname}: {e}')
+    except Exception as e:
+        logging.error(f'set_node_custom unexpected error: {e}')
+
+
+def get_node_custom(self, key):
+    """Retrieve node-level custom data. Returns None if not found."""
+    try:
+        if hasattr(self, 'poly'):
+            try:
+                cd = Custom(self.poly, 'customdata')
+                val = cd.get(f"{self.address}_{key}")
+                if val is not None:
+                    logging.debug(f'get_node_custom customdata: {self.address}_{key}={val}')
+                    return val
+            except Exception as e:
+                logging.debug(f'get_node_custom customdata failed: {e}')
+        fname = f"{self.address}_custom.json"
+        try:
+            with open(fname, 'r') as fh:
+                data = json.load(fh)
+            if key in data:
+                logging.debug(f'get_node_custom fallback file {fname} {key}={data[key]}')
+                return data[key]
+        except Exception:
+            return None
+    except Exception as e:
+        logging.error(f'get_node_custom unexpected error: {e}')
+    return None
+
+
+def checkNameSync(self):
+    """Called during longPoll to detect ISY-side node renames and re-apply saved names.
+    Uses lazy instance attributes so no per-class __init__ changes are needed."""
+    now = time.time()
+    if not hasattr(self, '_name_sync_last'):
+        self._name_sync_last = 0
+        self._name_sync_saved = None
+    if now - self._name_sync_last < 30:
+        return
+    self._name_sync_last = now
+    node = getattr(self, 'node', None)
+    if node is None:
+        return
+    try:
+        if self._name_sync_saved is None:
+            self._name_sync_saved = get_node_custom(self, 'saved_name')
+        if self._name_sync_saved:
+            if getattr(node, 'name', None) != self._name_sync_saved:
+                try:
+                    node.rename(self._name_sync_saved)
+                    logging.info(f'checkNameSync: renamed {self.address} to {self._name_sync_saved}')
+                except Exception as e:
+                    logging.debug(f'checkNameSync: rename failed for {self.address}: {e}')
+        else:
+            name = getattr(node, 'name', None)
+            if name:
+                set_node_custom(self, 'saved_name', name)
+                self._name_sync_saved = name
+    except Exception as e:
+        logging.debug(f'checkNameSync error for {self.address}: {e}')
     
 def daylist2bin(self, daylist):
     sum = 0

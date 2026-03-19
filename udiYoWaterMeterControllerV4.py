@@ -22,7 +22,7 @@ from udiYoSchedule import udiYoSchedule
 
 
 class udiYoWaterMeterController(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, w_unit2ISY, water_meter_unit2uom, calculate_water_volume, state2ISY, bool2ISY, update_schedule_data, node_queue, wait_for_node_done
+    from  udiYolinkLib import my_setDriver, w_unit2ISY, water_meter_unit2uom, calculate_water_volume, state2ISY, bool2ISY, update_schedule_data, node_queue, wait_for_node_done, checkNameSync
 
     id = 'yowatermeterCtrl'
     '''

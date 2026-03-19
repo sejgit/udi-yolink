@@ -21,7 +21,7 @@ import time
 from yolinkHubV3 import YoLinkHub
 
 class udiYoBatteryHub(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, wait_for_node_done, node_queue
+    from  udiYolinkLib import my_setDriver, wait_for_node_done, node_queue, checkNameSync
     '''
        drivers = [
             'ST' =  Powered
@@ -162,7 +162,7 @@ class udiYoBatteryHub(udi_interface.Node):
 
 
 class udiYoHub(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, wait_for_node_done, node_queue
+    from  udiYolinkLib import my_setDriver, wait_for_node_done, node_queue, checkNameSync
     id = 'yohub'
     drivers = [
             #{'driver': 'GV0', 'value': 99, 'uom': 25},
