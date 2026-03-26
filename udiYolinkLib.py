@@ -341,6 +341,11 @@ def checkNameSync(self):
     try:
         if self._name_sync_saved is None:
             self._name_sync_saved = get_node_custom(self, 'saved_name')
+        if self._name_sync_saved and hasattr(self, 'poly'):
+            valid_name = self.poly.getValidName(self._name_sync_saved)
+            if valid_name != self._name_sync_saved:
+                self._name_sync_saved = valid_name
+                set_node_custom(self, 'saved_name', valid_name)
         if self._name_sync_saved:
             if getattr(node, 'name', None) != self._name_sync_saved:
                 try:
@@ -351,10 +356,41 @@ def checkNameSync(self):
         else:
             name = getattr(node, 'name', None)
             if name:
+                if hasattr(self, 'poly'):
+                    name = self.poly.getValidName(name)
                 set_node_custom(self, 'saved_name', name)
                 self._name_sync_saved = name
     except Exception as e:
         logging.debug(f'checkNameSync error for {self.address}: {e}')
+
+
+def saveCurrentNodeNames(self):
+    """Persist current Polyglot node names through the setup controller.
+    This reuses YoLinkSetup.saveNodeNames() so UPDATE and STOP follow the
+    same persistence path as longPoll."""
+    try:
+        poly = getattr(self, 'poly', None)
+        if poly is None:
+            return False
+
+        setup_node = None
+        try:
+            setup_node = poly.getNode('setup')
+        except Exception:
+            setup_node = None
+
+        if setup_node is None:
+            try:
+                setup_node = poly.getNodes().get('setup')
+            except Exception:
+                setup_node = None
+
+        if setup_node is not None and hasattr(setup_node, 'saveNodeNames'):
+            setup_node.saveNodeNames()
+            return True
+    except Exception as e:
+        logging.debug(f'saveCurrentNodeNames error for {getattr(self, "address", "unknown")}: {e}')
+    return False
     
 def daylist2bin(self, daylist):
     sum = 0

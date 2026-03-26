@@ -19,7 +19,7 @@ import math
 from yolinkSmartRemoterV3 import YoLinkSmartRemoter
 
 class udiRemoteKey(udi_interface.Node):
-    from  udiYolinkLib import save_cmd_struct, retrieve_cmd_struct, node_queue, wait_for_node_done, mask2key, set_node_custom, get_node_custom
+    from  udiYolinkLib import save_cmd_struct, retrieve_cmd_struct, node_queue, wait_for_node_done, mask2key, set_node_custom, get_node_custom, checkNameSync
 
     id = 'smremotekey'
     drivers = [
@@ -39,9 +39,6 @@ class udiRemoteKey(udi_interface.Node):
         self.SHORT_CMD = self.address+'_S_CMD'
         self.name = name
         self.primary = primary
-        self.saved_name = None
-        self.name_check_interval = 30
-        self.last_name_check = 0
         #self.presstype = 99
         self.long_press_state = 'UNKNOWN'
         self.short_press_state = 'UNKNOWN'
@@ -72,9 +69,11 @@ class udiRemoteKey(udi_interface.Node):
         self.node = self.poly.getNode(address)
         # persist or restore saved name for key node
         try:
-            saved = get_node_custom(self, 'saved_name')
+            saved = self.get_node_custom('saved_name')
             if saved:
-                self.saved_name = saved
+                saved = self.poly.getValidName(saved)
+                self._name_sync_saved = saved
+                self.set_node_custom('saved_name', saved)
                 if self.node.name != saved:
                     try:
                         self.node.rename(saved)
@@ -82,8 +81,8 @@ class udiRemoteKey(udi_interface.Node):
                     except Exception as e:
                         logging.debug(f'Failed to restore key node name for {self.address}: {e}')
             else:
-                set_node_custom(self, 'saved_name', self.node.name)
-                self.saved_name = self.node.name
+                self.set_node_custom('saved_name', self.node.name)
+                self._name_sync_saved = self.node.name
         except Exception as e:
             logging.debug(f'Error handling key custom name for {self.address}: {e}')
      
@@ -119,25 +118,6 @@ class udiRemoteKey(udi_interface.Node):
 
     def checkDataUpdate(self):
         pass
-
-    def checkNameSync(self):
-        try:
-            now = time.time()
-            if now - self.last_name_check >= self.name_check_interval:
-                self.last_name_check = now
-                if self.saved_name is None:
-                    self.saved_name = get_node_custom(self, 'saved_name')
-                if self.saved_name and self.node and self.node.name != self.saved_name:
-                    try:
-                        self.node.rename(self.saved_name)
-                        logging.info(f'Renamed key node {self.address} to saved name {self.saved_name}')
-                    except Exception as e:
-                        logging.debug(f'Failed to rename key node {self.address} to saved name: {e}')
-                elif not self.saved_name:
-                    set_node_custom(self, 'saved_name', self.node.name)
-                    self.saved_name = self.node.name
-        except Exception as e:
-            logging.debug(f'checkNameSync key name handling error for {self.address}: {e}')
 
     def updateLastTime(self):
         pass
@@ -262,7 +242,7 @@ class udiRemoteKey(udi_interface.Node):
 
 
 class udiYoSmartRemoter(udi_interface.Node):
-    from  udiYolinkLib import node_queue, wait_for_node_done, set_node_custom, get_node_custom
+    from  udiYolinkLib import node_queue, wait_for_node_done, set_node_custom, get_node_custom, checkNameSync as sharedCheckNameSync, saveCurrentNodeNames
 
     id = 'yosmremote'
 
@@ -309,9 +289,6 @@ class udiYoSmartRemoter(udi_interface.Node):
         self.yoSmartRemote  = None
         self.node_ready = False
         self.system_ready=False
-        self.saved_name = None
-        self.name_check_interval = 30
-        self.last_name_check = 0
         self.last_state = 99
         self.n_queue = []
         self.max_remote_keys = 8
@@ -340,9 +317,11 @@ class udiYoSmartRemoter(udi_interface.Node):
         self.node_ready = True
         # persist or restore saved name for parent SmartRemoter
         try:
-            saved = get_node_custom(self, 'saved_name')
+            saved = self.get_node_custom('saved_name')
             if saved:
-                self.saved_name = saved
+                saved = self.poly.getValidName(saved)
+                self._name_sync_saved = saved
+                self.set_node_custom('saved_name', saved)
                 if self.node.name != saved:
                     try:
                         self.node.rename(saved)
@@ -350,8 +329,8 @@ class udiYoSmartRemoter(udi_interface.Node):
                     except Exception as e:
                         logging.debug(f'Failed to restore SmartRemoter node name for {self.address}: {e}')
             else:
-                set_node_custom(self, 'saved_name', self.node.name)
-                self.saved_name = self.node.name
+                self.set_node_custom('saved_name', self.node.name)
+                self._name_sync_saved = self.node.name
         except Exception as e:
             logging.debug(f'Error handling SmartRemoter custom name for {self.address}: {e}')
         
@@ -402,7 +381,8 @@ class udiYoSmartRemoter(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoSmartRemoter')
         self.node.setDriver('GV30', 0, True, True)
-        self.yoSmartRemote.shut_down()
+        if self.yoSmartRemote is not None:
+            self.yoSmartRemote.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 
@@ -414,28 +394,10 @@ class udiYoSmartRemoter(udi_interface.Node):
             self.updateData()
 
     def checkNameSync(self):
-        # ensure persisted parent and key names are enforced during longPoll
-        try:
-            now = time.time()
-            if now - self.last_name_check >= self.name_check_interval:
-                self.last_name_check = now
-                if self.saved_name is None:
-                    self.saved_name = get_node_custom(self, 'saved_name')
-                if self.saved_name and self.node and self.node.name != self.saved_name:
-                    try:
-                        self.node.rename(self.saved_name)
-                        logging.info(f'Renamed SmartRemoter parent node {self.address} to saved name {self.saved_name}')
-                    except Exception as e:
-                        logging.debug(f'Failed to rename SmartRemoter parent node {self.address} to saved name: {e}')
-                elif not self.saved_name:
-                    set_node_custom(self, 'saved_name', self.node.name)
-                    self.saved_name = self.node.name
-
-                for key_node in self.keys.values():
-                    if hasattr(key_node, 'checkNameSync'):
-                        key_node.checkNameSync()
-        except Exception as e:
-            logging.debug(f'checkNameSync name handling error for SmartRemoter {self.address}: {e}')
+        self.sharedCheckNameSync()
+        for key_node in self.keys.values():
+            if hasattr(key_node, 'checkNameSync'):
+                key_node.checkNameSync()
 
     def mask2key (self, mask):
         logging.debug('mask2key : {}'.format(mask))
@@ -518,6 +480,7 @@ class udiYoSmartRemoter(udi_interface.Node):
 
     def update(self, command = None):
         logging.info('udiYoSmartRemoter Update  Executed')
+        self.saveCurrentNodeNames()
         self.yoSmartRemote.refreshDevice()
     
 

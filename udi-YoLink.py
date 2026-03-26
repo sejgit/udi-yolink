@@ -173,6 +173,7 @@ class YoLinkSetup (udi_interface.Node):
             #self.yoAccess.writeTtsFile() #save current TTS messages
 
             self.my_setDriver('ST', 0)
+            self.saveNodeNames()
 
             if self.yoAccess:
                 self.yoAccess.shut_down()
@@ -180,6 +181,10 @@ class YoLinkSetup (udi_interface.Node):
             exit()
         except Exception as e:
             logging.error(f'Stop Exception : {e}')
+            try:
+                self.saveNodeNames()
+            except Exception as save_err:
+                logging.debug(f'Stop saveNodeNames failed: {save_err}')
             if self.yoAccess:
                 self.yoAccess.shut_down()
             self.poly.stop()

@@ -585,6 +585,7 @@ def saveNodeNames(self):
                 current_name = getattr(node, 'name', None)
                 if not current_name:
                     continue
+                current_name = self.poly.getValidName(current_name)
                 node_key = f"{addr}_saved_name"
                 saved = cd.get(node_key)
                 if saved != current_name:
