@@ -88,6 +88,8 @@ CMDP-key-NAME=Ir code Number (1-64)
 CMDP-ch-NAME=Output port(0-3)
 CMDP-index-NAME=Schedule Index
 ST-nlssmremote-GV1-NAME=Key Press Type
+CMD-nlssmremote-UPDATE-NAME=Update
+
 CMDP-onH-NAME=On Hour
 CMDP-onM-NAME=On Min
 CMDP-onS-NAME=On Seconds
