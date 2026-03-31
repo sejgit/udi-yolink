@@ -109,10 +109,11 @@ class udiYoDoorSensor(udi_interface.Node):
         #    self.poly.delNode(self.node.address)
 
     def doorState(self):
-        state = self.yoDoorSensor.get_data('state')
-        if state.lower() == 'closed':
+        state = self.yoDoorSensor.get_data('state','state')
+
+        if isinstance(state, str) and state.lower() == 'closed':
             return(0)
-        elif state.lower() == 'open':
+        elif isinstance(state, str) and state.lower() == 'open':
             return(1)
         else:
             return(99)

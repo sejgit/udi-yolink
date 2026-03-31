@@ -110,11 +110,11 @@ class udiYoLockV2(udi_interface.Node):
     def get_alerts(self):
         type = None
         info = {}
-        alert_info = self.get_data('alert')
-        if isinstance(alert_info, dict):
-            type = alert_info.get('type')
-            info = alert_info
-            del info['type']
+        #alert_info = self.yoLockget_data('alert')
+        #if isinstance(alert_info, dict):
+        type = self.yoLock.get_data('type','alert')
+        info = self.yoLock.get_data('source','alert')
+
         return type, info
 
     def source2ISY(self, source) -> int:

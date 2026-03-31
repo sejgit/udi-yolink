@@ -126,16 +126,19 @@ class udiYoDimmer(udi_interface.Node):
             tries += 1
 
         time.sleep(2)
+
         self.yoDimmer.get_attributes()
         sch_address = self.address[4:14] + '_SCH'
         sch_address = self.poly.getValidAddress(sch_address)
-        self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
-        self.adr_list.append(sch_address)
+
         self.dim_setting['dim'] = self.yoDimmer.get_data('brightness')
         self.yoDimmer.setBrightness(self.dim_setting['dim'])
         self.dim_setting['previous'] = self.yoDimmer.brightness
         #self.my_setDriver('ST', 1)
         self.yoDimmer.delayTimerCallback (self.updateDelayCountdown, self.timer_update )
+        self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
+        self.adr_list.append(sch_address)
+        time.sleep(1)
         self.yoDimmer.refreshSchedules()
         self.system_ready=True
 
