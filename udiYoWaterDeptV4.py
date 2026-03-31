@@ -99,7 +99,7 @@ class udiYoWaterDept(udi_interface.Node):
         logging.info('Start udiYoWaterDept')
         while not self.node_ready:
             time.sleep(0.5)
-        self.node.setDriver('GV30', 0, True, True)
+        self.my_setDriver('GV30', 0, True, True)
         self.yoWaterDept  = YoLinkWaterDeptSensor(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoWaterDept.initNode()
@@ -111,7 +111,7 @@ class udiYoWaterDept(udi_interface.Node):
             tries += 1
         time.sleep(2)
         self.temp_unit = self.yoAccess.get_temp_unit()
-        #self.node.setDriver('GV30', 1, True, True)
+        #self.my_setDriver('GV30', 1, True, True)
         self.system_ready=True
 
         
@@ -121,7 +121,7 @@ class udiYoWaterDept(udi_interface.Node):
     
     def stop (self):
         logging.info('Stop udiYoWaterDept')
-        self.node.setDriver('GV30', 0, True, True)
+        self.my_setDriver('GV30', 0, True, True)
         self.yoWaterDept.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)

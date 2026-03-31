@@ -82,10 +82,10 @@ class YoLinkDim(YoLinkMQTTDevice):
                 yolink.setState('on')
             else:
                 yolink.setState('off')
-        logging.debug('setBrightness : {}'.format(yolink.brightness))    
+            logging.debug('setBrightness : {}'.format(yolink.brightness))    
 
 
-    def setState(yolink, state, brightness=None):
+    def setState(yolink, state):
         logging.debug(yolink.type+' - setState')
         logging.debug('Dimmer Brightness: {}'.format(yolink.brightness))
 
@@ -97,7 +97,8 @@ class YoLinkDim(YoLinkMQTTDevice):
         data = {}
         data['params'] = {}
         data['params']['state'] = state.lower()
-        data['params']['brightness'] = int(yolink.brightness)
+        if isinstance(yolink.brightness, int):
+            data['params']['brightness'] = int(yolink.brightness)
         logging.debug('Dimmer setState Data {}'.format(data))
         return(yolink.setDevice( data))
 

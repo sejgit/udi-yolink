@@ -77,7 +77,7 @@ class udiYoGarageDoor(udi_interface.Node):
 
     def initNode(self):
         self.yoDoorControl.online = True
-        #self.node.setDriver('ST', 1, True, True)
+        #self.my_setDriver('ST', 1, True, True)
         
     def checkOnline(self):
         pass
@@ -113,7 +113,7 @@ class udiYoGarageDoor(udi_interface.Node):
                 self.my_setDriver('GV30', 1)
             else:
                 self.my_setDriver('GV20', 2)
-                #self.node.setDriver('ST', 0, True, True)
+                #self.my_setDriver('ST', 0, True, True)
 
         
 

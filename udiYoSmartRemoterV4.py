@@ -19,7 +19,7 @@ import math
 from yolinkSmartRemoterV3 import YoLinkSmartRemoter
 
 class udiRemoteKey(udi_interface.Node):
-    from  udiYolinkLib import save_cmd_struct, retrieve_cmd_struct, node_queue, wait_for_node_done, mask2key, set_node_custom, get_node_custom, checkNameSync
+    from  udiYolinkLib import my_setDriver, save_cmd_struct, retrieve_cmd_struct, node_queue, wait_for_node_done, mask2key, set_node_custom, get_node_custom, checkNameSync
 
     id = 'smremotekey'
     drivers = [
@@ -35,6 +35,7 @@ class udiRemoteKey(udi_interface.Node):
         self.key = key
         self.poly = polyglot
         self.address = address
+        self.node_ready = False
         self.LONG_CMD = self.address+'_L_CMD'
         self.SHORT_CMD = self.address+'_S_CMD'
         self.name = name
@@ -56,14 +57,14 @@ class udiRemoteKey(udi_interface.Node):
         #polyglot.subscribe(polyglot.CUSTOMPARAMS, self.parameterHandler)
         #polyglot.subscribe(polyglot.POLL, self.poll)
         #self.KeyOperations = Custom(self.poly, 'customdata')
-        polyglot.subscribe(polyglot.START, self.start, self.address)
-        polyglot.subscribe(polyglot.STOP, self.stop)
+        self.polysubscribe(self.poly.START, self.start, self.address)
+        self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         #self.poly.subscribe(self.poly.CUSTOMDATA, self.handleData)
         self.poly.subscribe(self.poly.CONFIGDONE, self.configHandler)
         # start processing events and create add our controller node
         
-        polyglot.ready()
+        self.poly.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
@@ -85,11 +86,11 @@ class udiRemoteKey(udi_interface.Node):
                 self._name_sync_saved = self.node.name
         except Exception as e:
             logging.debug(f'Error handling key custom name for {self.address}: {e}')
-     
+        self.node_ready = True
         
     def start(self):
         logging.debug('start / initialize smremotekey : {}'.format(self.key))
-        while not self.configDone:
+        while not self.configDone or not self.node_ready:
             time.sleep(1)
         '''
         if self.SHORT_CMD in self.KeyOperations:
@@ -105,9 +106,9 @@ class udiRemoteKey(udi_interface.Node):
             self.cmd_struct['long_press'] = 1
         '''
 
-        self.node.setDriver('ST', 99)
-        self.node.setDriver('GV1', self.cmd_struct['short_press'])
-        self.node.setDriver('GV2', self.cmd_struct['long_press'])
+        self.my_setDriver('ST', 99)
+        self.my_setDriver('GV1', self.cmd_struct['short_press'])
+        self.my_setDriver('GV2', self.cmd_struct['long_press'])
         self.system_ready=True
 
     def stop(self):
@@ -155,14 +156,14 @@ class udiRemoteKey(udi_interface.Node):
             self.short_press_state, isy_val = self.get_new_state(self.cmd_struct['short_press'], self.short_press_state)
             if self.short_press_state  != 'UNKNOWN':
                 self.node.reportCmd(self.short_press_state )
-            self.node.setDriver('ST', isy_val)
+            self.my_setDriver('ST', isy_val)
 
             logging.debug('send short press command cmd:{} driver{}'.format(self.short_press_state, isy_val))
         else:
             self.long_press_state, isy_val = self.get_new_state(self.cmd_struct['long_press'], self.long_press_state)
             if self.long_press_state  != 'UNKNOWN':
                 self.node.reportCmd(self.long_press_state )
-            self.node.setDriver('ST', isy_val)
+            self.my_setDriver('ST', isy_val)
    
             logging.debug('send long press command cmd:{} driver{}'.format(self.long_press_state, isy_val))
             
@@ -223,7 +224,7 @@ class udiRemoteKey(udi_interface.Node):
         logging.debug('short_cmdtype {}'.format(val))
         self.cmd_struct['short_press'] = val
         #self.KeyOperations[self.SHORT_CMD] = val  
-        self.node.setDriver('GV1', val, True, True)
+        self.my_setDriver('GV1', val, True, True)
         self.save_cmd_struct(self.cmd_struct)
 
     def long_cmdtype(self, command):
@@ -231,7 +232,7 @@ class udiRemoteKey(udi_interface.Node):
         logging.debug('long_cmdype {}'.format(val))
         self.cmd_struct['long_press'] = val
         #self.KeyOperations[self.LONG_CMD] = val
-        self.node.setDriver('GV2', val, True, True)
+        self.my_setDriver('GV2', val, True, True)
         self.save_cmd_struct(self.cmd_struct)
 
         
@@ -242,7 +243,7 @@ class udiRemoteKey(udi_interface.Node):
 
 
 class udiYoSmartRemoter(udi_interface.Node):
-    from  udiYolinkLib import node_queue, wait_for_node_done, set_node_custom, get_node_custom, checkNameSync as sharedCheckNameSync, saveCurrentNodeNames
+    from  udiYolinkLib import my_setDriver, node_queue, wait_for_node_done, set_node_custom, get_node_custom, checkNameSync as sharedCheckNameSync, saveCurrentNodeNames
 
     id = 'yosmremote'
 
@@ -265,8 +266,8 @@ class udiYoSmartRemoter(udi_interface.Node):
             {'driver': 'GV3', 'value': 99, 'uom': 25},
             {'driver': 'CLITEMP', 'value': 99, 'uom': 25},
             {'driver': 'ST', 'value': 0, 'uom': 25},
-            {'driver': 'GV30', 'value': 99, 'uom': 25},
             {'driver': 'GV20', 'value': 99, 'uom': 25},
+            {'driver': 'GV30', 'value': 99, 'uom': 25},
             ]
 
 
@@ -314,7 +315,7 @@ class udiYoSmartRemoter(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
-        self.node_ready = True
+
         # persist or restore saved name for parent SmartRemoter
         try:
             saved = self.get_node_custom('saved_name')
@@ -334,7 +335,7 @@ class udiYoSmartRemoter(udi_interface.Node):
         except Exception as e:
             logging.debug(f'Error handling SmartRemoter custom name for {self.address}: {e}')
         
-  
+        self.node_ready = True
 
     '''
     def node_queue(self, data):
@@ -352,7 +353,7 @@ class udiYoSmartRemoter(udi_interface.Node):
         logging.info('start - udiYoSmartRemoter')
         while not self.node_ready:
             time.sleep(0.5)
-        self.node.setDriver('GV30', 0, True, True)
+        self.my_setDriver('GV30', 0, True, True)
         self.yoSmartRemote  = YoLinkSmartRemoter(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.temp_unit = self.yoAccess.get_temp_unit()
@@ -364,7 +365,7 @@ class udiYoSmartRemoter(udi_interface.Node):
             time.sleep(2)
             tries += 1
         time.sleep(2)
-        #self.node.setDriver('GV30', 1, True, True)
+        #self.my_setDriver('GV30', 1, True, True)
         for key in range(0, self.nbr_keys):
             k_address =  self.address[4:14]+'key' + str(key)
             k_address = self.poly.getValidAddress(str(k_address))
@@ -380,7 +381,7 @@ class udiYoSmartRemoter(udi_interface.Node):
 
     def stop (self):
         logging.info('Stop udiYoSmartRemoter')
-        self.node.setDriver('GV30', 0, True, True)
+        self.my_setDriver('GV30', 0, True, True)
         if self.yoSmartRemote is not None:
             self.yoSmartRemote.shut_down()
         #if self.node:
@@ -437,34 +438,34 @@ class udiYoSmartRemoter(udi_interface.Node):
                                 #self.yoSmartRemote.clearEventData()
                                 #logging.debug('clearEventData')
                             if isinstance(press, int):
-                                self.node.setDriver('GV0', remote_key + press, uom=25)
-                                self.node.setDriver('ST', remote_key + press, uom=25)
-                            self.node.setDriver('GV1', remote_key, uom=25)
+                                self.my_setDriver('GV0', remote_key + press, uom=25)
+                                self.my_setDriver('ST', remote_key + press, uom=25)
+                            self.my_setDriver('GV1', remote_key, uom=25)
                         if isinstance(press, int):  
-                            self.node.setDriver('GV2', press, uom=25)   
+                            self.my_setDriver('GV2', press, uom=25)   
 
                     battery = self.yoSmartRemote.get_data('battery', 'state')
                     if isinstance(battery, int) or battery is None  :                
-                        self.node.setDriver('GV3', battery, uom=25)
+                        self.my_setDriver('GV3', battery, uom=25)
                     tempC = self.yoSmartRemote.get_data('devTemperature', 'state')
                     logging.debug("udiYoSmartRemoter temp: {}".format(tempC))
                     if isinstance(tempC, (int, float)):
                         if self.temp_unit == 0:
-                            self.node.setDriver('CLITEMP', round(tempC), uom=4)
+                            self.my_setDriver('CLITEMP', round(tempC), uom=4)
                         elif self.temp_unit == 1:
-                            self.node.setDriver('CLITEMP', round(tempC*9/5+32,1), uom=17)
+                            self.my_setDriver('CLITEMP', round(tempC*9/5+32,1), uom=17)
                     elif    tempC is None:
-                        self.node.setDriver('CLITEMP', tempC, uom=25)   
+                        self.my_setDriver('CLITEMP', tempC, uom=25)   
 
-                    self.node.setDriver('GV30', 1)
+                    self.my_setDriver('GV30', 1)
                     if self.yoSmartRemote.suspended:
-                        self.node.setDriver('GV20', 1)
+                        self.my_setDriver('GV20', 1)
                     else:
-                        self.node.setDriver('GV20', 0)
+                        self.my_setDriver('GV20', 0)
                 else:
 
-                    self.node.setDriver('GV30', 0, True, True)
-                    self.node.setDriver('GV20', 2)
+                    self.my_setDriver('GV30', 0, True, True)
+                    self.my_setDriver('GV20', 2)
         except Exception as e:
             logging.error('Smart Remote updateData exeption: {}'.format(e))
 

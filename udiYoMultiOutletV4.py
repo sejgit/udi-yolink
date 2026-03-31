@@ -463,6 +463,8 @@ class udiYoMultiOutlet(udi_interface.Node):
             self.nbrUsb = 1
         else:
             logging.error('Unsupported device : {}'.format(deviceInfo['modelName']))
+            self.nbrUsb = 0
+            self.nbrOutlets = 0
         self.ports =self.nbrOutlets + self.nbrUsb
         self.timer_update = 5
         self.devInfo =  deviceInfo
@@ -601,7 +603,10 @@ class udiYoMultiOutlet(udi_interface.Node):
             self.updateData()
 
     def updateData(self):
-        
+        if self.node is not None:
+            while not self.node_ready or not self.system_ready:
+                time.sleep(0.5)
+
         outletStates =  self.yoMultiOutlet.getMultiOutStates()
 
         if self.node_fully_config:

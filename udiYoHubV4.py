@@ -229,7 +229,7 @@ class udiYoHub(udi_interface.Node):
         #if not self.yoHub.online:
         #    logging.warning('Device {} not on-line'.format(self.devInfo['name']))            
         #else:
-        #    self.node.setDriver('ST', 1, True, True)
+        #    self.my_setDriver('ST', 1, True, True)
         self.system_ready=True
 
     def updateDelayCountdown (self, delayRemaining ) :
@@ -260,11 +260,11 @@ class udiYoHub(udi_interface.Node):
             message_type, message_action = self.yoHub.get_message_type()
             if self.yoHub.check_system_online():
                 #if state == 'ON':
-                #    self.node.setDriver('GV0', 1, True, True)
+                #    self.my_setDriver('GV0', 1, True, True)
                 #elif  state == 'OFF':
-                #    self.node.setDriver('GV0', 0, True, True)
+                #    self.my_setDriver('GV0', 0, True, True)
                 #else:
-                #    self.node.setDriver('GV0', 99, True, True)
+                #    self.my_setDriver('GV0', 99, True, True)
                 self.my_setDriver('ST', 1, type=message_type)
                 self.my_setDriver('GV30', 1, type=message_type)
                 if self.yoHub.suspended:

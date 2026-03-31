@@ -71,7 +71,8 @@ class udiYoInfraredCode(udi_interface.Node):
         except Exception as e:
             logging.debug(f'Error handling custom name for {self.address}: {e}')
         time.sleep(2)
-        self.updateData()
+        #self.updateData()
+
 
     def checkDataUpdate(self):
         if self.yoIRrem.data_updated():

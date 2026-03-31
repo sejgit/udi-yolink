@@ -54,7 +54,7 @@ class YoLinkLock(YoLinkMQTTDevice):
         if 'event' in data:
             if '.Alert' in data['event']:
                 if 'alert' in data['data']:
-                    if ['type'] in  data['data']['alert']:
+                    if 'type' in  data['data']['alert']:
                         yolink.alertType = data['data']['alert']['type']
                 elif 'alertType' in data['data']:
                     yolink.alertType = data['data']['alertType']

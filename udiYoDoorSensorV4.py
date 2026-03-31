@@ -160,7 +160,7 @@ class udiYoDoorSensor(udi_interface.Node):
                 if state_change is not None:
                     self.my_setDriver('GV3', int(state_change/1000), type=message_type)
                 else:
-                    self.my_setDriver('GV3', 99, uom=25, type=message_type)
+                    self.my_setDriver('GV3', 99, 25, type=message_type)
 
 
                 self.my_setDriver('GV30', 1)

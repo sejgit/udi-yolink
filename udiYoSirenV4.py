@@ -112,8 +112,8 @@ class udiYoSiren(udi_interface.Node):
         if self.yoSiren.data_updated():
             self.updateData()
         #if time.time() >= self.timer_expires - self.timer_update:
-        #    self.node.setDriver('GV1', 0, True, False)
-        #    self.node.setDriver('GV2', 0, True, False)
+        #    self.my_setDriver('GV1', 0, True, False)
+        #    self.my_setDriver('GV2', 0, True, False)
 
 
     def updateData(self):
@@ -134,7 +134,7 @@ class udiYoSiren(udi_interface.Node):
                 else:
                     self.my_setDriver('GV0', 99)
                     self.my_setDriver('ST', 99)
-                supply = self.udiYoSiren.get_data('powerSupply')
+                supply = self.yoSiren.get_data('powerSupply')
                 if supply in ['battery']:
                     logging.debug(f'udiYoSiren - getBattery: {supply} ')    
                     self.node.my_setDriver('GV2', self.yoSiren.get_data('battery'), type=message_type)
@@ -192,13 +192,13 @@ class udiYoSiren(udi_interface.Node):
         if state == 1:
             self.yoSiren.setState('on')
             self.sirenState = 1
-            self.node.setDriver('GV0',self.sirenState , True, True)
-            self.node.setDriver('ST',self.sirenState , True, True)
+            self.my_setDriver('GV0',self.sirenState , True, True)
+            self.my_setDriver('ST',self.sirenState , True, True)
         else:
             self.yoSiren.setState('off')
             self.sirenState  = 0
-            self.node.setDriver('GV0', self.sirenState , True, True)
-            self.node.setDriver('ST', self.sirenState , True, True)
+            self.my_setDriver('GV0', self.sirenState , True, True)
+            self.my_setDriver('ST', self.sirenState , True, True)
 
 
 
