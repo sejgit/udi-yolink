@@ -359,7 +359,8 @@ class YoLinkMQTTDevice(object):
    #@measure_time
     def setAttributes(yolink,  data):
         logging.debug(yolink.type+f' - setAttributes {data}')
-
+        if data is None:
+            data = {}
         methodStr = yolink.type+'.setAttributes'
             
         #data['time'] = str(int(time.time_ns()//1e6))# we assign time just before publish
@@ -373,9 +374,9 @@ class YoLinkMQTTDevice(object):
     
     def setDeviceAttributes(yolink,  data):
         logging.debug(yolink.type+f' - setDeviceAttributes {data}')
-
+        if data is None:
+            data = {}  
         methodStr = yolink.type+'.setDeviceAttributes'
-            
         #data['time'] = str(int(time.time_ns()//1e6))# we assign time just before publish
         data['method'] = methodStr
         data["targetDevice"] =  yolink.deviceInfo['deviceId']
@@ -389,6 +390,7 @@ class YoLinkMQTTDevice(object):
     #@measure_time
     def setDevice(yolink,  data):
         logging.debug(yolink.type+' - setDevice')
+
         worked = False
         if 'toggle' in yolink.methodList:
             methodStr = yolink.type+'.toggle'
@@ -397,7 +399,8 @@ class YoLinkMQTTDevice(object):
             methodStr = yolink.type+'.setState'
             worked = True
 
-           
+        if data is None:
+            data = {}           
         #data['time'] = str(int(time.time_ns()//1e6))# we assign time just before publish
         data['method'] = methodStr
         data["targetDevice"] =  yolink.deviceInfo['deviceId']
