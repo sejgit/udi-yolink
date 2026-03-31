@@ -16,7 +16,7 @@ from os import truncate
 #import udi_interface
 #import sys
 import time
-from yolinkInfraredRemoterV3 import YoLinkInfraredRem
+from yolinkInfraredRemoterV3 import YoLinkInfraredRemoter
 from udiYoSchedule import udiYoSchedule
 
 class udiYoInfraredCode(udi_interface.Node):
