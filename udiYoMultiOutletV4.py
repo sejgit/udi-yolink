@@ -726,9 +726,9 @@ class udiYoMultiOutlet(udi_interface.Node):
 
     commands = {
                 'UPDATE'        : update,
-                'LOOKUPSCH'    : lookup_schedule,
-                'DEFINESCH'    : define_schedule,
-                'CTRLSCH'      : control_schedule,
+                #'LOOKUPSCH'    : lookup_schedule,
+                #'DEFINESCH'    : define_schedule,
+                #'CTRLSCH'      : control_schedule,
                 }
 
 

@@ -918,7 +918,7 @@
                <p id="offdelay" editor="delaymin" init="GV2" />                                     
              </cmd >   
 
-            <cmd id="LOOKUPSCH" > 
+            <!--<cmd id="LOOKUPSCH" > 
                <p id="" editor="schIndexS" init="GV13" /> 
              </cmd >
             <cmd id="DEFINESCH" > 
@@ -938,7 +938,7 @@
             <cmd id="CTRLSCH" > 
                <p id="index" editor="schIndexS" init="GV13" /> 
                <p id="active" editor="schActiveI" init="GV14" />                                     
-             </cmd >     
+             </cmd >     -->
 
          </accepts>
       </cmds>
@@ -1059,7 +1059,7 @@
          </sends>
          <accepts>
             <cmd id="UPDATE" /> 
-            <cmd id="LOOKUPSCH" > 
+            <!--<cmd id="LOOKUPSCH" > 
                <p id="" editor="schIndexM" init="GV13" /> 
              </cmd >
             <cmd id="DEFINESCH" > 
@@ -1077,7 +1077,7 @@
             <cmd id="CTRLSCH" > 
                <p id="index" editor="schIndexM" init="GV13" /> 
                <p id="active" editor="schActiveI" init="GV14" />                                     
-             </cmd >
+             </cmd > -->
 
          </accepts>
       </cmds>

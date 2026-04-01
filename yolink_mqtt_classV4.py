@@ -376,6 +376,7 @@ class YoLinkMQTTDevice(object):
         logging.debug(yolink.type+f' - setDeviceAttributes {data}')
         if data is None:
             data = {}  
+            data['params'] = {}
         methodStr = yolink.type+'.setDeviceAttributes'
         #data['time'] = str(int(time.time_ns()//1e6))# we assign time just before publish
         data['method'] = methodStr

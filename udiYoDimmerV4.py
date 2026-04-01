@@ -81,14 +81,15 @@ class udiYoDimmer(udi_interface.Node):
         self.offDelay = 0
         self.schedule_selected = 0
         self.dim_setting = self.retrieve_cmd_struct()
-        if self.dim_setting == {}:
-
+        if self.dim_setting == {} or self.dim_setting is None:
+            self.dim_setting = {}   
             self.dim_setting['dim'] = 50
             self.dim_setting['dim_up'] =  80
             self.dim_setting['dim_down'] = 20
             self.dim_setting['previous'] = self.dim_setting['dim']
             self.save_cmd_struct(self.dim_setting)
         self.dim_setting['previous'] = self.dim_setting['dim']
+        logging.debug(f'Initial dim_setting {self.dim_setting}')
         self.dimmer_step = 3
         #self.Parameters = Custom(polyglot, 'customparams')
         # subscribe to the events we want
@@ -212,7 +213,9 @@ class udiYoDimmer(udi_interface.Node):
                 else:
                     self.my_setDriver('GV0', 99)
                 self.last_state = state
-                tmp = self.dim_setting['previous'] 
+                tmp = self.dim_setting['previous']
+                if tmp is None:
+                    tmp = self.yoDimmer.brightness
                 logging.debug(f'dim {self.yoDimmer.brightness} {tmp}')
                 if self.yoDimmer.brightness >= self.dim_setting['previous'] + self.dimmer_step:
                     #logging.debug('dim UP detected')
@@ -439,9 +442,9 @@ class udiYoDimmer(udi_interface.Node):
                 'DIMUP' : setDimUp,
                 'DIMDOWN' : setDimDown,
                 'DELAYCTRL'    : program_delays, 
-                'LOOKUPSCH'    : lookup_schedule,
-                'DEFINESCH'    : define_schedule,
-                'CTRLSCH'      : control_schedule,
+                #'LOOKUPSCH'    : lookup_schedule,
+                #'DEFINESCH'    : define_schedule,
+                #'CTRLSCH'      : control_schedule,
                 'FDUP'          : scene_dim,
                 'FDDOWN'        : scene_dim,
                 'FDSTOP'        : scene_dim
