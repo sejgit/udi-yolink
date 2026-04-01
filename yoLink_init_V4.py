@@ -1118,11 +1118,9 @@ class YoLinkInitPAC(object):
 
                 logging.debug( 'publish_data: {} - {}'.format(yoAccess.mqttList[deviceId]['request'], json.dumps(data, indent=4, separators=(",", ": "))))
                 result = yoAccess.client.publish(yoAccess.mqttList[deviceId]['request'], dataStr, yoAccess.QoS)
-                if yoAccess.retryQueue.qsize() > 0: 
-                    logging.debug( 'Cleaning up retry queue if not empty: {}'.format(yoAccess.retryQueue.qsize()))
-                    yoAccess._clean_retry_queue(deviceId, method)
-
-                    #####  Check if deviceID is in retry queue - if so remove it 
+                # Do not clear retry entries yet: wait for a confirmed successful response.
+                # Cleaning here can race with check_retry_queue and remove the only pending retry
+                # for a command that never receives a response.
                 
             else:
                 logging.error('device {} not in mqtt list'.format(deviceId))
@@ -1165,7 +1163,7 @@ class YoLinkInitPAC(object):
                     data['retry'] = 0 # starting retry
                     data['last_retry_time'] = int(data['time'])
                 yoAccess._enqueue_retry(data)
-            elif msg_code in ['0000000'] :
+            elif msg_code in ['000000'] :
                 if data is None: 
                     logging.error('No data received - device not ready - initiating retry'.format( data))
                     data['retry'] = 0 # starting retry
@@ -1210,7 +1208,7 @@ class YoLinkInitPAC(object):
                     logging.error('Max retries reached - giving up on command {}'.format(json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))))
                 '''
         except Exception as e:
-            logging.error('Exception No new data to publish - {}'.format(e))
+            logging.warning('Exception No new data to publish - {}'.format(e))
             yoAccess.processing_access.release()
             pass # go wait again unless stop is called
 
