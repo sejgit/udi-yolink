@@ -297,6 +297,7 @@ class YoLinkMultiOutlet(YoLinkMQTTDevice):
                     else:
                         offDelay = 0 
             states['port'+str(outlet)]= {'state':state, 'delays':{'on':onDelay, 'off':offDelay}}
+        logging.debug('getMultiOutStates - {}'.format(states))
         return(states)
 
 

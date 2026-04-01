@@ -14,6 +14,7 @@ except ImportError:
 #import sys
 import time
 from yolinkMultiOutletV3 import YoLinkMultiOutlet
+from udiYoSchedule import udiYoSchedule
 import re
 
 #assigned_addresses
@@ -568,19 +569,22 @@ class udiYoMultiOutlet(udi_interface.Node):
             logging.info('udiYoMultiOutlet - finished creating sub nodes - {} '.format(self.node_fully_config ))
 
             #logging.debug(self.subnodeAdr)
-        time.sleep(1)
-        self.yoMultiOutlet.initNode()
-        
-        tries = 1
-        while not self.yoMultiOutlet.check_system_online() and (tries <= 5 or self.yoMultiOutlet.throttled()):
-            logging.info('Waiting for device to come online...')
+            time.sleep(1)
+            self.yoMultiOutlet.initNode()
+            self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
+            self.adr_list.append(sch_address)
             time.sleep(2)
-            tries += 1
-        time.sleep(3)
-        self.yoMultiOutlet.refreshMultiOutlet()
-        self.yoMultiOutlet.refreshSchedules()
-        logging.debug('Finished  MultiOutlet start')
-        self.system_ready=True
+            self.yoMultiOutlet.refreshSchedules()
+            tries = 1
+            while not self.yoMultiOutlet.check_system_online() and (tries <= 5 or self.yoMultiOutlet.throttled()):
+                logging.info('Waiting for device to come online...')
+                time.sleep(2)
+                tries += 1
+            time.sleep(3)
+            #self.yoMultiOutlet.refreshMultiOutlet()
+
+            logging.debug('Finished  MultiOutlet start')
+            self.system_ready=True
 
     def updateDelayCountdown(self, timeRemaining):
         logging.debug('updateDelayCountdown - time: {}'.format(timeRemaining))
