@@ -1142,6 +1142,9 @@ class WaterMeterScheduleNode(OnOffScheduleNode):
         Args:
             schedule_type: 'valve' or 'leak' to determine which schedule methods to use
         """
+        if schedule_type not in ['valve', 'leak']:
+            logging.warning(f'Invalid schedule_type "{schedule_type}" for WaterMeterScheduleNode, defaulting to "valve"')
+            schedule_type = 'valve' 
         self.schedule_type = schedule_type
         super().__init__(polyglot, primary, address, name, yoAccess, deviceInfo)
 
@@ -1240,7 +1243,7 @@ class WaterMeterScheduleNode(OnOffScheduleNode):
     }
 
 
-def udiYoSchedule(polyglot, primary, address, name, yoAccess, deviceInfo, schedule_type=None):
+def udiYoSchedule(polyglot, primary, address, name, yoAccess, deviceInfo, schedule_type='valve'):
     """
     Factory function to create appropriate schedule node based on device type.
     
@@ -1269,7 +1272,7 @@ def udiYoSchedule(polyglot, primary, address, name, yoAccess, deviceInfo, schedu
     elif dev_type in ['SprinklerV2', 'Sprinkler']:
         return SprinklerScheduleNode(polyglot, primary, address, name, yoAccess, deviceInfo)
     elif dev_type in ['WaterMeterController', 'WaterMeterMultiController']:
-        return WaterMeterScheduleNode(polyglot, primary, address, name, yoAccess, deviceInfo, schedule_type=schedule_type or 'valve')
+        return WaterMeterScheduleNode(polyglot, primary, address, name, yoAccess, deviceInfo, schedule_type)
     else:  # Default to OnOff for Switch, Outlet, Dimmer, Manipulator, etc.
         return OnOffScheduleNode(polyglot, primary, address, name, yoAccess, deviceInfo)
 
