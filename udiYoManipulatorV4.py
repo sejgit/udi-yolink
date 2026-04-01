@@ -59,6 +59,7 @@ class udiYoManipulator(udi_interface.Node):
     def  __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
         super().__init__( polyglot, primary, address, name)   
         logging.debug('udiYoManipulator INIT- {}'.format(deviceInfo['name']))
+        self.name = name
         self.n_queue = []
         self.yoAccess = yoAccess
         self.devInfo =  deviceInfo
@@ -103,7 +104,7 @@ class udiYoManipulator(udi_interface.Node):
         time.sleep(1)
         tries = 1
         while not self.yoManipulator.check_system_online() and (tries <= 5 or self.yoManipulator.throttled()):
-            logging.info('Waiting for device to come online...')
+            logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
 

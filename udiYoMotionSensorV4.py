@@ -55,6 +55,7 @@ class udiYoMotionSensor(udi_interface.Node):
 
         logging.debug('YoLinkMotionSensor INIT- {}'.format(deviceInfo['name']))
         self.address = address
+        self.name = name
         self.yoAccess = yoAccess
         self.devInfo =  deviceInfo
 
@@ -99,7 +100,7 @@ class udiYoMotionSensor(udi_interface.Node):
         time.sleep(1)
         tries = 1
         while not self.yoMotionsSensor.check_system_online() and (tries <= 5 or self.yoMotionsSensor.throttled()):
-            logging.info('Waiting for device to come online...')
+            logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
         #self.my_setDriver('GV30', 1)

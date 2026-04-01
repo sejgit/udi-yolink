@@ -177,6 +177,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
         super().__init__( polyglot, primary, address, name)   
 
         logging.debug('udiIRremote INIT- {}'.format(deviceInfo['name']))
+        self.name = name
 
         self.yoAccess = yoAccess
         self.poly = polyglot
@@ -245,7 +246,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
         time.sleep(1)
 
         while not self.yoIRrem.check_system_online() and ( self.yoIRrem.throttled()):
-            logging.info('Waiting for device to come online.. Must be online to get learned codes')
+            logging.info(f'Waiting for device {self.name} to come online.. Must be online to get learned codes')
             time.sleep(2)
     
         #self.my_setDriver('ST', 1)

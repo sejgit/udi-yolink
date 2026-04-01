@@ -88,7 +88,7 @@ class udiYoDoorSensor(udi_interface.Node):
         time.sleep(1)
         tries = 1
         while not self.yoDoorSensor.check_system_online() and (tries <= 5 or self.yoDoorSensor.throttled()):
-            logging.info('Waiting for device to come online...')
+            logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
 

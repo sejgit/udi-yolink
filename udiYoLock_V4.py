@@ -50,6 +50,7 @@ class udiYoLockV2(udi_interface.Node):
         super().__init__( polyglot, primary, address, name)   
 
         logging.debug('udiYoLock INIT- {}'.format(deviceInfo['name']))
+        self.name = name
         self.n_queue = []   
         
         self.yoAccess = yoAccess
@@ -91,7 +92,7 @@ class udiYoLockV2(udi_interface.Node):
         time.sleep(1)
         tries = 1
         while not self.yoLock.check_system_online() and (tries <= 5 or self.yoLock.throttled()):
-            logging.info('Waiting for device to come online...')
+            logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
         self.my_setDriver('GV30', 1)
@@ -291,6 +292,7 @@ class udiYoLock(udi_interface.Node):
         super().__init__( polyglot, primary, address, name)   
 
         logging.debug('udiYoLock INIT- {}'.format(deviceInfo['name']))
+        self.name = name
         self.n_queue = []   
         
         self.yoAccess = yoAccess
@@ -331,7 +333,7 @@ class udiYoLock(udi_interface.Node):
         self.yoLock.initNode()
         tries = 1
         while not self.yoLock.check_system_online() and (tries <= 5 or self.yoLock.throttled()):
-            logging.info('Waiting for device to come online...')
+            logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
         self.my_setDriver('GV30', 1)

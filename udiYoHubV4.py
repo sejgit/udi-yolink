@@ -46,6 +46,7 @@ class udiYoBatteryHub(udi_interface.Node):
     def  __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
         super().__init__( polyglot, primary, address, name)   
         logging.debug('udiYoBatteryHub INIT- {}'.format(deviceInfo['name']))
+        self.name = name
         self.devInfo =  deviceInfo   
         self.yoAccess = yoAccess
         self.yoHub = None
@@ -82,7 +83,7 @@ class udiYoBatteryHub(udi_interface.Node):
         self.yoHub.initNode()
         tries = 1
         while not self.yoHub.check_system_online() and (tries <= 5 or self.yoHub.throttled()):
-            logging.info('Waiting for device to come online...')
+            logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
         time.sleep(1)
@@ -184,6 +185,7 @@ class udiYoHub(udi_interface.Node):
     def  __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
         super().__init__( polyglot, primary, address, name)   
         logging.debug('udiYoHub INIT- {}'.format(deviceInfo['name']))
+        self.name = name
         self.devInfo =  deviceInfo   
         self.yoAccess = yoAccess
         self.yoHub = None
@@ -221,7 +223,7 @@ class udiYoHub(udi_interface.Node):
         time.sleep(1)
         tries = 1
         while not self.yoHub.check_system_online() and (tries <= 5 or self.yoHub.throttled()):
-            logging.info('Waiting for device to come online...')
+            logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
 

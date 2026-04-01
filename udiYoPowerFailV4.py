@@ -56,6 +56,7 @@ class udiYoPowerFailSenor(udi_interface.Node):
         super().__init__( polyglot, primary, address, name)   
         #from  udiLib import node_queue, wait_for_node_done, getValidName, getValidAddress, send_temp_to_isy, isy_value, bool2ISY
         logging.debug('udiYoPowerFailSenor INIT- {}'.format(deviceInfo['name']))
+        self.name = name
         self.adress = address
         self.yoAccess = yoAccess
         self.devInfo =  deviceInfo
@@ -95,7 +96,7 @@ class udiYoPowerFailSenor(udi_interface.Node):
         time.sleep(1)
         tries = 1
         while not self.yoPowerFail.check_system_online() and (tries <= 5 or self.yoPowerFail.throttled()):
-            logging.info('Waiting for device to come online...')
+            logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
         #self.my_setDriver('GV30', 1)

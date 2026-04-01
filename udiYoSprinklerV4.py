@@ -70,6 +70,7 @@ class udiYoSprinkler(udi_interface.Node):
         #super(YoLinkSW, self).__init__( csName, csid, csseckey, devInfo,  self.updateStatus, )
         #  
         logging.debug('udiYoSprinkler INIT- {}'.format(deviceInfo['name']))
+        self.name = name
         self.n_queue = []  
         self.yoAccess = yoAccess
         self.devInfo =  deviceInfo
@@ -133,7 +134,7 @@ class udiYoSprinkler(udi_interface.Node):
         time.sleep(1)
         tries = 1
         while not self.yoTHsensor.check_system_online() and (tries <= 5 or self.yoTHsensor.throttled()):
-            logging.info('Waiting for device to come online...')
+            logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
         self.temp_unit = self.yoAccess.get_temp_unit()
