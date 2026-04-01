@@ -507,20 +507,12 @@ class udiYoMultiOutlet(udi_interface.Node):
         self.yoMultiOutlet  = YoLinkMultiOutlet(self.yoAccess, self.devInfo, self.updateStatus)
         self.yoMultiOutlet.nbrOutlets = self.nbrOutlets
         self.yoMultiOutlet.nbrUsb = self.nbrUsb
-        
-        #self.my_setDriver('GV30', 1)
-        #time.sleep(1)
-        #self.yoMultiOutlet.initNode()
-        #time.sleep(3)
-        #if not self.yoMultiOutlet.online:
-        #    logging.warning('Device {} not on-line -  Cannot determine number of outlets and USBs'.format(self.devInfo['name']))
-        #    self.ports = 0
-        #    self.nbrOutlets = 0
-        #    self.my_setDriver('GV30', 0)
-        #    #self.node_fully_config = False
 
-        #logging.debug('before start {} {}'.format(self.yoMultiOutlet.nbrOutlets, self.node_fully_config ))
-        if self.yoMultiOutlet.nbrOutlets == 0 and not self.yoMultiOutlet.check_system_online():
+        while not self.yoMultiOutlet.check_system_online() and not(self.yoMultiOutlet.throttled()):
+            logging.info('Waiting for device to come online...')
+            time.sleep(2)
+ 
+        if self.yoMultiOutlet.nbrOutlets == 0:
             logging.debug(' No config yet {} {}'.format(self.yoMultiOutlet.nbrOutlets, self.yoMultiOutlet.check_system_online()))
             self.my_setDriver('GV20', 2)
         else:
