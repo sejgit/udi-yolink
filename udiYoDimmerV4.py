@@ -216,7 +216,7 @@ class udiYoDimmer(udi_interface.Node):
                 if self.dim_setting['previous'] is None:
                     self.dim_setting['previous'] = self.yoDimmer.brightness
                 tmp = self.dim_setting['previous']
-                  logging.debug(f'dim {self.yoDimmer.brightness} {tmp}')
+                logging.debug(f'dim {self.yoDimmer.brightness} {tmp}')
                 if self.yoDimmer.brightness >= self.dim_setting['previous'] + self.dimmer_step:
                     #logging.debug('dim UP detected')
                     self.node.reportCmd('FDUP')
