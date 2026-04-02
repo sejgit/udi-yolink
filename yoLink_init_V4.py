@@ -947,7 +947,7 @@ class YoLinkInitPAC(object):
             yoAccess.time_tracking_dict[dev_id].append(t_now + t_delay)
             yoAccess.TimeTableLock.release()
             #logging.debug('TimeTrack after: time {} dev: {} delay: {} -  {}'.format(t_now, dev_id, int(math.ceil(t_delay/1000)), yoAccess.time_tracking_dict))
-            return(int(math.ceil(t_delay/1000)))
+            return(t_delay / 1000.0)  # return fractional seconds (not ceiling) to avoid rounding 188ms up to 1s
             #return(int(math.ceil(t_delay/1000)), int(math.ceil(t_all_delay)), int(math.ceil(t_all_delay)))
         except Exception as e:
             logging.error(f' Exception Timetrack : {e}')
@@ -1104,7 +1104,13 @@ class YoLinkInitPAC(object):
             if deviceId in yoAccess.mqttList:
                 logging.debug( 'Starting publish_data:')
                 ### check if publish list is full
-                
+
+                # enforce minimum 210ms between any two consecutive publishes before rate-limit check
+                min_gap_ns = 210_000_000  # 210 ms in nanoseconds
+                since_last_ns = time.time_ns() - yoAccess.lastPublishTime_ns
+                if since_last_ns < min_gap_ns:
+                    time.sleep((min_gap_ns - since_last_ns) / 1e9)
+
                 #all_delay, dev_delay =  yoAccess.time_tracking(timeNow_ms, deviceId)
                 delay_s =  yoAccess.time_tracking(deviceId)
                 #logging.debug( 'Needed delay: {} - {}'.format(delay, timeNow_s))
@@ -1112,11 +1118,6 @@ class YoLinkInitPAC(object):
                     logging.info('Delaying call by {}sec due to too many calls'.format(delay_s))
                     time.sleep(delay_s)
                     # As this is multi threaded we can just sleep  - if another call is ready and can go though is will so in a differnt thread
-                # enforce minimum 250ms between any two consecutive publishes to spread startup bursts
-                min_gap_ns = 250_000_000  # 250 ms in nanoseconds
-                since_last_ns = time.time_ns() - yoAccess.lastPublishTime_ns
-                if since_last_ns < min_gap_ns:
-                    time.sleep((min_gap_ns - since_last_ns) / 1e9)
                 yoAccess.lastPublishTime_ns = time.time_ns()
                 data['time'] = str(int(time.time_ns()/1e6))  # update time to actual packet time (to include delays)
                 message_id = data['time'] 
