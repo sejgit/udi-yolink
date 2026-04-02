@@ -80,6 +80,7 @@ class YoLinkInitPAC(object):
         yoAccess.tokenExpTime = 0
         yoAccess.timeExpMarging = 3600 # 1 hour - most devices report once per hour
         yoAccess.lastTransferTime = int(time.time())
+        yoAccess.lastPublishTime_ns = 0  # tracks last MQTT publish time (ns) for inter-publish spacing
         #yoAccess.timeExpMarging = 7170 #min for testing 
         yoAccess.tmpData = {}
         yoAccess.lastDataPacket = {}
@@ -1110,7 +1111,13 @@ class YoLinkInitPAC(object):
                 if delay_s > 0: # some delay needed
                     logging.info('Delaying call by {}sec due to too many calls'.format(delay_s))
                     time.sleep(delay_s)
-                    # As this is multi threaded we can just sleep  - if another call is ready and can go though is will so in a differnt thread    
+                    # As this is multi threaded we can just sleep  - if another call is ready and can go though is will so in a differnt thread
+                # enforce minimum 250ms between any two consecutive publishes to spread startup bursts
+                min_gap_ns = 250_000_000  # 250 ms in nanoseconds
+                since_last_ns = time.time_ns() - yoAccess.lastPublishTime_ns
+                if since_last_ns < min_gap_ns:
+                    time.sleep((min_gap_ns - since_last_ns) / 1e9)
+                yoAccess.lastPublishTime_ns = time.time_ns()
                 data['time'] = str(int(time.time_ns()/1e6))  # update time to actual packet time (to include delays)
                 message_id = data['time'] 
                 dataStr = str(json.dumps(data))
