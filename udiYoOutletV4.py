@@ -112,13 +112,15 @@ class udiYoOutlet(udi_interface.Node):
         self.yoOutlet = YoLinkOutlet(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoOutlet.initNode()
-        time.sleep(1)
+        time.sleep(2)
+        self.yoOutlet.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
+        # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
         tries = 1
         while not self.yoOutlet.check_system_online() and (tries <= 5 or self.yoOutlet.throttled()):
             logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
-        #time.sleep(2)
+
         sch_address = self.address[4:14] + '_SCH'
         sch_address = self.poly.getValidAddress(sch_address)
         self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
@@ -126,8 +128,7 @@ class udiYoOutlet(udi_interface.Node):
         time.sleep(2)
 
 
-        self.yoOutlet.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
-        self.yoOutlet.refreshSchedules()
+        # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
         self.system_ready=True
 
     def stop (self):

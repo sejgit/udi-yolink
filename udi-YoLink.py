@@ -10,6 +10,7 @@ import time
 
 
 from yoLink_init_V4 import YoLinkInitPAC
+from threading import Thread
 
 try:
     import udi_interface
@@ -156,6 +157,13 @@ class YoLinkSetup (udi_interface.Node):
             self.my_setDriver('ST', 1)
             self.my_setDriver('GV1', 1)
             self.deviceList = self.addNodes(self.deviceList)
+            # Defer non-critical schedule refreshes to avoid startup API bursts
+            # Run in background so node server can continue initializing
+            try:
+                t = Thread(target=self.deferred_refresh_schedules)
+                t.start()
+            except Exception:
+                logging.debug('Failed to start deferred_refresh_schedules thread')
         else:
             self.my_setDriver('ST', 0)
         #self.poly.updateProfile()
@@ -188,6 +196,74 @@ class YoLinkSetup (udi_interface.Node):
             if self.yoAccess:
                 self.yoAccess.shut_down()
             self.poly.stop()
+
+    def deferred_refresh_schedules(self):
+        """Background pass to refresh schedules for schedule-capable devices.
+
+        Iterates created nodes and invokes `refreshSchedules()` on the
+        first attribute that exposes it for each node. Calls are spaced
+        using `yoAccess.time_tracking(dev_id)` to avoid bursting API calls.
+        """
+        logging.info('Starting deferred schedule refresh pass')
+        try:
+            nodes = self.poly.getNodes()
+        except Exception as e:
+            logging.debug(f'Could not enumerate nodes for deferred refresh: {e}')
+            return
+
+        for addr, node in nodes.items():
+            if addr == self.address:
+                continue
+            try:
+                # prefer device-level devInfo if present
+                dev_id = None
+                try:
+                    if hasattr(node, 'devInfo') and isinstance(node.devInfo, dict):
+                        dev_id = node.devInfo.get('deviceId')
+                except Exception:
+                    dev_id = None
+
+                # find first attribute that exposes refreshSchedules()
+                source = None
+                for attr in dir(node):
+                    try:
+                        val = getattr(node, attr)
+                        if hasattr(val, 'refreshSchedules'):
+                            source = val
+                            break
+                    except Exception:
+                        continue
+
+                if source is None:
+                    continue
+
+                # try to obtain deviceId from the source wrapper if missing
+                if dev_id is None:
+                    try:
+                        if hasattr(source, 'devInfo') and isinstance(source.devInfo, dict):
+                            dev_id = source.devInfo.get('deviceId')
+                    except Exception:
+                        dev_id = None
+
+                if dev_id is None:
+                    logging.debug(f'No deviceId for node {addr}, skipping schedule refresh')
+                    continue
+
+                # space calls using yoAccess time tracking
+                try:
+                    delay = self.yoAccess.time_tracking(dev_id)
+                except Exception:
+                    delay = 0
+                if delay and delay > 0:
+                    time.sleep(delay)
+
+                try:
+                    source.refreshSchedules()
+                except Exception as e:
+                    logging.debug(f'Failed refreshSchedules for {addr}: {e}')
+
+            except Exception as e:
+                logging.debug(f'deferred refresh error for {addr}: {e}')
 
     def handleParams (self, userParam ):
         logging.debug('handleParams')

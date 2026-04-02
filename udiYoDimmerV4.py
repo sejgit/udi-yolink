@@ -141,7 +141,7 @@ class udiYoDimmer(udi_interface.Node):
         self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
         self.adr_list.append(sch_address)
         time.sleep(1)
-        self.yoDimmer.refreshSchedules()
+        # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
         self.system_ready=True
 
     def updateDelayCountdown (self, timeRemaining ) :

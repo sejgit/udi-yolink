@@ -569,7 +569,7 @@ class udiYoMultiOutlet(udi_interface.Node):
             self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
             self.adr_list.append(sch_address)
             time.sleep(2)
-            self.yoMultiOutlet.refreshSchedules()
+            # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
             tries = 1
             while not self.yoMultiOutlet.check_system_online() and (tries <= 5 or self.yoMultiOutlet.throttled()):
                 logging.info(f'Waiting for device {self.name} to come online...')

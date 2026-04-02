@@ -115,7 +115,7 @@ class udiYoManipulator(udi_interface.Node):
         #self.my_setDriver('GV30', 1)
         time.sleep(2)
         self.yoManipulator.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
-        self.yoManipulator.refreshSchedules()
+        # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
         self.system_ready=True
 
     def stop (self):

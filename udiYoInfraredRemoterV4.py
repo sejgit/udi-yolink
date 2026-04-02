@@ -260,7 +260,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.adr_list.append(sch_address)
         time.sleep(2)
         # Prime schedule values as soon as the schedule child node is created.
-        self.yoIRrem.refreshSchedules()
+        # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
 
         for code in range(0, len(code_dict_temp)):
             if code_dict_temp[code]:

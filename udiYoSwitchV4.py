@@ -110,7 +110,7 @@ class udiYoSwitch(udi_interface.Node):
             time.sleep(2)
             tries += 1
         time.sleep(2)
-        self.yoSwitch.refreshSchedules()
+        # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
         time.sleep(1)
 
 

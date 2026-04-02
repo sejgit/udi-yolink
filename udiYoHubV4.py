@@ -87,7 +87,7 @@ class udiYoBatteryHub(udi_interface.Node):
             time.sleep(2)
             tries += 1
         time.sleep(1)
-        self.yoHub.refreshDevice()
+        # refreshDevice() is called by initNode(); avoid duplicate call here to reduce API load
         self.system_ready=True
 
     def updateDelayCountdown (self, delayRemaining ) :

@@ -149,7 +149,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                 sch_address_leak = self.poly.getValidAddress(sch_address_leak)
                 self.schedule_leak = udiYoSchedule(self.poly, self.address, sch_address_leak, 'Leak Schedules', self.yoAccess, self.devInfo, schedule_type='leak')
                 self.adr_list.append(sch_address_leak)
-                self.yoWaterCtrl.refreshSchedules()
+                # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
         time.sleep(4)
 
         tries = 1
