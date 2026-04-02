@@ -49,6 +49,7 @@ class YoLinkMQTTDevice(object):
 
         #yolink.deviceId = yolink.deviceInfo['deviceId']
         yolink.type = yolink.deviceInfo['type']
+        yolink.name = yolink.deviceInfo['name']
         yolink.methodList = []
         yolink.MQTT_type = 'default'
         #yolink.delaySupport = ['Outlet', 'MultiOutlet', 'Manipulator', 'Switch', 'Dimmer', 'WaterMeterController']
