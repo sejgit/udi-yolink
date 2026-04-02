@@ -240,7 +240,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
         while not self.node_ready:
             time.sleep(0.5)
         self.my_setDriver('ST', 0)
-        self.yoIRrem  = YoLinkInfraredRem(self.yoAccess, self.devInfo, self.updateStatus)
+        self.yoIRrem  = YoLinkInfraredRemoter(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoIRrem.initNode()
         time.sleep(1)
