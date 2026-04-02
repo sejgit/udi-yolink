@@ -98,7 +98,8 @@ class udiYoBatteryHub(udi_interface.Node):
         #self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
 
-        self.yoHub.shut_down()
+        if getattr(self, 'yoHub', None):
+            self.yoHub.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 
@@ -242,7 +243,8 @@ class udiYoHub(udi_interface.Node):
         self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
 
-        self.yoHub.shut_down()
+        if getattr(self, 'yoHub', None):
+            self.yoHub.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 

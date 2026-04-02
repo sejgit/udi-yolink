@@ -123,7 +123,8 @@ class udiYoWaterDept(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoWaterDept')
         self.my_setDriver('GV30', 0, True, True)
-        self.yoWaterDept.shut_down()
+        if getattr(self, 'yoWaterDept', None):
+            self.yoWaterDept.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 

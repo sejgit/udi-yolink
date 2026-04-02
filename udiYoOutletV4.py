@@ -133,7 +133,8 @@ class udiYoOutlet(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoOutlet')
         self.my_setDriver('GV30', 0)
-        self.yoOutlet.shut_down()
+        if getattr(self, 'yoOutlet', None):
+            self.yoOutlet.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 

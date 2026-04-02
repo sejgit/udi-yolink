@@ -109,7 +109,7 @@ class udiYoMotionSensor(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoMotionSensor')
         self.my_setDriver('GV30', 0)
-        if self.yoMotionsSensor:
+        if getattr(self, 'yoMotionsSensor', None):
             self.yoMotionsSensor.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)

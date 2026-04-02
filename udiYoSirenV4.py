@@ -98,7 +98,8 @@ class udiYoSiren(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoSiren')
         self.my_setDriver('GV30', 0, True, True)
-        self.yoSiren.shut_down()
+        if getattr(self, 'yoSiren', None):
+            self.yoSiren.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
             

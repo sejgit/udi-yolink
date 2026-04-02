@@ -146,7 +146,8 @@ class udiYoSprinkler2(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoSprinkler2')
         self.my_setDriver('GV30', 0)
-        self.yoSprinkler.shut_down()
+        if getattr(self, 'yoSprinkler', None):
+            self.yoSprinkler.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
             

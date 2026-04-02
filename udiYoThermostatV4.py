@@ -116,9 +116,8 @@ class udiYoThermostat(udi_interface.Node):
         """Stop the thermostat device"""
         logging.info('Stop udiYoThermostat')
         self.my_setDriver('GV30', 0)
-        if self.yoThermostat:
+        if getattr(self, 'yoThermostat', None):
             self.yoThermostat.shut_down()
-
     def updateStatus(self, data):
         """Handle MQTT status updates from the device"""
         logging.debug('udiYoThermostat - updateStatus')

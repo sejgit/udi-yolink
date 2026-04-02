@@ -165,7 +165,8 @@ class udiYoDimmer(udi_interface.Node):
         logging.info('Stop udiyoDimmer')
         #self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
-        self.yoDimmer.shut_down()
+        if getattr(self, 'yoDimmer', None):
+            self.yoDimmer.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
             

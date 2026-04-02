@@ -101,9 +101,8 @@ class udiYoLockV2(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoLock')
         self.my_setDriver('GV30', 0)
-        self.yoLock.shut_down()
-
-
+        if getattr(self, 'yoLock', None):
+            self.yoLock.shut_down()
     def checkDataUpdate(self):
         if self.yoLock.data_updated():
             self.updateData()
@@ -342,9 +341,8 @@ class udiYoLock(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoLock')
         self.my_setDriver('GV30', 0)
-        self.yoLock.shut_down()
-
-
+        if getattr(self, 'yoLock', None):
+            self.yoLock.shut_down()
     def checkDataUpdate(self):
         if self.yoLock.data_updated():
             self.updateData()

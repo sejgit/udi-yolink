@@ -233,19 +233,17 @@ class YoLinkSetup (udi_interface.Node):
 
             self.my_setDriver('ST', 0)
 
-            if self.yoAccess:
+            if getattr(self, 'yoAccess', None):
                 self.yoAccess.shut_down()
-            if self.yoLocal:
+            if getattr(self, 'yoLocal', None):
                 self.yoLocal.shut_down()
-
             exit()
         except Exception as e:
             logging.error(f'Stop Exception : {e}')
-            if self.yoAccess:
+            if getattr(self, 'yoAccess', None):
                 self.yoAccess.shut_down()
-            if self.yoLocal:
+            if getattr(self, 'yoLocal', None):
                 self.yoLocal.shut_down()
-
             self.poly.stop()
 
 

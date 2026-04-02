@@ -352,9 +352,8 @@ class BaseScheduleNode(udi_interface.Node):
         """Stop schedule node cleanup."""
         logging.info(f'Stop {self.__class__.__name__}')
         self.my_setDriver('GV30', 0)
-        if self.yoSchedule:
+        if getattr(self, 'yoSchedule', None):
             self.yoSchedule.shut_down()
-
     def checkDataUpdate(self):
         """Check for schedule data updates."""
         self.updateData()

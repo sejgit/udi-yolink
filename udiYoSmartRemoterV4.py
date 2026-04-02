@@ -382,7 +382,7 @@ class udiYoSmartRemoter(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoSmartRemoter')
         self.my_setDriver('GV30', 0, True, True)
-        if self.yoSmartRemote is not None:
+        if getattr(self, 'yoSmartRemote', None):
             self.yoSmartRemote.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)

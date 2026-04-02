@@ -104,7 +104,8 @@ class udiYoDoorSensor(udi_interface.Node):
         logging.info('Stop - udiYoDoorSensor')
         #self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
-        self.yoDoorSensor.shut_down()
+        if getattr(self, 'yoDoorSensor', None):
+            self.yoDoorSensor.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 

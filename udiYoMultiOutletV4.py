@@ -590,8 +590,8 @@ class udiYoMultiOutlet(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoMultiOutlet ')
         self.my_setDriver('GV30', 0)
-        self.yoMultiOutlet.shut_down()
-
+        if getattr(self, 'yoMultiOutlet', None):
+            self.yoMultiOutlet.shut_down()
     def checkOnline(self):
         self.yoMultiOutlet.refreshDevice() 
 

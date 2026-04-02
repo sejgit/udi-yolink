@@ -91,9 +91,8 @@ class udiYoGarageFinger(udi_interface.Node):
         logging.info('Stop udiYoGarageFinger')
         self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
-        self.yoDoorControl.shut_down()
-
-    
+        if getattr(self, 'yoDoorControl', None):
+            self.yoDoorControl.shut_down()
     def updateStatus(self, data):
         logging.debug('updateStatus - udiYoGarageFinger')
 

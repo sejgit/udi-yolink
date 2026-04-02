@@ -153,7 +153,8 @@ class udiYoSwitch(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoSwitch')
         self.my_setDriver('GV30', 0)
-        self.yoSwitch.shut_down()
+        if getattr(self, 'yoSwitch', None):
+            self.yoSwitch.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
             

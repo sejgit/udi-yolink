@@ -141,7 +141,8 @@ class udiYoSoilSensor(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoSoilSensor')
         self.my_setDriver('GV30', 0)
-        self.yoSoilSensor.shut_down()
+        if getattr(self, 'yoSoilSensor', None):
+            self.yoSoilSensor.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 

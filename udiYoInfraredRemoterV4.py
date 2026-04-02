@@ -279,7 +279,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiIRremote')
         self.my_setDriver('ST', 0)
-        if self.yoIRrem is not None:
+        if getattr(self, 'yoIRrem', None):
             self.yoIRrem.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)

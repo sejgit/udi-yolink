@@ -191,7 +191,8 @@ class udiYoWaterMeterController(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoWaterMeterController')
         self.my_setDriver('GV30', 0)
-        self.yoWaterCtrl.shut_down()
+        if getattr(self, 'yoWaterCtrl', None):
+            self.yoWaterCtrl.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
             
