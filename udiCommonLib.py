@@ -188,6 +188,12 @@ def addNodes (self, deviceList) -> list:
                 logging.debug(f'HUB date {dev}')
                 #if  model in [ 'YS1606']: #Need to add local hub as cloud - does not seem to work as local - but it is not a device in the local network
                 #    dev_access = self.yoAccess
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)
                 if model in ['YS1613', 'YS1605', 'YS1606']:
                     temp = udiYoBatteryHub(self.poly, address, address, name, dev_access, dev)
                 else:
@@ -198,7 +204,13 @@ def addNodes (self, deviceList) -> list:
                 for adr in temp.adr_list:
                     self.assigned_addresses.append(adr)
             elif dev['type'] in ['SpeakerHub']:
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                        
                 temp = udiYoSpeakerHub(self.poly, address, address, name,  dev_access, dev )                    
                 self.msgList=[]
                 logging.debug('Checking NBR_TTS')
@@ -234,14 +246,16 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)  
 
             elif dev['type'] in ['Switch']:
-                if  model in ['YS5708', 'YS5709']:
-                    logging.info('Adding swithSec device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
-                    temp = udiYoSwitch(self.poly, address, address, name,  dev_access, dev )
-                elif  model in ['YS5716']:
-                    logging.info('Adding swithPwr device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding switch device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)
+                if  model in ['YS5708', 'YS5709', 'YS5716']:
                     temp = udiYoSwitch(self.poly, address, address, name,  dev_access, dev )
                 else:
-                    logging.info('Adding switch device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
                     temp = udiYoSwitch(self.poly, address, address, name,  dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -250,7 +264,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)
 
             elif dev['type'] in ['Dimmer']:
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                        
                 temp = udiYoDimmer(self.poly, address, address, name,  dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -259,7 +279,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)                    
 
             elif dev['type'] in ['THSensor']:      
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                        
                 temp = udiYoTHsensor(self.poly, address, address, name, dev_access, dev)
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -268,7 +294,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)
         
             elif dev['type'] in ['MultiOutlet']:
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                        
                 temp = udiYoMultiOutlet(self.poly, address, address, name, dev_access, dev)
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -277,7 +309,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)                     
                         
             elif dev['type'] in ['DoorSensor']:                 
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                        
                 temp = udiYoDoorSensor(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -286,7 +324,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)                      
                         
             elif dev['type'] in ['Manipulator']:              
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                        
                 temp = udiYoManipulator(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -295,7 +339,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)                      
                         
             elif dev['type'] in ['MotionSensor']:              
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                        
                 temp = udiYoMotionSensor(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -304,7 +354,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)                      
 
             elif dev['type'] in  ['VibrationSensor']:                    
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                        
                 temp = udiYoVibrationSensor(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -317,7 +373,13 @@ def addNodes (self, deviceList) -> list:
                 #    logging.info('Adding device w. power {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
                 #    temp = udiYoOutletPwr(self.poly, address, address, name, dev_access, dev )
                 #else:
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)
                 temp = udiYoOutlet(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -326,7 +388,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)                      
         
             elif dev['type'] in ['GarageDoor']:                 
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                        
                 temp = udiYoGarageDoor(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -335,7 +403,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)                      
         
             elif dev['type'] in ['Finger']:                   
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                        
                 temp = udiYoGarageFinger(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -344,7 +418,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)                                                       
 
             elif dev['type'] in ['Lock' ]:        
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                     
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                     
                 temp = udiYoLock(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -353,7 +433,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)                        
 
             elif dev['type'] in ['LockV2']:        
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                     
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                     
                 temp = udiYoLockV2(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -362,7 +448,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)    
 
             elif dev['type'] == 'InfraredRemoter':           
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                        
                 temp = udiYoInfraredRemoter(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -371,7 +463,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)      
                                 
             elif dev['type'] in ['LeakSensor']:                 
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                        
                 temp = udiYoLeakSensor(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -380,7 +478,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)     
 
             elif dev['type'] in ['WaterDepthSensor']:   #  YS7905-UC           
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                        
                 temp = udiYoWaterDept(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -389,7 +493,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)     
 
             elif dev['type'] in ['COSmokeSensor']:                
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                        
                 temp = udiYoCOSmokeSensor(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -398,7 +508,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)       
 
             elif dev['type'] in ['PowerFailureAlarm']:                 
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                        
                 temp = udiYoPowerFailSenor(self.poly, address, address, name, dev_access, dev )
 
                 while not temp.node_ready:
@@ -408,7 +524,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)                  
 
             elif dev['type'] in ['SmartRemoter']:                    
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                        
                 temp = udiYoSmartRemoter(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -417,7 +539,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)
 
             elif dev['type'] in ['Siren']:                  
-                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))                                        
+                logging.info('Adding device {} ({}) as {}'.format( dev['name'], dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                                        
                 temp = udiYoSiren(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -426,7 +554,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)
 
             elif dev['type'] in ['WaterMeterController']:
-                logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) ))                       
+                logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)                       
                 #if  model in ['YS5007']:    
                 #    temp = udiYoWaterMeterOnly(self.poly, address, address, name, dev_access, dev )
                 #elif model in ['YS5029']: 
@@ -444,7 +578,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)     
 
             elif dev['type'] in ['WaterMeterMultiController']:
-                logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) )) 
+                logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)
                 if model in ['YS5029']: 
                     temp = udiYoWaterMeterMulti(self.poly, address, address, name, dev_access, dev )
                 else: 
@@ -456,8 +596,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)                                                 
 
             elif dev['type'] in [ 'SprinklerV2']: #'Sprinkler',
-                logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) )) 
-
+                logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)
                 temp = udiYoSprinkler2(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -466,8 +611,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)   
 
             elif dev['type'] in ['Thermostat']:
-                logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) )) 
-
+                logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)
                 temp = udiYoThermostat(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
@@ -476,8 +626,13 @@ def addNodes (self, deviceList) -> list:
                     self.assigned_addresses.append(adr)                            
 
             elif dev['type'] in ['SoilThcSensor']:
-                logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) )) 
-
+                logging.info('Adding device {} {} ({}) as {} -'.format( dev['name'], model, dev['type'], str(name) ))
+                # Rate limit: wait before instantiating this device
+                dev_id = dev['deviceId']
+                delay_seconds = dev_access.time_tracking(dev_id)
+                if delay_seconds > 0:
+                    logging.debug(f'Rate limit delay for {dev["name"]}: {delay_seconds:.2f}s')
+                    time.sleep(delay_seconds)
                 temp = udiYoSoilSensor(self.poly, address, address, name, dev_access, dev )
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
