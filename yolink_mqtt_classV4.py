@@ -158,7 +158,7 @@ class YoLinkMQTTDevice(object):
 
     #@measure_time
     def deviceError(yolink, data):
-        logging.debug(yolink.type+' - deviceError : {}'.format(data))
+        logging.debug(f'{yolink.type} ({yolink.name}) - deviceError : {data}')
         yolink.online = False
         # may need to add more error handling 
 
@@ -185,7 +185,7 @@ class YoLinkMQTTDevice(object):
 
     #@measure_time
     def refreshDevice(yolink):
-        logging.debug('{} - refreshDevice - supports'.format(yolink.type))
+        logging.debug(f'{yolink.type} ({yolink.name}) - refreshDevice')
         #attempt = 1
         #maxAttempts = 3
 
@@ -208,19 +208,19 @@ class YoLinkMQTTDevice(object):
 
     #@measure_time
     def latestUpdate(yolink):
-        logging.debug('{} - Checking last update'.format(yolink.type))
-        logging.debug('Data: {}'.format(yolink.data))
+        logging.debug(f'{yolink.type} ({yolink.name}) - Checking last update')
+        logging.debug(f'{yolink.type} ({yolink.name}) - Data: {yolink.data}')
         if 'stateChangedAt' in yolink.data[yolink.dData]:
-            logging.debug('lastUpdate stateChangedAt {}'.format(yolink.data.get(yolink.dData, {})['stateChangedAt']))
+            logging.debug(f'{yolink.type} ({yolink.name}) - lastUpdate stateChangedAt {yolink.data.get(yolink.dData, {})["stateChangedAt"]}')
             return(yolink.data[yolink.dData]['stateChangedAt'])
         elif 'lastStateTime' in yolink.data:
-            logging.debug('lastUpdate lastStateTime {}'.format(yolink.data.get('lastStateTime')))
+            logging.debug(f'{yolink.type} ({yolink.name}) - lastUpdate lastStateTime {yolink.data.get("lastStateTime")}')       
             if isinstance(yolink.data['lastStateTime'], (int, float)):
                 return(yolink.data['lastStateTime'] )
             else:
                 return(0)        
         elif yolink.lastUpd in yolink.data:
-            logging.debug('lastUpdate lastUpdTime {}'.format(yolink.data.get(yolink.lastUpd)))
+            logging.debug(f'{yolink.type} ({yolink.name}) - lastUpdate lastUpdTime {yolink.data.get(yolink.lastUpd)}')
             if isinstance(yolink.data[yolink.lastUpd ], (int, float)):
                 return(yolink.data[yolink.lastUpd ])
             else:
@@ -229,11 +229,10 @@ class YoLinkMQTTDevice(object):
             timestamp = yolink.data.get('reportAt')
             if isinstance(timestamp, str):                
                 dt = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")            
-                logging.debug('lastUpdate reportAt {}'.format(int(dt.timestamp())))
+                logging.debug(f'{yolink.type} ({yolink.name}) - lastUpdate reportAt {int(dt.timestamp())}')
                 return(dt.timestamp()*1000) # make in ms
         elif 'time' in yolink.data:
-            logging.debug('lastUpdate time {}'.format(yolink.data.get('time')))
-
+            logging.debug(f'{yolink.type} ({yolink.name}) - lastUpdate time {yolink.data.get("time")}')
             return(yolink.data.get('time'))
         else:
             return(0)
@@ -241,19 +240,19 @@ class YoLinkMQTTDevice(object):
 
     #@measure_time
     def lastUpdate(yolink):
-        logging.debug('{} - Checking last update'.format(yolink.type))
-        logging.debug('Data: {}'.format(yolink.data))
+        logging.debug(f'{yolink.type} ({yolink.name}) - Checking last update')
+        logging.debug(f'{yolink.type} ({yolink.name}) - Data: {yolink.data}')
         if 'stateChangedAt' in yolink.data.get(yolink.dData, {}):
-            logging.debug('lastUpdate stateChangedAt {}'.format(yolink.data.get(yolink.dData, {})['stateChangedAt']))
+            logging.debug(f'{yolink.type} ({yolink.name}) - lastUpdate stateChangedAt {yolink.data.get(yolink.dData, {})["stateChangedAt"]}')
             return(yolink.data.get(yolink.dData, {})['stateChangedAt'])
         elif 'lastStateTime' in yolink.data:
-            logging.debug('lastUpdate lastStateTime {}'.format(yolink.data.get('lastStateTime')))
+            logging.debug(f'{yolink.type} ({yolink.name}) - lastUpdate lastStateTime {yolink.data.get("lastStateTime")}')
             if isinstance(yolink.data.get('lastStateTime', 0), (int, float)):
                 return(yolink.data.get('lastStateTime', 0) )
             else:
                 return(0)        
         elif yolink.lastUpd in yolink.data:
-            logging.debug('lastUpdate lastUpdTime {}'.format(yolink.data.get(yolink.lastUpd)))
+            logging.debug(f'{yolink.type} ({yolink.name}) - lastUpdate lastUpdTime {yolink.data.get(yolink.lastUpd)}')
             if isinstance(yolink.data.get(yolink.lastUpd), (int, float)):
                 return(yolink.data.get(yolink.lastUpd))
             else:
@@ -262,10 +261,10 @@ class YoLinkMQTTDevice(object):
             timestamp = yolink.data.get('reportAt')
             if isinstance(timestamp, str):
                 dt = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")                
-                logging.debug('lastUpdate reportAt {}'.format(int(dt.timestamp())))
+                logging.debug(f'{yolink.type} ({yolink.name}) - lastUpdate reportAt {int(dt.timestamp())}')
                 return(dt.timestamp()*1000) # make in ms
         elif 'time' in yolink.data:
-            logging.debug('lastUpdate time {}'.format(yolink.data.get('time')))
+            logging.debug(f'{yolink.type} ({yolink.name}) - lastUpdate time {yolink.data.get("time")}') 
 
             return(yolink.data.get('time'))
         else:
