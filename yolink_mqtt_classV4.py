@@ -271,7 +271,7 @@ class YoLinkMQTTDevice(object):
             return(0)
     
     def throttled(yolink) -> bool:
-        logging.debug(f"Checking if throttled for {json.dumps(yolink.deviceInfo, indent=2)}")
+        logging.debug(f"Checking if throttled for {yolink.deviceInfo['name']} ({yolink.deviceInfo['deviceId']})")
         targetId = yolink.deviceInfo['deviceId']
         delay_s = yolink.yoAccess.time_tracking(targetId)
         logging.debug(f"Throttled check for {targetId}, delay_s: {delay_s}")
@@ -1375,7 +1375,7 @@ class YoLinkMQTTDevice(object):
         try:
             ret_val = None  
             if yolink.online and yolink.dData in yolink.data:
-                logging.debug(yolink.type+f' - getData key {key} category {category} index {WM_index} {yolink.data[yolink.dData]}')
+                logging.debug(yolink.type+f' - get Data key {key} category {category} index {WM_index} {yolink.data[yolink.dData]}')
 
                 if yolink.data[yolink.dData] is {}:
                     logging.info(f'No data exists (no data returned)')

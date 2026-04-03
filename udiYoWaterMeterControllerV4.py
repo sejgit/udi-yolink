@@ -166,11 +166,11 @@ class udiYoWaterMeterController(udi_interface.Node):
         time.sleep(2)
         self.yoWaterCtrl.initDevice()
         time.sleep(1)
-        tries = 1
-        while not self.yoWaterCtrl.check_system_online() and (tries <= 5 or self.yoWaterCtrl.throttled()):
+       
+        while not self.yoWaterCtrl.check_system_online()
             logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
-            tries += 1
+            
         self.yoWaterCtrl.getMeterCount()
         self.meter_unit = self.yoWaterCtrl.getMeterUnit()
         self.ISYwater_unit = self.yoAccess.get_water_unit()
@@ -292,6 +292,8 @@ class udiYoWaterMeterController(udi_interface.Node):
                     self.my_setDriver('GV3', recent_duration,  44, type=message_type)   
 
                     pwr_mode = self.yoWaterCtrl.get_data('powerMode')
+                    if pwr_mode is None:
+                        pwr_mode = self.yoWaterCtrl.get_data('powerSupply')
                     bat_lvl =  self.yoWaterCtrl.get_data('battery')
 
                     logging.debug('udiYoWaterMeterController - getBattery: {},  {}  '.format(pwr_mode, bat_lvl))

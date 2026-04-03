@@ -55,7 +55,7 @@ class YoLinkWaterMeter(YoLinkMQTTDevice):
 
 
     def getMeterCount(yolink):
-        yolink.water_meter_count = 1
+        yolink.water_meter_count = None
         if yolink.check_system_online():
             if yolink.get_data('state', 'valve') is not None:
                 yolink.water_meter_count = 1
