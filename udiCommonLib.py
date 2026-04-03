@@ -155,7 +155,7 @@ def addNodes (self, deviceList) -> list:
     #                    'WaterDepthSensor', ]    'WaterMeterController', 
     
     #supportedYoTypes = ['SprinklerV2', 'Sprinkler', 'Thermostat', 'SoilThcSensor', 'THSensor' ]     
-    #supportedYoTypes = ['InfraredRemoter']   
+    supportedYoTypes = ['WaterMeterController', 'WaterMeterMultiController']   
       
     remove_list= []
     for dev in deviceList:
