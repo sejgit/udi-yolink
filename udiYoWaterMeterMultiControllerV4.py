@@ -113,10 +113,10 @@ class udiYoWaterMeterMulti(udi_interface.Node):
             time.sleep(1)
             tries = 1
             while not self.yoWaterCtrl.check_system_online() and (tries <= 10 or self.yoWaterCtrl.throttled()):
-                logging.info(f'Waiting for device {self.name} to come online...')
+                logging.info(f'Waiting for device {self.name} to come online... Attempt {tries}')
                 time.sleep(2)
                 tries += 1
-            if not self.yoWaterCtrl.check_system_online():
+            if self.yoWaterCtrl.check_system_online():
                 self.meter_count = self.yoWaterCtrl.getMeterCount()
                 logging.debug(f'Meter count: {self.meter_count}')
                 self.meter_unit =  self.yoWaterCtrl.getMeterUnit()
@@ -128,13 +128,12 @@ class udiYoWaterMeterMulti(udi_interface.Node):
             logging.debug(f'meter unit : { self.meter_unit} ISY unit: { self.ISYwater_unit} uom: {self.ISYmeter_uom}')
 
             self.my_setDriver('GV1', self.yoWaterCtrl.water_meter_count)
-            if self.meter_count > 1:
+            if isinstance(self.meter_count, int) and self.meter_count > 1:
                 self.wm_nodes= {}
                 for wm_index in range(0, self.meter_count):
                     address = f'{self.address[-12:]}_{wm_index}'
                     wm_address = self.poly.getValidAddress(address)
                     wm_name = self.poly.getValidName(f'{self.name} CH{wm_index+1}')
-
                     self.wm_nodes[wm_index] = udiYoSubWaterMeter(self.poly, self.address, wm_address, wm_name, wm_index, self.yoAccess, self.yoWaterCtrl)
                     self.adr_list.append(wm_address)
                     logging.info(f'Added Water Meter Node: {wm_name} at {wm_address}')
