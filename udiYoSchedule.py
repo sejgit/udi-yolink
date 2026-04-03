@@ -282,41 +282,24 @@ class BaseScheduleNode(udi_interface.Node):
         self._support_seconds_source = 'unresolved'
         
         # Create yoSchedule wrapper and determine support_seconds BEFORE node initialization
-        self.yoSchedule = self._create_yolink_schedule()               
+        self.yoSchedule = self._create_yolink_schedule()
+        # Do not call refreshSchedules or make API calls here; defer to post-startup refresh
         support_seconds = self._resolve_support_seconds()
-        logging.debug(f'Initial supportSeconds resolution: {support_seconds} (source: {self._support_seconds_source})')
-        attempts = 0
-        # Use the same supportSeconds resolution behavior for all schedule-capable nodes.
-        max_attempts = 3
-        while not isinstance(support_seconds, bool) and attempts < max_attempts:
-            logging.debug(f'Attempt {attempts+1}: supportSeconds not resolved, retrying after refreshing schedules')
-            refreshed = self._refresh_parent_schedules()
-            if not refreshed:
-                self.yoSchedule.refreshSchedules()
-            time.sleep(1)
-            support_seconds = self._resolve_support_seconds()
-            attempts += 1
-
         if not isinstance(support_seconds, bool):
             logging.debug('Could not determine supportSeconds during init, defaulting to False')
             support_seconds = False
             self._support_seconds_source = 'default_false'
-
         self.support_seconds = support_seconds
-        
         logging.debug(
             f'Schedule support_seconds: {self.support_seconds} '
             f'(source: {self._support_seconds_source})'
         )
-        
         # Resolve node ID BEFORE super().__init__(); do not mutate after init.
         resolved_id = self._set_id_for_seconds_support()
         if isinstance(resolved_id, str) and resolved_id:
             self.id = resolved_id
-        
         # NOW call super().__init__() with correct id
         super().__init__(polyglot, primary, address, name)
-        
         self.poly.subscribe(self.poly.START, self.start, self.address)
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)

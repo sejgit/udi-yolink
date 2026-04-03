@@ -150,7 +150,19 @@ class udiYoWaterMeterController(udi_interface.Node):
             time.sleep(0.5)
         self.my_setDriver('GV30', 1)
         self.my_setDriver('GV20', 0)
-        self.yoWaterCtrl= YoLinkWaterMeter(self.yoAccess, self.devInfo, self.updateStatus)
+        # Create schedule nodes before device online check
+        if self.scheduleSupport:
+            # Create valve schedule child node
+            sch_address_valve = self.address[4:14] + '_VSC'
+            sch_address_valve = self.poly.getValidAddress(sch_address_valve)
+            self.schedule_valve = udiYoSchedule(self.poly, self.address, sch_address_valve, 'Valve Schedules', self.yoAccess, self.devInfo, schedule_type='valve')
+            self.adr_list.append(sch_address_valve)
+            # Create leak schedule child node
+            sch_address_leak = self.address[4:14] + '_LSC'
+            sch_address_leak = self.poly.getValidAddress(sch_address_leak)
+            self.schedule_leak = udiYoSchedule(self.poly, self.address, sch_address_leak, 'Leak Schedules', self.yoAccess, self.devInfo, schedule_type='leak')
+            self.adr_list.append(sch_address_leak)
+        self.yoWaterCtrl = YoLinkWaterMeter(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoWaterCtrl.initDevice()
         time.sleep(1)
@@ -161,32 +173,10 @@ class udiYoWaterMeterController(udi_interface.Node):
             tries += 1
         self.yoWaterCtrl.getMeterCount()
         self.meter_unit = self.yoWaterCtrl.getMeterUnit()
-        #self.my_setDriver('GV30', 1)
-        #self.yoWaterCtrl.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
-
         self.ISYwater_unit = self.yoAccess.get_water_unit()
-        #self.my_setDriver('GV4',  self.meter_unit, 25)          
-        self.ISYmeter_uom = self.water_meter_unit2uom( self.ISYwater_unit)
-        logging.debug(f'meter unit : { self.meter_unit} ISY unit: { self.ISYwater_unit} uom: {self.ISYmeter_uom}')
-        if self.scheduleSupport:
-        # Create valve schedule child node
-            sch_address_valve = self.address[4:14] + '_VSC'
-            sch_address_valve = self.poly.getValidAddress(sch_address_valve)
-            self.schedule_valve = udiYoSchedule(self.poly, self.address, sch_address_valve, 'Valve Schedules', self.yoAccess, self.devInfo, schedule_type='valve')
-            self.adr_list.append(sch_address_valve)
-            
-            # Create leak schedule child node
-            sch_address_leak = self.address[4:14] + '_LSC'
-            sch_address_leak = self.poly.getValidAddress(sch_address_leak)
-            self.schedule_leak = udiYoSchedule(self.poly, self.address, sch_address_leak, 'Leak Schedules', self.yoAccess, self.devInfo, schedule_type='leak')
-            self.adr_list.append(sch_address_leak)        
-            time.sleep(2)
-            # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
-
-        # Prime schedule data for both child schedule nodes.
-            
-        #self.updateData()
-        self.system_ready=True
+        self.ISYmeter_uom = self.water_meter_unit2uom(self.ISYwater_unit)
+        logging.debug(f'meter unit : {self.meter_unit} ISY unit: {self.ISYwater_unit} uom: {self.ISYmeter_uom}')
+        self.system_ready = True
 
     def stop (self):
         logging.info('Stop udiYoWaterMeterController')

@@ -240,41 +240,31 @@ class udiYoInfraredRemoter(udi_interface.Node):
         while not self.node_ready:
             time.sleep(0.5)
         self.my_setDriver('ST', 0)
-        self.yoIRrem  = YoLinkInfraredRemoter(self.yoAccess, self.devInfo, self.updateStatus)
+        # Create schedule node before device online check
+        sch_address = self.address[4:14] + '_SCH'
+        sch_address = self.poly.getValidAddress(sch_address)
+        self.schedule = udiYoSchedule(self.poly, self.address, sch_address, 'Schedules', self.yoAccess, self.devInfo)
+        self.adr_list.append(sch_address)
+        self.yoIRrem = YoLinkInfraredRemoter(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoIRrem.initNode()
         time.sleep(1)
-
-        while not self.yoIRrem.check_system_online() and ( self.yoIRrem.throttled()):
+        while not self.yoIRrem.check_system_online() and (self.yoIRrem.throttled()):
             logging.info(f'Waiting for device {self.name} to come online.. Must be online to get learned codes')
             time.sleep(2)
-    
         #self.my_setDriver('ST', 1)
         self.my_setDriver('GV30', 1)
         code_dict_temp = self.yoIRrem.get_code_dict()
         logging.debug(f'Code dict temp: {code_dict_temp}')
-
-        sch_address = self.address[4:14] + '_SCH'
-        sch_address = self.poly.getValidAddress(sch_address)
-        self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
-        self.adr_list.append(sch_address)
         time.sleep(2)
-        # Prime schedule values as soon as the schedule child node is created.
-        # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
-
         for code in range(0, len(code_dict_temp)):
             if code_dict_temp[code]:
                 logging.info(f'Adding code {code} to node list')
                 self.codes_used.append(code)
                 self.add_code_node(code)
-        
-        #self.poly.setCustomParams({'yoirremote': self.address})
-        #self.poly.saveCustomParams()
         self.poly.updateProfile()
-        #self.poly.addCustomProfile(self.id, 'YoLink Infrared Remoter', 'YoLink Infrared Remoter', 'YoLink Infrared Remoter')
         logging.info('YoLink Infrared Remoter Node Ready')
-        #self.updateData()
-        self.system_ready=True
+        self.system_ready = True
 
     def stop (self):
         logging.info('Stop udiIRremote')

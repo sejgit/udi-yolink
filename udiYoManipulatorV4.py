@@ -97,8 +97,12 @@ class udiYoManipulator(udi_interface.Node):
         while not self.node_ready:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0)
+        # Create schedule node before device online check
+        sch_address = self.address[4:14] + '_SCH'
+        sch_address = self.poly.getValidAddress(sch_address)
+        self.schedule = udiYoSchedule(self.poly, self.address, sch_address, 'Schedules', self.yoAccess, self.devInfo)
+        self.adr_list.append(sch_address)
         self.yoManipulator = YoLinkManipulator(self.yoAccess, self.devInfo, self.updateStatus)
-        
         time.sleep(4)
         self.yoManipulator.initNode()
         time.sleep(1)
@@ -107,16 +111,10 @@ class udiYoManipulator(udi_interface.Node):
             logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
-
-        sch_address = self.address[4:14] + '_SCH'
-        sch_address = self.poly.getValidAddress(sch_address)
-        self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
-        self.adr_list.append(sch_address)
         #self.my_setDriver('GV30', 1)
         time.sleep(2)
-        self.yoManipulator.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
-        # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
-        self.system_ready=True
+        self.yoManipulator.delayTimerCallback(self.updateDelayCountdown, self.timer_update)
+        self.system_ready = True
 
     def stop (self):
         logging.info('Stop udiYoManipulator')

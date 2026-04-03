@@ -115,7 +115,12 @@ class udiYoSprinkler2(udi_interface.Node):
         logging.info('Start - udiYoSprinkler2')
         self.my_setDriver('GV30', 1)
         self.my_setDriver('GV20', 0)
-        self.yoSprinkler= YoLinkSprinkler(self.yoAccess, self.devInfo, self.updateStatus)
+        # Create schedule node before device online check
+        sch_address = self.address[4:14] + '_SCH'
+        sch_address = self.poly.getValidAddress(sch_address)
+        self.schedule = udiYoSchedule(self.poly, self.address, sch_address, 'Schedules', self.yoAccess, self.devInfo)
+        self.adr_list.append(sch_address)
+        self.yoSprinkler = YoLinkSprinkler(self.yoAccess, self.devInfo, self.updateStatus)
         self.yoSprinkler.initNode()
         time.sleep(1)
         tries = 1
@@ -123,25 +128,12 @@ class udiYoSprinkler2(udi_interface.Node):
             logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
-      
         self.meter_unit = self.yoSprinkler.get_data('meterUnit', 'attributes')
         self.step_factor = self.yoSprinkler.get_data('meterStepFactor', 'attributes')
-        #self.my_setDriver('GV30', 1)
-        #self.yoSprinkler.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
-
         self.ISYwater_unit = self.yoAccess.get_water_unit()
-        #self.my_setDriver('GV4',  self.meter_unit, 25)          
-        self.ISYmeter_uom = self.water_meter_unit2uom( self.ISYwater_unit)
-        logging.debug(f'meter unit : { self.meter_unit} ISY unit: { self.ISYwater_unit} uom: {self.ISYmeter_uom} meterFactor: {self.step_factor}')
-        sch_address = self.address[4:14] + '_SCH'
-        sch_address = self.poly.getValidAddress(sch_address)
-        self.schedule = udiYoSchedule(self.poly, self.address, sch_address, 'Schedules', self.yoAccess, self.devInfo)
-        self.adr_list.append(sch_address)
-        #time.sleep(2)
-        # Prime schedule node values immediately after startup.
-        #self.yoSprinkler.refreshSchedules()        
+        self.ISYmeter_uom = self.water_meter_unit2uom(self.ISYwater_unit)
+        logging.debug(f'meter unit : {self.meter_unit} ISY unit: {self.ISYwater_unit} uom: {self.ISYmeter_uom} meterFactor: {self.step_factor}')
         self.system_ready = True
-        #self.updateData()
 
     def stop (self):
         logging.info('Stop udiYoSprinkler2')

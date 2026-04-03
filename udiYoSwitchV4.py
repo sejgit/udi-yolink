@@ -99,7 +99,11 @@ class udiYoSwitch(udi_interface.Node):
         logging.info('start - udiYoSwitch')
         while not self.node_ready:
             time.sleep(0.5)
-        #self.my_setDriver('GV30', 0)
+        # Create schedule node before device online check
+        sch_address = self.address[4:14] + '_SCH'
+        sch_address = self.poly.getValidAddress(sch_address)
+        self.schedule = udiYoSchedule(self.poly, self.address, sch_address, 'Schedules', self.yoAccess, self.devInfo)
+        self.adr_list.append(sch_address)
         self.yoSwitch  = YoLinkSwitch(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(3)
         self.yoSwitch.initNode()
@@ -112,26 +116,19 @@ class udiYoSwitch(udi_interface.Node):
         time.sleep(2)
         # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
         time.sleep(1)
-
-
         #self.my_setDriver('GV30', 1)
-        self.yoSwitch.delayTimerCallback (self.updateDelayCountdown, self.timer_update )
-        for key in range (0,self.nbr_keys):
-            logging.debug(' {}'.format(key) )
-            k_address =  self.address[4:14]+'key' + str(key)
+        self.yoSwitch.delayTimerCallback(self.updateDelayCountdown, self.timer_update)
+        for key in range(0, self.nbr_keys):
+            logging.debug(' {}'.format(key))
+            k_address = self.address[4:14] + 'key' + str(key)
             k_address = self.poly.getValidAddress(str(k_address))
-            k_name =  str(self.name) + ' key' + str(key+1)
+            k_name = str(self.name) + ' key' + str(key + 1)
             k_name = self.poly.getValidName(str(k_name))
             self.keys[key] = udiRemoteKey(self.poly, self.address, k_address, k_name, key)
             self.adr_list.append(k_address)
             logging.debug('Waiting for node to complete{}'.format(self.adr_list))
             #self.wait_for_node_done()
-
-        sch_address = self.address[4:14] + '_SCH'
-        sch_address = self.poly.getValidAddress(sch_address)
-        self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
-        self.adr_list.append(sch_address)
-        self.system_ready=True
+        self.system_ready = True
 
     def updateDelayCountdown (self, timeRemaining ) :
         logging.debug('updateDelayCountdown {}'.format(timeRemaining))

@@ -117,7 +117,12 @@ class udiYoDimmer(udi_interface.Node):
             time.sleep(0.5)
         #self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
-        self.yoDimmer  = YoLinkDim(self.yoAccess, self.devInfo, self.updateStatus)
+        # Create schedule node before device online check
+        sch_address = self.address[4:14] + '_SCH'
+        sch_address = self.poly.getValidAddress(sch_address)
+        self.schedule = udiYoSchedule(self.poly, self.address, sch_address, 'Schedules', self.yoAccess, self.devInfo)
+        self.adr_list.append(sch_address)
+        self.yoDimmer = YoLinkDim(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.yoDimmer.initNode()
         time.sleep(1)
@@ -126,23 +131,15 @@ class udiYoDimmer(udi_interface.Node):
             logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
-
         time.sleep(2)
-
         self.yoDimmer.get_attributes()
-        sch_address = self.address[4:14] + '_SCH'
-        sch_address = self.poly.getValidAddress(sch_address)
-
         self.dim_setting['dim'] = self.yoDimmer.get_data('brightness')
         self.yoDimmer.setBrightness(self.dim_setting['dim'])
         self.dim_setting['previous'] = self.yoDimmer.brightness
         #self.my_setDriver('ST', 1)
-        self.yoDimmer.delayTimerCallback (self.updateDelayCountdown, self.timer_update )
-        self.schedule = udiYoSchedule( self.poly, self.address, sch_address, 'Schedules' , self.yoAccess, self.devInfo)
-        self.adr_list.append(sch_address)
+        self.yoDimmer.delayTimerCallback(self.updateDelayCountdown, self.timer_update)
         time.sleep(1)
-        # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
-        self.system_ready=True
+        self.system_ready = True
 
     def updateDelayCountdown (self, timeRemaining ) :
         logging.debug('updateDelayCountdown {}'.format(timeRemaining))

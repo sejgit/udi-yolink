@@ -210,6 +210,7 @@ class YoLinkInitPAC(object):
         if yoAccess.token == None:
             try:
                 now = int(time.time())
+                yoAccess.time_tracking('global')
                 response = requests.post( yoAccess.tokenURL,
                         data={"grant_type": "client_credentials",
                             "client_id" : yoAccess.uaID,
@@ -247,6 +248,7 @@ class YoLinkInitPAC(object):
             
             if yoAccess.token != None:
                 if now < yoAccess.token['expirationTime']:
+                    yoAccess.time_tracking('global')
                     response = requests.post( yoAccess.tokenURL,
                         data={"grant_type": "refresh_token",
                             "client_id" :  yoAccess.uaID,
@@ -254,6 +256,7 @@ class YoLinkInitPAC(object):
                             }, timeout= 5
                     )
                 else:
+                    yoAccess.time_tracking('global')
                     response = requests.post( yoAccess.tokenURL,
                         data={"grant_type": "client_credentials",
                             "client_id" : yoAccess.uaID,
@@ -269,6 +272,7 @@ class YoLinkInitPAC(object):
                     logging.error('Was not able to refresh token')
                     return(False)
             else:
+                yoAccess.time_tracking('global')
                 response = requests.post( yoAccess.tokenURL,
                     data={"grant_type": "client_credentials",
                         "client_id" : yoAccess.uaID,
@@ -319,6 +323,7 @@ class YoLinkInitPAC(object):
             headers1 = {}
             headers1['Content-type'] = 'application/json'
             headers1['Authorization'] = 'Bearer '+ yoAccess.token['access_token']
+            yoAccess.time_tracking('global')
             r = requests.post(yoAccess.apiv2URL, data=json.dumps(data), headers=headers1, timeout=5) 
             info = r.json()
             logging.debug('info : {}'.format(json.dumps(info, indent=4, separators=(',', ': ') )))
@@ -342,6 +347,7 @@ class YoLinkInitPAC(object):
             headers1['Content-type'] = 'application/json'
             headers1['Authorization'] = 'Bearer '+ yoAccess.token['access_token']
 
+            yoAccess.time_tracking('global')
             r = requests.post(yoAccess.apiv2URL, data=json.dumps(data), headers=headers1, timeout=5) 
             logging.debug('Obtaining  homeID : {}'.format(r.ok))
             if r.ok:
