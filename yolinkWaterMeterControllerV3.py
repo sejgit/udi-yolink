@@ -22,21 +22,22 @@ class YoLinkWaterMeter(YoLinkMQTTDevice):
         yolink.maxSchedules = 6
         #yolink.methodList = ['setAttributes', 'getState', 'setState', 'setDelay', 'getSchedules', 'setSchedules', 'getUpdate'   ]
         #yolink.eventList = ['StatusChange', 'Report', 'HourlyReport']
-        yolink.stateList = ['open', 'closed', 'on', 'off']
+        #yolink.stateList = ['open', 'closed', 'on', 'off']
         #yolink.ManipulatorName = 'WaterMeterControllerEvent'
         #yolink.eventTime = 'Time'
         yolink.type = deviceInfo['type']
         yolink.MQTT_type = 'c'
         yolink.uom = None
+        yolink.WMcount = None
+        yolink.meter_unit = None
+        yolink.water_meter_count = 1 
         #time.sleep(1)
 
 
     
+    '''
     def initDevice (yolink):
         logging.debug('init node')
-        yolink.WMcount = None
-        yolink.meter_unit = None
-        yolink.water_meter_count = 1 
         yolink.refreshDevice()
         #time.sleep(2)
         #logging.debug(f'Water Meter Controller - GV23 maxSchedules: {yolink.maxSchedules}')
@@ -47,7 +48,7 @@ class YoLinkWaterMeter(YoLinkMQTTDevice):
         #else:
         #    
         #yolink.refreshFW
-    
+    '''
 
     
     def updateStatus(yolink, data, WM_index = None):
