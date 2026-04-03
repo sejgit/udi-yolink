@@ -127,7 +127,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                 self.meter_count = 2 # default value if device is online but meter count not retrieved - should be updated when data is retrieved
                 self.poly.Notices['offline'] = 'Number of meters not retrieved (device likely offline) -  defaulting to 2.  If wrong make sure device is online and restart'
                 logging.warning('Device not online - defaulting meter count to 2')
-                
+
             self.my_setDriver('GV1', self.yoWaterCtrl.water_meter_count)
             if isinstance(self.meter_count, int) and self.meter_count > 1:
                 self.wm_nodes= {}
@@ -351,17 +351,8 @@ class udiYoSubWaterMeter(udi_interface.Node):
         while not self.node_ready:
             time.sleep(0.5)
 
-        #self.yoWaterCtrl= YoLinkWaterMultiMeter(self.yoAccess, self.yoWaterCtrl.devInfo, self.updateStatus)
-        
-        #time.sleep(4)
-        #self.yoWaterCtrl.initDevice()
-        #time.sleep(2)
-        tries = 1
-        while not self.yoWaterCtrl.check_system_online() and (tries <= 5 or self.yoWaterCtrl.throttled()):
-            logging.info(f'Waiting for device {self.name} to come online...')
-            time.sleep(2)
-            tries += 1
-        
+        # No online check here - the main node already waited for the device
+        # before creating subnodes; they share the same yoWaterCtrl reference.
         self.meter_unit =  self.yoWaterCtrl.getMeterUnit()
         self.ISYwater_unit = self.yoAccess.get_water_unit()     
         self.ISYmeter_uom= self.water_meter_unit2uom( self.ISYwater_unit)
@@ -400,10 +391,11 @@ class udiYoSubWaterMeter(udi_interface.Node):
                         logging.debug('Empty data received - skip updateData')
                         self.my_setDriver('GV20', 6)
                         return
-                    if self.ISYmeter_uom is None:
-                        logging.debug(f'meter unit : { self.meter_unit}')
-                        #self.my_setDriver('GV4',  self.meter_unit, 25)          
-                        self.ISYmeter_uom= self.water_meter_unit2uom( self.meter_unit)
+                    if self.meter_unit is None:
+                        self.meter_unit = self.yoWaterCtrl.getMeterUnit()
+                        self.ISYwater_unit = self.yoAccess.get_water_unit()
+                        self.ISYmeter_uom = self.water_meter_unit2uom(self.ISYwater_unit)
+
                     state =  self.yoWaterCtrl.get_data('state', 'valves', self.WM_index)
                     #Needs to update 
                     
