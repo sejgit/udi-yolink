@@ -110,10 +110,12 @@ class udiYoWaterMeterController(udi_interface.Node):
 
         self.devInfo =  deviceInfo
         self.yoWaterCtrl= None
+
         self.schedule_valve = None
         self.schedule_leak = None
         self.node_ready = False
-        self.system_ready=False
+        self.system_ready = False
+        self.meter_count = 1
         self.last_state = ''
         self.timer_cleared = True
         self.timer_update = 5
@@ -166,12 +168,18 @@ class udiYoWaterMeterController(udi_interface.Node):
         time.sleep(2)
         self.yoWaterCtrl.initDevice()
         time.sleep(1)
-       
-        while not self.yoWaterCtrl.check_system_online()
+        tries = 1
+        while not self.yoWaterCtrl.check_system_online() and (tries <= 10 or self.yoWaterCtrl.throttled()):
             logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
+            tries += 1
             
-        self.yoWaterCtrl.getMeterCount()
+        #self.yoWaterCtrl.getMeterCount()
+        #if self.meter_count is None:
+        #    logging.error('Water meter count not found')
+        #    self.poly.Notices['nometer'] = 'No watermeter found - may be offline - cannot continue initialization'
+        #    return
+
         self.meter_unit = self.yoWaterCtrl.getMeterUnit()
         self.ISYwater_unit = self.yoAccess.get_water_unit()
         self.ISYmeter_uom = self.water_meter_unit2uom(self.ISYwater_unit)
@@ -221,6 +229,10 @@ class udiYoWaterMeterController(udi_interface.Node):
                 message_type, message_action = self.yoWaterCtrl.get_message_type()
                 unix_time = self.yoWaterCtrl.get_report_time('time')
                 self.my_setDriver('TIME', unix_time, 151)
+                if self.meter_unit is None:
+                    self.meter_unit = self.yoWaterCtrl.getMeterUnit()
+                    self.ISYwater_unit = self.yoAccess.get_water_unit()
+                    self.ISYmeter_uom = self.water_meter_unit2uom(self.ISYwater_unit)
 
                 if message_type and 'Schedules' in str(message_type):
                     # Route valve schedules to valve node

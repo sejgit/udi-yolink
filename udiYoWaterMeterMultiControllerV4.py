@@ -62,6 +62,10 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         else:
             self.scheduleSupport = True     
 
+        self.meter_count = 2 # must be 2 or more - mostly if device is offline at startup - will be updated when device is online and data is retrieved
+        if model in ['YS5029']:
+            self.meter_count = 2
+    
         self.devInfo =  deviceInfo
         self.name = name
         self.address = address
@@ -112,17 +116,15 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                 logging.info(f'Waiting for device {self.name} to come online...')
                 time.sleep(2)
                 tries += 1
-            self.meter_count = self.yoWaterCtrl.getMeterCount()
-            self.meter_unit = self.yoWaterCtrl.getMeterUnit()
-            logging.debug(f'Meter count: {self.meter_count}')
-            if self.meter_count is None:
-                logging.error('Water meter count not found')
-                self.poly.Notices['nometer'] = 'No multi meter found - may be offline - cannot continue initialization'
-                return
-            
-            self.meter_unit =  self.yoWaterCtrl.getMeterUnit()
-            self.ISYwater_unit = self.yoAccess.get_water_unit()     
-            self.ISYmeter_uom= self.water_meter_unit2uom( self.ISYwater_unit)
+            if not self.yoWaterCtrl.check_system_online():
+                self.meter_count = self.yoWaterCtrl.getMeterCount()
+                logging.debug(f'Meter count: {self.meter_count}')
+                self.meter_unit =  self.yoWaterCtrl.getMeterUnit()
+                self.ISYwater_unit = self.yoAccess.get_water_unit()     
+                self.ISYmeter_uom= self.water_meter_unit2uom( self.ISYwater_unit)
+            else:
+                self.meter_count = 2 # default value if device is online but meter count not retrieved - should be updated when data is retrieved
+                self.poly.notice('Device is online but meter count not retrieved - defaulting to 2.  If wrong make sure device is online and restart')
             logging.debug(f'meter unit : { self.meter_unit} ISY unit: { self.ISYwater_unit} uom: {self.ISYmeter_uom}')
 
             self.my_setDriver('GV1', self.yoWaterCtrl.water_meter_count)
@@ -191,7 +193,10 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                 message_type, message_action = self.yoWaterCtrl.get_message_type()
                 unix_time = self.yoWaterCtrl.get_report_time('time')
                 self.my_setDriver('TIME', unix_time, 151)
-                
+                if self.meter_unit is None:
+                    self.meter_unit = self.yoWaterCtrl.getMeterUnit()
+                    self.ISYwater_unit = self.yoAccess.get_water_unit()
+                    self.ISYmeter_uom = self.water_meter_unit2uom(self.ISYwater_unit)
                 if message_type and 'Schedules' in str(message_type):
                     # Route valve schedules to valve node
                     if 'Valve' in str(message_type) and self.schedule_valve is not None:
