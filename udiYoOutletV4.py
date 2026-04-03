@@ -218,11 +218,9 @@ class udiYoOutlet(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('udiYoOutlet updateStatus')
-        if self.node is not None:
-            while not self.node_ready or not self.system_ready:
-                time.sleep(0.5)
-        self.yoOutlet.updateStatus(data)
-        self.updateData()
+        if self.yoOutlet is not None:
+            self.yoOutlet.updateStatus(data)
+            self.updateData()
 
 
     def updateDelayCountdown( self, timeRemaining):

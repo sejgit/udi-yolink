@@ -74,7 +74,7 @@ class udiYoSprinkler(udi_interface.Node):
         self.n_queue = []  
         self.yoAccess = yoAccess
         self.devInfo =  deviceInfo
-        self.yoTHsensor  = None
+        self.yoSprinkler  = None
         self.node_ready = False
         self.system_ready=False
         self.temp_unit = self.yoAccess.get_temp_unit()   
@@ -127,13 +127,13 @@ class udiYoSprinkler(udi_interface.Node):
         while not self.node_ready:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0)
-        self.yoTHsensor  = YoLinkSprinkler(self.yoAccess, self.devInfo, self.updateStatus)
+        self.yoSprinkler  = YoLinkSprinkler(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(1)
-        self.yoTHsensor.initNode()
+        self.yoSprinkler.initNode()
         time.sleep(1)
         time.sleep(1)
         tries = 1
-        while not self.yoTHsensor.check_system_online() and (tries <= 5 or self.yoTHsensor.throttled()):
+        while not self.yoSprinkler.check_system_online() and (tries <= 5 or self.yoSprinkler.throttled()):
             logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
@@ -142,28 +142,28 @@ class udiYoSprinkler(udi_interface.Node):
         self.system_ready=True
 
     def initNode(self):
-        self.yoTHsensor.refreshSensor()
+        self.yoSprinkler.refreshSensor()
 
     
     def stop (self):
         logging.info('Stop udiYoSprinkler')
         self.my_setDriver('GV30', 0)
-        if getattr(self, 'yoTHsensor', None):
-            self.yoTHsensor.shut_down()
+        if getattr(self, 'yoSprinkler', None):
+            self.yoSprinkler.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 
     def checkOnline(self):
-        self.yoTHsensor.refreshDevice()
+        self.yoSprinkler.refreshDevice()
 
     def checkDataUpdate(self):
-        if self.yoTHsensor.data_updated():
+        if self.yoSprinkler.data_updated():
             self.updateData()
 
 
     def get_alarms_state (self):
         alarm_on = False
-        alarms = self.yoTHsensor.getAlarms()
+        alarms = self.yoSprinkler.getAlarms()
         logging.debug(f'Alarms: {alarms}')
         if alarms:
             for a_type in alarms:
@@ -173,36 +173,36 @@ class udiYoSprinkler(udi_interface.Node):
 
 
     def updateData(self):
-        #alarms = self.yoTHsensor.getAlarms()
-        #limits = self.yoTHsensor.getLimits()
-        logging.info('yoTHsensor -  updateData')
+        #alarms = self.yoSprinkler.getAlarms()
+        #limits = self.yoSprinkler.getLimits()
+        logging.info('yoSprinkler -  updateData')
         alarm_det = False 
         if self.node is not None:
             while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
                 
-            message_type, message_action = self.yoTHsensor.get_message_type() # if event some data may not be updated 
-            unix_time = self.yoTHsensor.get_report_time('reportAt')
+            message_type, message_action = self.yoSprinkler.get_message_type() # if event some data may not be updated 
+            unix_time = self.yoSprinkler.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
-            if self.yoTHsensor.check_system_online():
-                tempC = self.yoTHsensor.get_data('temperature', 'state')
-                tempLimMin = self.yoTHsensor.get_data('min', 'tempLimit')
-                tempLimMax = self.yoTHsensor.get_data('max', 'tempLimit')    
-                lowTempAlarm = self.yoTHsensor.get_data('lowTemp', 'alarms')
-                highTempAlarm = self.yoTHsensor.get_data('highTemp', 'alarms')     
+            if self.yoSprinkler.check_system_online():
+                tempC = self.yoSprinkler.get_data('temperature', 'state')
+                tempLimMin = self.yoSprinkler.get_data('min', 'tempLimit')
+                tempLimMax = self.yoSprinkler.get_data('max', 'tempLimit')    
+                lowTempAlarm = self.yoSprinkler.get_data('lowTemp', 'alarms')
+                highTempAlarm = self.yoSprinkler.get_data('highTemp', 'alarms')     
                 alarm_det = alarm_det or lowTempAlarm or highTempAlarm        
                 hum = None
                 if 'hum' in self.meas_support:
-                    hum = self.yoTHsensor.get_data('humidity', 'state')
-                    humLimMin = self.yoTHsensor.get_data('min', 'humidityLimit')
-                    humLimMax = self.yoTHsensor.get_data('max', 'humidityLimit') 
-                    lowHumAlarm = self.yoTHsensor.get_data('lowHumidity', 'alarms')
-                    highHumAlarm = self.yoTHsensor.get_data('highHumidity', 'alarms')  
+                    hum = self.yoSprinkler.get_data('humidity', 'state')
+                    humLimMin = self.yoSprinkler.get_data('min', 'humidityLimit')
+                    humLimMax = self.yoSprinkler.get_data('max', 'humidityLimit') 
+                    lowHumAlarm = self.yoSprinkler.get_data('lowHumidity', 'alarms')
+                    highHumAlarm = self.yoSprinkler.get_data('highHumidity', 'alarms')  
                     alarm_det = alarm_det or lowHumAlarm or highHumAlarm
-                tempMeasMin, tempMeasMax, humMeasMin, humMeasMax = self.yoTHsensor.update_data_24_hours(unix_time, tempC, hum)
-                bat_lvl = self.yoTHsensor.get_data('battery', 'state')
-                bat_alarm = self.yoTHsensor.get_data('batteryLow', 'alarms')
-                #tempMeas = self.yoTHsensor.get_data('temperature', 'statistics')
+                tempMeasMin, tempMeasMax, humMeasMin, humMeasMax = self.yoSprinkler.update_data_24_hours(unix_time, tempC, hum)
+                bat_lvl = self.yoSprinkler.get_data('battery', 'state')
+                bat_alarm = self.yoSprinkler.get_data('batteryLow', 'alarms')
+                #tempMeas = self.yoSprinkler.get_data('temperature', 'statistics')
                 #if isinstance(tempMeas, dict):
                 #    tempMeasMin = tempMeas.get('min', None)
                 ##    tempMeasMax = tempMeas.get('max', None)
@@ -242,8 +242,8 @@ class udiYoSprinkler(udi_interface.Node):
    
                 
             
-                self.my_setDriver('GV1', self.yoTHsensor.bool2Nbr(lowTempAlarm), type=message_type)
-                self.my_setDriver('GV2', self.yoTHsensor.bool2Nbr(highTempAlarm), type=message_type)
+                self.my_setDriver('GV1', self.yoSprinkler.bool2Nbr(lowTempAlarm), type=message_type)
+                self.my_setDriver('GV2', self.yoSprinkler.bool2Nbr(highTempAlarm), type=message_type)
 
                 if 'hum' in self.meas_support:
                     if isinstance(hum,(int,float)):
@@ -253,8 +253,8 @@ class udiYoSprinkler(udi_interface.Node):
                         self.my_setDriver('GV13', humLimMax, 51, type=message_type)
                         self.my_setDriver('GV16', humMeasMin, 51, type=message_type)
                         self.my_setDriver('GV17', humMeasMax, 51, type=message_type)
-                    self.my_setDriver('GV4', self.yoTHsensor.bool2Nbr(lowHumAlarm), type=message_type)
-                    self.my_setDriver('GV5', self.yoTHsensor.bool2Nbr(highHumAlarm), type=message_type)
+                    self.my_setDriver('GV4', self.yoSprinkler.bool2Nbr(lowHumAlarm), type=message_type)
+                    self.my_setDriver('GV5', self.yoSprinkler.bool2Nbr(highHumAlarm), type=message_type)
                     if alarm_det or lowHumAlarm or highHumAlarm:
                         alarm_det = True
                 else:
@@ -268,7 +268,7 @@ class udiYoSprinkler(udi_interface.Node):
 
 
                 self.my_setDriver('BATLVL', bat_lvl, 25, type=message_type)
-                self.my_setDriver('GV7', self.yoTHsensor.bool2Nbr(bat_alarm))
+                self.my_setDriver('GV7', self.yoSprinkler.bool2Nbr(bat_alarm))
                 alarm_det = alarm_det or bat_alarm
 
                 if alarm_det != self.alarm_state:
@@ -279,12 +279,12 @@ class udiYoSprinkler(udi_interface.Node):
                     self.alarm_state = alarm_det                
 
 
-                    self.my_setDriver('GV8', self.yoTHsensor.bool2Nbr(self.alarm_state))
+                    self.my_setDriver('GV8', self.yoSprinkler.bool2Nbr(self.alarm_state))
                     self.my_setDriver('GV9', self.cmd_state)
 
                 self.my_setDriver('GV30', 1)
 
-                if self.yoTHsensor.suspended:
+                if self.yoSprinkler.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
                     self.my_setDriver('GV20', 0)                
@@ -299,7 +299,7 @@ class udiYoSprinkler(udi_interface.Node):
         if self.node is not None:
             while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
-        self.yoTHsensor.updateStatus(data)
+        self.yoSprinkler.updateStatus(data)
         self.updateData()
 
     def set_cmd(self, command):
@@ -311,7 +311,7 @@ class udiYoSprinkler(udi_interface.Node):
 
     def update(self, command = None):
         logging.info('THsensor Update')
-        self.yoTHsensor.refreshDevice()
+        self.yoSprinkler.refreshDevice()
        
     commands = {
                 'SETCMD': set_cmd,             

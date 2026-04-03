@@ -186,11 +186,9 @@ class udiYoWaterDept(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.debug('udiYoWaterDept - updateStatus')
-        if self.node is not None:
-            while not self.node_ready or not self.system_ready:
-                time.sleep(0.5)
-        self.yoWaterDept.updateStatus(data)
-        self.updateData()
+        if self.yoWaterDept is not None:        
+            self.yoWaterDept.updateStatus(data)
+            self.updateData()
 
     def set_attributes(self, command):
         logging.info('udiYoWaterDept  set_attributes - {}'.format(command))

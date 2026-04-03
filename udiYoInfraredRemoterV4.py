@@ -333,22 +333,21 @@ class udiYoInfraredRemoter(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('udiIRremote updateStatus')
-        if self.node is not None:
-            while not self.node_ready or not self.system_ready:
-                time.sleep(0.5)
-        self.yoIRrem.updateStatus(data)
-        self.updateData()
-        #res = self.yoIRrem.getIRstatus_info()
-        #logging.debug(f'IR status info: {res}')
-        logging.debug(f'Code nodes: {self.code_nodes}')
-        update_type = self.yoIRrem.get_info('type')
-        action = self.yoIRrem.get_info('action')
-        if action in ['send', 'report'] or update_type == 'event':
-            res_code = self.yoIRrem.get_data('key')
-            if isinstance(res_code, int) and res_code in self.code_nodes:
-                logging.debug(f'Updating code node {res_code}')
-                self.code_nodes[res_code].updateData()
-                
+        if self.yoIRrem is not None:
+  
+            self.yoIRrem.updateStatus(data)
+            self.updateData()
+            #res = self.yoIRrem.getIRstatus_info()
+            #logging.debug(f'IR status info: {res}')
+            logging.debug(f'Code nodes: {self.code_nodes}')
+            update_type = self.yoIRrem.get_info('type')
+            action = self.yoIRrem.get_info('action')
+            if action in ['send', 'report'] or update_type == 'event':
+                res_code = self.yoIRrem.get_data('key')
+                if isinstance(res_code, int) and res_code in self.code_nodes:
+                    logging.debug(f'Updating code node {res_code}')
+                    self.code_nodes[res_code].updateData()
+                    
     def checkOnline(self):
         self.yoIRrem.refreshDevice()
 

@@ -172,11 +172,9 @@ class udiYoVibrationSensor(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoLinkVibrationSensor')
-        if self.node is not None:
-            while not self.node_ready or not self.system_ready:
-                time.sleep(0.5)
-        self.yoVibrationSensor.updateStatus(data)
-        self.updateData()
+        if self.yoVibrationSensor is not None:
+            self.yoVibrationSensor.updateStatus(data)
+            self.updateData()
 
     def set_cmd(self, command):
         ctrl = int(command.get('value'))   

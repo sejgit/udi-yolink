@@ -255,11 +255,9 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                     
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoWaterMeterController')
-        if self.node is not None:
-            while not self.node_ready or not self.system_ready:
-                time.sleep(0.5)
-        self.yoWaterCtrl.updateStatus(data)
-        self.updateData()
+        if self.yoWaterCtrl is not None:        
+            self.yoWaterCtrl.updateStatus(data)  # always update device data immediately so check_system_online() can unblock start()
+            self.updateData()
 
     commands = {
                 'UPDATE': update,
@@ -634,14 +632,12 @@ class udiYoSubWaterMeter(udi_interface.Node):
         self.my_setDriver('GV2', self.offDelay * 60 )
         self.yoWaterCtrl.setDelayList([{'ch':str(self.WM_index), 'on':self.onDelay, 'off':self.offDelay}]) 
 
+    '''
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoWaterMeterMultiController')
-        if self.node is not None:
-            while not self.node_ready or not self.system_ready:
-                time.sleep(0.5)
-        self.yoWaterCtrl.updateStatus(data)
+        self.yoWaterCtrl.updateStatus(data)  # always update device data immediately so check_system_online() can unblock start()
         self.updateData()
-
+    '''
 
     commands = {
                 'UPDATE': update,

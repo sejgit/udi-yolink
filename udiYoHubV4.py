@@ -144,11 +144,9 @@ class udiYoBatteryHub(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('updateStatus - Hub')
-        if self.node is not None:
-            while not self.node_ready or not self.system_ready:
-                time.sleep(0.5)
-        self.yoHub.updateStatus(data)
-        self.updateData()
+        if self.yoHub is not None:
+            self.yoHub.updateStatus(data)
+            self.updateData()
            
 
     def update(self, command = None):
@@ -284,11 +282,9 @@ class udiYoHub(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('updateStatus - Hub')
-        if self.node is not None:
-            while not self.node_ready or not self.system_ready:
-                time.sleep(0.5)        
-        self.yoHub.updateStatus(data)
-        self.updateData()
+        if self.yoHub is not None:
+            self.yoHub.updateStatus(data)
+            self.updateData()
            
 
     def update(self, command = None):

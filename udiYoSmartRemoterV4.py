@@ -473,11 +473,9 @@ class udiYoSmartRemoter(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoSmartRemoter')
-        if self.node is not None:
-            while not self.node_ready or not self.system_ready:
-                time.sleep(0.5)
-        self.yoSmartRemote.updateStatus(data)
-        self.updateData()
+        if self.yoSmartRemote is not None:
+            self.yoSmartRemote.updateStatus(data)
+            self.updateData()
 
     def update(self, command = None):
         logging.info('udiYoSmartRemoter Update  Executed')

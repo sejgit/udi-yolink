@@ -96,12 +96,12 @@ class udiYoGarageDoor(udi_interface.Node):
         self.my_setDriver('GV30', 0)
         if getattr(self, 'yoDoorControl', None):
             self.yoDoorControl.shut_down()
+
     def updateStatus(self, data):
         logging.debug('updateStatus - udiYoGarageDoor')
-        if self.node is not None:
-            while not self.node_ready or not self.system_ready:
-                time.sleep(0.5)
-            self.yoDoorControl.updateCallbackStatus(data)
+        self.yoDoorControl.updateCallbackStatus(data)
+        if self.yoDoorControl is not None:
+
             if self.yoDoorControl.suspended:
                 self.my_setDriver('GV20', 1)
             else:

@@ -297,11 +297,9 @@ class udiYoTHsensor(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.debug('udiYoTHsensor - updateStatus')
-        if self.node is not None:
-            while not self.node_ready or not self.system_ready:
-                time.sleep(0.5)
-        self.yoTHsensor.updateStatus(data)
-        self.updateData()
+        if self.yoTHsensor is not None:
+            self.yoTHsensor.updateStatus(data)
+            self.updateData()
 
     def set_cmd(self, command):
         ctrl = int(command.get('value'))   
