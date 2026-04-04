@@ -301,26 +301,6 @@ class udiYoManipulator(udi_interface.Node):
         self.my_setDriver('GV2', self.offDelay * 60 )
         self.yoManipulator.setDelayList([{'on':self.onDelay, 'off':self.offDelay}]) 
 
-'''
-    def lookup_schedule(self, command):
-        logging.info('Manipulator lookup_schedule {}'.format(command))
-        self.schedule_selected = int(command.get('value'))
-        self.yoManipulator.refreshSchedules()
-
-    def define_schedule(self, command):
-        logging.info('udiYoSwitch define_schedule {}'.format(command))
-        query = command.get("query")
-        self.schedule_selected, params = self.prep_schedule(query)
-        self.yoManipulator.setSchedule(self.schedule_selected, params)
-
-
-    def control_schedule(self, command):
-        logging.info('udiYoSwitch control_schedule {}'.format(command))       
-        query = command.get("query")
-        self.activated, self.schedule_selected = self.activate_schedule(query)
-        self.yoSwiyoManipulatortch.activateSchedule(self.schedule_selected, self.activated)
-'''        
-
     commands = {
                 'UPDATE': update,
                 'DON'   : set_open,
