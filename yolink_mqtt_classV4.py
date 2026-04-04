@@ -317,6 +317,8 @@ class YoLinkMQTTDevice(object):
         
         if not yolink.online:
             logging.error('Status {} - Off line detected: {}'.format(yolink.deviceInfo['name'], yolink.data))
+        
+        logging.debug(f'check_system_online result for {yolink.deviceInfo["name"]}: {yolink.online}')   
         return(yolink.online)
 
 
