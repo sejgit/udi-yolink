@@ -1001,7 +1001,7 @@ class YoLinkInitPAC(object):
             temp_list = []
             try:    
                 if not yoAccess.retryQueue.empty():
-                    logging.debug(f'{yoAccess.access_mode} - Checking retry - queue size {yoAccess.retryQueue.qsize()}  ')                
+                    #logging.debug(f'{yoAccess.access_mode} - Checking retry - queue size {yoAccess.retryQueue.qsize()}  ')                
                     while not yoAccess.retryQueue.empty():
                         temp_list.append(yoAccess.retryQueue.get(timeout = 5))
                     yoAccess.retryLock.acquire()
@@ -1019,9 +1019,9 @@ class YoLinkInitPAC(object):
                             retry_fact = 0
                             retry_data['retry'] = retry_fact
                         delay = min(yoAccess.RETRY_STEP + 2**retry_fact, 3600) #double delay every iteration until 1 hour (3600 sec)
-                        logging.debug(f'{yoAccess.access_mode} delay {delay}')
-                        logging.debug(f"{yoAccess.access_mode} retry if negative { int(retry_data['last_retry_time']/1000+delay) - time_now}")
-                        logging.debug('{} - target device - {}'.format( yoAccess.access_mode, retry_data['targetDevice'] ))
+                        #logging.debug(f'{yoAccess.access_mode} delay {delay}')
+                        #logging.debug(f"{yoAccess.access_mode} retry if negative { int(retry_data['last_retry_time']/1000+delay) - time_now}")
+                        logging.debug('{} - target device - {} - delay {}'.format( yoAccess.access_mode, retry_data['targetDevice'], delay ))
                                                 
                         if int(retry_data['last_retry_time']/1000+delay) - time_now < 0:
                             selected_data_list.append(retry_data)
