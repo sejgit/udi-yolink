@@ -223,7 +223,7 @@ class udiYoWaterMeterController(udi_interface.Node):
     
     def updateData(self):
         try:
-            if self.node is not None:
+            if self.yoWaterCtrl is not None:
                 while not self.node_ready or not self.system_ready:
                     time.sleep(0.5)
                 message_type, message_action = self.yoWaterCtrl.get_message_type()

@@ -205,7 +205,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                     elif 'Leak' in str(message_type) and self.schedule_leak is not None:
                         self.schedule_leak.update_schedule_data(source_device=self.yoWaterCtrl)
                     return
-                
+                logging.debug(f'updateData called with message_type: {message_type}, message_action: {message_action}')
                 if self.yoWaterCtrl.check_system_online():
 
                     if self.yoWaterCtrl.emptyData():
