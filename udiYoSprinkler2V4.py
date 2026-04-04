@@ -12,6 +12,7 @@ except ImportError:
     logging.basicConfig(level=logging.INFO)
 
 from os import truncate
+import threading
 #import udi_interface
 #import sys
 import time
@@ -86,6 +87,7 @@ class udiYoSprinkler2(udi_interface.Node):
         self.schedule = None
         self.node_ready = False
         self.system_ready = False        
+        self._update_lock = threading.Lock()
         self.last_state = ''
         self.timer_cleared = True
         self.timer_update = 5
@@ -283,8 +285,9 @@ class udiYoSprinkler2(udi_interface.Node):
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoSprinkler2')
         if self.yoSprinkler is not None:
-            self.yoSprinkler.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoSprinkler.updateStatus(data)
+                self.updateData()
 
 
     def start_stop(self, command):

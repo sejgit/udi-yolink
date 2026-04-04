@@ -13,6 +13,7 @@ except ImportError:
 
 from ctypes import set_errno
 from os import truncate
+import threading
 #import udi_interface
 #import sys
 import time
@@ -188,6 +189,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.schedule = None
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         self.powerSupported = True # assume 
         self.n_queue = []     
 
@@ -334,19 +336,19 @@ class udiYoInfraredRemoter(udi_interface.Node):
     def updateStatus(self, data):
         logging.info('udiIRremote updateStatus')
         if self.yoIRrem is not None:
-  
-            self.yoIRrem.updateStatus(data)
-            self.updateData()
-            #res = self.yoIRrem.getIRstatus_info()
-            #logging.debug(f'IR status info: {res}')
-            logging.debug(f'Code nodes: {self.code_nodes}')
-            update_type = self.yoIRrem.get_info('type')
-            action = self.yoIRrem.get_info('action')
-            if action in ['send', 'report'] or update_type == 'event':
-                res_code = self.yoIRrem.get_data('key')
-                if isinstance(res_code, int) and res_code in self.code_nodes:
-                    logging.debug(f'Updating code node {res_code}')
-                    self.code_nodes[res_code].updateData()
+            with self._update_lock:
+                self.yoIRrem.updateStatus(data)
+                self.updateData()
+                #res = self.yoIRrem.getIRstatus_info()
+                #logging.debug(f'IR status info: {res}')
+                logging.debug(f'Code nodes: {self.code_nodes}')
+                update_type = self.yoIRrem.get_info('type')
+                action = self.yoIRrem.get_info('action')
+                if action in ['send', 'report'] or update_type == 'event':
+                    res_code = self.yoIRrem.get_data('key')
+                    if isinstance(res_code, int) and res_code in self.code_nodes:
+                        logging.debug(f'Updating code node {res_code}')
+                        self.code_nodes[res_code].updateData()
                     
     def checkOnline(self):
         self.yoIRrem.refreshDevice()

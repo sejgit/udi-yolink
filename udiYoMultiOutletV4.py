@@ -13,6 +13,7 @@ except ImportError:
 
 #import sys
 import time
+import threading
 from yolinkMultiOutletV3 import YoLinkMultiOutlet
 from udiYoSchedule import udiYoSchedule
 import re
@@ -473,6 +474,7 @@ class udiYoMultiOutlet(udi_interface.Node):
         self.yoMultiOutlet = None
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         self.subUsb = []
         self.subOutlet = []
         self.schedule_setected = 0
@@ -683,8 +685,9 @@ class udiYoMultiOutlet(udi_interface.Node):
         #self.yoMultiOutlet.online =  self.yoMultiOutlet.checkOnlineStatus(data)
         #if self.yoMultiOutlet.online:
         if self.yoMultiOutlet is not None:
-            self.yoMultiOutlet.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoMultiOutlet.updateStatus(data)
+                self.updateData()
 
         logging.debug( 'updateStatus data: {} {}'.format(self.node_fully_config, self.yoMultiOutlet.nbrOutlets ))
         if not self.node_fully_config: # Device was never initialized

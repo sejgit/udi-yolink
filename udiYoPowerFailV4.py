@@ -6,6 +6,7 @@ Polyglot TEST v3 node server
 MIT License
 """
 from os import truncate
+import threading
 try:
     import udi_interface
     logging = udi_interface.LOGGER
@@ -63,6 +64,7 @@ class udiYoPowerFailSenor(udi_interface.Node):
         self.yoVibrationSensor  = None
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         self.last_state = 99
         self.cmd_state = self.retrieve_cmd_state()
         self.n_queue = []
@@ -174,8 +176,9 @@ class udiYoPowerFailSenor(udi_interface.Node):
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoPowerFailSenor')
         if self.yoPowerFail is not None:
-            self.yoPowerFail.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoPowerFail.updateStatus(data)
+                self.updateData()
 
     def set_cmd(self, command):
         ctrl = int(command.get('value'))   

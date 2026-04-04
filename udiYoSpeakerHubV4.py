@@ -15,6 +15,7 @@ except ImportError:
     logging.basicConfig(level=logging.INFO)
 
 from os import truncate
+import threading
 #import udi_interface
 #import sys
 import time
@@ -58,6 +59,7 @@ class udiYoSpeakerHub(udi_interface.Node):
         self.yoSpeakerHub = None
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         self.n_queue = []
 
         #self.Parameters = Custom(polyglot, 'customparams')
@@ -180,8 +182,9 @@ class udiYoSpeakerHub(udi_interface.Node):
     def updateStatus(self, data):
         logging.info('updateStatus - speakerHub')
         if self.yoSpeakerHub is not None:
-            self.yoSpeakerHub.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoSpeakerHub.updateStatus(data)
+                self.updateData()
 
 
     def setWiFi (self, command):

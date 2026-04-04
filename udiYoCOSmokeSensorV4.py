@@ -6,6 +6,7 @@ Polyglot TEST v3 node server
 MIT License
 """
 from os import truncate
+import threading
 
 from yolinkCOSmokeSensorV3 import YoLinkCOSmokeSensor
 try:
@@ -76,6 +77,7 @@ class udiYoCOSmokeSensor(udi_interface.Node):
         self.yoCOSmokeSensor  = None
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         self.last_state = 99
         self.cmd_state = self.retrieve_cmd_state()
         self.last_alert = False
@@ -215,8 +217,9 @@ class udiYoCOSmokeSensor(udi_interface.Node):
     def updateStatus(self, data):
         logging.debug('updateStatus - yoCOSmokeSensor')
         if self.yoCOSmokeSensor is not None:
-            self.yoCOSmokeSensor.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoCOSmokeSensor.updateStatus(data)
+                self.updateData()
 
     def set_cmd(self, command):
         ctrl = int(command.get('value'))   

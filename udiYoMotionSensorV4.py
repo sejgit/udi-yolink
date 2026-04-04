@@ -6,6 +6,7 @@ Polyglot TEST v3 node server
 MIT License
 """
 from os import truncate
+import threading
 try:
     import udi_interface
     logging = udi_interface.LOGGER
@@ -66,6 +67,7 @@ class udiYoMotionSensor(udi_interface.Node):
         self.yoMotionsSensor  = None
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         self.cmd_state = self.retrieve_cmd_state()
         self.last_state = 99        
         self.n_queue = []
@@ -189,8 +191,9 @@ class udiYoMotionSensor(udi_interface.Node):
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoLinkMotionSensor')
         if self.yoMotionsSensor is not None:
-            self.yoMotionsSensor.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoMotionsSensor.updateStatus(data)
+                self.updateData()
 
     def set_cmd(self, command):
         ctrl = int(command.get('value'))   

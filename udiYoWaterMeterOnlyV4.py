@@ -12,6 +12,7 @@ except ImportError:
     logging.basicConfig(level=logging.INFO)
 
 from os import truncate
+import threading
 #import udi_interface
 #import sys
 import time
@@ -87,6 +88,7 @@ class udiYoWaterMeterOnly(udi_interface.Node):
         self.yoWaterCtrl= None
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         self.last_state = ''
         self.timer_cleared = True
         self.timer_update = 5
@@ -278,8 +280,9 @@ class udiYoWaterMeterOnly(udi_interface.Node):
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoWaterMeterController')
         if self.yoWaterCtrl is not None:        
-            self.yoWaterCtrl.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoWaterCtrl.updateStatus(data)
+                self.updateData()
 
     '''
     def updateDelayCountdown( self, timeRemaining):

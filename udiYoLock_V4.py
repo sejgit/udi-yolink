@@ -13,6 +13,7 @@ except ImportError:
 
 from ctypes import set_errno
 from os import truncate
+import threading
 #import udi_interface
 #import sys
 import time
@@ -58,6 +59,7 @@ class udiYoLockV2(udi_interface.Node):
         self.yoLock = None
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         self.last_state = ''
         self.powerSupported = True # assume
         if deviceInfo.get('type') in ['LockV2']:
@@ -203,8 +205,9 @@ class udiYoLockV2(udi_interface.Node):
     def updateStatus(self, data):
         logging.info('udiYoLock updateStatus')
         if self.yoLock is not None:
-            self.yoLock.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoLock.updateStatus(data)
+                self.updateData()
 
 
 
@@ -297,6 +300,7 @@ class udiYoLock(udi_interface.Node):
         self.yoLock = None
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         self.last_state = ''
         self.powerSupported = True # assume
         if deviceInfo.get('type') in ['LockV2']:
@@ -401,8 +405,9 @@ class udiYoLock(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('udiYoLock updateStatus')
-        self.yoLock.updateStatus(data)
-        self.updateData()
+        with self._update_lock:
+            self.yoLock.updateStatus(data)
+            self.updateData()
 
 
 

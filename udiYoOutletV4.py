@@ -14,6 +14,7 @@ except ImportError:
 
 from ctypes import set_errno
 from os import truncate
+import threading
 #import udi_interface
 #import sys
 import time
@@ -75,6 +76,7 @@ class udiYoOutlet(udi_interface.Node):
         self.yoOutlet = None
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         self.powerSupported = False # assume 
         model = str(deviceInfo['modelName'][:6])        
         if model in ['YS6803','YS6602','YS5716', 'YS6614']:
@@ -219,8 +221,9 @@ class udiYoOutlet(udi_interface.Node):
     def updateStatus(self, data):
         logging.info('udiYoOutlet updateStatus')
         if self.yoOutlet is not None:
-            self.yoOutlet.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoOutlet.updateStatus(data)
+                self.updateData()
 
 
     def updateDelayCountdown( self, timeRemaining):

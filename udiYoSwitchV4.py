@@ -17,6 +17,7 @@ except ImportError:
 #import udi_interface
 #import sys
 import time
+import threading
 from yolinkSwitchV3 import YoLinkSwitch
 from udiYoSmartRemoterV4 import udiRemoteKey
 from udiYoSchedule import udiYoSchedule
@@ -52,6 +53,7 @@ class udiYoSwitch(udi_interface.Node):
         self.yoSwitch = None
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         self.timer_cleared = True
         self.n_queue = [] 
         self.last_state = ''
@@ -254,8 +256,9 @@ class udiYoSwitch(udi_interface.Node):
     def updateStatus(self, data):
         logging.info('updateStatus - Switch')
         if self.yoSwitch is not None:
-            self.yoSwitch.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoSwitch.updateStatus(data)
+                self.updateData()
  
     def set_switch_on(self, command = None):
         logging.info('udiYoSwitch set_switch_on')  

@@ -15,6 +15,7 @@ except ImportError:
     logging.basicConfig(level=logging.INFO)
 
 import time
+import threading
 from yolinkThermostatV2 import YoLinkThermostat
 
 
@@ -58,6 +59,7 @@ class udiYoThermostat(udi_interface.Node):
         self.yoThermostat = None
         self.node_ready = False
         self.system_ready = False
+        self._update_lock = threading.Lock()
         self.temp_unit = self.yoAccess.get_temp_unit()
         self.properties_node = None
         self.n_queue = []
@@ -122,8 +124,9 @@ class udiYoThermostat(udi_interface.Node):
         """Handle MQTT status updates from the device"""
         logging.debug('udiYoThermostat - updateStatus')
         if self.yoThermostat is not None:
-            self.yoThermostat.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoThermostat.updateStatus(data)
+                self.updateData()
 
     def updateData(self):
         """Parse device state and update drivers"""

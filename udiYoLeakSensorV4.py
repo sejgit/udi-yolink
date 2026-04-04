@@ -6,6 +6,7 @@ Polyglot  v3 node server
 MIT License
 """
 from os import truncate
+import threading
 
 from yolinkLeakSensorV3 import YoLinkLeakSensor
 try:
@@ -25,74 +26,6 @@ class udiYoLeakSensor(udi_interface.Node):
 
     id = 'yoleaksens'
     
-    
-    '''
-       drivers = [
-            'GV0' = Water Alert
-            'GV1' = Battery Level
-            'ST' = Online
-            ]
-
-[{
-                            "id" : 'ST',
-                            "editor": 'alertstatus',
-                            "name": 'Leak State',
-                            },
-                            {   
-                            "id": "GV0",
-                            "editor": "sensorAlert",
-                            "name": "Sensor Moved State",                            
-                            },
-                            {   
-                            "id": "GV1",
-                            "editor": "sensorAlert",
-                            "name": "Sensor Freeze State",                            
-                            },
-                            {   
-                            "id": "GV2",
-                            "editor": "detectorError",
-                            "name": "Sensor Detector Error",                           
-                            },                            
-                            {   
-                            "id": "GV3",
-                            "editor": "reminder",
-                            "name": "Reminder State",                           
-                            },                            
-                            {   
-                            "id": "GV4",
-                            "editor": "beeping",
-                            "name": "Beeping State",                           
-                            },      
-                            {   
-                            "id": "BATLVL",
-                            "editor": "batlevel",
-                            "name": "Battery Level",                           
-                            },   
-                            {   
-                            "id": "CLITEMP",
-                            "editor": temp_unit,
-                            "name": "Device Temperature",                           
-                            },
-                            {   
-                            "id": "GV5",
-                            "editor": "op_mode",
-                            "name": "Device Operation Mode",                           
-                            },                            
-                            {   
-                            "id": "GV6",
-                            "editor": "sensitivity",
-                            "name": "Device Sensitivity",                           
-                            },
-                            {   
-                            "id": "GV10",
-                            "editor": "unixtime",
-                            "name": "Last Event Time",                           
-                            }
-                            ]
-
-
-
-    ''' 
         
     drivers = [
             {'driver': 'ST', 'value': 0, 'uom': 25}, #basic leak
@@ -129,6 +62,7 @@ class udiYoLeakSensor(udi_interface.Node):
         self.yoAccess = yoAccess
         self.devInfo =  deviceInfo
 
+        self._update_lock = threading.Lock()
         self.temp_unit = self.yoAccess.get_temp_unit()           
         if self.temp_unit == 1:
             self.id = 'yoleaksensF'
@@ -286,8 +220,9 @@ class udiYoLeakSensor(udi_interface.Node):
     def updateStatus(self, data):
         logging.debug('updateStatus - yoLeakSensor')
         if self.yoLeakSensor is not None:
-            self.yoLeakSensor.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoLeakSensor.updateStatus(data)
+                self.updateData()
 
     def set_beep_alert(self, command):
         beeping = int(command.get('value')) == 1   

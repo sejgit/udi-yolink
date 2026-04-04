@@ -15,6 +15,7 @@ except ImportError:
     logging.basicConfig(level=logging.INFO)
 
 from os import truncate
+import threading
 #import udi_interface
 #import sys
 import time
@@ -52,6 +53,7 @@ class udiYoBatteryHub(udi_interface.Node):
         self.yoHub = None
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         self.n_queue = [] 
         
         #self.Parameters = Custom(polyglot, 'customparams')
@@ -145,8 +147,9 @@ class udiYoBatteryHub(udi_interface.Node):
     def updateStatus(self, data):
         logging.info('updateStatus - Hub')
         if self.yoHub is not None:
-            self.yoHub.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoHub.updateStatus(data)
+                self.updateData()
            
 
     def update(self, command = None):
@@ -190,6 +193,7 @@ class udiYoHub(udi_interface.Node):
         self.yoHub = None
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         self.n_queue = [] 
         
         #self.Parameters = Custom(polyglot, 'customparams')
@@ -283,8 +287,9 @@ class udiYoHub(udi_interface.Node):
     def updateStatus(self, data):
         logging.info('updateStatus - Hub')
         if self.yoHub is not None:
-            self.yoHub.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoHub.updateStatus(data)
+                self.updateData()
            
 
     def update(self, command = None):

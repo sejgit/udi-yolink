@@ -6,6 +6,7 @@ Polyglot TEST v3 node server
 MIT License
 """
 import time
+import threading
 from yolinkDoorSensorV3 import YoLinkDoorSensor
 
 try:
@@ -51,6 +52,7 @@ class udiYoDoorSensor(udi_interface.Node):
         self.yoDoorSensor = None
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         self.last_state = 99
         self.cmd_state =  self.retrieve_cmd_state()
         logging.debug('udiYoDoorSensor INIT - {}'.format(deviceInfo['name']))
@@ -183,8 +185,9 @@ class udiYoDoorSensor(udi_interface.Node):
     def updateStatus(self, data):
         logging.debug('updateStatus - {}'.format(self.name))
         if self.yoDoorSensor is not None:
-            self.yoDoorSensor.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoDoorSensor.updateStatus(data)
+                self.updateData()
 
 
     def set_cmd(self, command):

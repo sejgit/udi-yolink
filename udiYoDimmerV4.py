@@ -16,6 +16,7 @@ except ImportError:
     logging.basicConfig(level=logging.INFO)
 
 from os import truncate
+import threading
 #import udi_interface
 #import sys
 from sre_parse import State
@@ -73,6 +74,7 @@ class udiYoDimmer(udi_interface.Node):
         self.yoDimmer = None
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         self.timer_cleared = True
         self.n_queue = [] # one queue for all
         self.last_state = ''
@@ -256,8 +258,9 @@ class udiYoDimmer(udi_interface.Node):
     def updateStatus(self, data):
         logging.info('updateStatus - Switch')
         if self.yoDimmer is not None:   
-            self.yoDimmer.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoDimmer.updateStatus(data)
+                self.updateData()
  
     def set_switch_on(self, command = None):
         logging.info('udiyoDimmer set_switch_on')  

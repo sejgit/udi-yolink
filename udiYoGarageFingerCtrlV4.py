@@ -6,6 +6,7 @@ Polyglot TEST v3 node server
 MIT License
 """
 from os import truncate
+import threading
 try:
     import udi_interface
     logging = udi_interface.LOGGER
@@ -47,6 +48,7 @@ class udiYoGarageFinger(udi_interface.Node):
         self.devInfo =  deviceInfo
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         self.yoDoorControl  = None
         logging.debug('udiYoGarageFinger INIT - {}'.format(deviceInfo['name']))
         self.n_queue = []
@@ -96,24 +98,25 @@ class udiYoGarageFinger(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.debug('updateStatus - udiYoGarageFinger')
-        self.yoDoorControl.updateCallbackStatus(data)
-        #logging.debug(data)
-        if self.yoDoorControl is not None:
+        with self._update_lock:
+            self.yoDoorControl.updateCallbackStatus(data)
+            #logging.debug(data)
+            if self.yoDoorControl is not None:
 
-            self.my_setDriver('ST',1)
-            self.my_setDriver('GV30',1)
-            if self.yoDoorControl.suspended:
-                self.my_setDriver('GV20', 1)
-            else:
-                self.my_setDriver('GV20', 0)
-                
-            if self.yoDoorControl.check_system_online():
-                self.my_setDriver('ST', 1)
-                self.my_setDriver('GV30', 1)
-            else:
-                self.my_setDriver('GV20', 2)
-                self.my_setDriver('ST', 0)
-                self.my_setDriver('GV30', 0)
+                self.my_setDriver('ST',1)
+                self.my_setDriver('GV30',1)
+                if self.yoDoorControl.suspended:
+                    self.my_setDriver('GV20', 1)
+                else:
+                    self.my_setDriver('GV20', 0)
+                    
+                if self.yoDoorControl.check_system_online():
+                    self.my_setDriver('ST', 1)
+                    self.my_setDriver('GV30', 1)
+                else:
+                    self.my_setDriver('GV20', 2)
+                    self.my_setDriver('ST', 0)
+                    self.my_setDriver('GV30', 0)
 
 
     def toggleDoor(self, command = None):

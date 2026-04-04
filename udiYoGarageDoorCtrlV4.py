@@ -6,6 +6,7 @@ Polyglot TEST v3 node server
 MIT License
 """
 from os import truncate
+import threading
 try:
     import udi_interface
     logging = udi_interface.LOGGER
@@ -47,6 +48,7 @@ class udiYoGarageDoor(udi_interface.Node):
         self.yoDoorControl  = None
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         logging.debug('udiYoGarageDoor INIT - {}'.format(deviceInfo['name']))
         self.n_queue = []
         #polyglot.subscribe(polyglot.POLL, self.poll)
@@ -99,20 +101,21 @@ class udiYoGarageDoor(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.debug('updateStatus - udiYoGarageDoor')
-        self.yoDoorControl.updateCallbackStatus(data)
-        if self.yoDoorControl is not None:
+        with self._update_lock:
+            self.yoDoorControl.updateCallbackStatus(data)
+            if self.yoDoorControl is not None:
 
-            if self.yoDoorControl.suspended:
-                self.my_setDriver('GV20', 1)
-            else:
-                self.my_setDriver('GV20', 0)
+                if self.yoDoorControl.suspended:
+                    self.my_setDriver('GV20', 1)
+                else:
+                    self.my_setDriver('GV20', 0)
 
-            if self.yoDoorControl.check_system_online():
-                self.my_setDriver('ST', 1)
-                self.my_setDriver('GV30', 1)
-            else:
-                self.my_setDriver('GV20', 2)
-                #self.my_setDriver('ST', 0, True, True)
+                if self.yoDoorControl.check_system_online():
+                    self.my_setDriver('ST', 1)
+                    self.my_setDriver('GV30', 1)
+                else:
+                    self.my_setDriver('GV20', 2)
+                    #self.my_setDriver('ST', 0, True, True)
 
         
 

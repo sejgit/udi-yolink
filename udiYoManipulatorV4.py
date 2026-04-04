@@ -12,6 +12,7 @@ except ImportError:
     logging.basicConfig(level=logging.INFO)
 
 from os import truncate
+import threading
 #import udi_interface
 #import sys
 import time
@@ -66,6 +67,7 @@ class udiYoManipulator(udi_interface.Node):
         self.yoManipulator = None
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         self.last_state = ''
         self.timer_cleared = True
         self.timer_update = 5
@@ -197,8 +199,9 @@ class udiYoManipulator(udi_interface.Node):
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoManipulator')
         if self.yoManipulator is not None:
-            self.yoManipulator.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoManipulator.updateStatus(data)
+                self.updateData()
 
       
 
@@ -298,7 +301,7 @@ class udiYoManipulator(udi_interface.Node):
         self.my_setDriver('GV2', self.offDelay * 60 )
         self.yoManipulator.setDelayList([{'on':self.onDelay, 'off':self.offDelay}]) 
 
-
+'''
     def lookup_schedule(self, command):
         logging.info('Manipulator lookup_schedule {}'.format(command))
         self.schedule_selected = int(command.get('value'))
@@ -316,7 +319,7 @@ class udiYoManipulator(udi_interface.Node):
         query = command.get("query")
         self.activated, self.schedule_selected = self.activate_schedule(query)
         self.yoSwiyoManipulatortch.activateSchedule(self.schedule_selected, self.activated)
-        
+'''        
 
     commands = {
                 'UPDATE': update,

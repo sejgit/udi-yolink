@@ -6,6 +6,7 @@ Polyglot TEST v3 node server
 MIT License
 """
 from os import truncate
+import threading
 try:
     import udi_interface
     logging = udi_interface.LOGGER
@@ -80,6 +81,7 @@ class udiYoTHsensor(udi_interface.Node):
         self.yoTHsensor  = None
         self.node_ready = False
         self.system_ready = False
+        self._update_lock = threading.Lock()
         self.poly = polyglot
         self.temp_unit = self.yoAccess.get_temp_unit()   
 
@@ -298,8 +300,9 @@ class udiYoTHsensor(udi_interface.Node):
     def updateStatus(self, data):
         logging.debug('udiYoTHsensor - updateStatus')
         if self.yoTHsensor is not None:
-            self.yoTHsensor.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoTHsensor.updateStatus(data)
+                self.updateData()
 
     def set_cmd(self, command):
         ctrl = int(command.get('value'))   

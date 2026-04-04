@@ -6,6 +6,7 @@ Polyglot TEST v3 node server
 MIT License
 """
 from os import truncate
+import threading
 try:
     import udi_interface
     logging = udi_interface.LOGGER
@@ -290,6 +291,7 @@ class udiYoSmartRemoter(udi_interface.Node):
         self.yoSmartRemote  = None
         self.node_ready = False
         self.system_ready=False
+        self._update_lock = threading.Lock()
         self.last_state = 99
         self.n_queue = []
         self.max_remote_keys = 8
@@ -474,8 +476,9 @@ class udiYoSmartRemoter(udi_interface.Node):
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoSmartRemoter')
         if self.yoSmartRemote is not None:
-            self.yoSmartRemote.updateStatus(data)
-            self.updateData()
+            with self._update_lock:
+                self.yoSmartRemote.updateStatus(data)
+                self.updateData()
 
     def update(self, command = None):
         logging.info('udiYoSmartRemoter Update  Executed')
