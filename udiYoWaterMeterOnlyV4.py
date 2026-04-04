@@ -149,8 +149,8 @@ class udiYoWaterMeterOnly(udi_interface.Node):
         #self.my_setDriver('GV4', self.yoWaterCtrl.meter_unit, 25)          
         self.meter_ISYuom = self.water_meter_unit2uom(self.ISYwater_unit)
         logging.debug(f'meter unit : {self.yoWaterCtrl.meter_unit} ISY unit: {self.ISYwater_unit} uom: {self.meter_ISYuom}')
-        self.updateData()
         self.system_ready=True
+        #self.updateData()
 
     def stop (self):
         logging.info('Stop udiYoWaterMeterController')

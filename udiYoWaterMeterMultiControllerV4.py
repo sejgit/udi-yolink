@@ -164,8 +164,8 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         
         #self.my_setDriver('GV30', 1)
         #self.yoWaterCtrl.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
-        self.updateData()
         self.system_ready=True
+        #self.updateData()  # not needed - updateStatus callback fires from initDevice response
 
     def stop (self):
         logging.info('Stop udiYoWaterMeterMultiController')
@@ -357,8 +357,8 @@ class udiYoSubWaterMeter(udi_interface.Node):
         logging.debug(f'meter unit : { self.meter_unit} ISY unit: { self.ISYwater_unit} uom: {self.ISYmeter_uom}')
         #self.yoWaterCtrl.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
         self.my_setDriver('GV1', 0,  self.ISYmeter_uom)
-        self.updateData()
         self.system_ready=True
+        #self.updateData()  # not needed - updateStatus callback fires from initDevice response
 
     def stop (self):
         logging.info('Stop udiYoWaterMeterMultiController')

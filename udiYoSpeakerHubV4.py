@@ -106,7 +106,7 @@ class udiYoSpeakerHub(udi_interface.Node):
             logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
-        self.updateData()
+        #self.updateData()
         #self.my_setDriver('GV30', 1)
         #time.sleep(3)
         self.system_ready=True
