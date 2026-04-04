@@ -116,6 +116,7 @@ class udiYoWaterMeterController(udi_interface.Node):
         self.schedule_leak = None
         self.node_ready = False
         self.system_ready = False
+        self.configDone = False
         self._update_lock = threading.Lock()
         self.meter_count = 1
         self.last_state = ''
@@ -131,6 +132,7 @@ class udiYoWaterMeterController(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         #known_meters = ['YS5007','YS5018', 'YS5008', 'YS5009', ]
         #if self.yoWaterCtrl.devInfo['model'] in known_meters:
         #    logging.debug(f'Known water meter model {self.yoWaterCtrl.devInfo["model"]}')   
@@ -148,9 +150,13 @@ class udiYoWaterMeterController(udi_interface.Node):
         logging.debug('udiYoWaterMeterController INIT done- {}'.format(self.commands))
 
 
+    def configDoneHandler(self):
+        logging.info(f'configDoneHandler called  - {self.devInfo["name"]}')
+        self.configDone = True
+
     def start(self):
         logging.info('Start - udiYoWaterMeterController')
-        while not self.node_ready:
+        while not self.node_ready and not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 1)
         self.my_setDriver('GV20', 0)
