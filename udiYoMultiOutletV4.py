@@ -473,6 +473,7 @@ class udiYoMultiOutlet(udi_interface.Node):
         self.devInfo =  deviceInfo
         self.yoMultiOutlet = None
         self.node_ready = False
+        self.configDone = False
         self.system_ready=False
         self._update_lock = threading.Lock()
         self.subUsb = []
@@ -487,6 +488,7 @@ class udiYoMultiOutlet(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         polyglot.subscribe(polyglot.ADDNODEDONE, self.node_queue)
+        polyglot.subscribe(polyglot.CONFIGDONE, self.configDoneHandler)
 
         # start processing events and create add our controller node
         polyglot.ready()
@@ -500,11 +502,15 @@ class udiYoMultiOutlet(udi_interface.Node):
         self.node_ready = True
         self.schedule_selected = 0
 
+    def configDoneHandler(self):
+        logging.info(f'configDoneHandler called  - {self.name}')
+        self.configDone = True
+
     def start(self):
         #self.node_fully_config = False
         #self.usbExists = True
         logging.debug('start - udiYoMultiOutlet: {}'.format(self.devInfo['name']))
-        while not self.node_ready:
+        while not self.node_ready and not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         self.yoMultiOutlet  = YoLinkMultiOutlet(self.yoAccess, self.devInfo, self.updateStatus)

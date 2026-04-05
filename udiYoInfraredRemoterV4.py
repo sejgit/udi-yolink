@@ -188,6 +188,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.yoIRrem = None
         self.schedule = None
         self.node_ready = False
+        self.configDone = False
         self.system_ready=False
         self._update_lock = threading.Lock()
         self.powerSupported = True # assume 
@@ -196,6 +197,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.poly.subscribe(polyglot.START, self.start, self.address)
         self.poly.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
           
 
         # start processing events and create add our controller node
@@ -237,9 +239,13 @@ class udiYoInfraredRemoter(udi_interface.Node):
         name = self.poly.getValidName(name)
         self.code_nodes[code] = udiYoInfraredCode(self.poly, self.primary, nde_address, name, code, self.yoIRrem)
 
+    def configDoneHandler(self):
+        logging.info(f'configDoneHandler called  - {self.name}')
+        self.configDone = True
+
     def start(self):
         logging.info('start - udiIRremote')
-        while not self.node_ready:
+        while not self.node_ready and not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('ST', 0)
         # Create schedule node before device online check

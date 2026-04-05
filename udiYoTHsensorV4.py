@@ -80,6 +80,7 @@ class udiYoTHsensor(udi_interface.Node):
         self.devInfo =  deviceInfo
         self.yoTHsensor  = None
         self.node_ready = False
+        self.configDone = False
         self.system_ready = False
         self._update_lock = threading.Lock()
         self.poly = polyglot
@@ -113,6 +114,7 @@ class udiYoTHsensor(udi_interface.Node):
         self.poly.subscribe(polyglot.START, self.start, self.address)
         self.poly.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
                      
         # start processing events and create add our controller node
         self.poly.ready()
@@ -126,13 +128,18 @@ class udiYoTHsensor(udi_interface.Node):
 
   
 
+    def configDoneHandler(self):
+        logging.info(f'configDoneHandler called  - {self.name}')
+        self.configDone = True
+
     def start(self):
         logging.info('Start udiYoTHsensor')
+        while not self.node_ready and not self.configDone:
+            time.sleep(0.5)
+
         self.my_setDriver('GV30', 0)
         self.yoTHsensor  = YoLinkTHSensor(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(1)
-        while not self.node_ready:
-            time.sleep(0.5)
 
         self.yoTHsensor.initNode()
         time.sleep(1)

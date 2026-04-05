@@ -75,6 +75,7 @@ class udiYoOutlet(udi_interface.Node):
         self.devInfo =  deviceInfo   
         self.yoOutlet = None
         self.node_ready = False
+        self.configDone = False
         self.system_ready=False
         self._update_lock = threading.Lock()
         self.powerSupported = False # assume 
@@ -93,6 +94,7 @@ class udiYoOutlet(udi_interface.Node):
         self.poly.subscribe(polyglot.START, self.start, self.address)
         self.poly.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
                
 
         # start processing events and create add our controller node
@@ -106,9 +108,13 @@ class udiYoOutlet(udi_interface.Node):
         self.node_ready = True
 
 
+    def configDoneHandler(self):
+        logging.info(f'configDoneHandler called  - {self.name}')
+        self.configDone = True
+
     def start(self):
         logging.info('start - YoOutlet')
-        while not self.node_ready:
+        while not self.node_ready and not self.configDone:
             time.sleep(0.5)
         #self.my_setDriver('GV30', 0)
         # Create schedule node before device online check

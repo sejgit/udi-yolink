@@ -58,6 +58,7 @@ class udiYoThermostat(udi_interface.Node):
         self.devInfo = deviceInfo
         self.yoThermostat = None
         self.node_ready = False
+        self.configDone = False
         self.system_ready = False
         self._update_lock = threading.Lock()
         self.temp_unit = self.yoAccess.get_temp_unit()
@@ -74,6 +75,7 @@ class udiYoThermostat(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
 
         # Add node and wait
         polyglot.ready()
@@ -84,10 +86,14 @@ class udiYoThermostat(udi_interface.Node):
         self.adr_list = [address]
         self.node_ready = True
 
+    def configDoneHandler(self):
+        logging.info(f'configDoneHandler called  - {self.name}')
+        self.configDone = True
+
     def start(self):
         """Initialize and start the thermostat device"""
         logging.info('Start udiYoThermostat')
-        while not self.node_ready:
+        while not self.node_ready and not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         self.yoThermostat = YoLinkThermostat(self.yoAccess, self.devInfo, self.updateStatus)

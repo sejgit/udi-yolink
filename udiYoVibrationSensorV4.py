@@ -60,6 +60,7 @@ class udiYoVibrationSensor(udi_interface.Node):
             self.id = 'yovibrasensF'
         self.yoVibrationSensor  = None
         self.node_ready = False
+        self.configDone = False
         self.system_ready=False
         self._update_lock = threading.Lock()
         self.last_state = 99
@@ -73,6 +74,7 @@ class udiYoVibrationSensor(udi_interface.Node):
         self.poly.subscribe(self.poly.START, self.start, self.address)
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         
 
         # start processing events and create add our controller node
@@ -87,9 +89,13 @@ class udiYoVibrationSensor(udi_interface.Node):
         logging.debug(f'udiYoVibrationSensor INIT- DONE {self.id}n  {self.name} {self.address} {self.temp_unit}')
 
 
+    def configDoneHandler(self):
+        logging.info(f'configDoneHandler called  - {self.name}')
+        self.configDone = True
+
     def start(self):
         logging.info('start - udiYoVibrationSensor')
-        while not self.node_ready:
+        while not self.node_ready and not self.configDone:
             time.sleep(0.5)
         #self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)

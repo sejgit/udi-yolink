@@ -58,6 +58,7 @@ class udiYoSpeakerHub(udi_interface.Node):
         self.yoAccess = yoAccess
         self.yoSpeakerHub = None
         self.node_ready = False
+        self.configDone = False
         self.system_ready=False
         self._update_lock = threading.Lock()
         self.n_queue = []
@@ -69,6 +70,7 @@ class udiYoSpeakerHub(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
    
         # start processing events and create add our controller node
         polyglot.ready()
@@ -82,9 +84,13 @@ class udiYoSpeakerHub(udi_interface.Node):
 
 
 
+    def configDoneHandler(self):
+        logging.info(f'configDoneHandler called  - {self.name}')
+        self.configDone = True
+
     def start(self):
         logging.info('start - udiYoSpeakerHub')
-        while not self.node_ready:
+        while not self.node_ready and not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         self.my_setDriver('ST', 0)

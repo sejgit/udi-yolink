@@ -74,6 +74,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         self.schedule_valve = None
         self.schedule_leak = None
         self.node_ready = False
+        self.configDone = False
         self.system_ready=False
         self._update_lock = threading.Lock()
         self.last_state = ''
@@ -83,9 +84,10 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         self.offDelay = 0
         self.valveState = 99 # needed as class c device - keep value until online again 
         #polyglot.subscribe(polyglot.POLL, self.poll)
-        self.poly.subscribe(polyglot.START, self.start, self.address)
-        self.poly.subscribe(polyglot.STOP, self.stop)
+        self.poly.subscribe(self.poly.START, self.start, self.address)
+        self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
 
         # start processing events and create add our controller node
         self.poly.ready()
@@ -98,9 +100,13 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         self.node_ready = True
 
 
+    def configDoneHandler(self):
+        logging.info(f'configDoneHandler called  - {self.name}')
+        self.configDone = True
+
     def start(self):
         logging.info('Start - udiYoWaterMeterMultiController')
-        while not self.node_ready:
+        while not self.node_ready and not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 1)
         self.my_setDriver('GV20', 0)
@@ -323,6 +329,7 @@ class udiYoSubWaterMeter(udi_interface.Node):
         
         self.yoWaterCtrl= wmAccess
         self.node_ready = False
+        self.configDone = False
         self.system_ready=False
         self.last_state = ''
         self.ISYmeter_uom= None
@@ -331,6 +338,7 @@ class udiYoSubWaterMeter(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         #known_meters = ['YS5007','YS5018', 'YS5008', 'YS5009', 'YS5029']
         #if self.yoWaterCtrl.devInfo['model'] in known_meters:
         #    logging.debug(f'Known water meter model {self.yoWaterCtrl.devInfo["model"]}')   
@@ -347,9 +355,13 @@ class udiYoSubWaterMeter(udi_interface.Node):
 
 
 
+    def configDoneHandler(self):
+        logging.info(f'configDoneHandler called  - {self.name}')
+        self.configDone = True
+
     def start(self):
         logging.info('Start - udiYoWaterMeterMultiController')
-        while not self.node_ready:
+        while not self.node_ready and not self.configDone:
             time.sleep(0.5)
 
         # No online check here - the main node already waited for the device

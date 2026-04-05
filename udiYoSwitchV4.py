@@ -52,6 +52,7 @@ class udiYoSwitch(udi_interface.Node):
         self.name = name
         self.yoSwitch = None
         self.node_ready = False
+        self.configDone = False
         self.system_ready=False
         self._update_lock = threading.Lock()
         self.timer_cleared = True
@@ -84,6 +85,7 @@ class udiYoSwitch(udi_interface.Node):
         self.poly.subscribe(self.poly.START, self.start, self.address)
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
                
 
         # start processing events and create add our controller node
@@ -96,10 +98,13 @@ class udiYoSwitch(udi_interface.Node):
         self.node_ready = True
         
             
+    def configDoneHandler(self):
+        logging.info(f'configDoneHandler called  - {self.name}')
+        self.configDone = True
 
     def start(self):
         logging.info('start - udiYoSwitch')
-        while not self.node_ready:
+        while not self.node_ready and not self.configDone:
             time.sleep(0.5)
         # Create schedule node before device online check
         sch_address = self.address[4:14] + '_SCH'

@@ -331,8 +331,8 @@ ST-nlsmanipu-TIME-NAME=Last device update
 ST-nlsmanipu-CLITEMP-NAME=Sensor Temperature
 ST-nlsmanipu-CLIHUM-NAME=Current Rel Humidity (%)
 CMD-nlsmanipu-MANCTRL-NAME=Switch control
-CMD-nlsmanipu-DON-NAME=Open
-CMD-nlsmanipu-DOF-NAME=Closed
+CMD-nlsmanipu-MOPEN-NAME=Open
+CMD-nlsmanipu-MCLOSE-NAME=Closed
 CMD-nlsmanipu-DELAYCTRL-NAME=Program Delays
 CMD-nlsmanipu-DEFINESCH-NAME=Define Schedule
 CMD-nlsmanipu-CTRLSCH-NAME=Set Schedule
@@ -847,8 +847,8 @@ CMDP-ORTOFF-NAME=Overrun Time Auto Off
 
 
 
-CMD-nlswatermeter-DON-NAME=Open Valve
-CMD-nlswatermeter-DOF-NAME=Close Valve
+CMD-nlswatermeter-VOPEN-NAME=Open Valve
+CMD-nlswatermeter-VCLOSE-NAME=Close Valve
 CMD-nlswatermeter-VALVECTRL-NAME=Control Valve
 CMD-nlswatermeter-SETATTRIB-NAME=Set Parameters
 CMD-nlswatermeter-DELAYCTRL-NAME=Set delays

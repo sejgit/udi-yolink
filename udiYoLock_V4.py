@@ -58,6 +58,7 @@ class udiYoLockV2(udi_interface.Node):
         self.devInfo =  deviceInfo
         self.yoLock = None
         self.node_ready = False
+        self.configDone = False
         self.system_ready=False
         self._update_lock = threading.Lock()
         self.last_state = ''
@@ -71,6 +72,7 @@ class udiYoLockV2(udi_interface.Node):
         self.poly.subscribe(self.poly.START, self.start, self.address)
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
              
 
         # start processing events and create add our controller node
@@ -84,9 +86,13 @@ class udiYoLockV2(udi_interface.Node):
 
 
 
+    def configDoneHandler(self):
+        logging.info(f'configDoneHandler called  - {self.name}')
+        self.configDone = True
+
     def start(self):
         logging.info('start - YoLinkLock')
-        while not self.node_ready:
+        while not self.node_ready and not self.configDone:
             time.sleep(0.5)
         self.yoLock  = YoLinkLock(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
@@ -299,6 +305,7 @@ class udiYoLock(udi_interface.Node):
         self.devInfo =  deviceInfo
         self.yoLock = None
         self.node_ready = False
+        self.configDone = False
         self.system_ready=False
         self._update_lock = threading.Lock()
         self.last_state = ''
@@ -312,6 +319,7 @@ class udiYoLock(udi_interface.Node):
         self.poly.subscribe(self.poly.START, self.start, self.address)
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
              
 
         # start processing events and create add our controller node
@@ -325,9 +333,13 @@ class udiYoLock(udi_interface.Node):
 
 
 
+    def configDoneHandler(self):
+        logging.info(f'configDoneHandler called  - {self.name}')
+        self.configDone = True
+
     def start(self):
         logging.info('start - YoLinkLock')
-        while not self.node_ready:
+        while not self.node_ready and not self.configDone:
             time.sleep(0.5)
         self.yoLock  = YoLinkLock(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)

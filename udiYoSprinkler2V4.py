@@ -86,6 +86,7 @@ class udiYoSprinkler2(udi_interface.Node):
         self.yoSprinkler= None
         self.schedule = None
         self.node_ready = False
+        self.configDone = False
         self.system_ready = False        
         self._update_lock = threading.Lock()
         self.last_state = ''
@@ -104,6 +105,7 @@ class udiYoSprinkler2(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         polyglot.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
@@ -113,8 +115,14 @@ class udiYoSprinkler2(udi_interface.Node):
         logging.debug('udiYoSprinkler2 INIT done- {}'.format(self.commands))
         self.node_ready = True
 
+    def configDoneHandler(self):
+        logging.info(f'configDoneHandler called  - {self.name}')
+        self.configDone = True
+
     def start(self):
         logging.info('Start - udiYoSprinkler2')
+        while not self.node_ready and not self.configDone:
+            time.sleep(0.5)
         self.my_setDriver('GV30', 1)
         self.my_setDriver('GV20', 0)
         # Create schedule node before device online check
@@ -123,6 +131,7 @@ class udiYoSprinkler2(udi_interface.Node):
         self.schedule = udiYoSchedule(self.poly, self.address, sch_address, 'Schedules', self.yoAccess, self.devInfo)
         self.adr_list.append(sch_address)
         self.yoSprinkler = YoLinkSprinkler(self.yoAccess, self.devInfo, self.updateStatus)
+        time.sleep(2)
         self.yoSprinkler.initNode()
         time.sleep(1)
         tries = 1

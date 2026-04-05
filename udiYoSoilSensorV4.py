@@ -81,6 +81,7 @@ class udiYoSoilSensor(udi_interface.Node):
         self.devInfo =  deviceInfo
         self.yoSoilSensor  = None
         self.node_ready = False
+        self.configDone = False
         self.system_ready=False
         self._update_lock = threading.Lock()
         self.temp_unit = self.yoAccess.get_temp_unit()   
@@ -103,6 +104,7 @@ class udiYoSoilSensor(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
                      
         # start processing events and create add our controller node
         polyglot.ready()
@@ -117,9 +119,13 @@ class udiYoSoilSensor(udi_interface.Node):
 
   
 
+    def configDoneHandler(self):
+        logging.info(f'configDoneHandler called  - {self.name}')
+        self.configDone = True
+
     def start(self):
         logging.info('Start udiYoSoilSensor')
-        while not self.node_ready:
+        while not self.node_ready and not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         self.yoSoilSensor  = YoLinkSoilSensor(self.yoAccess, self.devInfo, self.updateStatus)

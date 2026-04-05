@@ -52,6 +52,7 @@ class udiYoBatteryHub(udi_interface.Node):
         self.yoAccess = yoAccess
         self.yoHub = None
         self.node_ready = False
+        self.configDone = False
         self.system_ready=False
         self._update_lock = threading.Lock()
         self.n_queue = [] 
@@ -63,6 +64,7 @@ class udiYoBatteryHub(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
                
 
         # start processing events and create add our controller node
@@ -76,9 +78,13 @@ class udiYoBatteryHub(udi_interface.Node):
     
  
 
+    def configDoneHandler(self):
+        logging.info(f'configDoneHandler called  - {self.name}')
+        self.configDone = True
+
     def start(self):
         logging.info('start - udiYoBatteryHub')
-        while not self.node_ready:
+        while not self.node_ready and not self.configDone:
             time.sleep(0.5)
         self.yoHub  = YoLinkHub(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
@@ -192,6 +198,7 @@ class udiYoHub(udi_interface.Node):
         self.yoAccess = yoAccess
         self.yoHub = None
         self.node_ready = False
+        self.configDone = False
         self.system_ready=False
         self._update_lock = threading.Lock()
         self.n_queue = [] 
@@ -203,6 +210,7 @@ class udiYoHub(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
                
 
         # start processing events and create add our controller node
@@ -215,9 +223,13 @@ class udiYoHub(udi_interface.Node):
     
  
 
+    def configDoneHandler(self):
+        logging.info(f'configDoneHandler called  - {self.name}')
+        self.configDone = True
+
     def start(self):
         logging.info('start - udiYoHub')
-        while not self.node_ready:
+        while not self.node_ready and not self.configDone:
             time.sleep(0.5)
         self.yoHub  = YoLinkHub(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
