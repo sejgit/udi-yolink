@@ -20,7 +20,7 @@ from yolinkSirenV3 import YoLinkSiren
 
 
 class udiYoSiren(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, start_done, node_queue, wait_for_node_done, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, configDoneHandler,  node_queue, wait_for_node_done, checkNameSync
 
     id = 'yosiren'
     '''
@@ -67,7 +67,7 @@ class udiYoSiren(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         self.poly.subscribe(self.poly.STARTDONE, self.start_done)
 
         # start processing events and create add our controller node
@@ -80,13 +80,10 @@ class udiYoSiren(udi_interface.Node):
         self.node_ready = True
 
 
-    def configDoneHandler(self):
-        logging.info(f'configDoneHandler called  - {self.name}')
-        self.configDone = True
 
     def start(self):
         logging.info('Start - udiYoSiren')
-        while not self.node_ready: #  and not self.configDone:
+        while not self.node_ready  or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0, True, True)
 
@@ -129,7 +126,7 @@ class udiYoSiren(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready or not self.system_ready:
+            while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
             message_type, message_action = self.yoSiren.get_message_type() # if event some data may not be updated 
             unix_time = self.yoSiren.get_report_time('reportAt')

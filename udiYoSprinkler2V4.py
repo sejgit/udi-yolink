@@ -23,7 +23,7 @@ from udiYoSchedule import udiYoSchedule
 
 
 class udiYoSprinkler2(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, start_done,  water_meter_unit2uom, calculate_water_volume, state2ISY, update_schedule_data, node_queue, wait_for_node_done, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, configDoneHandler,   water_meter_unit2uom, calculate_water_volume, state2ISY, update_schedule_data, node_queue, wait_for_node_done, checkNameSync
 
     id = 'yosprinklerv2'
     '''
@@ -105,7 +105,7 @@ class udiYoSprinkler2(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         self.poly.subscribe(self.poly.STARTDONE, self.start_done)
 
         polyglot.ready()
@@ -117,13 +117,11 @@ class udiYoSprinkler2(udi_interface.Node):
         logging.debug('udiYoSprinkler2 INIT done- {}'.format(self.commands))
         self.node_ready = True
 
-    def configDoneHandler(self):
-        logging.info(f'configDoneHandler called  - {self.name}')
-        self.configDone = True
+
 
     def start(self):
         logging.info('Start - udiYoSprinkler2')
-        while not self.node_ready: #  and not self.configDone:
+        while not self.node_ready  or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 1)
         self.my_setDriver('GV20', 0)
@@ -187,7 +185,7 @@ class udiYoSprinkler2(udi_interface.Node):
     def updateData(self):
         try:
             if self.node is not None:
-                while not self.node_ready:
+                while not self.node_ready or not self.system_ready or not self.configDone:
                     time.sleep(0.5)
                 message_type, message_action = self.yoSprinkler.get_message_type()
                 unix_time = self.yoSprinkler.get_report_time('time')

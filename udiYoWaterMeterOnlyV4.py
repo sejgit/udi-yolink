@@ -103,7 +103,7 @@ class udiYoWaterMeterOnly(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         self.poly.subscribe(self.poly.STARTDONE, self.start_done)
 
         # start processing events and create add our controller node
@@ -117,13 +117,11 @@ class udiYoWaterMeterOnly(udi_interface.Node):
 
 
 
-    def configDoneHandler(self):
-        logging.info(f'configDoneHandler called  - {self.name}')
-        self.configDone = True
+
 
     def start(self):
         logging.info('Start - udiYoWaterMeterController')
-        while not self.node_ready: #  and not self.configDone:
+        while not self.node_ready or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 1)
         self.my_setDriver('GV20', 0)
@@ -185,7 +183,7 @@ class udiYoWaterMeterOnly(udi_interface.Node):
     def updateData(self):
         try:
             if self.node is not None:
-                while not self.node_ready or not self.system_ready:
+                while not self.node_ready or not self.system_ready or not self.configDone:
                     time.sleep(0.5)
                 message_type, message_action = self.yoWaterCtrl.get_message_type() # if event some data may not be updated 
                 unix_time = self.yoWaterCtrl.get_report_time('reportAt')

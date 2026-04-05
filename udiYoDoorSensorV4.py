@@ -19,7 +19,7 @@ except ImportError:
 
 
 class udiYoDoorSensor(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, start_done, save_cmd_state, retrieve_cmd_state, node_queue, wait_for_node_done, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, configDoneHandler,  save_cmd_state, retrieve_cmd_state, node_queue, wait_for_node_done, checkNameSync
 
     id = 'yodoorsens'
     
@@ -52,7 +52,7 @@ class udiYoDoorSensor(udi_interface.Node):
         self.yoDoorSensor = None
         self.node_ready = False
         self.configDone = False
-        self.system_ready=False
+        self.system_ready = False
         self._update_lock = threading.Lock()
         self.last_state = 99
         self.cmd_state =  self.retrieve_cmd_state()
@@ -65,7 +65,7 @@ class udiYoDoorSensor(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         self.poly.subscribe(self.poly.STARTDONE, self.start_done)
 
 
@@ -81,13 +81,11 @@ class udiYoDoorSensor(udi_interface.Node):
 
 
 
-    def configDoneHandler(self):
-        logging.info(f'configDoneHandler called  - {self.name}')
-        self.configDone = True
+
 
     def start(self):
         logging.info('start - udiYoDoorSensor')
-        while not self.node_ready:# and not self.configDone:
+        while not self.node_ready or not self.configDone:
             time.sleep(0.5)
         #self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
@@ -140,7 +138,7 @@ class udiYoDoorSensor(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready or not self.system_ready:
+            while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
             message_type, message_action = self.yoDoorSensor.get_message_type() # if event some data may not be updated 
             unix_time = self.yoDoorSensor.get_report_time('reportAt')

@@ -20,7 +20,7 @@ from yolinkThermostatV2 import YoLinkThermostat
 
 
 class udiYoThermostat(udi_interface.Node):
-    from udiYolinkLib import my_setDriver, start_done, node_queue, wait_for_node_done, checkNameSync
+    from udiYolinkLib import my_setDriver, start_done, configDoneHandler,  node_queue, wait_for_node_done, checkNameSync
 
     id = 'yothermostat'
 
@@ -75,7 +75,7 @@ class udiYoThermostat(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         self.poly.subscribe(self.poly.STARTDONE, self.start_done)
 
         # Add node and wait
@@ -87,14 +87,12 @@ class udiYoThermostat(udi_interface.Node):
         self.adr_list = [address]
         self.node_ready = True
 
-    def configDoneHandler(self):
-        logging.info(f'configDoneHandler called  - {self.name}')
-        self.configDone = True
+
 
     def start(self):
         """Initialize and start the thermostat device"""
         logging.info('Start udiYoThermostat')
-        while not self.node_ready: #  and not self.configDone:
+        while not self.node_ready or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         self.yoThermostat = YoLinkThermostat(self.yoAccess, self.devInfo, self.updateStatus)
@@ -139,7 +137,7 @@ class udiYoThermostat(udi_interface.Node):
         """Parse device state and update drivers"""
         logging.info('udiYoThermostat - updateData')
         if self.node is not None:
-            while not self.node_ready or not self.system_ready:
+            while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)            
             message_type, message_action = self.yoThermostat.get_message_type()
             # Update timestamp

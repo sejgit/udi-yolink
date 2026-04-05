@@ -100,13 +100,10 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         self.node_ready = True
 
 
-    def configDoneHandler(self):
-        logging.info(f'configDoneHandler called  - {self.name}')
-        self.configDone = True
 
     def start(self):
         logging.info('Start - udiYoWaterMeterMultiController')
-        while not self.node_ready and not self.configDone:
+        while not self.node_ready or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 1)
         self.my_setDriver('GV20', 0)
@@ -196,7 +193,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
     def updateData(self):
         try:
             if self.node is not None:
-                while not self.node_ready or not self.system_ready:
+                while not self.node_ready or not self.system_ready or not self.configDone:
                     time.sleep(0.5)
                 message_type, message_action = self.yoWaterCtrl.get_message_type()
                 unix_time = self.yoWaterCtrl.get_report_time('time')
@@ -274,7 +271,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
 
 
 class udiYoSubWaterMeter(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, start_done,  w_unit2ISY, calculate_water_volume, save_cmd_state, water_meter_unit2uom, retrieve_cmd_state, bool2ISY, state2ISY, state2Nbr, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, configDoneHandler,   w_unit2ISY, calculate_water_volume, save_cmd_state, water_meter_unit2uom, retrieve_cmd_state, bool2ISY, state2ISY, state2Nbr, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key, checkNameSync
 
     id = 'yowatermeterSubL'
     '''
@@ -358,13 +355,9 @@ class udiYoSubWaterMeter(udi_interface.Node):
 
 
 
-    def configDoneHandler(self):
-        logging.info(f'configDoneHandler called  - {self.name}')
-        self.configDone = True
-
     def start(self):
         logging.info('Start - udiYoWaterMeterMultiController')
-        while not self.node_ready and not self.configDone:
+        while not self.node_ready or not self.configDone:
             time.sleep(0.5)
 
         # No online check here - the main node already waited for the device
@@ -398,7 +391,7 @@ class udiYoSubWaterMeter(udi_interface.Node):
     def updateData(self):
         try:
             if self.node is not None:
-                while not self.node_ready or not self.system_ready:
+                while not self.node_ready or not self.system_ready or not self.configDone:
                     time.sleep(0.5)
                 message_type, message_action = self.yoWaterCtrl.get_message_type()
                 if self.yoWaterCtrl.check_system_online():

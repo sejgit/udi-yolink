@@ -22,7 +22,7 @@ import time
 from yolinkSpeakerHubV3 import YoLinkSpeakerH
 
 class udiYoSpeakerHub(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, start_done, bool2ISY, node_queue, wait_for_node_done, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, configDoneHandler,  bool2ISY, node_queue, wait_for_node_done, checkNameSync
     id = 'yospeakerh'
     drivers = [
             {'driver': 'ST', 'value': 0, 'uom': 25},
@@ -70,7 +70,7 @@ class udiYoSpeakerHub(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         self.poly.subscribe(self.poly.STARTDONE, self.start_done)
    
         # start processing events and create add our controller node
@@ -85,13 +85,9 @@ class udiYoSpeakerHub(udi_interface.Node):
 
 
 
-    def configDoneHandler(self):
-        logging.info(f'configDoneHandler called  - {self.name}')
-        self.configDone = True
-
     def start(self):
         logging.info('start - udiYoSpeakerHub')
-        while not self.node_ready: #  and not self.configDone:
+        while not self.node_ready  or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         self.my_setDriver('ST', 0)
@@ -159,7 +155,7 @@ class udiYoSpeakerHub(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready or not self.system_ready:
+            while not self.node_ready or not self.system_ready or self.configDone:
                 time.sleep(0.5)
             message_type, message_action = self.yoSpeakerHub.get_message_type()
             self.my_setDriver('TIME', self.yoSpeakerHub.getLastUpdateTime(), 151)

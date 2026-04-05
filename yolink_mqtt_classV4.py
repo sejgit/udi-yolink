@@ -83,8 +83,6 @@ class YoLinkMQTTDevice(object):
         yolink.dDelay = 'delay'
         yolink.messageTime = 'time'
         yolink.scheduleSec = False
-
-
         yolink.forceStop = False
         yolink.eventSupport = False # Support adding to EventQueue
         yolink.disconnect = False

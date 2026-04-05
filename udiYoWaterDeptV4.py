@@ -20,7 +20,7 @@ from yolinkWaterDeptV3 import YoLinkWaterDeptSensor
 
 
 class udiYoWaterDept(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, start_done, retrieve_cmd_state, bool2ISY, node_queue, wait_for_node_done, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, configDoneHandler,  retrieve_cmd_state, bool2ISY, node_queue, wait_for_node_done, checkNameSync
 
     id = 'yowaterdept'
     
@@ -83,7 +83,7 @@ class udiYoWaterDept(udi_interface.Node):
         self.poly.subscribe(self.poly.START, self.start, self.address)
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         self.poly.subscribe(self.poly.STARTDONE, self.start_done)
                      
         # start processing events and create add our controller node
@@ -99,13 +99,9 @@ class udiYoWaterDept(udi_interface.Node):
 
   
 
-    def configDoneHandler(self):
-        logging.info(f'configDoneHandler called  - {self.name}')
-        self.configDone = True
-
     def start(self):
         logging.info('Start udiYoWaterDept')
-        while not self.node_ready: #  and not self.configDone:
+        while not self.node_ready or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0, True, True)
         self.yoWaterDept  = YoLinkWaterDeptSensor(self.yoAccess, self.devInfo, self.updateStatus)
@@ -148,7 +144,7 @@ class udiYoWaterDept(udi_interface.Node):
         #limits = self.yoWaterDept.getLimits()
         try:
             if self.node is not None:
-                while not self.node_ready or not self.system_ready:
+                while not self.node_ready or not self.system_ready or not self.configDone:
                     time.sleep(0.5)
             message_type, message_action = self.yoWaterDept.get_message_type() # if event some data may not be updated 
             unix_time = self.yoWaterDept.get_report_time('reportAt')

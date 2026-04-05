@@ -22,7 +22,7 @@ import time
 from yolinkHubV3 import YoLinkHub
 
 class udiYoBatteryHub(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, start_done, wait_for_node_done, node_queue, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, configDoneHandler,  wait_for_node_done, node_queue, checkNameSync
     '''
        drivers = [
             'ST' =  Powered
@@ -64,7 +64,7 @@ class udiYoBatteryHub(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         self.poly.subscribe(self.poly.STARTDONE, self.start_done)
                
 
@@ -77,15 +77,11 @@ class udiYoBatteryHub(udi_interface.Node):
         self.adr_list = [address]
         self.node_ready = True
     
- 
 
-    def configDoneHandler(self):
-        logging.info(f'configDoneHandler called  - {self.name}')
-        self.configDone = True
 
     def start(self):
         logging.info('start - udiYoBatteryHub')
-        while not self.node_ready and not self.configDone:
+        while not self.node_ready or not self.configDone:
             time.sleep(0.5)
         self.yoHub  = YoLinkHub(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
@@ -123,7 +119,7 @@ class udiYoBatteryHub(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready or not self.system_ready:
+            while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
 
             if self.yoHub.check_system_online():
@@ -172,7 +168,7 @@ class udiYoBatteryHub(udi_interface.Node):
 
 
 class udiYoHub(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, wait_for_node_done, node_queue, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, configDoneHandler, wait_for_node_done, node_queue, checkNameSync
     id = 'yohub'
     drivers = [
             #{'driver': 'GV0', 'value': 99, 'uom': 25},
@@ -222,15 +218,11 @@ class udiYoHub(udi_interface.Node):
         self.adr_list = [address]
         self.node_ready = True
     
- 
 
-    def configDoneHandler(self):
-        logging.info(f'configDoneHandler called  - {self.name}')
-        self.configDone = True
 
     def start(self):
         logging.info('start - udiYoHub')
-        while not self.node_ready and not self.configDone:
+        while not self.node_ready or not self.configDone:
             time.sleep(0.5)
         self.yoHub  = YoLinkHub(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
@@ -273,7 +265,7 @@ class udiYoHub(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready or not self.system_ready:
+            while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
 
             message_type, message_action = self.yoHub.get_message_type()

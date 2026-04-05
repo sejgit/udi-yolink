@@ -21,7 +21,7 @@ from yolinkPowerFailV3 import YoLinkPowerFailSensor
 
 
 class udiYoPowerFailSenor(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, start_done, save_cmd_state, retrieve_cmd_state, bool2ISY, node_queue, wait_for_node_done, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, configDoneHandler,  save_cmd_state, retrieve_cmd_state, bool2ISY, node_queue, wait_for_node_done, checkNameSync
 
     id = 'yopwralarm'
     
@@ -90,13 +90,10 @@ class udiYoPowerFailSenor(udi_interface.Node):
         self.adr_list.append(address)
         self.node_ready = True
 
-    def configDoneHandler(self):
-        logging.info(f'configDoneHandler called  - {self.name}')
-        self.configDone = True
 
     def start(self):
         logging.info('start - udiYoPowerFailSenor')
-        while not self.node_ready: #  and not self.configDone:
+        while not self.node_read  or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         self.yoPowerFail  = YoLinkPowerFailSensor(self.yoAccess, self.devInfo, self.updateStatus)
@@ -131,7 +128,7 @@ class udiYoPowerFailSenor(udi_interface.Node):
     def updateData(self):
         alert_state = ['normal', 'alert', 'off']
         if self.node is not None:
-            while not self.node_ready or not self.system_ready:
+            while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
             message_type, message_action = self.yoPowerFail.get_message_type() # if event some data may not be updated 
             unix_time = self.yoPowerFail.get_report_time('reportAt')

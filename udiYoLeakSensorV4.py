@@ -22,7 +22,7 @@ import time
 
 
 class udiYoLeakSensor(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, start_done, save_cmd_state, retrieve_cmd_state, state2ISY, node_queue, wait_for_node_done, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, configDoneHandler,  save_cmd_state, retrieve_cmd_state, state2ISY, node_queue, wait_for_node_done, checkNameSync
 
     id = 'yoleaksens'
     
@@ -79,7 +79,7 @@ class udiYoLeakSensor(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         self.poly.subscribe(self.poly.STARTDONE, self.start_done)
              
         # start processing events and create add our controller node
@@ -93,13 +93,10 @@ class udiYoLeakSensor(udi_interface.Node):
         self.node_ready = True
 
 
-    def configDoneHandler(self):
-        logging.info(f'configDoneHandler called  - {self.name}')
-        self.configDone = True
 
     def start(self):
         logging.info('start - YoLinkLeakSensor')
-        while not self.node_ready and not self.configDone:
+        while not self.node_ready or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         self.yoLeakSensor  = YoLinkLeakSensor(self.yoAccess, self.devInfo, self.updateStatus)
@@ -142,7 +139,7 @@ class udiYoLeakSensor(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready or not self.system_ready:
+            while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
             message_type, action_type = self.yoLeakSensor.get_message_type() # if event some data may not be updated 
             unix_time = self.yoLeakSensor.get_report_time('reportAt')

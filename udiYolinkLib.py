@@ -31,6 +31,10 @@ def start_done(self):
     logging.info(f'start_done called  - {self.devInfo["name"]}')
     self.system_ready = True
 
+def configDoneHandler(self):
+    logging.info(f'configDoneHandler called  - {self.devInfo["name"]}')
+    self.configDone = True
+
 def updateEpochTime(self, command=None ):
     logging.info('updateEpochTime ')
     #unit = int(command.get('value'))

@@ -425,7 +425,7 @@ class YoLinkInitPAC(object):
             return(False)
 
     #@measure_time
-    def subscribe_mqtt(yoAccess, deviceId, callback):
+    def subscribe_mqtt(yoAccess, deviceId, callback) -> bool:
 
         logging.info(f'{yoAccess.access_mode} Subscribing deviceId {deviceId} to MQTT {yoAccess.mqtt_str}+{ yoAccess.homeID}')
         topicReq = yoAccess.mqtt_str +yoAccess.homeID+'/'+ deviceId +'/request'
@@ -446,6 +446,7 @@ class YoLinkInitPAC(object):
                                             'subscribed': True
                                             }
             time.sleep(1)
+        return(True)
 
     #@measure_time
     def update_mqtt_subscription (yoAccess, deviceId):

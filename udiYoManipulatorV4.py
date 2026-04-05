@@ -23,7 +23,7 @@ from udiYoSchedule import udiYoSchedule
 
 
 class udiYoManipulator(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, start_done,  prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, configDoneHandler,   prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, checkNameSync
     id = 'yomanipu'
     '''
        drivers = [
@@ -82,7 +82,7 @@ class udiYoManipulator(udi_interface.Node):
         self.poly.subscribe(polyglot.START, self.start, self.address)
         self.poly.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         self.poly.subscribe(self.poly.STARTDONE, self.start_done)
 
         # start processing events and create add our controller node
@@ -97,13 +97,9 @@ class udiYoManipulator(udi_interface.Node):
 
 
 
-    def configDoneHandler(self):
-        logging.info(f'configDoneHandler called  - {self.name}')
-        self.configDone = True
-
     def start(self):
         logging.info('Start - udiYoManipulator')
-        while not self.node_ready: #  and not self.configDone:
+        while not self.node_ready or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         # Create schedule node before device online check
@@ -149,7 +145,7 @@ class udiYoManipulator(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready or not self.system_ready:
+            while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
             message_type, message_action  = self.yoManipulator.get_message_type()
             if message_action in ['getSchedules', 'setSchedules']:

@@ -22,7 +22,7 @@ from yolinkLockV3 import YoLinkLock
 
 
 class udiYoLockV2(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, start_done, save_cmd_state, retrieve_cmd_state, bool2ISY, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, configDoneHandler,  save_cmd_state, retrieve_cmd_state, bool2ISY, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key, checkNameSync
 
     id = 'yolockv2'
     '''
@@ -72,7 +72,7 @@ class udiYoLockV2(udi_interface.Node):
         self.poly.subscribe(self.poly.START, self.start, self.address)
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         self.poly.subscribe(self.poly.STARTDONE, self.start_done)
              
 
@@ -87,13 +87,10 @@ class udiYoLockV2(udi_interface.Node):
 
 
 
-    def configDoneHandler(self):
-        logging.info(f'configDoneHandler called  - {self.name}')
-        self.configDone = True
 
     def start(self):
         logging.info('start - YoLinkLock')
-        while not self.node_ready: #  and not self.configDone:
+        while not self.node_ready or not self.configDone:
             time.sleep(0.5)
         self.yoLock  = YoLinkLock(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
@@ -142,7 +139,7 @@ class udiYoLockV2(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready or not self.system_ready:
+            while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
             message_type, message_action = self.yoLock.get_message_type() # if event some data may not be updated 
             unix_time = self.yoLock.get_report_time('reportAt')
@@ -334,13 +331,9 @@ class udiYoLock(udi_interface.Node):
 
 
 
-    def configDoneHandler(self):
-        logging.info(f'configDoneHandler called  - {self.name}')
-        self.configDone = True
-
     def start(self):
         logging.info('start - YoLinkLock')
-        while not self.node_ready and not self.configDone:
+        while not self.node_ready or not self.configDone:
             time.sleep(0.5)
         self.yoLock  = YoLinkLock(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)

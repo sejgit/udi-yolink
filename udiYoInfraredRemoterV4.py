@@ -152,7 +152,7 @@ class udiYoInfraredCode(udi_interface.Node):
 
 
 class udiYoInfraredRemoter(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, start_done, update_schedule_data, node_queue, wait_for_node_done, set_node_custom, get_node_custom, checkNameSync as sharedCheckNameSync, saveCurrentNodeNames
+    from  udiYolinkLib import my_setDriver, start_done, configDoneHandler,  update_schedule_data, node_queue, wait_for_node_done, set_node_custom, get_node_custom, checkNameSync as sharedCheckNameSync, saveCurrentNodeNames
 
 
     '''
@@ -197,7 +197,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.poly.subscribe(polyglot.START, self.start, self.address)
         self.poly.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         self.poly.subscribe(self.poly.STARTDONE, self.start_done)
           
 
@@ -240,13 +240,11 @@ class udiYoInfraredRemoter(udi_interface.Node):
         name = self.poly.getValidName(name)
         self.code_nodes[code] = udiYoInfraredCode(self.poly, self.primary, nde_address, name, code, self.yoIRrem)
 
-    def configDoneHandler(self):
-        logging.info(f'configDoneHandler called  - {self.name}')
-        self.configDone = True
+
 
     def start(self):
         logging.info('start - udiIRremote')
-        while not self.node_ready: #  and not self.configDone:
+        while not self.node_ready  or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('ST', 0)
         # Create schedule node before device online check
@@ -308,7 +306,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready or not self.system_ready:
+            while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
             logging.debug('updateData - {}'.format(self.yoIRrem.check_system_online()))
             message_type, message_action = self.yoIRrem.get_message_type()

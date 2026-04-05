@@ -23,7 +23,7 @@ from udiYoSchedule import udiYoSchedule
 
 
 class udiYoWaterMeterController(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, w_unit2ISY, water_meter_unit2uom, calculate_water_volume, state2ISY, bool2ISY, update_schedule_data, node_queue, wait_for_node_done, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, configDoneHandler, w_unit2ISY, water_meter_unit2uom, calculate_water_volume, state2ISY, bool2ISY, update_schedule_data, node_queue, wait_for_node_done, checkNameSync
 
     id = 'yowatermeterCtrl'
     '''
@@ -116,7 +116,7 @@ class udiYoWaterMeterController(udi_interface.Node):
         self.schedule_leak = None
         self.node_ready = False
         self.system_ready = False
-        #self.configDone = False
+        self.configDone = False
         self._update_lock = threading.Lock()
         self.meter_count = 1
         self.last_state = ''
@@ -132,7 +132,7 @@ class udiYoWaterMeterController(udi_interface.Node):
         self.poly.subscribe(self.poly.START, self.start, self.address)
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         self.poly.subscribe(self.poly.STARTDONE, self.start_done)
 
 
@@ -140,7 +140,7 @@ class udiYoWaterMeterController(udi_interface.Node):
         #if self.yoWaterCtrl.devInfo['model'] in known_meters:
         #    logging.debug(f'Known water meter model {self.yoWaterCtrl.devInfo["model"]}')   
         #    if self.yoWaterCtrl.devInfo['model'] in ['YS5029']: # dual channel model  -  no temps and not 
-
+        self.poly.ready()
 
         # start processing events and create add our controller node
       
@@ -152,20 +152,12 @@ class udiYoWaterMeterController(udi_interface.Node):
         
         logging.debug('udiYoWaterMeterController INIT done- {}'.format(self.commands))
         self.node_ready = True
-        self.poly.ready()
 
-    #def configDoneHandler(self):
-    #    logging.info(f'configDoneHandler called  - {self.devInfo["name"]}')
-    #    self.configDone = True
-
-    def start_done(self):
-        logging.info(f'start_done called  - {self.devInfo["name"]}')
-        self.system_ready = True
 
 
     def start(self):
         logging.info('Start - udiYoWaterMeterController')
-        while not self.node_ready:
+        while not self.node_ready or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 1)
         self.my_setDriver('GV20', 0)
@@ -241,7 +233,7 @@ class udiYoWaterMeterController(udi_interface.Node):
     def updateData(self):
         try:
             if self.yoWaterCtrl is not None:
-                while not self.node_ready or not self.system_ready:
+                while not self.node_ready or not self.system_ready or not self.configDone:
                     time.sleep(0.5)
                 message_type, message_action = self.yoWaterCtrl.get_message_type()
                 unix_time = self.yoWaterCtrl.get_report_time('time')
