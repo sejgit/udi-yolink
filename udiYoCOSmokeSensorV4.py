@@ -23,7 +23,7 @@ import time
 
 
 class udiYoCOSmokeSensor(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, bool2nbr, node_queue, wait_for_node_done, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, save_cmd_state, retrieve_cmd_state, bool2nbr, node_queue, wait_for_node_done, checkNameSync
 
     id = 'yoCOSmokesens'
     
@@ -89,6 +89,7 @@ class udiYoCOSmokeSensor(udi_interface.Node):
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
              
         # start processing events and create add our controller node
         self.poly.ready()

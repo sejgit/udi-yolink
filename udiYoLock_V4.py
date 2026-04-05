@@ -22,7 +22,7 @@ from yolinkLockV3 import YoLinkLock
 
 
 class udiYoLockV2(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, bool2ISY, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, save_cmd_state, retrieve_cmd_state, bool2ISY, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key, checkNameSync
 
     id = 'yolockv2'
     '''
@@ -72,7 +72,8 @@ class udiYoLockV2(udi_interface.Node):
         self.poly.subscribe(self.poly.START, self.start, self.address)
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
              
 
         # start processing events and create add our controller node
@@ -92,7 +93,7 @@ class udiYoLockV2(udi_interface.Node):
 
     def start(self):
         logging.info('start - YoLinkLock')
-        while not self.node_ready and not self.configDone:
+        while not self.node_ready: #  and not self.configDone:
             time.sleep(0.5)
         self.yoLock  = YoLinkLock(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)

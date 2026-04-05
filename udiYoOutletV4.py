@@ -23,7 +23,7 @@ from udiYoSchedule import udiYoSchedule
 
 
 class udiYoOutlet(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, bool2ISY, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, bool2ISY, checkNameSync
     id = 'yooutlet'
     '''
        drivers = [
@@ -94,7 +94,8 @@ class udiYoOutlet(udi_interface.Node):
         self.poly.subscribe(polyglot.START, self.start, self.address)
         self.poly.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
                
 
         # start processing events and create add our controller node
@@ -114,7 +115,7 @@ class udiYoOutlet(udi_interface.Node):
 
     def start(self):
         logging.info('start - YoOutlet')
-        while not self.node_ready and not self.configDone:
+        while not self.node_ready: #  and not self.configDone:
             time.sleep(0.5)
         #self.my_setDriver('GV30', 0)
         # Create schedule node before device online check

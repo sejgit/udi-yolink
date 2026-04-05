@@ -20,7 +20,7 @@ from yolinkWaterDeptV3 import YoLinkWaterDeptSensor
 
 
 class udiYoWaterDept(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, retrieve_cmd_state, bool2ISY, node_queue, wait_for_node_done, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, retrieve_cmd_state, bool2ISY, node_queue, wait_for_node_done, checkNameSync
 
     id = 'yowaterdept'
     
@@ -83,7 +83,8 @@ class udiYoWaterDept(udi_interface.Node):
         self.poly.subscribe(self.poly.START, self.start, self.address)
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
                      
         # start processing events and create add our controller node
         self.poly.ready()
@@ -104,7 +105,7 @@ class udiYoWaterDept(udi_interface.Node):
 
     def start(self):
         logging.info('Start udiYoWaterDept')
-        while not self.node_ready and not self.configDone:
+        while not self.node_ready: #  and not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0, True, True)
         self.yoWaterDept  = YoLinkWaterDeptSensor(self.yoAccess, self.devInfo, self.updateStatus)

@@ -23,7 +23,7 @@ from udiYoSchedule import udiYoSchedule
 
 
 class udiYoSprinkler2(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, water_meter_unit2uom, calculate_water_volume, state2ISY, update_schedule_data, node_queue, wait_for_node_done, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done,  water_meter_unit2uom, calculate_water_volume, state2ISY, update_schedule_data, node_queue, wait_for_node_done, checkNameSync
 
     id = 'yosprinklerv2'
     '''
@@ -105,7 +105,9 @@ class udiYoSprinkler2(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
+
         polyglot.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
@@ -121,7 +123,7 @@ class udiYoSprinkler2(udi_interface.Node):
 
     def start(self):
         logging.info('Start - udiYoSprinkler2')
-        while not self.node_ready and not self.configDone:
+        while not self.node_ready: #  and not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 1)
         self.my_setDriver('GV20', 0)

@@ -22,7 +22,7 @@ from yolinkGarageDoorToggleV2 import YoLinkGarageDoorCtrl
 
 
 class udiYoGarageDoor(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, wait_for_node_done, node_queue, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, wait_for_node_done, node_queue, checkNameSync
     id = 'yogarage'
     
     '''
@@ -56,7 +56,8 @@ class udiYoGarageDoor(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
         
         # start processing events and create add our controller node
         polyglot.ready()
@@ -74,7 +75,7 @@ class udiYoGarageDoor(udi_interface.Node):
 
     def start(self):
         logging.info('start - udiYoGarageDoor')
-        while not self.node_ready and not self.configDone:
+        while not self.node_ready:# and not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)

@@ -274,7 +274,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
 
 
 class udiYoSubWaterMeter(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, w_unit2ISY, calculate_water_volume, save_cmd_state, water_meter_unit2uom, retrieve_cmd_state, bool2ISY, state2ISY, state2Nbr, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done,  w_unit2ISY, calculate_water_volume, save_cmd_state, water_meter_unit2uom, retrieve_cmd_state, bool2ISY, state2ISY, state2Nbr, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key, checkNameSync
 
     id = 'yowatermeterSubL'
     '''
@@ -338,7 +338,10 @@ class udiYoSubWaterMeter(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
+
+
         #known_meters = ['YS5007','YS5018', 'YS5008', 'YS5009', 'YS5029']
         #if self.yoWaterCtrl.devInfo['model'] in known_meters:
         #    logging.debug(f'Known water meter model {self.yoWaterCtrl.devInfo["model"]}')   
@@ -361,7 +364,7 @@ class udiYoSubWaterMeter(udi_interface.Node):
 
     def start(self):
         logging.info('Start - udiYoWaterMeterMultiController')
-        while not self.node_ready and not self.configDone:
+        while not self.node_ready: #  and not self.configDone:
             time.sleep(0.5)
 
         # No online check here - the main node already waited for the device

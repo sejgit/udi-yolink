@@ -26,6 +26,11 @@ from datetime import datetime
 
 driver_lock = threading.Lock()
 
+
+def start_done(self):
+    logging.info(f'start_done called  - {self.devInfo["name"]}')
+    self.system_ready = True
+
 def updateEpochTime(self, command=None ):
     logging.info('updateEpochTime ')
     #unit = int(command.get('value'))

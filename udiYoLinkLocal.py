@@ -35,6 +35,7 @@ class YoLinkSetup (udi_interface.Node):
         self.hb = 0
         self.nodeDefineDone = False
         self.handleParamsDone = False
+        self.configDone = False
         self.pollStart = False
         self.debug = False
         self.address = address
@@ -121,7 +122,7 @@ class YoLinkSetup (udi_interface.Node):
         logging.info('Executing start - udi-YoLink')
         
         #logging.setLevel(30)
-        while not self.nodeDefineDone and self.handleParamsDone:
+        while not self.nodeDefineDone or not self.handleParamsDone or not self.configDone:
             time.sleep(1)
             logging.debug ('waiting for inital node to get created')
 

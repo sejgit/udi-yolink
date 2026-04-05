@@ -23,7 +23,7 @@ from udiYoSmartRemoterV4 import udiRemoteKey
 from udiYoSchedule import udiYoSchedule
 
 class udiYoSwitch(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, prep_schedule, state2ISY, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, prep_schedule, state2ISY, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key, checkNameSync
     id = 'yoswitch'
 
     drivers = [
@@ -85,7 +85,8 @@ class udiYoSwitch(udi_interface.Node):
         self.poly.subscribe(self.poly.START, self.start, self.address)
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
                
 
         # start processing events and create add our controller node
@@ -104,7 +105,7 @@ class udiYoSwitch(udi_interface.Node):
 
     def start(self):
         logging.info('start - udiYoSwitch')
-        while not self.node_ready and not self.configDone:
+        while not self.node_ready: #  and not self.configDone:
             time.sleep(0.5)
         # Create schedule node before device online check
         sch_address = self.address[4:14] + '_SCH'

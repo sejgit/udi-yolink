@@ -22,7 +22,7 @@ from yolinkWaterMeterControllerV3 import YoLinkWaterMeter
 
 
 class udiYoWaterMeterOnly(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, water_meter_unit2uom, calculate_water_volume, bool2ISY, node_queue, wait_for_node_done, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_only, water_meter_unit2uom, calculate_water_volume, bool2ISY, node_queue, wait_for_node_done, checkNameSync
 
     id = 'yowatermeterOnly'
     '''
@@ -103,7 +103,8 @@ class udiYoWaterMeterOnly(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
 
         # start processing events and create add our controller node
         polyglot.ready()
@@ -122,7 +123,7 @@ class udiYoWaterMeterOnly(udi_interface.Node):
 
     def start(self):
         logging.info('Start - udiYoWaterMeterController')
-        while not self.node_ready and not self.configDone:
+        while not self.node_ready: #  and not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 1)
         self.my_setDriver('GV20', 0)

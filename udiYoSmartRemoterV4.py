@@ -244,7 +244,7 @@ class udiRemoteKey(udi_interface.Node):
 
 
 class udiYoSmartRemoter(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, node_queue, wait_for_node_done, set_node_custom, get_node_custom, checkNameSync as sharedCheckNameSync, saveCurrentNodeNames
+    from  udiYolinkLib import my_setDriver, start_done, node_queue, wait_for_node_done, set_node_custom, get_node_custom, checkNameSync as sharedCheckNameSync, saveCurrentNodeNames
 
     id = 'yosmremote'
 
@@ -309,7 +309,8 @@ class udiYoSmartRemoter(udi_interface.Node):
         self.poly.subscribe(self.poly.START, self.start, self.address)
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
         
 
         # start processing events and create add our controller node
@@ -359,7 +360,7 @@ class udiYoSmartRemoter(udi_interface.Node):
     def start(self):
 
         logging.info('start - udiYoSmartRemoter')
-        while not self.node_ready and not self.configDone:
+        while not self.node_ready: #  and not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0, True, True)
         self.yoSmartRemote  = YoLinkSmartRemoter(self.yoAccess, self.devInfo, self.updateStatus)
