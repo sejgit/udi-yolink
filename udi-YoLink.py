@@ -38,6 +38,7 @@ class YoLinkSetup (udi_interface.Node):
         
         self.nodeDefineDone = False
         self.handleParamsDone = False
+        self.configDone = False
         self.pollStart = False
         self.debug = False
         self.address = address
@@ -75,7 +76,7 @@ class YoLinkSetup (udi_interface.Node):
         logging.debug('self.address : ' + str(self.address))
         logging.debug('self.name :' + str(self.name))   
         self.poly.updateProfile()
-        self.poly.ready()
+       
         self.poly.addNode(self)
         self.wait_for_node_done()
         self.node = self.poly.getNode(self.address)
@@ -83,30 +84,26 @@ class YoLinkSetup (udi_interface.Node):
         self.my_setDriver('GV1', 0)
         self.assigned_addresses = []
         self.assigned_addresses.append(self.address)   
-        logging.debug('YoLinkSetup init DONE')
+        logging.debug('YoLinkSetup init DONE')        
         self.nodeDefineDone = True
 
-
-
-    '''
+ 
     def configDoneHandler(self):
-        # We use this to discover devices, or ask to authenticate if user has not already done so
         self.poly.Notices.clear()
         logging.info('configDoneHandler called')
-        #self.myNetatmo.updateOauthConfig()
         self.nodes_in_db = self.poly.getNodesFromDb()
         logging.debug('Nodes in Nodeserver - before cleanup: {} - {}'.format(len(self.nodes_in_db),self.nodes_in_db))
         self.configDone = True
-    '''
+    
 
     def start (self):
         logging.info('Executing start - udi-YoLink')
         logging.info ('Access using PAC/UAC')
         #logging.setLevel(30)
-        while not self.nodeDefineDone:
+        while not self.nodeDefineDone and not self.configDone:
             time.sleep(1)
             logging.debug ('waiting for inital node to get created')
-
+        self.poly.ready()
 
         
         #self.supportedYoTypes = ['WaterMeterController',  'InfraredRemoter']
