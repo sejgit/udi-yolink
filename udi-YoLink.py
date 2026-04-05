@@ -100,7 +100,7 @@ class YoLinkSetup (udi_interface.Node):
         logging.info('Executing start - udi-YoLink')
         logging.info ('Access using PAC/UAC')
         #logging.setLevel(30)
-        while not self.nodeDefineDone and not self.configDone and not self.handleParamsDone:
+        while not self.nodeDefineDone or not self.configDone or not self.handleParamsDone:
             time.sleep(1)
             logging.debug ('waiting for inital node to get created')
         self.poly.ready()
@@ -335,14 +335,14 @@ class YoLinkSetup (udi_interface.Node):
                 self.nbr_dev_API_calls = int(userParam['DEV_CALLS_PER_MIN'])   
             
             nodes = self.poly.getNodes()
-            #logging.debug('nodes: {}'.format(nodes))
+            logging.debug('nodes: {}'.format(nodes))
             for nde in nodes:
-                #logging.debug('node : {}'.format(nde))
+                logging.debug('node : {}'.format(nde))
                 if nde in userParam:
 
                     user_param_name = userParam[nde]
                     temp_node = nodes[nde]
-                    #logging.debug('User param name : {}, node name {}'.format(user_param_name, temp_node.name))
+                    logging.debug('User param name : {}, node name {}'.format(user_param_name, temp_node.name))
                     if user_param_name != temp_node.name:
                         temp_node.rename(user_param_name)
                         logging.info('Renaming node {} to {}'.format(nde, temp_node.name))
