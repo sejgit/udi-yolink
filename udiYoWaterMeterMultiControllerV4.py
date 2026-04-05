@@ -643,9 +643,9 @@ class udiYoSubWaterMeter(udi_interface.Node):
     '''
 
     commands = {
-                'UPDATE': update,
-                'DON'   : set_open,
-                'DOF'   : set_close,
+    
+                'VOPEN'   : set_open,
+                'VCLOSE'   : set_close,
                 'SETATTRIB' : set_attributes,
                 }
 

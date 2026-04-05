@@ -303,8 +303,8 @@ class udiYoManipulator(udi_interface.Node):
 
     commands = {
                 'UPDATE': update,
-                'DON'   : set_open,
-                'DOF'   : set_close,
+                'MOPEN'   : set_open,
+                'MCLOSE'   : set_close,
                 'MANCTRL': manipuControl, 
                 #'ONDELAY' : prepOnDelay,
                 #'OFFDELAY' : prepOffDelay,

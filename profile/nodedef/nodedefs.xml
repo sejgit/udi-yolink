@@ -1160,8 +1160,8 @@
          </sends>
          <accepts>
             <cmd id="UPDATE" /> 
-            <cmd id="DON" editor="manstate"/> 
-            <cmd id="DOF" editor="manstate"/> 
+            <cmd id="MOPEN"/> 
+            <cmd id="MCLOSE" /> 
 
 
             <cmd id="MANCTRL" > 
@@ -1223,8 +1223,8 @@
          </sends>
          <accepts>
             <cmd id="UPDATE" /> 
-            <cmd id="DON" /> 
-            <cmd id="DOF" /> 
+            <cmd id="VOPEN" /> 
+            <cmd id="VCLOSE" /> 
 
             <cmd id="SETATTRIB">
                <p id="LLIMIT" editor="leaklimit"  /> 
@@ -1287,8 +1287,8 @@
          </sends>
          <accepts>
             <cmd id="UPDATE" /> 
-            <cmd id="DON" /> 
-            <cmd id="DOF" /> 
+            <cmd id="VOPEN" /> 
+            <cmd id="VCLOSE" /> 
 
             <cmd id="SETATTRIB">
                <p id="LLIMIT" editor="leaklimit"  /> 
@@ -1349,8 +1349,8 @@
          </sends>
          <accepts>
             <cmd id="UPDATE" /> 
-            <cmd id="DON" /> 
-            <cmd id="DOF" /> 
+            <cmd id="VOPEN" /> 
+            <cmd id="VCLOSE" /> 
             <cmd id="SETATTRIB">
                <p id="LLIMIT" editor="leaklimit"  /> 
                <p id="LOFF" editor="enableSet"  />       
@@ -1443,9 +1443,8 @@
 
          </sends>
          <accepts>
-            <cmd id="UPDATE" /> 
-            <cmd id="DON" /> 
-            <cmd id="DOF" /> 
+            <cmd id="VOPEN" /> 
+            <cmd id="VCLOSE" /> 
 
             <cmd id="SETATTRIB">
                <p id="LLIMIT" editor="leaklimit"  /> 
@@ -1498,9 +1497,8 @@
 
          </sends>
          <accepts>
-            <cmd id="UPDATE" /> 
-            <cmd id="DON" /> 
-            <cmd id="DOF" /> 
+            <cmd id="VOPEN" /> 
+            <cmd id="VCLOSE" /> 
 
             <cmd id="SETATTRIB">
                <p id="LLIMIT" editor="literSet"  /> 
@@ -1547,9 +1545,8 @@
 
          </sends>
          <accepts>
-            <cmd id="UPDATE" /> 
-            <cmd id="DON" /> 
-            <cmd id="DOF" /> 
+            <cmd id="VOPEN" /> 
+            <cmd id="VCLOSE" /> 
 
             <cmd id="SETATTRIB">
                <p id="LLIMIT" editor="gallonSet"  /> 
