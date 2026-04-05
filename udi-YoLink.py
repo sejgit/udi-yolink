@@ -55,7 +55,8 @@ class YoLinkSetup (udi_interface.Node):
         self.mqttURL = 'api.yosmart.com'
         self.mqttPort = 8003
         self.display_update_sec=60
-
+        self.Parameters = Custom(self.poly, 'customparams')
+        self.Notices = Custom(self.poly, 'notices')
         
         #logging.setLevel(10)
         logging.info(f'Version {version}')
