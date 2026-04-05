@@ -100,7 +100,7 @@ class YoLinkSetup (udi_interface.Node):
         logging.info('Executing start - udi-YoLink')
         logging.info ('Access using PAC/UAC')
         #logging.setLevel(30)
-        while not self.nodeDefineDone and not self.configDone:
+        while not self.nodeDefineDone and not self.configDone and not self.handleParamsDone:
             time.sleep(1)
             logging.debug ('waiting for inital node to get created')
         self.poly.ready()
