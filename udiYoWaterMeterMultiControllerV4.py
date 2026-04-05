@@ -338,7 +338,7 @@ class udiYoSubWaterMeter(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         self.poly.subscribe(self.poly.STARTDONE, self.start_done)
 
 
@@ -364,7 +364,7 @@ class udiYoSubWaterMeter(udi_interface.Node):
 
     def start(self):
         logging.info('Start - udiYoWaterMeterMultiController')
-        while not self.node_ready: #  and not self.configDone:
+        while not self.node_ready and not self.configDone:
             time.sleep(0.5)
 
         # No online check here - the main node already waited for the device
