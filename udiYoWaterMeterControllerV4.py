@@ -171,7 +171,7 @@ class udiYoWaterMeterController(udi_interface.Node):
             logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
-         if self.scheduleSupport:
+        if self.scheduleSupport:
             # Create valve schedule child node
             sch_address_valve = self.address[4:14] + '_VSC'
             sch_address_valve = self.poly.getValidAddress(sch_address_valve)
