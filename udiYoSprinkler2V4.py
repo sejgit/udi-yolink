@@ -293,14 +293,23 @@ class udiYoSprinkler2(udi_interface.Node):
     def start_stop(self, command):
         logging.info(f'udiYoSprinkler2 - start_stop {command}')
         
-        action = int(command.get('value'))
+        #action = int(command.get('value'))
+        query = command.get("query")
         data={}
         data['params'] = {}
-        logging.debug(f'start_stop action: {action}')
-        if action in [ 0, 1]:  # stop
-            data['params']['running'] = action == 1
+        logging.debug(f'start_stop action: {query}')
+        if 'startstop.uom25' in query:
+            action = int(query.get('startstop.uom25'))
+            if action in [ 0, 1]:  # stop
+                data['params']['running'] = action == 1
+        if 'watermode.uom25' in query:
+            mode = int(query.get('watermode.uom25'))
+            logging.debug(f'start_stop watermode: {mode}')      
+            if mode == 0:
+                data['params']['waterMode'] = 'manual'
+            elif mode == 1:
+                data['params']['waterMode'] = 'schedule'    
 
-        
         self.yoSprinkler.setDevice(data)
 
 
