@@ -385,14 +385,15 @@ class YoLinkSetup (udi_interface.Node):
 
 if __name__ == "__main__":
     try:
+        logging.info
         polyglot = udi_interface.Interface([])
 
-        logging.debug('Starting YoLink NodeServer - version {}'.format(version) )
+        logging.info('Starting YoLink NodeServer - version {}'.format(version) )
 
         polyglot.start(version)
-        logging.debug('YoLink NodeServer Started - calling setup')
+        logging.info('YoLink NodeServer Started - calling setup')
         YoLinkSetup(polyglot, 'setup', 'setup', 'YoLinkSetup')
-        logging.debug('YoLinkSetup node created - entering runForever')
+        logging.info('YoLinkSetup node created - entering runForever')
         # Just sit and wait for events
         polyglot.runForever()
     except (KeyboardInterrupt, SystemExit):
