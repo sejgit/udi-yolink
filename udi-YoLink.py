@@ -32,7 +32,7 @@ class YoLinkSetup (udi_interface.Node):
 
     def  __init__(self, polyglot, primary, address, name):
         super().__init__( polyglot, primary, address, name)  
-        
+        logging.info(f'Version {version}')
         self.poly=polyglot
         self.hb = 0
         
@@ -59,7 +59,7 @@ class YoLinkSetup (udi_interface.Node):
         self.Notices = Custom(self.poly, 'notices')
         
         #logging.setLevel(10)
-        logging.info(f'Version {version}')
+
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.START, self.start, address)
         self.poly.subscribe(self.poly.LOGLEVEL, self.handleLevelChange)
@@ -70,7 +70,7 @@ class YoLinkSetup (udi_interface.Node):
         self.n_queue = []
         self.yoLocal = None
         self.yoAccess = None 
-
+        logging.info(f'Version {version}')
         self.Parameters = Custom(self.poly, 'customparams')
         self.Notices = Custom(self.poly, 'notices')
         logging.debug('YoLinkSetup init')
