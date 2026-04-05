@@ -182,7 +182,7 @@ def addNodes (self, deviceList) -> list:
 
             name = dev['name']
             name = self.poly.getValidName(name)
-            self.Parameters[address] =  dev['name']
+            #self.Parameters[address] =  dev['name']
 
             logging.info('adding/checking device : {} - {}'.format(dev['name'], dev['type']))
             if dev['type'] == 'Hub':   
