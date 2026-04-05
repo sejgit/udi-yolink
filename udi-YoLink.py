@@ -55,8 +55,7 @@ class YoLinkSetup (udi_interface.Node):
         self.mqttURL = 'api.yosmart.com'
         self.mqttPort = 8003
         self.display_update_sec=60
-        self.Parameters = Custom(self.poly, 'customparams')
-        self.Notices = Custom(self.poly, 'notices')
+
         
         #logging.setLevel(10)
 
@@ -67,6 +66,10 @@ class YoLinkSetup (udi_interface.Node):
         self.poly.subscribe(self.poly.POLL, self.systemPoll)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        
+        self.Parameters = Custom(self.poly, 'customparams')
+        self.Notices = Custom(self.poly, 'notices')
+
         self.n_queue = []
         self.yoLocal = None
         self.yoAccess = None 
