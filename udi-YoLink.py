@@ -74,11 +74,11 @@ class YoLinkSetup (udi_interface.Node):
         self.yoLocal = None
         self.yoAccess = None 
         logging.info(f'Version {version}')
-        self.Parameters = Custom(self.poly, 'customparams')
-        self.Notices = Custom(self.poly, 'notices')
+
         logging.debug('YoLinkSetup init')
         logging.debug('self.address : ' + str(self.address))
         logging.debug('self.name :' + str(self.name))   
+        self.poly.ready()
         self.poly.updateProfile()
        
         self.poly.addNode(self)
