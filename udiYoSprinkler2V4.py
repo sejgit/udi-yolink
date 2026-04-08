@@ -134,10 +134,6 @@ class udiYoSprinkler2(udi_interface.Node):
             logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
-        sch_address = self.address[4:14] + '_SCH'
-        sch_address = self.poly.getValidAddress(sch_address)
-        self.schedule = udiYoSchedule(self.poly, self.address, sch_address, 'Schedules', self.yoAccess, self.devInfo)
-        self.adr_list.append(sch_address)
         self.yoSprinkler = YoLinkSprinkler(self.yoAccess, self.devInfo, self.updateStatus)
 
         self.meter_unit = self.yoSprinkler.get_data('meterUnit', 'attributes')
@@ -146,6 +142,13 @@ class udiYoSprinkler2(udi_interface.Node):
         self.ISYmeter_uom = self.water_meter_unit2uom(self.ISYwater_unit)
         logging.debug(f'meter unit : {self.meter_unit} ISY unit: {self.ISYwater_unit} uom: {self.ISYmeter_uom} meterFactor: {self.step_factor}')
         self.system_ready = True
+
+    def create_schedule_nodes(self):
+        sch_address = self.address[4:14] + '_SCH'
+        sch_address = self.poly.getValidAddress(sch_address)
+        self.schedule = udiYoSchedule(self.poly, self.address, sch_address, 'Schedules', self.yoAccess, self.devInfo)
+        self.adr_list.append(sch_address)
+        return [sch_address]
 
     def stop (self):
         logging.info('Stop udiYoSprinkler2')

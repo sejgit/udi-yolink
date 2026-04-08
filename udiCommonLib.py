@@ -3,7 +3,7 @@
 Yolink Control Main Node  program 
 MIT License
 """
-version = '1.8.25'
+version = '1.8.27'
 import sys
 import re
 import time
@@ -159,6 +159,7 @@ def addNodes (self, deviceList) -> list:
     #supportedYoTypes = ['WaterMeterMultiController']     
 
     remove_list= []
+    schedule_queue = []
     for dev in deviceList:
         logging.debug(f'DEVICE BEING ANALYZED {dev}')
         
@@ -169,7 +170,7 @@ def addNodes (self, deviceList) -> list:
             nodename = str(dev['deviceId'][-14:])
             address = self.poly.getValidAddress(nodename)
             if 'modelName' in dev:
-                model = dev['modelName']    
+                model = dev['modelName'][:6]
             else:
                 model = 'Unknown'
 
@@ -437,7 +438,6 @@ def addNodes (self, deviceList) -> list:
                 else:
                     logging.warning('Currently unsupported Water Meter Controller model: {} - {} - trying default '.format(model, dev['name'] ))
                     temp = udiYoWaterMeterController(self.poly, address, address, name, dev_access, dev )
-                    continue
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
                     time.sleep(4)
@@ -485,6 +485,15 @@ def addNodes (self, deviceList) -> list:
                     time.sleep(4)
                 for adr in temp.adr_list:
                     self.assigned_addresses.append(adr)    
+
+            if hasattr(temp, 'create_schedule_nodes'):
+                schedule_queue.append(temp)
+
+    # Second pass: create schedule nodes after all main device nodes are ready
+    logging.info('Creating schedule nodes for {} devices'.format(len(schedule_queue)))
+    for temp in schedule_queue:
+        for adr in temp.create_schedule_nodes():
+            self.assigned_addresses.append(adr)
 
     time.sleep(1)
     # need to go through nodes to see if there are nodes that no longer exist in device list                

@@ -108,11 +108,6 @@ class udiYoManipulator(udi_interface.Node):
         time.sleep(4)
         self.yoManipulator.initNode()
         time.sleep(1)
-        
-        sch_address = self.address[4:14] + '_SCH'
-        sch_address = self.poly.getValidAddress(sch_address)
-        self.schedule = udiYoSchedule(self.poly, self.address, sch_address, 'Schedules', self.yoAccess, self.devInfo)
-        self.adr_list.append(sch_address)        
         tries = 1
         while not self.yoManipulator.check_system_online() and (tries <= 5 or self.yoManipulator.throttled()):
             logging.info(f'Waiting for device {self.name} to come online...')
@@ -122,6 +117,13 @@ class udiYoManipulator(udi_interface.Node):
         time.sleep(2)
         self.yoManipulator.delayTimerCallback(self.updateDelayCountdown, self.timer_update)
         self.system_ready = True
+
+    def create_schedule_nodes(self):
+        sch_address = self.address[4:14] + '_SCH'
+        sch_address = self.poly.getValidAddress(sch_address)
+        self.schedule = udiYoSchedule(self.poly, self.address, sch_address, 'Schedules', self.yoAccess, self.devInfo)
+        self.adr_list.append(sch_address)
+        return [sch_address]
 
     def stop (self):
         logging.info('Stop udiYoManipulator')

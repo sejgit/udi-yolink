@@ -570,11 +570,6 @@ class udiYoMultiOutlet(udi_interface.Node):
 
             #logging.debug(self.subnodeAdr)
             time.sleep(1)
-            # Create schedule node before device online check
-            sch_address = self.address[4:14] + '_SCH'
-            sch_address = self.poly.getValidAddress(sch_address)
-            self.schedule = udiYoSchedule(self.poly, self.address, sch_address, 'Schedules', self.yoAccess, self.devInfo)
-            self.adr_list.append(sch_address)
             self.yoMultiOutlet.initNode()
             time.sleep(2)
             # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
@@ -587,6 +582,13 @@ class udiYoMultiOutlet(udi_interface.Node):
             #self.yoMultiOutlet.refreshMultiOutlet()
             logging.debug('Finished  MultiOutlet start')
             self.system_ready = True
+
+    def create_schedule_nodes(self):
+        sch_address = self.address[4:14] + '_SCH'
+        sch_address = self.poly.getValidAddress(sch_address)
+        self.schedule = udiYoSchedule(self.poly, self.address, sch_address, 'Schedules', self.yoAccess, self.devInfo)
+        self.adr_list.append(sch_address)
+        return [sch_address]
 
     def updateDelayCountdown(self, timeRemaining):
         logging.debug('updateDelayCountdown - time: {}'.format(timeRemaining))

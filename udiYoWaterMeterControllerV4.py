@@ -162,7 +162,6 @@ class udiYoWaterMeterController(udi_interface.Node):
             time.sleep(0.5)
         self.my_setDriver('GV30', 1)
         self.my_setDriver('GV20', 0)
-        # Create schedule nodes before device online check
        
         self.yoWaterCtrl = YoLinkWaterMeter(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
@@ -173,28 +172,27 @@ class udiYoWaterMeterController(udi_interface.Node):
             logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
-        if self.scheduleSupport:
-            # Create valve schedule child node
-            sch_address_valve = self.address[4:14] + '_VSC'
-            sch_address_valve = self.poly.getValidAddress(sch_address_valve)
-            self.schedule_valve = udiYoSchedule(self.poly, self.address, sch_address_valve, 'Valve Schedules', self.yoAccess, self.devInfo, schedule_type='valve')
-            self.adr_list.append(sch_address_valve)
-            # Create leak schedule child node
-            sch_address_leak = self.address[4:14] + '_LSC'
-            sch_address_leak = self.poly.getValidAddress(sch_address_leak)
-            self.schedule_leak = udiYoSchedule(self.poly, self.address, sch_address_leak, 'Leak Schedules', self.yoAccess, self.devInfo, schedule_type='leak')
-            self.adr_list.append(sch_address_leak)    
-        #self.yoWaterCtrl.getMeterCount()
-        #if self.meter_count is None:
-        #    logging.error('Water meter count not found')
-        #    self.poly.Notices['nometer'] = 'No watermeter found - may be offline - cannot continue initialization'
-        #    return
 
         self.meter_unit = self.yoWaterCtrl.getMeterUnit()
         self.ISYwater_unit = self.yoAccess.get_water_unit()
         self.ISYmeter_uom = self.water_meter_unit2uom(self.ISYwater_unit)
         logging.debug(f'meter unit : {self.meter_unit} ISY unit: {self.ISYwater_unit} uom: {self.ISYmeter_uom}')
         #self.system_ready = True
+
+    def create_schedule_nodes(self):
+        new_addresses = []
+        if self.scheduleSupport:
+            sch_address_valve = self.address[4:14] + '_VSC'
+            sch_address_valve = self.poly.getValidAddress(sch_address_valve)
+            self.schedule_valve = udiYoSchedule(self.poly, self.address, sch_address_valve, 'Valve Schedules', self.yoAccess, self.devInfo, schedule_type='valve')
+            self.adr_list.append(sch_address_valve)
+            new_addresses.append(sch_address_valve)
+            sch_address_leak = self.address[4:14] + '_LSC'
+            sch_address_leak = self.poly.getValidAddress(sch_address_leak)
+            self.schedule_leak = udiYoSchedule(self.poly, self.address, sch_address_leak, 'Leak Schedules', self.yoAccess, self.devInfo, schedule_type='leak')
+            self.adr_list.append(sch_address_leak)
+            new_addresses.append(sch_address_leak)
+        return new_addresses
 
     def stop (self):
         logging.info('Stop udiYoWaterMeterController')

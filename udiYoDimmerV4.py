@@ -129,10 +129,6 @@ class udiYoDimmer(udi_interface.Node):
         time.sleep(2)
         self.yoDimmer.initNode()
         time.sleep(1)
-        sch_address = self.address[4:14] + '_SCH'
-        sch_address = self.poly.getValidAddress(sch_address)
-        self.schedule = udiYoSchedule(self.poly, self.address, sch_address, 'Schedules', self.yoAccess, self.devInfo)
-        self.adr_list.append(sch_address)
 
         tries = 1
         while not self.yoDimmer.check_system_online() and (tries <= 5 or self.yoDimmer.throttled()):
@@ -148,6 +144,13 @@ class udiYoDimmer(udi_interface.Node):
         self.yoDimmer.delayTimerCallback(self.updateDelayCountdown, self.timer_update)
         time.sleep(1)
         self.system_ready = True
+
+    def create_schedule_nodes(self):
+        sch_address = self.address[4:14] + '_SCH'
+        sch_address = self.poly.getValidAddress(sch_address)
+        self.schedule = udiYoSchedule(self.poly, self.address, sch_address, 'Schedules', self.yoAccess, self.devInfo)
+        self.adr_list.append(sch_address)
+        return [sch_address]
 
     def updateDelayCountdown (self, timeRemaining ) :
         logging.debug('updateDelayCountdown {}'.format(timeRemaining))

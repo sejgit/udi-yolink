@@ -145,17 +145,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                     logging.info(f'Added Water Meter Node: {wm_name} at {wm_address}')
 
             if self.scheduleSupport:
-                # Create valve schedule child node
-                sch_address_valve = self.address[4:14] + '_VSC'
-                sch_address_valve = self.poly.getValidAddress(sch_address_valve)
-                self.schedule_valve = udiYoSchedule(self.poly, self.address, sch_address_valve, 'Valve Schedules', self.yoAccess, self.devInfo, schedule_type='valve')
-                self.adr_list.append(sch_address_valve)
-                
-                # Create leak schedule child node
-                sch_address_leak = self.address[4:14] + '_LSC'
-                sch_address_leak = self.poly.getValidAddress(sch_address_leak)
-                self.schedule_leak = udiYoSchedule(self.poly, self.address, sch_address_leak, 'Leak Schedules', self.yoAccess, self.devInfo, schedule_type='leak')
-                self.adr_list.append(sch_address_leak)
+                pass  # schedule nodes created via create_schedule_nodes() after all main nodes are added
                 # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
         time.sleep(4)
 
@@ -171,6 +161,21 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         #self.yoWaterCtrl.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
         #self.system_ready=True
         #self.updateData()  # not needed - updateStatus callback fires from initDevice response
+
+    def create_schedule_nodes(self):
+        new_addresses = []
+        if self.scheduleSupport:
+            sch_address_valve = self.address[4:14] + '_VSC'
+            sch_address_valve = self.poly.getValidAddress(sch_address_valve)
+            self.schedule_valve = udiYoSchedule(self.poly, self.address, sch_address_valve, 'Valve Schedules', self.yoAccess, self.devInfo, schedule_type='valve')
+            self.adr_list.append(sch_address_valve)
+            new_addresses.append(sch_address_valve)
+            sch_address_leak = self.address[4:14] + '_LSC'
+            sch_address_leak = self.poly.getValidAddress(sch_address_leak)
+            self.schedule_leak = udiYoSchedule(self.poly, self.address, sch_address_leak, 'Leak Schedules', self.yoAccess, self.devInfo, schedule_type='leak')
+            self.adr_list.append(sch_address_leak)
+            new_addresses.append(sch_address_leak)
+        return new_addresses
 
     def stop (self):
         logging.info('Stop udiYoWaterMeterMultiController')
