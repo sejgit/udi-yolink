@@ -50,7 +50,6 @@ class udiYoWaterMeterMulti(udi_interface.Node):
     def  __init__(self, polyglot, primary, address, name, yoAccess, deviceInfo):
         super().__init__( polyglot, primary, address, name, )   
         logging.debug('udiYoWaterMeterMultiController INIT- {}'.format(deviceInfo['name']))
-        self.n_queue = []
         
         self.poly = polyglot
         self.yoAccess = yoAccess
@@ -82,13 +81,14 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         known_meters = ['']
         self.onDelay = 0
         self.offDelay = 0
+        self.n_queue = []
         self.valveState = 99 # needed as class c device - keep value until online again 
         #polyglot.subscribe(polyglot.POLL, self.poll)
         self.poly.subscribe(self.poly.START, self.start, self.address)
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
-
+        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
         # start processing events and create add our controller node
         self.poly.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
@@ -169,7 +169,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         
         #self.my_setDriver('GV30', 1)
         #self.yoWaterCtrl.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
-        self.system_ready=True
+        #self.system_ready=True
         #self.updateData()  # not needed - updateStatus callback fires from initDevice response
 
     def stop (self):

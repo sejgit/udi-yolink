@@ -107,7 +107,7 @@ class udiYoWaterMeterController(udi_interface.Node):
             self.scheduleSupport = True
 
         if self.water_unit not in [0,3]:
-            logging.error('Only Litere and Gallon supported for now')
+            logging.error('Only Liters and Gallons supported for now')
 
         self.devInfo =  deviceInfo
         self.yoWaterCtrl= None
@@ -146,11 +146,12 @@ class udiYoWaterMeterController(udi_interface.Node):
       
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
-        self.node = self.poly.getNode(address)
+        #self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
         
         logging.debug('udiYoWaterMeterController INIT done- {}'.format(self.commands))
+        self.node = self.poly.getNode(address)
         self.node_ready = True
 
 

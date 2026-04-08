@@ -28,7 +28,7 @@ from udiCommonLib import version
 
 class YoLinkSetup (udi_interface.Node):
     from udiYolinkLib import my_setDriver, node_queue, wait_for_node_done, updateEpochTime, convert_temp_unit, convert_water_unit
-    from udiCommonLib import systemPoll, addNodes, heartbeat, configDoneHandler, checkNodes, handleLevelChange, saveNodeNames
+    from udiCommonLib import systemPoll, addNodes, heartbeat, checkNodes, handleLevelChange, saveNodeNames
 
     def  __init__(self, polyglot, primary, address, name):
         super().__init__( polyglot, primary, address, name)  
@@ -107,8 +107,7 @@ class YoLinkSetup (udi_interface.Node):
         while not self.nodeDefineDone or not self.configDone or not self.handleParamsDone:
             logging.debug ('waiting for inital node to get created')
             time.sleep(1)
-        self.poly.ready()
-
+    
         
         #self.supportedYoTypes = ['WaterMeterController',  'InfraredRemoter']
         #self.supportedYoTypes = [ 'WaterDepthSensor', 'VibrationSensor']    

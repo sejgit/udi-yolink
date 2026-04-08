@@ -509,16 +509,14 @@ def addNodes (self, deviceList) -> list:
         deviceList.remove(remove_dev)
         
     logging.debug('Device list after removals: {}'.format(deviceList))
-    return (deviceList)
-
-
+  
     time.sleep(1)
     # checking params for erassed nodes
     self.poly.updateProfile()
     self.yolink_nodes = self.poly.getNodes()
     self.my_setDriver('GV1', 1)
     self.pollStart = True
-
+    return (deviceList)
 '''
 def stop(self):
     try:
