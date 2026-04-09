@@ -622,7 +622,8 @@ def systemPoll (self, polltype):
                 #Keep token current
                 #self.my_setDriver('GV0', self.temp_unit)
                 try:
-                    #if not self.yoAccess.refresh_token(): #refresh failed
+                    #if not if hasattr(self.yolink_nodes[nde], 'checkOnline'):
+                                self.yoAccess.refresh_token(): #refresh failed
                     #    while not self.yoAccess.request_new_token():
                     #            time.sleep(60)
                     #logging.info('Updating device status')
