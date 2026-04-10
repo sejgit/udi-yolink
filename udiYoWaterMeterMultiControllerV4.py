@@ -97,6 +97,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         self.adr_list = []
         self.adr_list.append(address)
         self.wm_nodes= {}
+        self.sub_nodes_ready = False
         self.node_ready = True
 
 
@@ -105,7 +106,6 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         logging.info('Start - udiYoWaterMeterMultiController')
         while not self.node_ready or not self.configDone:
             time.sleep(0.5)
-        self.my_setDriver('GV30', 1)
         self.my_setDriver('GV20', 0)
         self.yoWaterCtrl= YoLinkWaterMeter(self.yoAccess, self.devInfo, self.updateStatus)
         self.water_meter_list = []
@@ -117,7 +117,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
             self.yoWaterCtrl.initDevice()
             time.sleep(1)
             tries = 1
-            while not self.yoWaterCtrl.check_system_online() and (tries <= 10 or self.yoWaterCtrl.throttled()):
+            while not self.yoWaterCtrl.check_system_online() or  not (tries <= 10 or self.yoWaterCtrl.throttled()):
                 logging.info(f'Waiting for device {self.name} to come online... Attempt {tries}')
                 time.sleep(2)
                 tries += 1
@@ -143,6 +143,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                     self.wm_nodes[wm_index] = udiYoSubWaterMeter(self.poly, self.address, wm_address, wm_name, wm_index, self.yoAccess, self.yoWaterCtrl)
                     self.adr_list.append(wm_address)
                     logging.info(f'Added Water Meter Node: {wm_name} at {wm_address}')
+            self.sub_nodes_ready = True
 
             if self.scheduleSupport:
                 pass  # schedule nodes created via create_schedule_nodes() after all main nodes are added

@@ -453,6 +453,9 @@ def addNodes (self, deviceList) -> list:
                 while not temp.node_ready:
                     logging.debug( 'Waiting for node {}-{} to be ready'.format(dev['type'] , dev['name']))
                     time.sleep(4)
+                while not getattr(temp, 'sub_nodes_ready', True):
+                    logging.debug( 'Waiting for sub-nodes {}-{} to be ready'.format(dev['type'] , dev['name']))
+                    time.sleep(4)
                 for adr in temp.adr_list:
                     self.assigned_addresses.append(adr)                                                 
 
@@ -623,7 +626,7 @@ def systemPoll (self, polltype):
                 #self.my_setDriver('GV0', self.temp_unit)
                 try:
                     #if not if hasattr(self.yolink_nodes[nde], 'checkOnline'):
-                                self.yoAccess.refresh_token(): #refresh failed
+                    #    self.yoAccess.refresh_token(): #refresh failed
                     #    while not self.yoAccess.request_new_token():
                     #            time.sleep(60)
                     #logging.info('Updating device status')
