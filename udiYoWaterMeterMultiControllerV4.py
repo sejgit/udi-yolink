@@ -117,7 +117,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
             self.yoWaterCtrl.initDevice()
             time.sleep(1)
             tries = 1
-            while not self.yoWaterCtrl.check_system_online() or  not (tries <= 10 or self.yoWaterCtrl.throttled()):
+            while not self.yoWaterCtrl.check_system_online() and (tries <= 10 or self.yoWaterCtrl.throttled()):
                 logging.info(f'Waiting for device {self.name} to come online... Attempt {tries}')
                 time.sleep(2)
                 tries += 1
@@ -160,7 +160,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         
         #self.my_setDriver('GV30', 1)
         #self.yoWaterCtrl.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
-        #self.system_ready=True
+        self.system_ready = True
         #self.updateData()  # not needed - updateStatus callback fires from initDevice response
 
     def create_schedule_nodes(self):
