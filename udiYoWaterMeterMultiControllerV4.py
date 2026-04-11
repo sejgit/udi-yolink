@@ -120,8 +120,6 @@ class udiYoWaterMeterMulti(udi_interface.Node):
             while not self.yoWaterCtrl.check_system_online():
                 logging.info(f'Waiting for device {self.name} to come online... Attempt {tries}')
                 time.sleep(2)
-
-
             self.meter_count = self.yoWaterCtrl.getMeterCount()
             logging.debug(f'Meter count: {self.meter_count}')
             self.meter_unit =  self.yoWaterCtrl.getMeterUnit()
@@ -145,9 +143,9 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                     logging.info(f'Added Water Meter Node: {wm_name} at {wm_address}')
             self.sub_nodes_ready = True
 
-            if self.scheduleSupport:
-                pass  # schedule nodes created via create_schedule_nodes() after all main nodes are added
-                # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
+            #if self.scheduleSupport:
+            #    pass  # schedule nodes created via create_schedule_nodes() after all main nodes are added
+            #    # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
         time.sleep(4)
 
         tries = 1
