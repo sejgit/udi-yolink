@@ -116,24 +116,24 @@ class udiYoWaterMeterMulti(udi_interface.Node):
             time.sleep(2)
             self.yoWaterCtrl.initDevice()
             time.sleep(1)
-            tries = 1
-            while not self.yoWaterCtrl.check_system_online() and (tries <= 10 or self.yoWaterCtrl.throttled()):
+
+            while not self.yoWaterCtrl.check_system_online():
                 logging.info(f'Waiting for device {self.name} to come online... Attempt {tries}')
                 time.sleep(2)
-                tries += 1
-            if self.yoWaterCtrl.check_system_online():
-                self.meter_count = self.yoWaterCtrl.getMeterCount()
-                logging.debug(f'Meter count: {self.meter_count}')
-                self.meter_unit =  self.yoWaterCtrl.getMeterUnit()
-                self.ISYwater_unit = self.yoAccess.get_water_unit()     
-                self.ISYmeter_uom= self.water_meter_unit2uom( self.ISYwater_unit)
-                logging.debug(f'meter unit : { self.meter_unit} ISY unit: { self.ISYwater_unit} uom: {self.ISYmeter_uom}')
-            else:
+
+
+            self.meter_count = self.yoWaterCtrl.getMeterCount()
+            logging.debug(f'Meter count: {self.meter_count}')
+            self.meter_unit =  self.yoWaterCtrl.getMeterUnit()
+            self.ISYwater_unit = self.yoAccess.get_water_unit()     
+            self.ISYmeter_uom= self.water_meter_unit2uom( self.ISYwater_unit)
+            logging.debug(f'meter unit : { self.meter_unit} ISY unit: { self.ISYwater_unit} uom: {self.ISYmeter_uom}')
+            if self.meter_count is None:
                 self.meter_count = 2 # default value if device is online but meter count not retrieved - should be updated when data is retrieved
                 self.poly.Notices['offline'] = 'Number of meters not retrieved (device likely offline) -  defaulting to 2.  If wrong make sure device is online and restart'
-                logging.warning('Device not online - defaulting meter count to 2')
 
             self.my_setDriver('GV1', self.yoWaterCtrl.water_meter_count)
+            logging.debug(f'Setting water meter count driver to: {self.yoWaterCtrl.water_meter_count}')
             if isinstance(self.meter_count, int) and self.meter_count > 1:
                 self.wm_nodes= {}
                 for wm_index in range(0, self.meter_count):

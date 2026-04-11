@@ -57,15 +57,15 @@ class YoLinkWaterMeter(YoLinkMQTTDevice):
 
     def getMeterCount(yolink):
         yolink.water_meter_count = None
-        if yolink.check_system_online():
-            if yolink.get_data('state', 'valve') is not None:
-                yolink.water_meter_count = 1
+        logging
+        if yolink.get_data('state', 'valve') is not None:
+            yolink.water_meter_count = 1
 
-            else:
-                valve_list = yolink.get_data('state','meters')
-                logging.debug(f'valve_list: {valve_list}')  
-                if valve_list is not None and isinstance(valve_list, dict):
-                    yolink.water_meter_count = len(valve_list)
+        else:
+            valve_list = yolink.get_data('state','meters')
+            logging.debug(f'valve_list: {valve_list}')  
+            if valve_list is not None and isinstance(valve_list, dict, list):
+                yolink.water_meter_count = len(valve_list)
         logging.debug(f'Water Meter Controller - meter count set to {yolink.water_meter_count}')
         return(yolink.water_meter_count)
 
