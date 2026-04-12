@@ -120,6 +120,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
             while not self.yoWaterCtrl.check_system_online():
                 logging.info(f'Waiting for device {self.name} to come online... Attempt {tries}')
                 time.sleep(min(300, tries*5))
+                tries += 1
             self.meter_count = self.yoWaterCtrl.getMeterCount()
             logging.debug(f'Meter count: {self.meter_count}')
             self.meter_unit =  self.yoWaterCtrl.getMeterUnit()
