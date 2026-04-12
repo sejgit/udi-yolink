@@ -917,6 +917,9 @@ class YoLinkMQTTDevice(object):
     def refreshSchedules(yolink):
         logging.debug(yolink.type + '- refreshSchedules')
 
+        unsupported_models = {'YS5029', 'YS5009'}
+        model_name = str(yolink.deviceInfo.get('modelName', ''))[:6]
+
         def _can_send_schedule_request(method_name):
             now = time.time()
             last_sent = yolink._schedule_refresh_last_sent.get(method_name, 0)
@@ -934,6 +937,14 @@ class YoLinkMQTTDevice(object):
 
         # Water meter controllers (single + multi) support valve and leak schedules.
         if yolink.type in ['WaterMeterController', 'WaterMeterMultiController']:
+            if model_name in unsupported_models:
+                logging.debug(
+                    '{}- refreshSchedules skipped for unsupported water meter model {}'.format(
+                        yolink.type, model_name
+                    )
+                )
+                return
+
             valve_method = yolink.type + '.getValveSchedules'
             if _can_send_schedule_request(valve_method):
                 data['method'] = valve_method
