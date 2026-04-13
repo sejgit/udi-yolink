@@ -145,7 +145,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                     address = f'{self.address[-12:]}_{wm_index}'
                     wm_address = self.poly.getValidAddress(address)
                     wm_name = self.poly.getValidName(f'{self.name} CH{wm_index+1}')
-                    self.wm_nodes[wm_index] = udiYoSubWaterMeter(self.poly, self.address, wm_address, wm_name, wm_index, self.yoAccess, self.yoWaterCtrl)
+                    self.wm_nodes[wm_index] = udiYoSubWaterMeter(self.poly, self.address, wm_address, wm_name, wm_index, self.yoAccess, self.yoWaterCtrl, self.devInfo)
                     self.adr_list.append(wm_address)
                     logging.info(f'Added Water Meter Node: {wm_name} at {wm_address}')
             self.sub_nodes_ready = True
@@ -318,11 +318,12 @@ class udiYoSubWaterMeter(udi_interface.Node):
 
 
 
-    def  __init__(self, polyglot, primary, address, name, WMindex, yoAccess, wmAccess):
+    def  __init__(self, polyglot, primary, address, name, WMindex, yoAccess, wmAccess, devInfo=None):
         super().__init__( polyglot, primary, address, name)   
         logging.debug(f'udiYoWaterMeterSub- {name}')
         self.n_queue = []
         self.yoAccess = yoAccess
+        self.devInfo = devInfo if devInfo is not None else {}
         self.temp_unit = self.yoAccess.get_temp_unit() 
         self.water_unit = self.yoAccess.get_water_unit()    
         if self.water_unit == 0:
