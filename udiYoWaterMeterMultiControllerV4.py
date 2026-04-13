@@ -98,6 +98,8 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         self.adr_list.append(address)
         self.wm_nodes= {}
         self.sub_nodes_ready = False
+        while not self.sub_nodes_ready:
+            time.sleep(0.5)
         self.node_ready = True
 
 
