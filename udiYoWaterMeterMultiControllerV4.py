@@ -416,10 +416,13 @@ class udiYoSubWaterMeter(udi_interface.Node):
                         self.ISYwater_unit = self.yoAccess.get_water_unit()
                         self.ISYmeter_uom = self.water_meter_unit2uom(self.ISYwater_unit)
 
-                    state =  self.yoWaterCtrl.get_data('valves', 'state', self.WM_index)
+                    state = self.yoWaterCtrl.get_data('valves', 'state', self.WM_index)
+                    logging.debug(f'valve state : {state} {self.WM_index}')
+                    if isinstance(state, dict):
+                        state = state.get(str(self.WM_index))
                     logging.debug(f'valve state : {state}')
-                    
-                    if state != None:
+
+                    if isinstance(state, str):
                         if state.lower() == 'open':
                             self.valveState = 1
                             self.my_setDriver('GV0', self.valveState, type=message_type)
