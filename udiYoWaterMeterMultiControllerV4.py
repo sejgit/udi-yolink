@@ -136,7 +136,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
             if self.meter_count is None:
                 self.meter_count = 2 # default value if device is online but meter count not retrieved - should be updated when data is retrieved
                 self.poly.Notices['offline'] = 'Number of meters not retrieved (device likely offline) -  defaulting to 2.  If wrong make sure device is online and restart'
-
+            self.poly.Notices.delete('offline')
             self.my_setDriver('GV1', self.yoWaterCtrl.water_meter_count)
             logging.debug(f'Setting water meter count driver to: {self.yoWaterCtrl.water_meter_count}')
             if isinstance(self.meter_count, int) and self.meter_count > 1:
