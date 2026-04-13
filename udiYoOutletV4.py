@@ -95,7 +95,6 @@ class udiYoOutlet(udi_interface.Node):
         self.poly.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
-        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
                
 
         # start processing events and create add our controller node
@@ -128,7 +127,7 @@ class udiYoOutlet(udi_interface.Node):
             time.sleep(2)
             tries += 1
         time.sleep(2)
-        self.system_ready = True
+        self.start_done()
 
     def create_schedule_nodes(self):
         sch_address = self.address[4:14] + '_SCH'

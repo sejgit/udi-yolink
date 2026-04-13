@@ -77,7 +77,6 @@ class udiYoPowerFailSenor(udi_interface.Node):
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
-        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
         
 
         # start processing events and create add our controller node
@@ -106,7 +105,7 @@ class udiYoPowerFailSenor(udi_interface.Node):
             time.sleep(2)
             tries += 1
         #self.my_setDriver('GV30', 1)
-        self.system_ready=True
+        self.start_done()
 
     def stop (self):
         logging.info('Stop udiYoPowerFailSenor')

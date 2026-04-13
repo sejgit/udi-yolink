@@ -115,7 +115,6 @@ class udiYoTHsensor(udi_interface.Node):
         self.poly.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
-        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
                      
         # start processing events and create add our controller node
         self.poly.ready()
@@ -147,7 +146,7 @@ class udiYoTHsensor(udi_interface.Node):
             time.sleep(2)
             tries += 1
         self.temp_unit = self.yoAccess.get_temp_unit()
-        self.system_ready = True
+        self.start_done()
         #self.my_setDriver('GV30', 1)
 
     def initNode(self):

@@ -76,7 +76,6 @@ class udiYoThermostat(udi_interface.Node):
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
-        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
 
         # Add node and wait
         polyglot.ready()
@@ -116,8 +115,8 @@ class udiYoThermostat(udi_interface.Node):
         )
         self.adr_list.append(prop_address)
 
-        self.system_ready = True
         logging.info('Thermostat online and ready')
+        self.start_done()
 
     def stop(self):
         """Stop the thermostat device"""

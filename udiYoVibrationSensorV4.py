@@ -75,7 +75,6 @@ class udiYoVibrationSensor(udi_interface.Node):
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
-        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
         
 
         # start processing events and create add our controller node
@@ -106,7 +105,7 @@ class udiYoVibrationSensor(udi_interface.Node):
             logging.info('Waiting for vibration sensor to come online...')
             time.sleep(2)
             tries += 1
-        self.system_ready=True
+        self.start_done()
 
     def stop (self):
         logging.info('Stop udiYoVibrationSensor')

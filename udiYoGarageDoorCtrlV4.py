@@ -57,7 +57,6 @@ class udiYoGarageDoor(udi_interface.Node):
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
-        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
         
         # start processing events and create add our controller node
         polyglot.ready()
@@ -80,7 +79,7 @@ class udiYoGarageDoor(udi_interface.Node):
         self.my_setDriver('ST', 1)
         self.my_setDriver('GV30', 1)
         #time.sleep(3)
-        self.system_ready=True
+        self.start_done()
 
     def initNode(self):
         self.yoDoorControl.online = True

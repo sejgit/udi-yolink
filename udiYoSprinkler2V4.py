@@ -106,7 +106,6 @@ class udiYoSprinkler2(udi_interface.Node):
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
-        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
 
         polyglot.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
@@ -141,7 +140,7 @@ class udiYoSprinkler2(udi_interface.Node):
         self.ISYwater_unit = self.yoAccess.get_water_unit()
         self.ISYmeter_uom = self.water_meter_unit2uom(self.ISYwater_unit)
         logging.debug(f'meter unit : {self.meter_unit} ISY unit: {self.ISYwater_unit} uom: {self.ISYmeter_uom} meterFactor: {self.step_factor}')
-        self.system_ready = True
+        self.start_done()
 
     def create_schedule_nodes(self):
         sch_address = self.address[4:14] + '_SCH'

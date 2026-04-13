@@ -346,7 +346,6 @@ class udiYoSubWaterMeter(udi_interface.Node):
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
-        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
 
 
         #known_meters = ['YS5007','YS5018', 'YS5008', 'YS5009', 'YS5029']
@@ -378,7 +377,7 @@ class udiYoSubWaterMeter(udi_interface.Node):
         logging.debug(f'meter unit : { self.meter_unit} ISY unit: { self.ISYwater_unit} uom: {self.ISYmeter_uom}')
         #self.yoWaterCtrl.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
         self.my_setDriver('GV1', 0,  self.ISYmeter_uom)
-        self.system_ready=True
+        self.start_done()
         #self.updateData()  # not needed - updateStatus callback fires from initDevice response
 
     def stop (self):

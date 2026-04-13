@@ -65,7 +65,6 @@ class udiYoBatteryHub(udi_interface.Node):
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
-        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
                
 
         # start processing events and create add our controller node
@@ -93,7 +92,7 @@ class udiYoBatteryHub(udi_interface.Node):
             tries += 1
         time.sleep(1)
         # refreshDevice() is called by initNode(); avoid duplicate call here to reduce API load
-        self.system_ready=True
+        self.start_done()
 
     def updateDelayCountdown (self, delayRemaining ) :
         logging.debug('updateDelayCountdown {}'.format(delayRemaining))

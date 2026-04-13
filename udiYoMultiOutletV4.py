@@ -458,10 +458,10 @@ class udiYoMultiOutlet(udi_interface.Node):
         self.name = name
         self.yoAccess = yoAccess
         self.delaysActive = False
-        if 'YS6802' in deviceInfo['modelName']:
-            self.nbrOutlets = 2
-            self.nbrUsb = 0
-        elif 'YS6801' in deviceInfo['modelName']:
+        self.nbrOutlets = 2
+        self.nbrUsb = 0
+ 
+        elif deviceInfo['modelName'][:6] in ['YS6801']:
             self.nbrOutlets = 4
             self.nbrUsb = 1
         else:
@@ -489,7 +489,6 @@ class udiYoMultiOutlet(udi_interface.Node):
         polyglot.subscribe(polyglot.STOP, self.stop)
         polyglot.subscribe(polyglot.ADDNODEDONE, self.node_queue)
         polyglot.subscribe(polyglot.CONFIGDONE, self.configDoneHandler)
-        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
 
         # start processing events and create add our controller node
         polyglot.ready()
@@ -581,7 +580,7 @@ class udiYoMultiOutlet(udi_interface.Node):
             time.sleep(3)
             #self.yoMultiOutlet.refreshMultiOutlet()
             logging.debug('Finished  MultiOutlet start')
-            self.system_ready = True
+            self.start_done()
 
     def create_schedule_nodes(self):
         sch_address = self.address[4:14] + '_SCH'

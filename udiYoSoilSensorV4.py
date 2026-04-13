@@ -105,7 +105,6 @@ class udiYoSoilSensor(udi_interface.Node):
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
-        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
                      
         # start processing events and create add our controller node
         polyglot.ready()
@@ -137,7 +136,7 @@ class udiYoSoilSensor(udi_interface.Node):
             tries += 1
         self.temp_unit = self.yoAccess.get_temp_unit()
         #self.my_setDriver('GV30', 1)
-        self.system_ready=True
+        self.start_done()
 
     def initNode(self):
         self.yoSoilSensor.refreshSensor()

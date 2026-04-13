@@ -80,7 +80,6 @@ class udiYoLeakSensor(udi_interface.Node):
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
-        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
              
         # start processing events and create add our controller node
         polyglot.ready()
@@ -109,12 +108,11 @@ class udiYoLeakSensor(udi_interface.Node):
             time.sleep(2)
             tries += 1
         #self.my_setDriver('ST', 1)
+        self.start_done()
 
         #time.sleep(3)
     
     '''
-        self.system_ready=True
-
     def initNode(self):
         self.yoLeakSensor.refreshSensor()
     '''

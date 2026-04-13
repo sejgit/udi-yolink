@@ -310,7 +310,6 @@ class udiYoSmartRemoter(udi_interface.Node):
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
-        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
         
 
         # start processing events and create add our controller node
@@ -383,7 +382,7 @@ class udiYoSmartRemoter(udi_interface.Node):
             self.adr_list.append(k_address)
         self.wait_for_node_done()
 
-        self.system_ready=True
+        self.start_done()
 
     def stop (self):
         logging.info('Stop udiYoSmartRemoter')

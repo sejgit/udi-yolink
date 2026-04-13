@@ -66,7 +66,6 @@ class udiYoDoorSensor(udi_interface.Node):
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
-        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
 
 
         polyglot.ready()
@@ -105,7 +104,7 @@ class udiYoDoorSensor(udi_interface.Node):
 
         #else:
         #    self.my_setDriver('ST', 1)
-        self.system_ready=True
+        self.start_done()
 
     def stop (self):
         logging.info('Stop - udiYoDoorSensor')
