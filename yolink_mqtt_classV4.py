@@ -1398,24 +1398,32 @@ class YoLinkMQTTDevice(object):
                 # and get_data('properties', 'state') when nested under state.
                 if isinstance(category, str) and category in data_root and isinstance(data_root[category], dict):
                     if key in data_root[category]:
-                        return data_root[category][key]
+                        ret_val = data_root[category][key]
 
                 # Direct top-level lookup: returns both scalars and dicts/lists,
                 # e.g. get_data('properties') when properties is at data root.
-                if key in data_root:
+                if ret_val is None and key in data_root:
                     logging.debug(f'ret_val0  {key} {data_root[key]}')
-                    return data_root[key]
-                        
-                res = yolink.extract_two_level(category, key)
-                logging.debug(f'extract_two_level result: {res}')
-                if res and isinstance(res, dict):
-                    if isinstance( WM_index, int):
-                        if str(WM_index) in res:
-                                ret_val = res[str(WM_index)]
-                    else:
-                        ret_val = res
-                else:
-                    ret_val = res
+                    ret_val = data_root[key]
+
+                if ret_val is None:
+                    ret_val = yolink.extract_two_level(category, key)
+                    logging.debug(f'extract_two_level result: {ret_val}')
+
+                if isinstance(ret_val, dict) and WM_index is not None:
+                    wm_key = str(WM_index)
+                    if wm_key in ret_val:
+                        return ret_val[wm_key]
+                    if WM_index in ret_val:
+                        return ret_val[WM_index]
+
+                if isinstance(ret_val, list) and WM_index is not None:
+                    try:
+                        wm_idx = int(WM_index)
+                        if 0 <= wm_idx < len(ret_val):
+                            return ret_val[wm_idx]
+                    except (TypeError, ValueError):
+                        pass
             return(ret_val)
         except KeyError as e:
             logging.error(f'EXCEPTION - getData {e}')    
