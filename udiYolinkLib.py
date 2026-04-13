@@ -585,7 +585,7 @@ def send_rel_temp_to_isy(self, temperature, stateVar):
             self.my_setDriver(stateVar, round(temperature,1), 4)
         else: # messana = Farenheit
             self.my_setDriver(stateVar, round(temperature*5/9,1), 17)
-    elif  self.ISY_temp_unit == 1: # Farenheit in ISY
+    else  self.ISY_temp_unit == 1: # Farenheit in ISY
         if self.messana_temp_unit == 'Celsius' or self.messana_temp_unit == 0:
             self.my_setDriver(stateVar, round((temperature*9/5),1),  4)
         else:
@@ -601,13 +601,9 @@ def send_temp_to_isy (self, temperature, stateVar):
             self.my_setDriver(stateVar, round(temperature,1),  4)
         else: # messana = Farenheit
             self.my_setDriver(stateVar, round((temperature-32)*5/9,1),  17)
-    elif  self.ISY_temp_unit == 1: # Farenheit in ISY
+    else  self.ISY_temp_unit == 1: # Farenheit in ISY
         if self.messana_temp_unit == 'Celsius' or self.messana_temp_unit == 0:
             self.my_setDriver(stateVar, round((temperature*9/5+32),1), 4)
         else:
             self.my_setDriver(stateVar, round(temperature,1),  17)
-    else: # kelvin
-        if self.messana_temp_unit == 'Celsius' or self.messana_temp_unit == 0:
-            self.my_setDriver(stateVar, round((temperature+273.15,1), 4))
-        else:
-            self.my_setDriver(stateVar, round((temperature+273.15-32)*9/5,1),  17)
+
