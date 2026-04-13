@@ -461,10 +461,10 @@ class udiYoMultiOutlet(udi_interface.Node):
         self.nbrOutlets = 2
         self.nbrUsb = 0
  
-        elif deviceInfo['modelName'][:6] in ['YS6801']:
+        if deviceInfo['modelName'][:6] in ['YS6801']:
             self.nbrOutlets = 4
             self.nbrUsb = 1
-        else:
+        elif deviceInfo.get('type') not in ['MultiOutlet']:
             logging.error('Unsupported device : {}'.format(deviceInfo['modelName']))
             self.nbrUsb = 0
             self.nbrOutlets = 0
@@ -499,6 +499,11 @@ class udiYoMultiOutlet(udi_interface.Node):
         self.adr_list.append(address)
 
         self.node_fully_config = False
+        # Multi-outlet children are fixed at startup, so parent readiness waits for them.
+        self.main_node_ready = True
+        self.sub_nodes_ready = False
+        while not self.sub_nodes_ready:
+            time.sleep(0.5)
         self.node_ready = True
         self.schedule_selected = 0
 
@@ -508,7 +513,7 @@ class udiYoMultiOutlet(udi_interface.Node):
         #self.node_fully_config = False
         #self.usbExists = True
         logging.debug('start - udiYoMultiOutlet: {}'.format(self.devInfo['name']))
-        while not self.node_ready or not self.configDone:
+        while not self.main_node_ready or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         self.yoMultiOutlet  = YoLinkMultiOutlet(self.yoAccess, self.devInfo, self.updateStatus)
@@ -522,6 +527,7 @@ class udiYoMultiOutlet(udi_interface.Node):
         if self.yoMultiOutlet.nbrOutlets == 0:
             logging.debug(' No config yet {} {}'.format(self.yoMultiOutlet.nbrOutlets, self.yoMultiOutlet.check_system_online()))
             self.my_setDriver('GV20', 2)
+            self.sub_nodes_ready = True
         else:
             self.yoMultiOutlet.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
             time.sleep(2)
@@ -566,6 +572,8 @@ class udiYoMultiOutlet(udi_interface.Node):
             
             self.node_fully_config = True
             logging.info('udiYoMultiOutlet - finished creating sub nodes - {} '.format(self.node_fully_config ))
+
+            self.sub_nodes_ready = True
 
             #logging.debug(self.subnodeAdr)
             time.sleep(1)

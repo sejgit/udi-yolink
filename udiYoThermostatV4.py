@@ -84,6 +84,11 @@ class udiYoThermostat(udi_interface.Node):
 
         self.node = self.poly.getNode(address)
         self.adr_list = [address]
+        # Thermostat has one fixed child node created during startup.
+        self.main_node_ready = True
+        self.sub_nodes_ready = False
+        while not self.sub_nodes_ready:
+            time.sleep(0.5)
         self.node_ready = True
 
 
@@ -91,7 +96,7 @@ class udiYoThermostat(udi_interface.Node):
     def start(self):
         """Initialize and start the thermostat device"""
         logging.info('Start udiYoThermostat')
-        while not self.node_ready or not self.configDone:
+        while not self.main_node_ready or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         self.yoThermostat = YoLinkThermostat(self.yoAccess, self.devInfo, self.updateStatus)
@@ -114,6 +119,7 @@ class udiYoThermostat(udi_interface.Node):
             self,
         )
         self.adr_list.append(prop_address)
+        self.sub_nodes_ready = True
 
         logging.info('Thermostat online and ready')
         self.start_done()

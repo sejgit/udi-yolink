@@ -338,7 +338,10 @@ class udiYoSmartRemoter(udi_interface.Node):
                 self._name_sync_saved = self.node.name
         except Exception as e:
             logging.debug(f'Error handling SmartRemoter custom name for {self.address}: {e}')
-        
+
+        # Track the initial child-key build, but do not block parent readiness on it.
+        self.main_node_ready = True
+        self.sub_nodes_ready = False
         self.node_ready = True
 
     '''
@@ -356,7 +359,7 @@ class udiYoSmartRemoter(udi_interface.Node):
     def start(self):
 
         logging.info('start - udiYoSmartRemoter')
-        while not self.node_ready  or not self.configDone:
+        while not self.main_node_ready  or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0, True, True)
         self.yoSmartRemote  = YoLinkSmartRemoter(self.yoAccess, self.devInfo, self.updateStatus)
@@ -380,6 +383,7 @@ class udiYoSmartRemoter(udi_interface.Node):
 
             self.keys[key] = udiRemoteKey(self.poly, self.address, k_address, k_name, key)
             self.adr_list.append(k_address)
+        self.sub_nodes_ready = True
         self.wait_for_node_done()
 
         self.start_done()

@@ -227,6 +227,9 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.adr_list.append(address)   
         self.codes_used = []
         self.code_nodes = {}
+        # Track the initial learned-code scan, but allow later child-node additions.
+        self.main_node_ready = True
+        self.sub_nodes_ready = False
         self.node_ready = True
 
     def add_code_node(self, code):
@@ -243,7 +246,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
 
     def start(self):
         logging.info('start - udiIRremote')
-        while not self.node_ready  or not self.configDone:
+        while not self.main_node_ready  or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('ST', 0)
         # Create schedule node before device online check
@@ -265,6 +268,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
                 logging.info(f'Adding code {code} to node list')
                 self.codes_used.append(code)
                 self.add_code_node(code)
+        self.sub_nodes_ready = True
         self.poly.updateProfile()
         logging.info('YoLink Infrared Remoter Node Ready')
         self.start_done()
