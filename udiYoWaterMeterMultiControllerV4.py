@@ -73,6 +73,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         self.schedule_valve = None
         self.schedule_leak = None
         self.node_ready = False
+        self.main_node_ready = False
         self.configDone = False
         self.system_ready=False
         self._update_lock = threading.Lock()
@@ -97,6 +98,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         self.adr_list = []
         self.adr_list.append(address)
         self.wm_nodes= {}
+        self.main_node_ready = True
         self.sub_nodes_ready = False
         while not self.sub_nodes_ready:
             time.sleep(0.5)
@@ -106,7 +108,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
 
     def start(self):
         logging.info('Start - udiYoWaterMeterMultiController')
-        while not self.node_ready or not self.configDone:
+        while not self.main_ready or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV20', 0)
         self.yoWaterCtrl= YoLinkWaterMeter(self.yoAccess, self.devInfo, self.updateStatus)
@@ -159,10 +161,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
             time.sleep(2)
             tries += 1
         time.sleep(2)
-        
-        
-        #self.my_setDriver('GV30', 1)
-        #self.yoWaterCtrl.delayTimerCallback (self.updateDelayCountdown, self.timer_update)
+            
         self.start_done()
         #self.updateData()  # not needed - updateStatus callback fires from initDevice response
 
