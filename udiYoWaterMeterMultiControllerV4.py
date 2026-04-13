@@ -108,7 +108,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
 
     def start(self):
         logging.info('Start - udiYoWaterMeterMultiController')
-        while not self.main_ready or not self.configDone:
+        while not self.main_node_ready or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV20', 0)
         self.yoWaterCtrl= YoLinkWaterMeter(self.yoAccess, self.devInfo, self.updateStatus)
@@ -183,8 +183,9 @@ class udiYoWaterMeterMulti(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoWaterMeterMultiController')
         #self.my_setDriver('GV30', 0)
-        if getattr(self, 'yoWaterCtrl', None):
-            self.yoWaterCtrl.shut_down()
+        ctrl = getattr(self, 'yoWaterCtrl', None)
+        if ctrl is not None and hasattr(ctrl, 'shut_down'):
+            ctrl.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 
@@ -382,8 +383,9 @@ class udiYoSubWaterMeter(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoWaterMeterMultiController')
 
-        if getattr(self, 'yoWaterCtrl', None):
-            self.yoWaterCtrl.shut_down()
+        ctrl = getattr(self, 'yoWaterCtrl', None)
+        if ctrl is not None and hasattr(ctrl, 'shut_down'):
+            ctrl.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
             

@@ -590,11 +590,7 @@ def send_rel_temp_to_isy(self, temperature, stateVar):
             self.my_setDriver(stateVar, round((temperature*9/5),1),  4)
         else:
             self.my_setDriver(stateVar, round(temperature,1), 17)
-    else: # kelvin
-        if self.messana_temp_unit == 'Celsius' or self.messana_temp_unit == 0:
-            self.my_setDriver(stateVar, round((temperature,1), 4))
-        else:
-            self.my_setDriver(stateVar, round((temperature)*9/5,1),  17)
+
 
 
 def send_temp_to_isy (self, temperature, stateVar):
