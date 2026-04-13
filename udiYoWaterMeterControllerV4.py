@@ -168,11 +168,12 @@ class udiYoWaterMeterController(udi_interface.Node):
         self.yoWaterCtrl.initDevice()
         time.sleep(1)
         tries = 1
-        while not self.yoWaterCtrl.check_system_online() and (tries <= 10 or self.yoWaterCtrl.throttled()):
+        while not self.yoWaterCtrl.check_system_online():
             logging.info(f'Waiting for device {self.name} to come online...')
-            time.sleep(2)
+            self.poly.Notices['offline'] = f'Waiting for device {self.name} to come online...'
+            time.sleep(min(300, tries*5))  # Exponential backoff, max 5 minutes
             tries += 1
-
+        
         self.meter_unit = self.yoWaterCtrl.getMeterUnit()
         self.ISYwater_unit = self.yoAccess.get_water_unit()
         self.ISYmeter_uom = self.water_meter_unit2uom(self.ISYwater_unit)
