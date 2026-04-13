@@ -155,13 +155,14 @@ def addNodes (self, deviceList) -> list:
     #                    'WaterDepthSensor', ]    'WaterMeterController', 
     
     #supportedYoTypes = ['SprinklerV2', 'Sprinkler', 'Thermostat', 'SoilThcSensor', 'THSensor' ]     
-    supportedYoTypes = ['WaterMeterController', 'WaterMeterMultiController']   
+    #supportedYoTypes = ['WaterMeterController', 'WaterMeterMultiController']   
     #supportedYoTypes = ['WaterMeterMultiController']     
 
     remove_list= []
     schedule_queue = []
     for dev in deviceList:
         logging.debug(f'DEVICE BEING ANALYZED {dev}')
+        temp = None
         
         if dev['type'] not  in supportedYoTypes:            
             logging.warning('Currently unsupported device type found: {} - {}'.format(dev['type'], dev['name'] ))        
