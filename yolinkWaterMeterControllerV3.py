@@ -64,6 +64,9 @@ class YoLinkWaterMeter(YoLinkMQTTDevice):
             logging.debug(f'meter_list: {meter_list}')  
             if meter_list is not None and isinstance(meter_list, (dict, list)):
                 yolink.water_meter_count = len(meter_list)
+        elif yolink.get_data('meter', 'state') is not None:
+            # Single-channel devices report a scalar meter value under state.state.meter.
+            yolink.water_meter_count = 1
         else:
             yolink.water_meter_count = 1
         logging.debug(f'Water Meter Controller - meter count set to {yolink.water_meter_count}')
@@ -217,7 +220,9 @@ class YoLinkWaterMeter(YoLinkMQTTDevice):
             logging.debug(yolink.type+' - getAlarms')
             alarms = {}
             if yolink.check_system_online():   
-                alarm_data = yolink.get_data('alarm')
+                alarm_data = yolink.get_data('alarm', 'state')
+                if alarm_data is None:
+                    alarm_data = yolink.get_data('alarm')
                 if isinstance(alarm_data, dict):
                     alarms = dict(alarm_data)
                     if isinstance(WM_index, int):
@@ -237,7 +242,9 @@ class YoLinkWaterMeter(YoLinkMQTTDevice):
             logging.debug(yolink.type+' - getAttributes')
             attributes = {}
             if yolink.check_system_online():   
-                attr_data = yolink.get_data('attributes')
+                attr_data = yolink.get_data('attributes', 'state')
+                if attr_data is None:
+                    attr_data = yolink.get_data('attributes')
                 if isinstance(attr_data, dict):
                     attributes = dict(attr_data)
                     if 'meterUnit' in attributes and yolink.uom is None:
