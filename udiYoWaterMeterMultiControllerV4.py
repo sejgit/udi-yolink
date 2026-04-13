@@ -417,7 +417,7 @@ class udiYoSubWaterMeter(udi_interface.Node):
                         self.ISYmeter_uom = self.water_meter_unit2uom(self.ISYwater_unit)
 
                     state = self.yoWaterCtrl.get_data('valves', 'state', self.WM_index)
-                    logging.debug(f'valve state : {state} {self.WM_index}')p
+                    logging.debug(f'valve state : {state} {self.WM_index}')
                     if isinstance(state, dict):
                         state = state.get(str(self.WM_index))
                     logging.debug(f'valve state : {state}')
