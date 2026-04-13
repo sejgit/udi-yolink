@@ -133,7 +133,7 @@ class udiYoWaterMeterController(udi_interface.Node):
         self.poly.subscribe(self.poly.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
-        self.poly.subscribe(self.poly.STARTDONE, self.start_done)
+        #self.poly.subscribe(self.poly.STARTDONE, self.start_done)
 
 
         #known_meters = ['YS5007','YS5018', 'YS5008', 'YS5009', ]
@@ -173,12 +173,12 @@ class udiYoWaterMeterController(udi_interface.Node):
             self.poly.Notices['offline'] = f'Waiting for device {self.name} to come online...'
             time.sleep(min(300, tries*5))  # Exponential backoff, max 5 minutes
             tries += 1
-        
+
         self.meter_unit = self.yoWaterCtrl.getMeterUnit()
         self.ISYwater_unit = self.yoAccess.get_water_unit()
         self.ISYmeter_uom = self.water_meter_unit2uom(self.ISYwater_unit)
         logging.debug(f'meter unit : {self.meter_unit} ISY unit: {self.ISYwater_unit} uom: {self.ISYmeter_uom}')
-        #self.system_ready = True
+        self.start_done()
 
     def create_schedule_nodes(self):
         new_addresses = []
@@ -216,7 +216,7 @@ class udiYoWaterMeterController(udi_interface.Node):
         #    self.my_setDriver('GV2', 0)
 
     
-    def unit2uom(self) -> int:
+    def unit2uom(self):
         logging.debug(f'unit2uom {self.yoWaterCtrl.uom}')
         isy_uom = None
         if self.water_unit == 0:
