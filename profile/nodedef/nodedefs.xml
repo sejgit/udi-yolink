@@ -1446,7 +1446,6 @@
          <accepts>
             <cmd id="VOPEN" /> 
             <cmd id="VCLOSE" /> 
-
             <cmd id="SETATTRIB">
                <p id="LLIMIT" editor="leaklimit"  /> 
                <p id="LOFF" editor="enableSet" />       
@@ -1500,7 +1499,6 @@
          <accepts>
             <cmd id="VOPEN" /> 
             <cmd id="VCLOSE" /> 
-
             <cmd id="SETATTRIB">
                <p id="LLIMIT" editor="literSet"  /> 
                <p id="LOFF" editor="enableSet" />       

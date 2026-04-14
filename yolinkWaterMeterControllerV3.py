@@ -80,7 +80,6 @@ class YoLinkWaterMeter(YoLinkMQTTDevice):
         return(yolink.meter_unit)
 
     def setValveState(yolink, state, WM_index=None):
-
         try:
             data = {}
             state = state.lower()

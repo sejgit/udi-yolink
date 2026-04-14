@@ -147,8 +147,9 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                     wm_name = self.poly.getValidName(f'{self.name} CH{wm_index+1}')
                     self.wm_nodes[wm_index] = udiYoSubWaterMeter(self.poly, self.address, wm_address, wm_name, wm_index, self.yoAccess, self.yoWaterCtrl, self.devInfo)
                     self.adr_list.append(wm_address)
-                    logging.info(f'Added Water Meter Node: {wm_name} at {wm_address}')
+                    logging.debug(f'Added Water Meter Node: {wm_name} at {wm_address}')
             self.sub_nodes_ready = True
+            logging.debug(f'Registered node addresses for {self.name}: {self.adr_list}')
 
             #if self.scheduleSupport:
             #    pass  # schedule nodes created via create_schedule_nodes() after all main nodes are added
@@ -664,7 +665,6 @@ class udiYoSubWaterMeter(udi_interface.Node):
     '''
 
     commands = {
-    
                 'VOPEN'   : set_open,
                 'VCLOSE'   : set_close,
                 'SETATTRIB' : set_attributes,
