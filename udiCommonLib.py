@@ -636,7 +636,8 @@ def systemPoll (self, polltype):
                     self.saveNodeNames()
                     for nde in self.yolink_nodes:
                         if nde != 'setup':   # but not the controller node
-                            self.yolink_nodes[nde].checkOnline()
+                            if hasattr(self.yolink_nodes[nde], 'checkOnline'):
+                                self.yolink_nodes[nde].checkOnline()
                             if hasattr(self.yolink_nodes[nde], 'checkNameSync'):
                                 self.yolink_nodes[nde].checkNameSync()
                             logging.debug('longpoll {}'.format(nde))
