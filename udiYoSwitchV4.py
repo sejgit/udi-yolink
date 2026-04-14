@@ -62,6 +62,7 @@ class udiYoSwitch(udi_interface.Node):
         self.timer_expires = 0
         self.onDelay = 0
         self.offDelay = 0
+        self.scheduleSupport = True
         self.schedule_selected = 0
         self.keys = {}
         self.support_power = False
@@ -165,12 +166,14 @@ class udiYoSwitch(udi_interface.Node):
         #    self.poly.delNode(self.node.address)
             
     def checkOnline(self):
-        self.yoSwitch.refreshDevice() 
+        if hasattr(self.yoSwitch, 'check_system_online') and callable(getattr(self.yoSwitch, 'check_system_online')):
+            self.yoSwitch.refreshDevice() 
     
     
     def checkDataUpdate(self):
-        if self.yoSwitch.data_updated():
-            self.updateData()
+        if hasattr(self.yoSwitch, 'data_updated') and callable(getattr(self.yoSwitch, 'data_updated')): 
+            if self.yoSwitch.data_updated():
+                    self.updateData()
 
  
     def updateData(self):

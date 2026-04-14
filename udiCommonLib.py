@@ -490,7 +490,7 @@ def addNodes (self, deviceList) -> list:
                 for adr in temp.adr_list:
                     self.assigned_addresses.append(adr)    
 
-            if hasattr(temp, 'create_schedule_nodes'):
+            if getattr(temp, 'scheduleSupport', False) and hasattr(temp, 'create_schedule_nodes'):
                 schedule_queue.append(temp)
 
     # Second pass: create schedule nodes after all main device nodes are ready

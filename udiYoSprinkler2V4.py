@@ -85,6 +85,7 @@ class udiYoSprinkler2(udi_interface.Node):
         self.devInfo =  deviceInfo
         self.yoSprinkler= None
         self.schedule = None
+        self.scheduleSupport = True
         self.node_ready = False
         self.configDone = False
         self.system_ready = False        

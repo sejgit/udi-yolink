@@ -223,12 +223,15 @@ class YoLinkSetup (udi_interface.Node):
                 except Exception:
                     dev_id = None
 
-                # find first attribute that exposes refreshSchedules()
+                # find first schedule-capable device wrapper
                 source = None
                 for attr in dir(node):
                     try:
                         val = getattr(node, attr)
-                        if hasattr(val, 'refreshSchedules'):
+                        if not hasattr(val, 'refreshSchedules'):
+                            continue
+                        supports_schedule_refresh = getattr(val, 'supports_schedule_refresh', None)
+                        if callable(supports_schedule_refresh) and supports_schedule_refresh():
                             source = val
                             break
                     except Exception:
@@ -251,7 +254,7 @@ class YoLinkSetup (udi_interface.Node):
 
                 # space calls using yoAccess time tracking
                 try:
-                    delay = self.yoAccess.time_tracking(dev_id)
+                    delay = self.yoAccess.time_tracking(dev_id) if self.yoAccess is not None else 0
                 except Exception:
                     delay = 0
                 if delay and delay > 0:

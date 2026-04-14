@@ -55,6 +55,18 @@ class YoLinkMQTTDevice(object):
         #yolink.delaySupport = ['Outlet', 'MultiOutlet', 'Manipulator', 'Switch', 'Dimmer', 'WaterMeterController']
         yolink.delaySupport = ['Outlet', 'MultiOutlet', 'Manipulator', 'Switch', 'Dimmer']
         yolink.scheduleSupport = []#['Outlet', 'MultiOutlet', 'Manipulator', 'Switch','InfraredRemoter','Sprinkler', 'Thermostat', 'Dimmer' ]
+        yolink.scheduleRefreshTypes = {
+            'Dimmer',
+            'InfraredRemoter',
+            'Manipulator',
+            'MultiOutlet',
+            'Outlet',
+            'Sprinkler',
+            'SprinklerV2',
+            'Switch',
+            'WaterMeterController',
+            'WaterMeterMultiController',
+        }
         yolink.online = False # assume it is offline  until otherwise
         yolink.suspended = True # assume it is suspended until otherwise
         yolink.nbrPorts = 1
@@ -104,6 +116,9 @@ class YoLinkMQTTDevice(object):
         yolink.messagePending = False
         yolink._schedule_refresh_last_sent = {}
         yolink.scheduleRefreshCooldownSec = 4 if yolink.type == 'InfraredRemoter' else 2
+
+    def supports_schedule_refresh(yolink):
+        return yolink.type in yolink.scheduleRefreshTypes
     
     def reset_structure(yolink):
         if yolink.type in yolink.delaySupport and yolink.type not in yolink.scheduleSupport :

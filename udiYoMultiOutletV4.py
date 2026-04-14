@@ -479,6 +479,7 @@ class udiYoMultiOutlet(udi_interface.Node):
         self.subUsb = []
         self.subOutlet = []
         self.schedule_setected = 0
+        self.scheduleSupport = True
         self.n_queue = []
         
         #self.Parameters = Custom(polyglot, 'customparams')

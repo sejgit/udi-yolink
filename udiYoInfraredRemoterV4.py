@@ -187,6 +187,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.primary = primary
         self.yoIRrem = None
         self.schedule = None
+        self.scheduleSupport = True
         self.node_ready = False
         self.configDone = False
         self.system_ready=False

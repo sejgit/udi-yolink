@@ -75,6 +75,7 @@ class udiYoManipulator(udi_interface.Node):
         self.timer_expires = 0
         self.onDelay = 0
         self.offDelay = 0
+        self.scheduleSupport = True
         self.schedule_selected = 0
         self.valveState = 99 # needed as class c device - keep value until online again 
         #polyglot.subscribe(polyglot.POLL, self.poll)

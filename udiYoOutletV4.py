@@ -89,6 +89,7 @@ class udiYoOutlet(udi_interface.Node):
         self.timer_expires = 0
         self.onDelay = 0
         self.offDelay = 0
+        self.scheduleSupport = True
         #self.schedule_selected = None
         self.poly = polyglot
         self.poly.subscribe(polyglot.START, self.start, self.address)

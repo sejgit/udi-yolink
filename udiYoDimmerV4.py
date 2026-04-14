@@ -83,6 +83,7 @@ class udiYoDimmer(udi_interface.Node):
         self.timer_expires = 0
         self.onDelay = 0
         self.offDelay = 0
+        self.scheduleSupport = True
         self.schedule_selected = 0
         self.dim_setting = self.retrieve_cmd_struct()
         if self.dim_setting == {} or self.dim_setting is None:
