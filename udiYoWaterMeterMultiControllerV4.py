@@ -203,7 +203,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
     def updateData(self):
         try:
             if self.node is not None:
-                while not self.sub_node_ready or not self.system_ready or not self.configDone:
+                while not self.system_ready or not self.configDone:
                     time.sleep(0.5)
                 message_type, message_action = self.yoWaterCtrl.get_message_type()
                 unix_time = self.yoWaterCtrl.get_report_time('time')
