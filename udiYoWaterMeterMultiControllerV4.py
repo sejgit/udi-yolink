@@ -203,7 +203,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
     def updateData(self):
         try:
             if self.node is not None:
-                while not self.node_ready or not self.system_ready or not self.configDone:
+                while not self.sub_node_ready or not self.system_ready or not self.configDone:
                     time.sleep(0.5)
                 message_type, message_action = self.yoWaterCtrl.get_message_type()
                 unix_time = self.yoWaterCtrl.get_report_time('time')
@@ -336,7 +336,7 @@ class udiYoSubWaterMeter(udi_interface.Node):
         self.WM_index = WMindex
         
         self.yoWaterCtrl= wmAccess
-        self.node_ready = False
+        self.sub_node_ready = False
         self.configDone = False
         self.system_ready=False
         self.last_state = ''
@@ -361,13 +361,13 @@ class udiYoSubWaterMeter(udi_interface.Node):
         self.node = self.poly.getNode(address)
         self.adr_list = []
         self.adr_list.append(address)
-        self.node_ready = True
+        self.sub_node_ready = True
 
 
 
     def start(self):
         logging.info('Start - udiYoWaterMeterMultiController')
-        while not self.node_ready or not self.configDone:
+        while not self.sub_node_ready or not self.configDone:
             time.sleep(0.5)
 
         # No online check here - the main node already waited for the device
