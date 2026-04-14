@@ -156,7 +156,7 @@ def addNodes (self, deviceList) -> list:
     
     #supportedYoTypes = ['SprinklerV2', 'Sprinkler', 'Thermostat', 'SoilThcSensor', 'THSensor' ]     
     #supportedYoTypes = ['WaterMeterController', 'WaterMeterMultiController']   
-    supportedYoTypes = ['WaterMeterMultiController']     
+    #supportedYoTypes = ['WaterMeterMultiController']     
 
     remove_list= []
     schedule_queue = []
