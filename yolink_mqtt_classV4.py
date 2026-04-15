@@ -488,7 +488,7 @@ class YoLinkMQTTDevice(object):
                     logging.debug('getStateValue NO MATCH - {} '.format(key))
                 return(result)
             else:
-                return(99)
+                return(None)
         except Exception as e:
             logging.debug('getData exception: {}'.format(e) )
             return(None)

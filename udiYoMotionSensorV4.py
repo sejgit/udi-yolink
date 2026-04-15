@@ -130,7 +130,7 @@ class udiYoMotionSensor(udi_interface.Node):
             else:
                 return(1)
         else:
-            return(99)
+            return(None)
 
     def checkDataUpdate(self):
         if self.yoMotionsSensor.data_updated():

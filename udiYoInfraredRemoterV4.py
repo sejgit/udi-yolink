@@ -308,7 +308,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
             else: 
                 return(2)
         else:
-            return(99)
+            return(None)
 
 
     def updateData(self):

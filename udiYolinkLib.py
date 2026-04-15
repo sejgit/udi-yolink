@@ -243,7 +243,7 @@ def bool2Nbr (self, data):
     elif data is False:
         return(0)
     else:
-        return(99)
+        return(None)
 
 def bool2ISY (self, data):
     if data is True:
@@ -251,7 +251,7 @@ def bool2ISY (self, data):
     elif data is False:
         return(0)
     else:
-        return(99)
+        return(None)
 
 def bool2nbr(self, type):
     if type is True:
@@ -259,7 +259,7 @@ def bool2nbr(self, type):
     elif type is False:
         return(0)
     else:
-        return(99)
+        return(None)
 
 def state2Nbr(self, val):
     if val == 'normal':
@@ -267,7 +267,7 @@ def state2Nbr(self, val):
     elif val == 'alert':
         return(1)
     else:
-        return(99)
+        return(None)
 
 def state2ISY(self, val):
     if val in ['normal', 'off' , False, 'closed', 'close']:
@@ -275,11 +275,11 @@ def state2ISY(self, val):
     elif val in ['alert', 'on', True, 'opened', 'open']:
         return(1)
     else:
-        return(99)
+        return(None)
 
 def isy_value(self, value):
     if value == None:
-        return (99)
+        return (None)
     else:
         return(value)
 
