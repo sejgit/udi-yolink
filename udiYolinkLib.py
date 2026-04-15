@@ -164,16 +164,21 @@ def wait_for_node_done(self):
         time.sleep(0.1)
     self.n_queue.pop()
 
-def my_setDriver(self, key, value, UOM=None, force=False, type=None):
+def my_setDriver(self, key, value, UOM=None, force=None, type=None):
     with driver_lock:
         logging.debug(f'my_setDriver : {key} {value} {UOM} {type}')
         try:
             if any(item.get('driver') == key for item in self.drivers):
+                if force is None:
+                    if type in ['method']: #methods are forced so force update of data even if not changed
+                        force = True  
+                    else:
+                        force = False     
                 if value is None:
-                    if type  in ['report']: #['event', 'setAttributes', 'setState']:
+                    if type  in ['event']: 
                         logging.debug('None value passed = seting 99, UOM 25')
                         self.node.setDriver(key, 99, True, force, 25)
-                else:                
+                else:  
                     if key in ['GV20']: # Connection state o
                         try:
                             if self.yoAccess.local:

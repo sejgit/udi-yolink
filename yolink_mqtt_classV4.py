@@ -75,7 +75,7 @@ class YoLinkMQTTDevice(object):
         logging.debug(f"{yoAccess.access_mode} subscribe_mqtt: {yolink.deviceInfo['deviceId']}")
         yolink.yoAccess.subscribe_mqtt(deviceInfo['deviceId'], callback)
         yolink.lastDataPacket = ''
-        yolink.lastControlPacket = '' 
+        yolink.lastControlPacket = {}
         yolink.TZcomp = (yolink.timezoneOffsetSec() /60 /60)
         yolink.lastUpdateTime = 0
         #yolink.yolink_URL = yoAccess.apiv2URL
@@ -215,7 +215,7 @@ class YoLinkMQTTDevice(object):
         #while not yolink.yoAccess.publish_data(data) and attempt <= maxAttempts:
         #    time.sleep(2)
         #    attempt = attempt + 1
-        yolink.lastControlPacket = data
+        #yolink.lastControlPacket = data
         time.sleep(1)
         yolink.check_system_online()
 
