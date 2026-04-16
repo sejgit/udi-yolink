@@ -137,16 +137,29 @@ class udiYoSpeakerHub(udi_interface.Node):
         logging.info('Stop udiYoSpeakerHub')
         self.my_setDriver('GV30', 0)
         self.my_setDriver('ST', 0)
-        if getattr(self, 'yoSpeakerHub', None):
-            self.yoSpeakerHub.shut_down()
+        speaker_hub = self.yoSpeakerHub
+        if speaker_hub is not None:
+            speaker_hub.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
+
+    def _get_speaker_hub(self, caller):
+        if self.yoSpeakerHub is None:
+            logging.warning(f'udiYoSpeakerHub - {caller} skipped; speaker hub not initialized yet')
+            return None
+        return self.yoSpeakerHub
             
     def checkOnline(self):
-        self.yoSpeakerHub.refreshDevice() 
+        speaker_hub = self._get_speaker_hub('checkOnline')
+        if speaker_hub is None:
+            return
+        speaker_hub.refreshDevice() 
         
     def checkDataUpdate(self):
-        if self.yoSpeakerHub.data_updated():
+        speaker_hub = self._get_speaker_hub('checkDataUpdate')
+        if speaker_hub is None:
+            return
+        if speaker_hub.data_updated():
             self.updateData()
 
     def updateLastTime(self):
@@ -156,10 +169,13 @@ class udiYoSpeakerHub(udi_interface.Node):
         if self.node is not None:
             while not self.node_ready or not self.system_ready or self.configDone:
                 time.sleep(0.5)
-            message_type, message_action = self.yoSpeakerHub.get_message_type()
-            self.my_setDriver('TIME', self.yoSpeakerHub.getLastUpdateTime(), 151)
-            logging.debug(f'TIME {self.yoSpeakerHub.getLastUpdateTime()}')
-            if self.yoSpeakerHub.check_system_online():
+            speaker_hub = self._get_speaker_hub('updateData')
+            if speaker_hub is None:
+                return
+            message_type, message_action = speaker_hub.get_message_type()
+            self.my_setDriver('TIME', speaker_hub.getLastUpdateTime(), 151)
+            logging.debug(f'TIME {speaker_hub.getLastUpdateTime()}')
+            if speaker_hub.check_system_online():
                 self.my_setDriver('GV0', self.volume, type=message_type )
                 self.my_setDriver('GV1', self.bool2ISY(self.beepEnabled), type=message_type )
                 self.my_setDriver('GV2', self.bool2ISY(self.mute), type=message_type )
@@ -169,7 +185,7 @@ class udiYoSpeakerHub(udi_interface.Node):
                 self.my_setDriver('GV5', self.repeat, type=message_type )
                 self.my_setDriver('GV30', 1 )
                 self.my_setDriver('ST', 1, type=message_type )
-                if self.yoSpeakerHub.suspended:
+                if speaker_hub.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
                      self.my_setDriver('GV20', 0)
@@ -225,19 +241,25 @@ class udiYoSpeakerHub(udi_interface.Node):
     '''
     def setMute(self, command):
         logging.info('udiYoSpeakerHub setMute')
+        speaker_hub = self._get_speaker_hub('setMute')
+        if speaker_hub is None:
+            return
         mute = int(command.get('value'))
         #self.my_setDriver('GV2', self.yoSpeakerHub.mute )
         #mute =  mute == 1
         self.mute = mute == 1
-        self.yoSpeakerHub.setMute(self.mute)
+        speaker_hub.setMute(self.mute)
     
     def setBeepEnable(self, command):
         logging.info('udiYoSpeakerHub setBeepEnable')
+        speaker_hub = self._get_speaker_hub('setBeepEnable')
+        if speaker_hub is None:
+            return
         beepEn =int(command.get('value'))
         #self.my_setDriver('GV1', self.beepEn )
         self.beepEnabled =  self.beepEn == 1
       
-        self.yoSpeakerHub.setBeepEnable(self.beepEnabled )
+        speaker_hub.setBeepEnable(self.beepEnabled )
     '''
     def setVolume(self, command):
         logging.info('udiYoSpeakerHub setVolume')
@@ -260,6 +282,9 @@ class udiYoSpeakerHub(udi_interface.Node):
     def playMessageNew(self, command ):
         try:
             logging.info(f'udiYoSpeakerHub playMessage {command}')
+            speaker_hub = self._get_speaker_hub('playMessageNew')
+            if speaker_hub is None:
+                return
             query = command.get("query")
             self.messageNbr = int(query.get("message.uom25"))
             self.message = self.yoAccess.TtsMessages[self.messageNbr]
@@ -271,17 +296,20 @@ class udiYoSpeakerHub(udi_interface.Node):
             self.tone = self.tone_list[self.tone_nbr]
             #self.my_setDriver('GV3', self.tone_nbr )
             logging.debug(f'tone: {self.tone }')
-            self.yoSpeakerHub.repeat = int(query.get("repeat.uom56"))
+            speaker_hub.repeat = int(query.get("repeat.uom56"))
             #self.my_setDriver('GV5', self.yoSpeakerHub.repeat  )
             logging.debug(f'play: {self.message} {self.tone} {self.volume } {self.repeat}')
-            self.yoSpeakerHub.playAudio(self.message, self.tone,self.volume, self.repeat)
+            speaker_hub.playAudio(self.message, self.tone,self.volume, self.repeat)
             
         except KeyError as e:
             logging.error(f'Error playng message {e}')
 
     def update(self, command = None):
         logging.info('udiYoSpeakerHub Update Status')
-        self.yoSpeakerHub.refreshDevice()
+        speaker_hub = self._get_speaker_hub('update')
+        if speaker_hub is None:
+            return
+        speaker_hub.refreshDevice()
         #self.yoSpeakerHub.refreshSchedules()     
 
 

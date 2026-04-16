@@ -100,21 +100,31 @@ class udiYoGarageDoor(udi_interface.Node):
         logging.info('Stop udiYoGarageDoor')
         self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
-        if getattr(self, 'yoDoorControl', None):
-            self.yoDoorControl.shut_down()
+        door_control = self.yoDoorControl
+        if door_control is not None:
+            door_control.shut_down()
+
+    def _get_door_control(self, caller):
+        if self.yoDoorControl is None:
+            logging.warning(f'udiYoGarageDoor - {caller} skipped; garage door control not initialized yet')
+            return None
+        return self.yoDoorControl
 
     def updateStatus(self, data):
         logging.debug('updateStatus - udiYoGarageDoor')
+        door_control = self._get_door_control('updateStatus')
+        if door_control is None:
+            return
         with self._update_lock:
-            self.yoDoorControl.updateCallbackStatus(data)
-            if self.yoDoorControl is not None:
+            door_control.updateCallbackStatus(data)
+            if door_control is not None:
 
-                if self.yoDoorControl.suspended:
+                if door_control.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
                     self.my_setDriver('GV20', 0)
 
-                if self.yoDoorControl.check_system_online():
+                if door_control.check_system_online():
                     self.my_setDriver('ST', 1)
                     self.my_setDriver('GV30', 1)
                 else:
@@ -126,7 +136,10 @@ class udiYoGarageDoor(udi_interface.Node):
 
     def toggleDoor(self, command = None):
         logging.info('GarageDoor Toggle Door')
-        self.yoDoorControl.toggleDevice()
+        door_control = self._get_door_control('toggleDoor')
+        if door_control is None:
+            return
+        door_control.toggleDevice()
         self.node.reportCmd('DON')
         time.sleep(1.5)
         self.node.reportCmd('DOF')

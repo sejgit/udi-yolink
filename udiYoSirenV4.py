@@ -103,20 +103,33 @@ class udiYoSiren(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoSiren')
         self.my_setDriver('GV30', 0, True, True)
-        if getattr(self, 'yoSiren', None):
-            self.yoSiren.shut_down()
+        siren = self.yoSiren
+        if siren is not None:
+            siren.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
+
+    def _get_siren(self, caller):
+        if self.yoSiren is None:
+            logging.warning(f'udiYoSiren - {caller} skipped; siren not initialized yet')
+            return None
+        return self.yoSiren
             
     def checkOnline(self):
         #get get info even if battery operated 
-        self.yoSiren.refreshDevice()    
+        siren = self._get_siren('checkOnline')
+        if siren is None:
+            return
+        siren.refreshDevice()    
 
 
  
 
     def checkDataUpdate(self):
-        if self.yoSiren.data_updated():
+        siren = self._get_siren('checkDataUpdate')
+        if siren is None:
+            return
+        if siren.data_updated():
             self.updateData()
         #if time.time() >= self.timer_expires - self.timer_update:
         #    self.my_setDriver('GV1', 0, True, False)
@@ -127,12 +140,15 @@ class udiYoSiren(udi_interface.Node):
         if self.node is not None:
             while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
-            message_type, message_action = self.yoSiren.get_message_type() # if event some data may not be updated 
-            unix_time = self.yoSiren.get_report_time('reportAt')
+            siren = self._get_siren('updateData')
+            if siren is None:
+                return
+            message_type, message_action = siren.get_message_type() # if event some data may not be updated 
+            unix_time = siren.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
             state_list = ['normal', 'alert', 'off']
-            if self.yoSiren.check_system_online():
-                state =  self.yoSiren.get_data('state')
+            if siren.check_system_online():
+                state =  siren.get_data('state')
                 logging.debug('Siren state {}'.format(state))
                 if state in state_list:
   
@@ -141,20 +157,20 @@ class udiYoSiren(udi_interface.Node):
                 else:
                     self.my_setDriver('GV0', 99)
                     self.my_setDriver('ST', 99)
-                supply = self.yoSiren.get_data('powerSupply')
+                supply = siren.get_data('powerSupply')
                 if supply in ['battery']:
                     logging.debug(f'udiYoSiren - getBattery: {supply} ')    
-                    self.node.my_setDriver('GV2', self.yoSiren.get_data('battery'), type=message_type)
+                    self.node.my_setDriver('GV2', siren.get_data('battery'), type=message_type)
                 elif supply in ['ext_supply', 'usb']:
                     logging.debug('udiYoSiren - external Supply')    
                     self.my_setDriver('GV2', 98, type=message_type)
                 else:
                     self.my_setDriver('GV2', 99, type=message_type)
-                duration = self.yoSiren.get_data('alarmDuration')
+                duration = siren.get_data('alarmDuration')
                 logging.debug('AlarmDuration : {}'.format(duration))
                 self.my_setDriver('GV1', duration, type=message_type)
                 if self.soundLevelSupport:
-                    sound_level = self.yoSiren.get_data('soundLevel')
+                    sound_level = siren.get_data('soundLevel')
                     if sound_level in [1,100]:
                         sound_level = 1
                     elif sound_level in [2,104]:
@@ -174,7 +190,7 @@ class udiYoSiren(udi_interface.Node):
 
 
                 #logging.debug('Timer info : {} '. format(time.time() - self.timer_expires))
-                if self.yoSiren.suspended:
+                if siren.suspended:
                     self.my_setDriver('GV20', 1, True, True)
                 else:
                     self.my_setDriver('GV20', 0)
@@ -194,14 +210,17 @@ class udiYoSiren(udi_interface.Node):
 
     def sirenControl(self, command):
         logging.info('Siren Control')
+        siren = self._get_siren('sirenControl')
+        if siren is None:
+            return
         state = int(command.get('value'))
         if state == 1:
-            self.yoSiren.setState('on')
+            siren.setState('on')
             self.sirenState = 1
             self.my_setDriver('GV0',self.sirenState , True, True)
             self.my_setDriver('ST',self.sirenState , True, True)
         else:
-            self.yoSiren.setState('off')
+            siren.setState('off')
             self.sirenState  = 0
             self.my_setDriver('GV0', self.sirenState , True, True)
             self.my_setDriver('ST', self.sirenState , True, True)
@@ -210,7 +229,10 @@ class udiYoSiren(udi_interface.Node):
 
     def update(self, command = None):
         logging.info('Update Status Executed')
-        self.yoSiren.refreshDevice()
+        siren = self._get_siren('update')
+        if siren is None:
+            return
+        siren.refreshDevice()
 
 
 

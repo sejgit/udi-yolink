@@ -128,17 +128,30 @@ class udiYoManipulator(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoManipulator')
         self.my_setDriver('GV30', 0)
-        if getattr(self, 'yoManipulator', None):
-            self.yoManipulator.shut_down()
+        manipulator = self.yoManipulator
+        if manipulator is not None:
+            manipulator.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
+
+    def _get_manipulator(self, caller):
+        if self.yoManipulator is None:
+            logging.warning(f'udiYoManipulator - {caller} skipped; manipulator not initialized yet')
+            return None
+        return self.yoManipulator
             
     def checkOnline(self):
         #get get info even if battery operated 
-        self.yoManipulator.refreshDevice()    
+        manipulator = self._get_manipulator('checkOnline')
+        if manipulator is None:
+            return
+        manipulator.refreshDevice()    
 
     def checkDataUpdate(self):
-        if self.yoManipulator.data_updated():
+        manipulator = self._get_manipulator('checkDataUpdate')
+        if manipulator is None:
+            return
+        if manipulator.data_updated():
             self.updateData()
         #if time.time() >= self.timer_expires - self.timer_update:
         #    self.my_setDriver('GV1', 0)
@@ -149,15 +162,19 @@ class udiYoManipulator(udi_interface.Node):
         if self.node is not None:
             while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
-            message_type, message_action  = self.yoManipulator.get_message_type()
+            manipulator = self._get_manipulator('updateData')
+            if manipulator is None:
+                return
+            message_type, message_action  = manipulator.get_message_type()
             if message_action in ['getSchedules', 'setSchedules']:
-                self.schedule.update_schedule_data(source_device=self.yoManipulator)
+                if self.schedule is not None:
+                    self.schedule.update_schedule_data(source_device=manipulator)
             else:                
 
-                unix_time = self.yoManipulator.get_report_time('reportAt')
+                unix_time = manipulator.get_report_time('reportAt')
                 self.my_setDriver('TIME', unix_time, 151)
-                if self.yoManipulator.check_system_online():
-                    state =  self.yoManipulator.get_data('state')
+                if manipulator.check_system_online():
+                    state =  manipulator.get_data('state')
 
                     if state.upper() == 'OPEN':
                         self.valveState = 1
@@ -181,8 +198,8 @@ class udiYoManipulator(udi_interface.Node):
                         self.my_setDriver('GV1', 0)
                         self.my_setDriver('GV2', 0)  
                     #logging.debug('udiYoManipulator - getBattery: {}'.format(self.yoManipulator.getBattery()))    
-                    self.my_setDriver('BATLVL', self.yoManipulator.get_data('battery'), type=message_type)      
-                    if self.yoManipulator.suspended:
+                    self.my_setDriver('BATLVL', manipulator.get_data('battery'), type=message_type)      
+                    if manipulator.suspended:
                         self.my_setDriver('GV20', 1)
                     else:
                         self.my_setDriver('GV20', 0)
@@ -234,16 +251,19 @@ class udiYoManipulator(udi_interface.Node):
   
     def manipuControl(self, command):
         logging.info('Manipulator manipuControl')
+        manipulator = self._get_manipulator('manipuControl')
+        if manipulator is None:
+            return
         state = int(command.get('value'))
         if state == 1:
-            self.yoManipulator.setState('open')
+            manipulator.setState('open')
             self.valveState = 1
             self.my_setDriver('GV0',self.valveState  )  
             self.my_setDriver('ST',self.valveState  )  
    
             #self.node.reportCmd('DON')
         elif state == 0:
-            self.yoManipulator.setState('closed')
+            manipulator.setState('closed')
             self.valveState  = 0
             self.my_setDriver('GV0',self.valveState )
             self.my_setDriver('ST',self.valveState  )
@@ -253,12 +273,15 @@ class udiYoManipulator(udi_interface.Node):
             #self.yolink.setMultiOutDelay(self.port, self.onDelay, self.offDelay)
             self.my_setDriver('GV1', self.onDelay * 60)
             self.my_setDriver('GV2', self.offDelay * 60 )
-            self.yoManipulator.setDelayList([{'on':self.onDelay, 'off':self.offDelay}]) 
+            manipulator.setDelayList([{'on':self.onDelay, 'off':self.offDelay}]) 
 
 
     def set_open(self, command = None):
         logging.info('Manipulator - set_open')
-        self.yoManipulator.setState('open')
+        manipulator = self._get_manipulator('set_open')
+        if manipulator is None:
+            return
+        manipulator.setState('open')
         self.valveState  = 1
         self.my_setDriver('GV0',self.valveState  )
         self.my_setDriver('ST',self.valveState  )
@@ -267,7 +290,10 @@ class udiYoManipulator(udi_interface.Node):
 
     def set_close(self, command = None):
         logging.info('Manipulator - set_close')
-        self.yoManipulator.setState('closed')
+        manipulator = self._get_manipulator('set_close')
+        if manipulator is None:
+            return
+        manipulator.setState('closed')
         self.valveState  = 0
         self.my_setDriver('GV0',self.valveState  )
         self.my_setDriver('ST',self.valveState  )
@@ -297,16 +323,22 @@ class udiYoManipulator(udi_interface.Node):
 
     def update(self, command = None):
         logging.info('Update Status Executed')
-        self.yoManipulator.refreshDevice()
+        manipulator = self._get_manipulator('update')
+        if manipulator is None:
+            return
+        manipulator.refreshDevice()
 
     def program_delays(self, command):
         logging.info('Manipulator program_delays {}'.format(command))
+        manipulator = self._get_manipulator('program_delays')
+        if manipulator is None:
+            return
         query = command.get("query")
         self.onDelay = int(query.get("ondelay.uom44"))
         self.offDelay = int(query.get("offdelay.uom44"))
         self.my_setDriver('GV1', self.onDelay * 60)
         self.my_setDriver('GV2', self.offDelay * 60 )
-        self.yoManipulator.setDelayList([{'on':self.onDelay, 'off':self.offDelay}]) 
+        manipulator.setDelayList([{'on':self.onDelay, 'off':self.offDelay}]) 
 
     commands = {
                 'UPDATE': update,

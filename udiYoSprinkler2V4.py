@@ -12,6 +12,7 @@ except ImportError:
     logging.basicConfig(level=logging.INFO)
 
 from os import truncate
+from typing import Optional
 import threading
 #import udi_interface
 #import sys
@@ -96,7 +97,7 @@ class udiYoSprinkler2(udi_interface.Node):
         self.timer_expires = 0
         self.mode = ''
 
-        self.step_factor = 1
+        self.step_factor: int | float = 1
         self.ISYmeter_uom = None
         self.ISYwater_unit = None
         self.meter_unit = None
@@ -139,7 +140,11 @@ class udiYoSprinkler2(udi_interface.Node):
 
 
         self.meter_unit = self.yoSprinkler.get_data('meterUnit', 'attributes')
-        self.step_factor = self.yoSprinkler.get_data('meterStepFactor', 'attributes')
+        step_factor = self.yoSprinkler.get_data('meterStepFactor', 'attributes')
+        if isinstance(step_factor, (int, float)) and step_factor != 0:
+            self.step_factor = step_factor
+        else:
+            self.step_factor = 1
         self.ISYwater_unit = self.yoAccess.get_water_unit()
         self.ISYmeter_uom = self.water_meter_unit2uom(self.ISYwater_unit)
         logging.debug(f'meter unit : {self.meter_unit} ISY unit: {self.ISYwater_unit} uom: {self.ISYmeter_uom} meterFactor: {self.step_factor}')
@@ -155,17 +160,30 @@ class udiYoSprinkler2(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoSprinkler2')
         self.my_setDriver('GV30', 0)
-        if getattr(self, 'yoSprinkler', None):
-            self.yoSprinkler.shut_down()
+        sprinkler = self.yoSprinkler
+        if sprinkler is not None:
+            sprinkler.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
+
+    def _get_sprinkler(self, caller) -> Optional[YoLinkSprinkler]:
+        if self.yoSprinkler is None:
+            logging.warning(f'udiYoSprinkler2 - {caller} skipped; sprinkler not initialized yet')
+            return None
+        return self.yoSprinkler
             
     def checkOnline(self):
         #get get info even if battery operated 
-        self.yoSprinkler.refreshDevice()    
+        sprinkler = self._get_sprinkler('checkOnline')
+        if sprinkler is None:
+            return
+        sprinkler.refreshDevice()    
 
     def checkDataUpdate(self):
-        if self.yoSprinkler.data_updated():
+        sprinkler = self._get_sprinkler('checkDataUpdate')
+        if sprinkler is None:
+            return
+        if sprinkler.data_updated():
             #self.yoSprinkler.refreshDevice() 
             self.updateData()
         #if time.time() >= self.timer_expires - self.timer_update:
@@ -173,8 +191,7 @@ class udiYoSprinkler2(udi_interface.Node):
         #    self.my_setDriver('GV2', 0)
 
     
-    def unit2uom(self) -> int:
-        logging.debug(f'unit2uom {self.yoSprinkler.uom}')
+    def unit2uom(self) -> int | None:
         isy_uom = None
         if self.water_unit == 0:
             isy_uom = 69 # gallon
@@ -192,16 +209,22 @@ class udiYoSprinkler2(udi_interface.Node):
             if self.node is not None:
                 while not self.node_ready or not self.system_ready or not self.configDone:
                     time.sleep(0.5)
-                message_type, message_action = self.yoSprinkler.get_message_type()
-                unix_time = self.yoSprinkler.get_report_time('time')
+                sprinkler = self._get_sprinkler('updateData')
+                if sprinkler is None:
+                    return
+                message_info = sprinkler.get_message_type()
+                if not isinstance(message_info, tuple) or len(message_info) != 2:
+                    return
+                message_type, message_action = message_info
+                unix_time = sprinkler.get_report_time('time')
                 self.my_setDriver('TIME', unix_time, 151)
                 if message_type and 'Schedules' in str(message_type):
                     if self.schedule is not None:
-                        self.schedule.update_schedule_data(source_device=self.yoSprinkler)
+                        self.schedule.update_schedule_data(source_device=sprinkler)
                     return
-                if self.yoSprinkler.check_system_online():
+                if sprinkler.check_system_online():
                     self.my_setDriver('GV30', 1)
-                    if self.yoSprinkler.emptyData():
+                    if sprinkler.emptyData():
                         logging.debug('Empty data received - skip updateData')
                         self.my_setDriver('GV20', 6)
                         return
@@ -209,16 +232,16 @@ class udiYoSprinkler2(udi_interface.Node):
                         logging.debug(f'meter unit : { self.meter_unit}')
                         #self.my_setDriver('GV4',  self.meter_unit, 25)          
                         self.ISYmeter_uom = self.water_meter_unit2uom( self.meter_unit)
-                    running = self.yoSprinkler.get_data('running', 'state')
+                    running = sprinkler.get_data('running', 'state')
                     if isinstance(running, bool):
                         logging.debug(f'water running : {running}')
                         self.my_setDriver('ST', self.state2ISY(running), type=message_type)
-                    no_water = self.yoSprinkler.get_data('noWaterWhenRunning', 'state')
+                    no_water = sprinkler.get_data('noWaterWhenRunning', 'state')
                     if isinstance(no_water, bool):
-                        logging.debug(f'water noWaterWhenRunning : {no_water}')       
+                        logging.debug(f'water noWaterWhenRunning : {no_water}')
                         self.my_setDriver('GV1', self.state2ISY(no_water), type=message_type)   
 
-                    events_happened = self.yoSprinkler.get_data('metadata')
+                    events_happened = sprinkler.get_data('metadata')
                     if isinstance(events_happened, dict) and events_happened is not {}:
                         if 'events' in events_happened:
                             events = events_happened['events']
@@ -230,8 +253,8 @@ class udiYoSprinkler2(udi_interface.Node):
                                         #self.my_setDriver('ST', self.state2ISY(event in ['WaterStart']), type=message_type)
                             if 'NoWater' in events or 'FlowProtect' in events:
                                 self.my_setDriver('GV9', 1, type=message_type, UOM=25)
-                                type = self.yoSprinkler.get_data('type', 'water')
-                                amount = self.yoSprinkler.get_data('value', 'water')
+                                type = sprinkler.get_data('type', 'water')
+                                amount = sprinkler.get_data('value', 'water')
                                 if isinstance(amount, (int,float)):
                                     if type in ['amount']:
                                         self.my_setDriver('GV7', 0, UOM=25)
@@ -249,8 +272,8 @@ class udiYoSprinkler2(udi_interface.Node):
                             eventsdata = events_happened['data']
                             logging.debug(f'events data: {eventsdata}') 
                             if isinstance(eventsdata, dict):
-                                type = self.yoSprinkler.get_data('type', 'water')
-                                amount = self.yoSprinkler.get_data('value', 'water')
+                                type = sprinkler.get_data('type', 'water')
+                                amount = sprinkler.get_data('value', 'water')
 
                                 if isinstance(amount, (int,float)):
                                     if type in ['amount']:
@@ -265,20 +288,20 @@ class udiYoSprinkler2(udi_interface.Node):
 
                         self.my_setDriver('GV10', unix_time, type=message_type, UOM=151)
                             
-                    water_amount = self.yoSprinkler.get_data('waterFlowing')
+                    water_amount = sprinkler.get_data('waterFlowing')
                     logging.debug(f'water manualWater value: {water_amount}')
                     if isinstance(water_amount, (int,float)):
                         #round(float(self.calculate_water_volume(water_amount/self.step_factor,  self.meter_unit,  self.ISYwater_unit)), 1)
                         self.my_setDriver('ST', self.state2ISY( water_amount != 0), type=message_type)
                 
-                    water_delay = self.yoSprinkler.get_data('duration', 'waterDelay')
+                    water_delay = sprinkler.get_data('duration', 'waterDelay')
                     logging.debug(f'water delay value: {water_delay}')
                     if isinstance(water_delay, (int,float)):
                         self.my_setDriver('GV12', water_delay, type=message_type, UOM=44)
 
    
-                    pwr_mode = self.yoSprinkler.get_data('powerMode')
-                    bat_lvl =  self.yoSprinkler.get_data('battery')
+                    pwr_mode = sprinkler.get_data('powerMode')
+                    bat_lvl =  sprinkler.get_data('battery')
                     logging.debug('udiYoWaterMeterController - getBattery: {},  {}  '.format(pwr_mode, bat_lvl))
                     if pwr_mode in ['PowerLine']:
                         self.my_setDriver('BATLVL', 98, 25, type=message_type)  # AC powered
@@ -286,7 +309,7 @@ class udiYoSprinkler2(udi_interface.Node):
                         self.my_setDriver('BATLVL', bat_lvl, 25, type=message_type)
     
                 
-                    if self.yoSprinkler.suspended:
+                    if sprinkler.suspended:
                         self.my_setDriver('GV20', 1, type=message_type)
                     else:
                         self.my_setDriver('GV20', 0)
@@ -307,6 +330,9 @@ class udiYoSprinkler2(udi_interface.Node):
 
     def start_stop(self, command):
         logging.info(f'udiYoSprinkler2 - start_stop {command}')
+        sprinkler = self._get_sprinkler('start_stop')
+        if sprinkler is None:
+            return
         
         #action = int(command.get('value'))
         query = command.get("query")
@@ -325,7 +351,7 @@ class udiYoSprinkler2(udi_interface.Node):
             elif mode == 1:
                 data['params']['waterMode'] = 'schedule'    
 
-        self.yoSprinkler.setDevice(data)
+        sprinkler.setDevice(data)
 
 
         #self.node.reportCmd('DON')
@@ -333,6 +359,9 @@ class udiYoSprinkler2(udi_interface.Node):
 
     def set_watermode(self, command):
         logging.info(f'set_watermode {command}')
+        sprinkler = self._get_sprinkler('set_watermode')
+        if sprinkler is None:
+            return
 
         data={}
         data['params'] = {}
@@ -343,10 +372,13 @@ class udiYoSprinkler2(udi_interface.Node):
             data['params']['waterMode'] = 'manual'
         elif mode == 1:
             data['params']['waterMode'] = 'schedule'    
-        self.yoSprinkler.setDevice(data)
+        sprinkler.setDevice(data)
 
     def set_attributes(self, command):
         logging.info(f'set_attributes {command}')
+        sprinkler = self._get_sprinkler('set_attributes')
+        if sprinkler is None:
+            return
         query = command.get("query")
         data={}
         data['params'] = {}
@@ -369,25 +401,39 @@ class udiYoSprinkler2(udi_interface.Node):
             if self.mode == 'amount':
                 if self.ISYwater_unit == 0: #gallon
                     amount = amount / 0.264172
-                amount = amount * self.step_factor
+                amount = amount * float(self.step_factor)
             data['params'] ['manualWater']['value'] = int(amount) 
            
-        self.yoSprinkler.setAttributes(data)
+        sprinkler.setAttributes(data)
 
 
     def update(self, command = None):
         logging.info('Update Status Executed')
-        self.yoSprinkler.refreshDevice()
+        sprinkler = self._get_sprinkler('update')
+        if sprinkler is None:
+            return
+        sprinkler.refreshDevice()
         # Keep schedule child node in sync when user requests UPDATE.
-        self.yoSprinkler.refreshSchedules()
+        sprinkler.refreshSchedules()
         
 
 
 
     def set_delay(self, command):
         logging.info(f'set_delay {command}')
+        sprinkler = self._get_sprinkler('set_delay')
+        if sprinkler is None:
+            return
         delay_time = int(command.get('value'))
-        self.yoSprinkler.setAttributes(delay_time)   
+        data = {
+            'params': {
+                'waterDelay': {
+                    'type': 'manual',
+                    'value': delay_time,
+                }
+            }
+        }
+        sprinkler.setAttributes(data)   
 
     commands = {
                 'UPDATE': update,

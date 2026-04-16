@@ -622,7 +622,7 @@ class udiYoMultiOutlet(udi_interface.Node):
         if self.node is not None:
             while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
-            message_type, message_action = self.yoOutlet.get_message_type()
+            message_type, message_action = self.yoMultiOutlet.get_message_type()
             if message_action in ['getSchedules', 'setSchedules']:
                 self.schedule.update_schedule_data(source_device=self.yoOutlet)
                 if self.yoOutlet.check_system_online():
