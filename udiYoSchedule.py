@@ -392,10 +392,10 @@ class BaseScheduleNode(udi_interface.Node):
         time_info = self._parse_time_string(timestr)
         
         if not time_info:
-            self.my_setDriver(hour_driver, 99)
-            self.my_setDriver(minute_driver, 99)
+            self.my_setDriver(hour_driver, 99, 25)
+            self.my_setDriver(minute_driver, 99, 25)
             if second_driver:
-                self.my_setDriver(second_driver, 99)
+                self.my_setDriver(second_driver, 99, 25)
             return
         
         hour = time_info['hour']
@@ -403,10 +403,10 @@ class BaseScheduleNode(udi_interface.Node):
         
         # 25:00 means "not set" in YoLink
         if hour == 25:
-            self.my_setDriver(hour_driver, 98)
-            self.my_setDriver(minute_driver, 98)
+            self.my_setDriver(hour_driver, 98, 25)
+            self.my_setDriver(minute_driver, 98, 25)
             if second_driver:
-                self.my_setDriver(second_driver, 98)
+                self.my_setDriver(second_driver, 98, 25)
         else:
             self.my_setDriver(hour_driver, hour, 19)
             self.my_setDriver(minute_driver, minute, 44)
@@ -559,15 +559,15 @@ class BaseScheduleNode(udi_interface.Node):
     def _clear_schedule_display(self, selected_schedule):
         """Clear all schedule drivers (no schedule selected)."""
         self.my_setDriver('GV13', selected_schedule) 
-        self.my_setDriver('GV14', 99)
-        self.my_setDriver('GV15', 99)
-        self.my_setDriver('GV16', 99)
-        self.my_setDriver('GV17', 99)
-        self.my_setDriver('GV18', 99)
+        self.my_setDriver('GV14', 99, 25)
+        self.my_setDriver('GV15', 99, 25)
+        self.my_setDriver('GV16', 99, 25)
+        self.my_setDriver('GV17', 99, 25)
+        self.my_setDriver('GV18', 99, 25)
         self.my_setDriver('GV19', 0)
         if self.support_seconds:
-            self.my_setDriver('GV21', 99)
-            self.my_setDriver('GV22', 99)
+            self.my_setDriver('GV21', 99, 25)
+            self.my_setDriver('GV22', 99, 25)
 
     def commands(self):
         """Return command dictionary. Override in subclasses."""
