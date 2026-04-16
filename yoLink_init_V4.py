@@ -435,7 +435,8 @@ class YoLinkInitPAC(object):
         logging.debug('Subscribing to topics: {} {} {}'.format(topicReq, topicResp, topicReport))
 
         if not deviceId in yoAccess.mqttList :
-            yoAccess.client.subscribe(topicReq, yoAccess.QoS)
+            # Do NOT subscribe to the device request topic to avoid receiving our own published requests.
+            # Subscribe only to responses and reports from the device.
             yoAccess.client.subscribe(topicResp, yoAccess.QoS)
             yoAccess.client.subscribe(topicReport,  yoAccess.QoS)
 
@@ -459,12 +460,11 @@ class YoLinkInitPAC(object):
 
         if  deviceId in yoAccess.mqttList :
             logging.debug('unsubscribe {}'.format(deviceId))
-            yoAccess.client.unsubscribe(yoAccess.mqttList[deviceId]['request'] )
+            # Do not unsubscribe/subscribe to request topic (we don't subscribe to it).
             yoAccess.client.unsubscribe(yoAccess.mqttList[deviceId]['response'] )
             yoAccess.client.unsubscribe(yoAccess.mqttList[deviceId]['report'] )
             
             logging.debug('re-subscribe {}'.format(deviceId))
-            yoAccess.client.subscribe(topicReq, yoAccess.QoS)
             yoAccess.client.subscribe(topicResp, yoAccess.QoS)
             yoAccess.client.subscribe(topicReport, yoAccess.QoS)
             yoAccess.mqttList[deviceId]['request'] =  topicReq
