@@ -124,7 +124,9 @@ class udiYoSprinkler2(udi_interface.Node):
         while not self.node_ready  or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 1)
+                
         self.my_setDriver('GV20', 0)
+        self.yoSprinkler = YoLinkSprinkler(self.yoAccess, self.devInfo, self.updateStatus)
         # Create schedule node before device online check
         time.sleep(2)
         self.yoSprinkler.initNode()
@@ -134,7 +136,7 @@ class udiYoSprinkler2(udi_interface.Node):
             logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(2)
             tries += 1
-        self.yoSprinkler = YoLinkSprinkler(self.yoAccess, self.devInfo, self.updateStatus)
+
 
         self.meter_unit = self.yoSprinkler.get_data('meterUnit', 'attributes')
         self.step_factor = self.yoSprinkler.get_data('meterStepFactor', 'attributes')
