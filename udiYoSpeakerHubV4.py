@@ -6,13 +6,15 @@ Polyglot TEST v3 node server
 MIT License
 """
 
+import importlib
+
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 
 from os import truncate
 import threading
@@ -167,12 +169,16 @@ class udiYoSpeakerHub(udi_interface.Node):
 
     def updateData(self):
         if self.node is not None:
-            while not self.node_ready or not self.system_ready or self.configDone:
+            while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
             speaker_hub = self._get_speaker_hub('updateData')
             if speaker_hub is None:
                 return
-            message_type, message_action = speaker_hub.get_message_type()
+            message_info = speaker_hub.get_message_type()
+            if not isinstance(message_info, tuple) or len(message_info) != 2:
+                return
+            message_type = message_info[0]
+            message_action = message_info[1]
             self.my_setDriver('TIME', speaker_hub.getLastUpdateTime(), 151)
             logging.debug(f'TIME {speaker_hub.getLastUpdateTime()}')
             if speaker_hub.check_system_online():
@@ -206,14 +212,14 @@ class udiYoSpeakerHub(udi_interface.Node):
 
 
     def setWiFi (self, command):
-        logging ('setWiFi')
+        logging.info('setWiFi')
         
     def setSSID (self, ssid):
-        logging ('setSSID')
+        logging.info('setSSID')
         self.WiFiSSID = ssid
 
     def setPassword (self, password ):
-        logging ('setPassword')
+        logging.info('setPassword')
         self.WiFipassword = password
 
     '''
@@ -257,7 +263,7 @@ class udiYoSpeakerHub(udi_interface.Node):
             return
         beepEn =int(command.get('value'))
         #self.my_setDriver('GV1', self.beepEn )
-        self.beepEnabled =  self.beepEn == 1
+        self.beepEnabled = beepEn == 1
       
         speaker_hub.setBeepEnable(self.beepEnabled )
     '''
@@ -296,7 +302,8 @@ class udiYoSpeakerHub(udi_interface.Node):
             self.tone = self.tone_list[self.tone_nbr]
             #self.my_setDriver('GV3', self.tone_nbr )
             logging.debug(f'tone: {self.tone }')
-            speaker_hub.repeat = int(query.get("repeat.uom56"))
+            self.repeat = int(query.get("repeat.uom56"))
+            speaker_hub.repeat = self.repeat
             #self.my_setDriver('GV5', self.yoSpeakerHub.repeat  )
             logging.debug(f'play: {self.message} {self.tone} {self.volume } {self.repeat}')
             speaker_hub.playAudio(self.message, self.tone,self.volume, self.repeat)

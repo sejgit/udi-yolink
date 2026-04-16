@@ -5,14 +5,15 @@ Polyglot TEST v3 node server
 
 MIT License
 """
+import importlib
 from os import truncate
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 #import sys
 import time
 from yolinkWaterDeptV3 import YoLinkWaterDeptSensor
@@ -121,61 +122,81 @@ class udiYoWaterDept(udi_interface.Node):
 
         
     def initNode(self):
-        self.yoWaterDept.refreshSensor()
+        sensor = self._get_sensor('initNode')
+        if sensor is None:
+            return
+        sensor.refreshSensor()
 
     
     def stop (self):
         logging.info('Stop udiYoWaterDept')
         self.my_setDriver('GV30', 0, True, True)
-        if getattr(self, 'yoWaterDept', None):
-            self.yoWaterDept.shut_down()
+        sensor = self._get_sensor('stop')
+        if sensor is not None:
+            sensor.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 
+    def _get_sensor(self, caller):
+        sensor = getattr(self, 'yoWaterDept', None)
+        if sensor is None:
+            logging.warning('udiYoWaterDept.%s called before device initialization', caller)
+        return sensor
+
     def checkOnline(self):
-        self.yoWaterDept.refreshDevice()
+        sensor = self._get_sensor('checkOnline')
+        if sensor is None:
+            return
+        sensor.refreshDevice()
 
     def checkDataUpdate(self):
-        if self.yoWaterDept.data_updated():
+        sensor = self._get_sensor('checkDataUpdate')
+        if sensor is None:
+            return
+        if sensor.data_updated():
             self.updateData()
 
 
     def updateData(self):
         #alarms = self.yoWaterDept.getAlarms()
         #limits = self.yoWaterDept.getLimits()
+        sensor = self._get_sensor('updateData')
+        if sensor is None:
+            return
         try:
             if self.node is not None:
                 while not self.node_ready or not self.system_ready or not self.configDone:
                     time.sleep(0.5)
-            message_type, message_action = self.yoWaterDept.get_message_type() # if event some data may not be updated 
-            unix_time = self.yoWaterDept.get_report_time('reportAt')
+            message_info = sensor.get_message_type()
+            message_type = message_info[0] if isinstance(message_info, (list, tuple)) and len(message_info) >= 1 else None
+            unix_time = sensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 
 
-            if self.yoWaterDept.check_system_online():
-                water_dept = self.yoWaterDept.get_data('waterDepth', 'state')
+            if sensor.check_system_online():
+                water_dept = sensor.get_data('waterDepth', 'state')
                 logging.debug(f"yoWaterDept : {water_dept}")
             
                 self.my_setDriver('GV0', water_dept, type=message_type)
                 self.my_setDriver('ST', water_dept, type=message_type)
-                settings_low  = self.yoWaterDept.get_data('low', 'alarmSettings')
-                settings_high  = self.yoWaterDept.get_data('high', 'alarmSettings')
+                settings_low  = sensor.get_data('low', 'alarmSettings')
+                settings_high  = sensor.get_data('high', 'alarmSettings')
                 self.my_setDriver('GV1', settings_low, 56)
                 self.my_setDriver('GV2', settings_high, 56)
-                alarms =  self.yoWaterDept.getAlarms()
-                alarm_low = self.yoWaterDept.get_data('lowAlarm', 'alarm')
-                alarm_high = self.yoWaterDept.get_data('highAlarm', 'alarm')
-                alarm_error = self.yoWaterDept.get_data('detectorError', 'alarm')
+                alarms =  sensor.getAlarms()
+                alarm_low = sensor.get_data('lowAlarm', 'alarm')
+                alarm_high = sensor.get_data('highAlarm', 'alarm')
+                alarm_error = sensor.get_data('detectorError', 'alarm')
                 self.my_setDriver('GV3', self.bool2ISY(alarm_low), type=message_type)
                 self.my_setDriver('GV4', self.bool2ISY(alarm_high), type=message_type)
                 self.my_setDriver('GV5', self.bool2ISY(alarm_error), type=message_type)
 
-                self.my_setDriver('BATLVL', self.yoWaterDept.get_data('battery', 'state'), type=message_type)
+                self.my_setDriver('BATLVL', sensor.get_data('battery', 'state'), type=message_type)
                 #logging.debug('Last  tamp {}'.format(int(self.yoWaterDept.lastUpdate()/60)))
                 #logging.debug('date tamp {}'.format(int(self.yoWaterDept.getDataTimestamp()/60)))
                 #self.my_setDriver('TIME', int(self.yoWaterDept.getDataTimestamp()/60), 44)
                 self.my_setDriver('GV30', 1)
-                if self.yoWaterDept.suspended:
+                if sensor.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
                     self.my_setDriver('GV20', 0)                    
@@ -184,7 +205,7 @@ class udiYoWaterDept(udi_interface.Node):
                 self.my_setDriver('GV20', 0)  
         except Exception as e:
                     logging.error(f'Exception updateData {e}')
-                    self.my_setDriver('TIME', int(self.yoWaterDept.getDataTimestamp()/60))       
+                    self.my_setDriver('TIME', int(sensor.getDataTimestamp()/60))       
             
 
 
@@ -202,14 +223,20 @@ class udiYoWaterDept(udi_interface.Node):
         lowAlarm= int(query.get("waterLowAlarm.uom56"))
         attribs['high'] = highAlarm
         attribs['low'] = lowAlarm
-        self.yoWaterDept.setAttributes(attribs)
+        sensor = self._get_sensor('set_attributes')
+        if sensor is None:
+            return
+        sensor.setAttributes(attribs)
         self.my_setDriver('GV1', 98, 25)
         self.my_setDriver('GV2', 98, 25)
 
 
     def update(self, command = None):
         logging.info('WaterDept Update')
-        self.yoWaterDept.refreshDevice()
+        sensor = self._get_sensor('update')
+        if sensor is None:
+            return
+        sensor.refreshDevice()
        
 
 

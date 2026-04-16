@@ -3,13 +3,15 @@
 MIT License
 """
 
+import importlib
+
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 
 from os import truncate
 from typing import Optional

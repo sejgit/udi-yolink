@@ -5,15 +5,16 @@ Polyglot TEST v3 node server
 
 MIT License
 """
+import importlib
 from os import truncate
 import threading
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 #import sys
 import time
 
@@ -147,28 +148,47 @@ class udiYoSprinkler(udi_interface.Node):
         self.start_done()
 
     def initNode(self):
-        self.yoSprinkler.refreshSensor()
+        sprinkler = self._get_sprinkler('initNode')
+        if sprinkler is None:
+            return
+        sprinkler.refreshSensor()
 
     
     def stop (self):
         logging.info('Stop udiYoSprinkler')
         self.my_setDriver('GV30', 0)
-        if getattr(self, 'yoSprinkler', None):
-            self.yoSprinkler.shut_down()
+        sprinkler = self._get_sprinkler('stop')
+        if sprinkler is not None:
+            sprinkler.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 
+    def _get_sprinkler(self, caller):
+        sprinkler = getattr(self, 'yoSprinkler', None)
+        if sprinkler is None:
+            logging.warning('udiYoSprinkler.%s called before device initialization', caller)
+        return sprinkler
+
     def checkOnline(self):
-        self.yoSprinkler.refreshDevice()
+        sprinkler = self._get_sprinkler('checkOnline')
+        if sprinkler is None:
+            return
+        sprinkler.refreshDevice()
 
     def checkDataUpdate(self):
-        if self.yoSprinkler.data_updated():
+        sprinkler = self._get_sprinkler('checkDataUpdate')
+        if sprinkler is None:
+            return
+        if sprinkler.data_updated():
             self.updateData()
 
 
     def get_alarms_state (self):
         alarm_on = False
-        alarms = self.yoSprinkler.getAlarms()
+        sprinkler = self._get_sprinkler('get_alarms_state')
+        if sprinkler is None:
+            return False
+        alarms = sprinkler.getAlarms()
         logging.debug(f'Alarms: {alarms}')
         if alarms:
             for a_type in alarms:
@@ -182,31 +202,39 @@ class udiYoSprinkler(udi_interface.Node):
         #limits = self.yoSprinkler.getLimits()
         logging.info('yoSprinkler -  updateData')
         alarm_det = False 
+        sprinkler = self._get_sprinkler('updateData')
+        if sprinkler is None:
+            return
         if self.node is not None:
             while not self.node_ready or not self.system_ready or self.configDone:
                 time.sleep(0.5)
                 
-            message_type, message_action = self.yoSprinkler.get_message_type() # if event some data may not be updated 
-            unix_time = self.yoSprinkler.get_report_time('reportAt')
+            message_info = sprinkler.get_message_type()
+            message_type = message_info[0] if isinstance(message_info, (list, tuple)) and len(message_info) >= 1 else None
+            unix_time = sprinkler.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
-            if self.yoSprinkler.check_system_online():
-                tempC = self.yoSprinkler.get_data('temperature', 'state')
-                tempLimMin = self.yoSprinkler.get_data('min', 'tempLimit')
-                tempLimMax = self.yoSprinkler.get_data('max', 'tempLimit')    
-                lowTempAlarm = self.yoSprinkler.get_data('lowTemp', 'alarms')
-                highTempAlarm = self.yoSprinkler.get_data('highTemp', 'alarms')     
+            if sprinkler.check_system_online():
+                tempC = sprinkler.get_data('temperature', 'state')
+                tempLimMin = sprinkler.get_data('min', 'tempLimit')
+                tempLimMax = sprinkler.get_data('max', 'tempLimit')    
+                lowTempAlarm = sprinkler.get_data('lowTemp', 'alarms')
+                highTempAlarm = sprinkler.get_data('highTemp', 'alarms')     
                 alarm_det = alarm_det or lowTempAlarm or highTempAlarm        
                 hum = None
+                humLimMin = None
+                humLimMax = None
+                lowHumAlarm = False
+                highHumAlarm = False
                 if 'hum' in self.meas_support:
-                    hum = self.yoSprinkler.get_data('humidity', 'state')
-                    humLimMin = self.yoSprinkler.get_data('min', 'humidityLimit')
-                    humLimMax = self.yoSprinkler.get_data('max', 'humidityLimit') 
-                    lowHumAlarm = self.yoSprinkler.get_data('lowHumidity', 'alarms')
-                    highHumAlarm = self.yoSprinkler.get_data('highHumidity', 'alarms')  
+                    hum = sprinkler.get_data('humidity', 'state')
+                    humLimMin = sprinkler.get_data('min', 'humidityLimit')
+                    humLimMax = sprinkler.get_data('max', 'humidityLimit') 
+                    lowHumAlarm = sprinkler.get_data('lowHumidity', 'alarms')
+                    highHumAlarm = sprinkler.get_data('highHumidity', 'alarms')  
                     alarm_det = alarm_det or lowHumAlarm or highHumAlarm
-                tempMeasMin, tempMeasMax, humMeasMin, humMeasMax = self.yoSprinkler.update_data_24_hours(unix_time, tempC, hum)
-                bat_lvl = self.yoSprinkler.get_data('battery', 'state')
-                bat_alarm = self.yoSprinkler.get_data('batteryLow', 'alarms')
+                tempMeasMin, tempMeasMax, humMeasMin, humMeasMax = sprinkler.update_data_24_hours(unix_time, tempC, hum)
+                bat_lvl = sprinkler.get_data('battery', 'state')
+                bat_alarm = sprinkler.get_data('batteryLow', 'alarms')
                 #tempMeas = self.yoSprinkler.get_data('temperature', 'statistics')
                 #if isinstance(tempMeas, dict):
                 #    tempMeasMin = tempMeas.get('min', None)
@@ -247,8 +275,8 @@ class udiYoSprinkler(udi_interface.Node):
    
                 
             
-                self.my_setDriver('GV1', self.yoSprinkler.bool2Nbr(lowTempAlarm), type=message_type)
-                self.my_setDriver('GV2', self.yoSprinkler.bool2Nbr(highTempAlarm), type=message_type)
+                self.my_setDriver('GV1', sprinkler.bool2Nbr(lowTempAlarm), type=message_type)
+                self.my_setDriver('GV2', sprinkler.bool2Nbr(highTempAlarm), type=message_type)
 
                 if 'hum' in self.meas_support:
                     if isinstance(hum,(int,float)):
@@ -258,8 +286,8 @@ class udiYoSprinkler(udi_interface.Node):
                         self.my_setDriver('GV13', humLimMax, 51, type=message_type)
                         self.my_setDriver('GV16', humMeasMin, 51, type=message_type)
                         self.my_setDriver('GV17', humMeasMax, 51, type=message_type)
-                    self.my_setDriver('GV4', self.yoSprinkler.bool2Nbr(lowHumAlarm), type=message_type)
-                    self.my_setDriver('GV5', self.yoSprinkler.bool2Nbr(highHumAlarm), type=message_type)
+                    self.my_setDriver('GV4', sprinkler.bool2Nbr(lowHumAlarm), type=message_type)
+                    self.my_setDriver('GV5', sprinkler.bool2Nbr(highHumAlarm), type=message_type)
                     if alarm_det or lowHumAlarm or highHumAlarm:
                         alarm_det = True
                 else:
@@ -273,7 +301,7 @@ class udiYoSprinkler(udi_interface.Node):
 
 
                 self.my_setDriver('BATLVL', bat_lvl, 25, type=message_type)
-                self.my_setDriver('GV7', self.yoSprinkler.bool2Nbr(bat_alarm))
+                self.my_setDriver('GV7', sprinkler.bool2Nbr(bat_alarm))
                 alarm_det = alarm_det or bat_alarm
 
                 if alarm_det != self.alarm_state:
@@ -284,12 +312,12 @@ class udiYoSprinkler(udi_interface.Node):
                     self.alarm_state = alarm_det                
 
 
-                    self.my_setDriver('GV8', self.yoSprinkler.bool2Nbr(self.alarm_state))
+                    self.my_setDriver('GV8', sprinkler.bool2Nbr(self.alarm_state))
                     self.my_setDriver('GV9', self.cmd_state)
 
                 self.my_setDriver('GV30', 1)
 
-                if self.yoSprinkler.suspended:
+                if sprinkler.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
                     self.my_setDriver('GV20', 0)                
@@ -301,11 +329,14 @@ class udiYoSprinkler(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.debug('udiYoSprinkler - updateStatus')
+        sprinkler = self._get_sprinkler('updateStatus')
+        if sprinkler is None:
+            return
         if self.node is not None:
             while not self.node_ready or not self.system_ready:
                 time.sleep(0.5)
         with self._update_lock:
-            self.yoSprinkler.updateStatus(data)
+            sprinkler.updateStatus(data)
             self.updateData()
 
     def set_cmd(self, command):
@@ -317,7 +348,10 @@ class udiYoSprinkler(udi_interface.Node):
 
     def update(self, command = None):
         logging.info('THsensor Update')
-        self.yoSprinkler.refreshDevice()
+        sprinkler = self._get_sprinkler('update')
+        if sprinkler is None:
+            return
+        sprinkler.refreshDevice()
        
     commands = {
                 'SETCMD': set_cmd,             

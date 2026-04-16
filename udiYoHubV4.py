@@ -6,13 +6,15 @@ Polyglot TEST v3 node server
 MIT License
 """
 
+import importlib
+
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 
 from os import truncate
 import threading
@@ -102,31 +104,48 @@ class udiYoBatteryHub(udi_interface.Node):
         #self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
 
-        if getattr(self, 'yoHub', None):
-            self.yoHub.shut_down()
+        hub = self._get_hub('stop')
+        if hub is not None:
+            hub.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 
+    def _get_hub(self, caller):
+        hub = getattr(self, 'yoHub', None)
+        if hub is None:
+            logging.warning('udiYoBatteryHub.%s called before device initialization', caller)
+        return hub
+
 
     def checkOnline(self):
-        self.yoHub.refreshDevice() 
+        hub = self._get_hub('checkOnline')
+        if hub is None:
+            return
+        hub.refreshDevice() 
 
     def checkDataUpdate(self):
-        if self.yoHub.data_updated():
+        hub = self._get_hub('checkDataUpdate')
+        if hub is None:
+            return
+        if hub.data_updated():
             self.updateData()
 
 
     def updateData(self):
+        hub = self._get_hub('updateData')
+        if hub is None:
+            return
         if self.node is not None:
             while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
 
-            if self.yoHub.check_system_online():
-                message_type, message_action = self.yoHub.get_message_type()
+            if hub.check_system_online():
+                message_info = hub.get_message_type()
+                message_type = message_info[0] if isinstance(message_info, (list, tuple)) and len(message_info) >= 1 else None
                 #pwr_info = self.yoHub.getPowerInfo()
-                dc_power = self.yoHub.get_data('dc', 'power')
+                dc_power = hub.get_data('dc', 'power')
                 #battery_exists = self.yoHub.get_data('battery', 'power')
-                battery_state = self.yoHub.get_data('batteryState', 'power')
+                battery_state = hub.get_data('batteryState', 'power')
                 if isinstance(dc_power, bool):
                     if dc_power:
                         self.my_setDriver('ST', 1, type=message_type)
@@ -137,7 +156,7 @@ class udiYoBatteryHub(udi_interface.Node):
                 if  isinstance(battery_state, int):
                         self.my_setDriver('GV0', battery_state, type=message_type)  
                 self.my_setDriver('GV30', 1, type=message_type)
-                if self.yoHub.suspended:
+                if hub.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
                     self.my_setDriver('GV20', 0)
@@ -156,7 +175,10 @@ class udiYoBatteryHub(udi_interface.Node):
 
     def update(self, command = None):
         logging.info('udiYoHub Update Status')
-        self.yoHub.refreshDevice()
+        hub = self._get_hub('update')
+        if hub is None:
+            return
+        hub.refreshDevice()
         #self.yoHub.refreshSchedules()     
 
 
@@ -249,26 +271,43 @@ class udiYoHub(udi_interface.Node):
         self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
 
-        if getattr(self, 'yoHub', None):
-            self.yoHub.shut_down()
+        hub = self._get_hub('stop')
+        if hub is not None:
+            hub.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 
+    def _get_hub(self, caller):
+        hub = getattr(self, 'yoHub', None)
+        if hub is None:
+            logging.warning('udiYoHub.%s called before device initialization', caller)
+        return hub
+
 
     def checkOnline(self):
-        self.yoHub.refreshDevice() 
+        hub = self._get_hub('checkOnline')
+        if hub is None:
+            return
+        hub.refreshDevice() 
 
     def checkDataUpdate(self):
-        if self.yoHub.data_updated():
+        hub = self._get_hub('checkDataUpdate')
+        if hub is None:
+            return
+        if hub.data_updated():
             self.updateData()
 
     def updateData(self):
+        hub = self._get_hub('updateData')
+        if hub is None:
+            return
         if self.node is not None:
             while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
 
-            message_type, message_action = self.yoHub.get_message_type()
-            if self.yoHub.check_system_online():
+            message_info = hub.get_message_type()
+            message_type = message_info[0] if isinstance(message_info, (list, tuple)) and len(message_info) >= 1 else None
+            if hub.check_system_online():
                 #if state == 'ON':
                 #    self.my_setDriver('GV0', 1, True, True)
                 #elif  state == 'OFF':
@@ -277,7 +316,7 @@ class udiYoHub(udi_interface.Node):
                 #    self.my_setDriver('GV0', 99, True, True)
                 self.my_setDriver('ST', 1, type=message_type)
                 self.my_setDriver('GV30', 1, type=message_type)
-                if self.yoHub.suspended:
+                if hub.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
                     self.my_setDriver('GV20', 0)
@@ -298,7 +337,10 @@ class udiYoHub(udi_interface.Node):
 
     def update(self, command = None):
         logging.info('udiYoHub Update Status')
-        self.yoHub.refreshDevice()
+        hub = self._get_hub('update')
+        if hub is None:
+            return
+        hub.refreshDevice()
         #self.yoHub.refreshSchedules()     
 
 

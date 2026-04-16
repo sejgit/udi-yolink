@@ -5,15 +5,16 @@ Polyglot TEST v3 node server
 
 MIT License
 """
+import importlib
 from os import truncate
 import threading
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 #import sys
 import time
 from yolinkGarageFingerToggleV2 import YoLinkGarageFingerCtrl
@@ -84,7 +85,10 @@ class udiYoGarageFinger(udi_interface.Node):
         self.start_done()
 
     def initNode(self):
-        self.yoDoorControl.online = True
+        door_control = self._get_door_control('initNode')
+        if door_control is None:
+            return
+        door_control.online = True
         #self.my_setDriver('ST',1)
         
     def checkOnline(self):

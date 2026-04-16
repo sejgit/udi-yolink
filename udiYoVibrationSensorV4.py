@@ -5,15 +5,16 @@ Polyglot TEST v3 node server
 
 MIT License
 """
+import importlib
 from os import truncate
 import threading
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 
 import time
 from yolinkVibrationSensorV3 import YoLinkVibrationSensor
@@ -111,28 +112,45 @@ class udiYoVibrationSensor(udi_interface.Node):
         logging.info('Stop udiYoVibrationSensor')
         #self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
-        if getattr(self, 'yoVibrationSensor', None):
-            self.yoVibrationSensor.shut_down()
+        sensor = self._get_sensor('stop')
+        if sensor is not None:
+            sensor.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 
+    def _get_sensor(self, caller):
+        sensor = getattr(self, 'yoVibrationSensor', None)
+        if sensor is None:
+            logging.warning('udiYoVibrationSensor.%s called before device initialization', caller)
+        return sensor
+
     def checkOnline(self):
-        self.yoVibrationSensor.refreshDevice()   
+        sensor = self._get_sensor('checkOnline')
+        if sensor is None:
+            return
+        sensor.refreshDevice()   
     
     def checkDataUpdate(self):
-        if self.yoVibrationSensor.data_updated():
+        sensor = self._get_sensor('checkDataUpdate')
+        if sensor is None:
+            return
+        if sensor.data_updated():
             self.updateData()
 
 
     def updateData(self):
+            sensor = self._get_sensor('updateData')
+            if sensor is None:
+                return
             if self.node is not None:
                 while not self.node_ready or not self.system_ready or not self.configDone:
                     time.sleep(0.5)
-            message_type, message_action = self.yoVibrationSensor.get_message_type() # if event some data may not be updated 
-            unix_time = self.yoVibrationSensor.get_report_time('reportAt')
+            message_info = sensor.get_message_type()
+            message_type = message_info[0] if isinstance(message_info, (list, tuple)) and len(message_info) >= 1 else None
+            unix_time = sensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
-            if self.yoVibrationSensor.check_system_online():               
-                vib_state = self.yoVibrationSensor.get_data('state', 'state')
+            if sensor.check_system_online():               
+                vib_state = sensor.get_data('state', 'state')
                 if vib_state == ['normal'] :
                     self.my_setDriver('GV0', 1, type=message_type)
                     self.my_setDriver('ST', 1, type=message_type)
@@ -149,10 +167,10 @@ class udiYoVibrationSensor(udi_interface.Node):
                     self.my_setDriver('GV0', 99) 
                     self.my_setDriver('ST', 99)
                     self.last_state = 99
-                self.my_setDriver('GV1', self.yoVibrationSensor.get_data( 'battery', 'state'), type=message_type)
+                self.my_setDriver('GV1', sensor.get_data( 'battery', 'state'), type=message_type)
 
                 self.my_setDriver('GV30', 1)
-                devTemp =  self.yoVibrationSensor.get_data('devTemperature', 'state')
+                devTemp =  sensor.get_data('devTemperature', 'state')
                 if devTemp != 'NA':
                     if self.temp_unit == 0:
                         self.my_setDriver('CLITEMP', round(devTemp,0), 4, type=message_type)
@@ -160,7 +178,7 @@ class udiYoVibrationSensor(udi_interface.Node):
                         self.my_setDriver('CLITEMP', round(devTemp*9/5+32,0), 17, type=message_type)
                 else:
                     self.my_setDriver('CLITEMP', 99,  25)
-                if self.yoVibrationSensor.suspended:
+                if sensor.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
                     self.my_setDriver('GV20', 0)
@@ -191,7 +209,10 @@ class udiYoVibrationSensor(udi_interface.Node):
 
     def update(self, command = None):
         logging.info('udiYoVibrationSensor Update  Executed')
-        self.yoVibrationSensor.refreshSensor()
+        sensor = self._get_sensor('update')
+        if sensor is None:
+            return
+        sensor.refreshSensor()
        
 
     def noop(self, command = None):

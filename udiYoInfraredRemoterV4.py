@@ -3,13 +3,15 @@
 MIT License
 """
 
+import importlib
+
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 
 from ctypes import set_errno
 from os import truncate
@@ -76,20 +78,32 @@ class udiYoInfraredCode(udi_interface.Node):
 
 
     def checkDataUpdate(self):
-        if self.yoIRrem.data_updated():
+        remote = self._get_remote('checkDataUpdate')
+        if remote is None:
+            return
+        if remote.data_updated():
             self.updateData()
+
+    def _get_remote(self, caller):
+        remote = getattr(self, 'yoIRrem', None)
+        if remote is None:
+            logging.warning('udiYoInfraredCode.%s called before infrared-remote initialization', caller)
+        return remote
             
     def checkOnline(self):
         pass  #is it a sub node - do nothing
 
     def updateData(self):
+        remote = self._get_remote('updateData')
+        if remote is None:
+            return
         if self.node is not None:
             #while not self.node_ready or not self.system_ready:
             #    time.sleep(0.5)
             #logging.debug('updateData - {}'.format(self.yoIRrem.check_system_online()))
-            self.my_setDriver('TIME', self.yoIRrem.getLastUpdateTime(), 151)
+            self.my_setDriver('TIME', remote.getLastUpdateTime(), 151)
             #self.my_setDriver('ST', 0)
-            if self.yoIRrem.suspended:
+            if remote.suspended:
                 self.my_setDriver('GV20', 1)
             else:
                 self.my_setDriver('GV20', 0)
@@ -103,14 +117,17 @@ class udiYoInfraredCode(udi_interface.Node):
     def send_IRcode(self, command=None):
         try:
             logging.info('udiIRremote send_IRcode')
-            if self.yoIRrem.send_code( self.code):
+            remote = self._get_remote('send_IRcode')
+            if remote is None:
+                return
+            if remote.send_code( self.code):
                 #time.sleep(0.5)
                 #res = self.yoIRrem.get_send_status()
                 #while res is {} and self.yoIRrem.check_system_online():
                 time.sleep(1)
                 #res = self.yoIRrem.get_send_status()
                 #logging.debug(f'Send code {self.code} {res}')
-                if self.yoIRrem.get_data('success') and self.yoIRrem.get_data('key') == self.code:
+                if remote.get_data('success') and remote.get_data('key') == self.code:
                     logging.info('Code {} sent successfully'.format(self.code))
                     self.node.reportCmd('DON')  
                     self.my_setDriver('ST', 1)
@@ -284,13 +301,23 @@ class udiYoInfraredRemoter(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiIRremote')
         self.my_setDriver('ST', 0)
-        if getattr(self, 'yoIRrem', None):
-            self.yoIRrem.shut_down()
+        remote = self._get_remote('stop')
+        if remote is not None:
+            remote.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 
+    def _get_remote(self, caller):
+        remote = getattr(self, 'yoIRrem', None)
+        if remote is None:
+            logging.warning('udiYoInfraredRemoter.%s called before device initialization', caller)
+        return remote
+
     def checkDataUpdate(self):
-        if self.yoIRrem.data_updated():
+        remote = self._get_remote('checkDataUpdate')
+        if remote is None:
+            return
+        if remote.data_updated():
             self.updateData()
 
     def checkNameSync(self):
@@ -312,29 +339,35 @@ class udiYoInfraredRemoter(udi_interface.Node):
 
 
     def updateData(self):
+        remote = self._get_remote('updateData')
+        if remote is None:
+            return
+        message_type = None
         if self.node is not None:
             while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
-            logging.debug('updateData - {}'.format(self.yoIRrem.check_system_online()))
-            message_type, message_action = self.yoIRrem.get_message_type()
-            unix_time = self.yoIRrem.get_report_time('reportAt')
+            logging.debug('updateData - {}'.format(remote.check_system_online()))
+            message_info = remote.get_message_type()
+            message_type = message_info[0] if isinstance(message_info, (list, tuple)) and len(message_info) >= 1 else None
+            message_action = message_info[1] if isinstance(message_info, (list, tuple)) and len(message_info) >= 2 else None
+            unix_time = remote.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 
             if message_type and 'Schedules' in str(message_type):
                 if self.schedule is not None:
-                    self.schedule.update_schedule_data(source_device=self.yoIRrem)
+                    self.schedule.update_schedule_data(source_device=remote)
                 return
 
-        if  self.yoIRrem.check_system_online():
-            res = self.yoIRrem.get_status_code()
+        if  remote.check_system_online():
+            res = remote.get_status_code()
             logging.debug(f'IR remote status code: {res}')
             self.my_setDriver('ST', self.err_code2nbr(res), type=message_type)
             self.my_setDriver('GV0',len(self.codes_used) )                 
-            self.my_setDriver('GV1',self.yoIRrem.get_data('battery'), type=message_type)
+            self.my_setDriver('GV1',remote.get_data('battery'), type=message_type)
             self.my_setDriver('GV2',self.err_code2nbr(res), type=message_type)
 
             self.my_setDriver('GV30', 1)
-            if self.yoIRrem.suspended:
+            if remote.suspended:
                 self.my_setDriver('GV20', 1)
             else:
                 self.my_setDriver('GV20', 0)
@@ -348,31 +381,38 @@ class udiYoInfraredRemoter(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('udiIRremote updateStatus')
-        if self.yoIRrem is not None:
+        remote = self._get_remote('updateStatus')
+        if remote is not None:
             with self._update_lock:
-                self.yoIRrem.updateStatus(data)
+                remote.updateStatus(data)
                 self.updateData()
                 #res = self.yoIRrem.getIRstatus_info()
                 #logging.debug(f'IR status info: {res}')
                 logging.debug(f'Code nodes: {self.code_nodes}')
-                update_type = self.yoIRrem.get_info('type')
-                action = self.yoIRrem.get_info('action')
+                update_type = remote.get_info('type')
+                action = remote.get_info('action')
                 if action in ['send', 'report'] or update_type == 'event':
-                    res_code = self.yoIRrem.get_data('key')
+                    res_code = remote.get_data('key')
                     if isinstance(res_code, int) and res_code in self.code_nodes:
                         logging.debug(f'Updating code node {res_code}')
                         self.code_nodes[res_code].updateData()
                     
     def checkOnline(self):
-        self.yoIRrem.refreshDevice()
+        remote = self._get_remote('checkOnline')
+        if remote is None:
+            return
+        remote.refreshDevice()
 
 
     def update(self, command = None):
         logging.info('Update Status Executed')
         self.saveCurrentNodeNames()
-        self.yoIRrem.refreshDevice()
+        remote = self._get_remote('update')
+        if remote is None:
+            return
+        remote.refreshDevice()
         # Keep schedule child node in sync when UPDATE is requested.
-        self.yoIRrem.refreshSchedules()
+        remote.refreshSchedules()
     
     
     def find_next_code(self):  
@@ -385,7 +425,10 @@ class udiYoInfraredRemoter(udi_interface.Node):
     
     def learn_IRcode(self, command=None):
         logging.info('udiIRremote learn_IRcode')
-        if self.yoIRrem.nbr_codes < 64:
+        remote = self._get_remote('learn_IRcode')
+        if remote is None:
+            return
+        if remote.nbr_codes < 64:
             code = self.find_next_code()
             if  not isinstance(code, int):
                 logging.info('Maximum number of codes already learned')
@@ -393,14 +436,14 @@ class udiYoInfraredRemoter(udi_interface.Node):
             self.codes_used.append(code)
             logging.info(f'Learning code {code}')
 
-            self.yoIRrem.learn(code)
+            remote.learn(code)
             time.sleep(1)
-            res = self.yoIRrem.check_learn_completed(code)
+            res = remote.check_learn_completed(code)
             logging.debug(f'Initial learn res: {res}')  
             attempts = 1
             while res in ['learning', 'ignore'] and attempts < 10:
                 time.sleep(1)
-                res = self.yoIRrem.check_learn_completed(code)
+                res = remote.check_learn_completed(code)
                 attempts += 1   
                 logging.debug(f'Learn res: {res}')  
 
@@ -409,7 +452,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
                 logging.info(f'Code {code} learned - creating new node')
                 self.add_code_node(code)
                                                                    
-                self.yoIRrem.refreshDevice()
+                remote.refreshDevice()
                 #self.updateData()
             else:
                 logging.info('Unsuccessful learn of code {}'.format(code))

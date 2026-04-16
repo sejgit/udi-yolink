@@ -3,13 +3,15 @@
 MIT License
 """
 
+import importlib
+
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 
 from os import truncate
 import threading
@@ -165,7 +167,11 @@ class udiYoManipulator(udi_interface.Node):
             manipulator = self._get_manipulator('updateData')
             if manipulator is None:
                 return
-            message_type, message_action  = manipulator.get_message_type()
+            message_info = manipulator.get_message_type()
+            if not isinstance(message_info, tuple) or len(message_info) != 2:
+                return
+            message_type = message_info[0]
+            message_action = message_info[1]
             if message_action in ['getSchedules', 'setSchedules']:
                 if self.schedule is not None:
                     self.schedule.update_schedule_data(source_device=manipulator)

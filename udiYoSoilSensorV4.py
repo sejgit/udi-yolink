@@ -5,15 +5,16 @@ Polyglot TEST v3 node server
 
 MIT License
 """
+import importlib
 from os import truncate
 import threading
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 #import sys
 import time
 
@@ -139,28 +140,47 @@ class udiYoSoilSensor(udi_interface.Node):
         self.start_done()
 
     def initNode(self):
-        self.yoSoilSensor.refreshSensor()
+        sensor = self._get_sensor('initNode')
+        if sensor is None:
+            return
+        sensor.refreshSensor()
 
     
     def stop (self):
         logging.info('Stop udiYoSoilSensor')
         self.my_setDriver('GV30', 0)
-        if getattr(self, 'yoSoilSensor', None):
-            self.yoSoilSensor.shut_down()
+        sensor = self._get_sensor('stop')
+        if sensor is not None:
+            sensor.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 
+    def _get_sensor(self, caller):
+        sensor = getattr(self, 'yoSoilSensor', None)
+        if sensor is None:
+            logging.warning('udiYoSoilSensor.%s called before device initialization', caller)
+        return sensor
+
     def checkOnline(self):
-        self.yoSoilSensor.refreshDevice()
+        sensor = self._get_sensor('checkOnline')
+        if sensor is None:
+            return
+        sensor.refreshDevice()
 
     def checkDataUpdate(self):
-        if self.yoSoilSensor.data_updated():
+        sensor = self._get_sensor('checkDataUpdate')
+        if sensor is None:
+            return
+        if sensor.data_updated():
             self.updateData()
 
 
     def get_alarms_state (self):
         alarm_on = False
-        alarms = self.yoSoilSensor.getAlarms()
+        sensor = self._get_sensor('get_alarms_state')
+        if sensor is None:
+            return False
+        alarms = sensor.getAlarms()
         logging.debug(f'Alarms: {alarms}')
         if alarms:
             for a_type in alarms:
@@ -174,25 +194,29 @@ class udiYoSoilSensor(udi_interface.Node):
         #limits = self.yoSoilSensor.getLimits()
         logging.info('yoSoilSensor -  updateData')
         alarm_det = False 
+        sensor = self._get_sensor('updateData')
+        if sensor is None:
+            return
         if self.node is not None:
             while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)                
-            message_type, message_action = self.yoSoilSensor.get_message_type() # if event some data may not be updated 
-            unix_time = self.yoSoilSensor.get_report_time('reportAt')
+            message_info = sensor.get_message_type()
+            message_type = message_info[0] if isinstance(message_info, (list, tuple)) and len(message_info) >= 1 else None
+            unix_time = sensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
-            if self.yoSoilSensor.check_system_online():
-                conductivity = self.yoSoilSensor.get_data('conductivity', 'state')
-                lowCondAlarm = self.yoSoilSensor.get_data('lowConductivity', 'alarm')
-                highCondAlarm = self.yoSoilSensor.get_data('highConductivity', 'alarm')
+            if sensor.check_system_online():
+                conductivity = sensor.get_data('conductivity', 'state')
+                lowCondAlarm = sensor.get_data('lowConductivity', 'alarm')
+                highCondAlarm = sensor.get_data('highConductivity', 'alarm')
                 alarm_det = alarm_det or lowCondAlarm or highCondAlarm
                 if isinstance(conductivity, (int, float)):
                     self.my_setDriver('ST', round(conductivity/1000,1),  70, type=message_type)
                 else:
                     self.my_setDriver('ST', 99,  25)
-                self.my_setDriver('GV1', self.yoSoilSensor.bool2Nbr(lowCondAlarm), type=message_type)
-                self.my_setDriver('GV2', self.yoSoilSensor.bool2Nbr(highCondAlarm), type=message_type) 
-                min_conduct = self.yoSoilSensor.get_data('min', 'conductivityLimit')
-                max_conduct = self.yoSoilSensor.get_data('max', 'conductivityLimit')
+                self.my_setDriver('GV1', sensor.bool2Nbr(lowCondAlarm), type=message_type)
+                self.my_setDriver('GV2', sensor.bool2Nbr(highCondAlarm), type=message_type) 
+                min_conduct = sensor.get_data('min', 'conductivityLimit')
+                max_conduct = sensor.get_data('max', 'conductivityLimit')
                 if isinstance(min_conduct, (int, float)):
                     self.my_setDriver('GV14', round(min_conduct/1000,1),  70, type=message_type)
                 else:
@@ -201,11 +225,11 @@ class udiYoSoilSensor(udi_interface.Node):
                     self.my_setDriver('GV15', round(max_conduct/1000,1),  70, type=message_type)    
                 else:
                     self.my_setDriver('GV15', 99,  25)
-                tempC = self.yoSoilSensor.get_data('temperature', 'state')
-                tempLimMin = self.yoSoilSensor.get_data('min', 'tempLimit')
-                tempLimMax = self.yoSoilSensor.get_data('max', 'tempLimit')    
-                lowTempAlarm = self.yoSoilSensor.get_data('lowTemp', 'alarm')
-                highTempAlarm = self.yoSoilSensor.get_data('highTemp', 'alarm')     
+                tempC = sensor.get_data('temperature', 'state')
+                tempLimMin = sensor.get_data('min', 'tempLimit')
+                tempLimMax = sensor.get_data('max', 'tempLimit')    
+                lowTempAlarm = sensor.get_data('lowTemp', 'alarm')
+                highTempAlarm = sensor.get_data('highTemp', 'alarm')     
                 if isinstance(tempC, (int, float)):
                     if self.temp_unit == 0:
                         self.my_setDriver('CLITEMP', round(tempC,1),  4, type=message_type)
@@ -227,14 +251,14 @@ class udiYoSoilSensor(udi_interface.Node):
                     self.my_setDriver('ST', 99,  25)
                     self.my_setDriver('GV10', 99, 25)
                     self.my_setDriver('GV11', 99, 25)            
-                self.my_setDriver('GV3', self.yoSoilSensor.bool2Nbr(lowTempAlarm), type=message_type)
-                self.my_setDriver('GV4', self.yoSoilSensor.bool2Nbr(highTempAlarm), type=message_type)
+                self.my_setDriver('GV3', sensor.bool2Nbr(lowTempAlarm), type=message_type)
+                self.my_setDriver('GV4', sensor.bool2Nbr(highTempAlarm), type=message_type)
 
-                hum = self.yoSoilSensor.get_data('humidity', 'state')
-                humLimMin = self.yoSoilSensor.get_data('min', 'humidityLimit')
-                humLimMax = self.yoSoilSensor.get_data('max', 'humidityLimit') 
-                lowHumAlarm = self.yoSoilSensor.get_data('lowHumidity', 'alarm')
-                highHumAlarm = self.yoSoilSensor.get_data('highHumidity', 'alarm')  
+                hum = sensor.get_data('humidity', 'state')
+                humLimMin = sensor.get_data('min', 'humidityLimit')
+                humLimMax = sensor.get_data('max', 'humidityLimit') 
+                lowHumAlarm = sensor.get_data('lowHumidity', 'alarm')
+                highHumAlarm = sensor.get_data('highHumidity', 'alarm')  
                 alarm_det = alarm_det or lowHumAlarm or highHumAlarm
 
                 if isinstance(hum,(int,float)):
@@ -248,17 +272,17 @@ class udiYoSoilSensor(udi_interface.Node):
                     self.my_setDriver('GV12', 99, 25)
                     self.my_setDriver('GV13', 99, 25)      
 
-                self.my_setDriver('GV5', self.yoSoilSensor.bool2Nbr(lowHumAlarm), type=message_type)
-                self.my_setDriver('GV6', self.yoSoilSensor.bool2Nbr(highHumAlarm), type=message_type)
+                self.my_setDriver('GV5', sensor.bool2Nbr(lowHumAlarm), type=message_type)
+                self.my_setDriver('GV6', sensor.bool2Nbr(highHumAlarm), type=message_type)
 
 
 
 
-                periodAlarm = self.yoSoilSensor.get_data('period', 'alarm')
+                periodAlarm = sensor.get_data('period', 'alarm')
                 alarm_det = alarm_det or periodAlarm
-                self.my_setDriver('GV7', self.yoSoilSensor.bool2Nbr(periodAlarm), type=message_type)
-                self.my_setDriver('GV8', self.yoSoilSensor.bool2Nbr(alarm_det), type=message_type)                
-                bat_lvl = self.yoSoilSensor.get_data('battery')
+                self.my_setDriver('GV7', sensor.bool2Nbr(periodAlarm), type=message_type)
+                self.my_setDriver('GV8', sensor.bool2Nbr(alarm_det), type=message_type)                
+                bat_lvl = sensor.get_data('battery')
                 self.my_setDriver('BATLVL', bat_lvl, 25, type=message_type)
 
 
@@ -272,7 +296,7 @@ class udiYoSoilSensor(udi_interface.Node):
 
                 self.my_setDriver('GV30', 1)
 
-                if self.yoSoilSensor.suspended:
+                if sensor.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
                     self.my_setDriver('GV20', 0)                
@@ -298,7 +322,10 @@ class udiYoSoilSensor(udi_interface.Node):
 
     def update(self, command = None):
         logging.info('THsensor Update')
-        self.yoSoilSensor.refreshDevice()
+        sensor = self._get_sensor('update')
+        if sensor is None:
+            return
+        sensor.refreshDevice()
        
     commands = {
                 'SETCMD': set_cmd,             

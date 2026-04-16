@@ -5,17 +5,18 @@ Polyglot TEST v3 node server
 
 MIT License
 """
+import importlib
 import time
 import threading
 from yolinkDoorSensorV3 import YoLinkDoorSensor
 
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 
 
 class udiYoDoorSensor(udi_interface.Node):
@@ -110,13 +111,23 @@ class udiYoDoorSensor(udi_interface.Node):
         logging.info('Stop - udiYoDoorSensor')
         #self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
-        if getattr(self, 'yoDoorSensor', None):
-            self.yoDoorSensor.shut_down()
+        sensor = self._get_sensor('stop')
+        if sensor is not None:
+            sensor.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 
+    def _get_sensor(self, caller):
+        sensor = getattr(self, 'yoDoorSensor', None)
+        if sensor is None:
+            logging.warning('udiYoDoorSensor.%s called before device initialization', caller)
+        return sensor
+
     def doorState(self):
-        state = self.yoDoorSensor.get_data('state','state')
+        sensor = self._get_sensor('doorState')
+        if sensor is None:
+            return None
+        state = sensor.get_data('state','state')
 
         if isinstance(state, str) and state.lower() == 'closed':
             return(0)
@@ -127,23 +138,33 @@ class udiYoDoorSensor(udi_interface.Node):
     
     def checkOnline(self):
         # only gets the casched status (battery operated device)
-        self.yoDoorSensor.refreshDevice()
+        sensor = self._get_sensor('checkOnline')
+        if sensor is None:
+            return
+        sensor.refreshDevice()
        
     def checkDataUpdate(self):
-        if self.yoDoorSensor.data_updated():
+        sensor = self._get_sensor('checkDataUpdate')
+        if sensor is None:
+            return
+        if sensor.data_updated():
             self.updateData()
 
 
 
     def updateData(self):
+        sensor = self._get_sensor('updateData')
+        if sensor is None:
+            return
         if self.node is not None:
             while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
-            message_type, message_action = self.yoDoorSensor.get_message_type() # if event some data may not be updated 
-            unix_time = self.yoDoorSensor.get_report_time('reportAt')
+            message_info = sensor.get_message_type()
+            message_type = message_info[0] if isinstance(message_info, (list, tuple)) and len(message_info) >= 1 else None
+            unix_time = sensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 
-            if self.yoDoorSensor.check_system_online():
+            if sensor.check_system_online():
                 doorstate = self.doorState()
                 if doorstate == 1:
                     self.my_setDriver('GV0', 1 )
@@ -159,10 +180,10 @@ class udiYoDoorSensor(udi_interface.Node):
                     self.my_setDriver('GV0', 99 )
                     self.my_setDriver('ST', 99 )
                 self.last_state = doorstate
-                self.my_setDriver('GV1', self.yoDoorSensor.getBattery())
+                self.my_setDriver('GV1', sensor.getBattery())
                 self.my_setDriver('GV2', self.cmd_state)
                 #self.my_setDriver('ST', 1)
-                state_change = self.yoDoorSensor.get_data('stateChangedAt', 'state')
+                state_change = sensor.get_data('stateChangedAt', 'state')
                 logging.debug('state_change : {}'.format(state_change))
                 if state_change is not None:
                     self.my_setDriver('GV3', int(state_change/1000), type=message_type)
@@ -171,7 +192,7 @@ class udiYoDoorSensor(udi_interface.Node):
 
 
                 self.my_setDriver('GV30', 1)
-                if self.yoDoorSensor.suspended:
+                if sensor.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
                     self.my_setDriver('GV20', 0)
@@ -203,7 +224,10 @@ class udiYoDoorSensor(udi_interface.Node):
 
     def update(self, command = None):
         logging.info('{} - Update Status Executed'.format(self.name))
-        self.yoDoorSensor.refreshDevice()
+        sensor = self._get_sensor('update')
+        if sensor is None:
+            return
+        sensor.refreshDevice()
        
     def noop(self, command = None):
         pass

@@ -5,15 +5,16 @@ Polyglot TEST v3 node server
 
 MIT License
 """
+import importlib
 from os import truncate
 import threading
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 
 import time
 from yolinkPowerFailV3 import YoLinkPowerFailSensor
@@ -57,11 +58,13 @@ class udiYoPowerFailSenor(udi_interface.Node):
         super().__init__( polyglot, primary, address, name)   
         #from  udiLib import node_queue, wait_for_node_done, getValidName, getValidAddress, send_temp_to_isy, isy_value, bool2ISY
         logging.debug('udiYoPowerFailSenor INIT- {}'.format(deviceInfo['name']))
+        self.poly = polyglot
+        self.address = address
         self.name = name
         self.adress = address
         self.yoAccess = yoAccess
         self.devInfo =  deviceInfo
-        self.yoVibrationSensor  = None
+        self.yoPowerFail = None
         self.node_ready = False
         self.configDone = False
         self.system_ready=False
@@ -76,7 +79,7 @@ class udiYoPowerFailSenor(udi_interface.Node):
         polyglot.subscribe(polyglot.START, self.start, self.address)
         polyglot.subscribe(polyglot.STOP, self.stop)
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
-        #self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
+        self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         
 
         # start processing events and create add our controller node
@@ -92,7 +95,7 @@ class udiYoPowerFailSenor(udi_interface.Node):
 
     def start(self):
         logging.info('start - udiYoPowerFailSenor')
-        while not self.node_read  or not self.configDone:
+        while not self.node_ready or not self.configDone:
             time.sleep(0.5)
         self.my_setDriver('GV30', 0)
         self.yoPowerFail  = YoLinkPowerFailSensor(self.yoAccess, self.devInfo, self.updateStatus)
@@ -110,31 +113,48 @@ class udiYoPowerFailSenor(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoPowerFailSenor')
         self.my_setDriver('GV30', 0)
-        if getattr(self, 'yoPowerFail', None):
-            self.yoPowerFail.shut_down()
+        sensor = self._get_sensor('stop')
+        if sensor is not None:
+            sensor.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 
+    def _get_sensor(self, caller):
+        sensor = getattr(self, 'yoPowerFail', None)
+        if sensor is None:
+            logging.warning('udiYoPowerFailSenor.%s called before device initialization', caller)
+        return sensor
+
     def checkOnline(self):
-        self.yoPowerFail.refreshDevice()   
+        sensor = self._get_sensor('checkOnline')
+        if sensor is None:
+            return
+        sensor.refreshDevice()   
     
     def checkDataUpdate(self):
-        if self.yoPowerFail.data_updated():
+        sensor = self._get_sensor('checkDataUpdate')
+        if sensor is None:
+            return
+        if sensor.data_updated():
             self.updateData()
 
 
 
     def updateData(self):
         alert_state = ['normal', 'alert', 'off']
+        sensor = self._get_sensor('updateData')
+        if sensor is None:
+            return
         if self.node is not None:
             while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
-            message_type, message_action = self.yoPowerFail.get_message_type() # if event some data may not be updated 
-            unix_time = self.yoPowerFail.get_report_time('reportAt')
+            message_info = sensor.get_message_type()
+            message_type = message_info[0] if isinstance(message_info, (list, tuple)) and len(message_info) >= 1 else None
+            unix_time = sensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
      
-            if self.yoPowerFail.check_system_online():
-                state = self.yoPowerFail.get_data('state', 'state')
+            if sensor.check_system_online():
+                state = sensor.get_data('state', 'state')
                 logging.debug('state GV0 : {}'.format(state))
                 if state in alert_state:    
                     state_val = alert_state.index(state) 
@@ -148,18 +168,18 @@ class udiYoPowerFailSenor(udi_interface.Node):
                         self.node.reportCmd('DON')
                     elif state == 0 and self.cmd_state in [0,2]:
                         self.node.reportCmd('DOF')                    
-                self.my_setDriver('GV1', self.yoPowerFail.get_data('battery', 'state'))
-                alert = self.yoPowerFail.get_data('alertType', 'state')
+                self.my_setDriver('GV1', sensor.get_data('battery', 'state'))
+                alert = sensor.get_data('alertType', 'state')
                 logging.debug('AlertState GV2 : {}'.format(alert))
                 self.my_setDriver('GV2', alert, type=message_type)
-                powered = self.yoPowerFail.get_data('powerSupply', 'state')
+                powered = sensor.get_data('powerSupply', 'state')
                 logging.debug('Powered  GV3 : {}'.format(powered))
                 self.my_setDriver('GV3', self.bool2ISY(powered), type=message_type)
-                muted = self.yoPowerFail.get_data('mute', 'state')
+                muted = sensor.get_data('mute', 'state')
                 logging.debug('Muted GV4 : {}'.format(muted))
                 self.my_setDriver('GV4', self.bool2ISY(muted), type=message_type)
                 self.my_setDriver('GV30', 1)
-                if self.yoPowerFail.suspended:
+                if sensor.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
                     self.my_setDriver('GV20', 0)
@@ -178,9 +198,10 @@ class udiYoPowerFailSenor(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoPowerFailSenor')
-        if self.yoPowerFail is not None:
+        sensor = self._get_sensor('updateStatus')
+        if sensor is not None:
             with self._update_lock:
-                self.yoPowerFail.updateStatus(data)
+                sensor.updateStatus(data)
                 self.updateData()
 
     def set_cmd(self, command):
@@ -193,7 +214,10 @@ class udiYoPowerFailSenor(udi_interface.Node):
         
     def update(self, command = None):
         logging.info('udiYoPowerFailSenor Update  Executed')
-        self.yoPowerFail.refreshDevice()
+        sensor = self._get_sensor('update')
+        if sensor is None:
+            return
+        sensor.refreshDevice()
        
 
     def noop(self, command = None):

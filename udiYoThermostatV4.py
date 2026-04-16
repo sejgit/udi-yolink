@@ -6,13 +6,15 @@ Supports Thermostat.getState, setState, setECO, setProperties, setCorrection
 MIT License
 """
 
+import importlib
+
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 
 import time
 import threading
@@ -128,57 +130,70 @@ class udiYoThermostat(udi_interface.Node):
         """Stop the thermostat device"""
         logging.info('Stop udiYoThermostat')
         self.my_setDriver('GV30', 0)
-        if getattr(self, 'yoThermostat', None):
-            self.yoThermostat.shut_down()
+        thermostat = self._get_thermostat('stop')
+        if thermostat is not None:
+            thermostat.shut_down()
+
+    def _get_thermostat(self, caller):
+        thermostat = getattr(self, 'yoThermostat', None)
+        if thermostat is None:
+            logging.warning('udiYoThermostat.%s called before device initialization', caller)
+        return thermostat
+
     def updateStatus(self, data):
         """Handle MQTT status updates from the device"""
         logging.debug('udiYoThermostat - updateStatus')
-        if self.yoThermostat is not None:
+        thermostat = self._get_thermostat('updateStatus')
+        if thermostat is not None:
             with self._update_lock:
-                self.yoThermostat.updateStatus(data)
+                thermostat.updateStatus(data)
                 self.updateData()
 
     def updateData(self):
         """Parse device state and update drivers"""
         logging.info('udiYoThermostat - updateData')
+        thermostat = self._get_thermostat('updateData')
+        if thermostat is None:
+            return
         if self.node is not None:
             while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)            
-            message_type, message_action = self.yoThermostat.get_message_type()
+            message_info = thermostat.get_message_type()
+            message_type = message_info[0] if isinstance(message_info, (list, tuple)) and len(message_info) >= 1 else None
             # Update timestamp
-            unix_time = self.yoThermostat.get_report_time('time')
+            unix_time = thermostat.get_report_time('time')
             self.my_setDriver('TIME', unix_time, 151)
             
-            if self.yoThermostat.check_system_online():
+            if thermostat.check_system_online():
                 self.my_setDriver('GV30', 1)
                 
                 # Current readings from state
-                currentTemp = self.yoThermostat.get_data('temperature', 'state')
-                humidity = self.yoThermostat.get_data('humidity', 'state')
+                currentTemp = thermostat.get_data('temperature', 'state')
+                humidity = thermostat.get_data('humidity', 'state')
                 
                 # Setpoints
-                lowTemp = self.yoThermostat.get_data('lowTemp', 'state')
-                highTemp = self.yoThermostat.get_data('highTemp', 'state')
+                lowTemp = thermostat.get_data('lowTemp', 'state')
+                highTemp = thermostat.get_data('highTemp', 'state')
                 
                 # Operating mode
-                mode = self.yoThermostat.get_data('mode', 'state')
-                fan = self.yoThermostat.get_data('fan', 'state')
-                sche = self.yoThermostat.get_data('sche', 'state')
-                running = self.yoThermostat.get_data('running', 'state')
+                mode = thermostat.get_data('mode', 'state')
+                fan = thermostat.get_data('fan', 'state')
+                sche = thermostat.get_data('sche', 'state')
+                running = thermostat.get_data('running', 'state')
 
                 # Sensors (optional)
-                sensor1 = self.yoThermostat.get_data('temperature', 'sensor1')
-                sensor2 = self.yoThermostat.get_data('temperature', 'sensor2')
+                sensor1 = thermostat.get_data('temperature', 'sensor1')
+                sensor2 = thermostat.get_data('temperature', 'sensor2')
 
                 # Optional states in 'other'
-                auxHeat = self.yoThermostat.get_data('auxiliaryHeat',  'other')
-                stage2 = self.yoThermostat.get_data('secondStage', 'other')
-                drRunning = self.yoThermostat.get_data('drRunning', 'other')
+                auxHeat = thermostat.get_data('auxiliaryHeat',  'other')
+                stage2 = thermostat.get_data('secondStage', 'other')
+                drRunning = thermostat.get_data('drRunning', 'other')
 
                 # Eco mode
-                eco_mode = self.yoThermostat.get_data('mode','eco')
-                eco_highTemp = self.yoThermostat.get_data('highTemp','eco')
-                eco_lowTemp = self.yoThermostat.get_data('lowTemp','eco')
+                eco_mode = thermostat.get_data('mode','eco')
+                eco_highTemp = thermostat.get_data('highTemp','eco')
+                eco_lowTemp = thermostat.get_data('lowTemp','eco')
 
                 # Current temperature
                 if isinstance(currentTemp, (int, float)):
@@ -272,15 +287,15 @@ class udiYoThermostat(udi_interface.Node):
                     self.my_setDriver('GV5', 1 if drRunning else 0, 25, type=message_type)
 
                 # Properties
-                properties = self.yoThermostat.get_data('properties')
+                properties = thermostat.get_data('properties')
                 if not isinstance(properties, dict):
-                    properties = self.yoThermostat.get_data('properties', 'state')
+                    properties = thermostat.get_data('properties', 'state')
                 logging.debug(f'Parsing properties data: {properties}')
                 if properties and isinstance(properties, dict) and self.properties_node is not None:
                     self.properties_node.updateProperties(properties, message_type)
 
                 # Suspended state check
-                if self.yoThermostat.suspended:
+                if thermostat.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
                     self.my_setDriver('GV20', 0)
@@ -291,8 +306,9 @@ class udiYoThermostat(udi_interface.Node):
     def update(self, command=None):
         """Refresh device state"""
         logging.info('udiYoThermostat update')
-        if self.yoThermostat:
-            self.yoThermostat.refreshDevice()
+        thermostat = self._get_thermostat('update')
+        if thermostat is not None:
+            thermostat.refreshDevice()
 
     def setLowTemp(self, command):
         """Set low temperature setpoint"""
@@ -302,12 +318,14 @@ class udiYoThermostat(udi_interface.Node):
             if self.temp_unit == 1:
                 temp_celsius = round((temp - 32) * 5/9, 1)
                 logging.info(f'udiYoThermostat setLowTemp - {temp}°F ({temp_celsius}°C)')
-                if self.yoThermostat:
-                    self.yoThermostat.setLowTemp(temp_celsius)
+                thermostat = self._get_thermostat('setLowTemp')
+                if thermostat is not None:
+                    thermostat.setLowTemp(temp_celsius)
             else:
                 logging.info(f'udiYoThermostat setLowTemp - {temp}°C')
-                if self.yoThermostat:
-                    self.yoThermostat.setLowTemp(temp)
+                thermostat = self._get_thermostat('setLowTemp')
+                if thermostat is not None:
+                    thermostat.setLowTemp(temp)
         except (ValueError, TypeError) as e:
             logging.error(f'setLowTemp invalid value: {e}')
 
@@ -319,12 +337,14 @@ class udiYoThermostat(udi_interface.Node):
             if self.temp_unit == 1:
                 temp_celsius = round((temp - 32) * 5/9, 1)
                 logging.info(f'udiYoThermostat setHighTemp - {temp}°F ({temp_celsius}°C)')
-                if self.yoThermostat:
-                    self.yoThermostat.setHighTemp(temp_celsius)
+                thermostat = self._get_thermostat('setHighTemp')
+                if thermostat is not None:
+                    thermostat.setHighTemp(temp_celsius)
             else:
                 logging.info(f'udiYoThermostat setHighTemp - {temp}°C')
-                if self.yoThermostat:
-                    self.yoThermostat.setHighTemp(temp)
+                thermostat = self._get_thermostat('setHighTemp')
+                if thermostat is not None:
+                    thermostat.setHighTemp(temp)
         except (ValueError, TypeError) as e:
             logging.error(f'setHighTemp invalid value: {e}')
 
@@ -335,8 +355,9 @@ class udiYoThermostat(udi_interface.Node):
             mode_map = {0: 'off', 1: 'heat', 2: 'cool', 3: 'auto'}
             mode = mode_map.get(mode_val, 'off')
             logging.info(f'udiYoThermostat setMode - {mode}')
-            if self.yoThermostat:
-                self.yoThermostat.setMode(mode)
+            thermostat = self._get_thermostat('setMode')
+            if thermostat is not None:
+                thermostat.setMode(mode)
         except (ValueError, TypeError) as e:
             logging.error(f'setMode invalid value: {e}')
 
@@ -347,8 +368,9 @@ class udiYoThermostat(udi_interface.Node):
             fan_map = {0: 'auto', 1: 'on'}
             fan = fan_map.get(fan_val, 'auto')
             logging.info(f'udiYoThermostat setFan - {fan}')
-            if self.yoThermostat:
-                self.yoThermostat.setFan(fan)
+            thermostat = self._get_thermostat('setFan')
+            if thermostat is not None:
+                thermostat.setFan(fan)
         except (ValueError, TypeError) as e:
             logging.error(f'setFan invalid value: {e}')
 
@@ -359,8 +381,9 @@ class udiYoThermostat(udi_interface.Node):
             sche_map = {0: 'run', 1: 'hold'}
             sche = sche_map.get(sche_val, 'run')
             logging.info(f'udiYoThermostat setScheduleMode - {sche}')
-            if self.yoThermostat:
-                self.yoThermostat.setScheduleMode(sche)
+            thermostat = self._get_thermostat('setScheduleMode')
+            if thermostat is not None:
+                thermostat.setScheduleMode(sche)
         except (ValueError, TypeError) as e:
             logging.error(f'setScheduleMode invalid value: {e}')
 
@@ -404,8 +427,9 @@ class udiYoThermostat(udi_interface.Node):
                     eco_high = round(eco_high * 5 / 9, 1)
 
             logging.info(f'udiYoThermostat setEco - mode={eco_mode}, low={eco_low}, high={eco_high}')
-            if self.yoThermostat:
-                self.yoThermostat.setECO(mode=eco_mode, lowTemp=eco_low, highTemp=eco_high)
+            thermostat = self._get_thermostat('setEco')
+            if thermostat is not None:
+                thermostat.setECO(mode=eco_mode, lowTemp=eco_low, highTemp=eco_high)
         except (ValueError, TypeError) as e:
             logging.error(f'setEco invalid value: {e} | command={command}')
 
@@ -458,7 +482,10 @@ class udiYoThermostatProperties(udi_interface.Node):
         self.node_ready = True
 
     def _yo(self):
-        return self.parent_node.yoThermostat if self.parent_node else None
+        yo = self.parent_node.yoThermostat if self.parent_node else None
+        if yo is None:
+            logging.warning('udiYoThermostatProperties called before thermostat initialization')
+        return yo
 
     def updateProperties(self, properties, message_type=None):
         if not isinstance(properties, dict):

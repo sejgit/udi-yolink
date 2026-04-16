@@ -3,13 +3,15 @@
 MIT License
 """
 
+import importlib
+
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 
 from ctypes import set_errno
 from os import truncate
@@ -140,7 +142,7 @@ class udiYoLockV2(udi_interface.Node):
         if source in ['Password']:
             return 0
         elif source in ['Manual']:
-            return
+            return 1
         elif source in ['Key']:
             return 2
         elif source in['AutoLock', 'Automatic']:
@@ -157,7 +159,11 @@ class udiYoLockV2(udi_interface.Node):
             lock = self._get_lock('updateData')
             if lock is None:
                 return
-            message_type, message_action = lock.get_message_type() # if event some data may not be updated 
+            message_info = lock.get_message_type()
+            if not isinstance(message_info, tuple) or len(message_info) != 2:
+                return
+            message_type = message_info[0]
+            message_action = message_info[1] # if event some data may not be updated 
             unix_time = lock.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 
@@ -406,7 +412,11 @@ class udiYoLock(udi_interface.Node):
             lock = self._get_lock('updateData')
             if lock is None:
                 return
-            message_type, message_action = lock.get_message_type() # if event some data may not be updated 
+            message_info = lock.get_message_type()
+            if not isinstance(message_info, tuple) or len(message_info) != 2:
+                return
+            message_type = message_info[0]
+            message_action = message_info[1] # if event some data may not be updated 
             unix_time = lock.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 

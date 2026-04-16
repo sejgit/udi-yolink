@@ -5,17 +5,18 @@ Polyglot  v3 node server
 
 MIT License
 """
+import importlib
 from os import truncate
 import threading
 
 from yolinkLeakSensorV3 import YoLinkLeakSensor
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 import time
 
 
@@ -120,31 +121,48 @@ class udiYoLeakSensor(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoLeakSensor ')
         self.my_setDriver('GV30', 0)
-        if getattr(self, 'yoLeakSensor', None):
-            self.yoLeakSensor.shut_down()
+        sensor = self._get_sensor('stop')
+        if sensor is not None:
+            sensor.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)  
 
+    def _get_sensor(self, caller):
+        sensor = getattr(self, 'yoLeakSensor', None)
+        if sensor is None:
+            logging.warning('udiYoLeakSensor.%s called before device initialization', caller)
+        return sensor
+
     def checkOnline(self):
         #we only get casched values - but MQTT remains alive
-        self.yoLeakSensor.refreshDevice()  
+        sensor = self._get_sensor('checkOnline')
+        if sensor is None:
+            return
+        sensor.refreshDevice()  
 
 
     def checkDataUpdate(self):
-        if self.yoLeakSensor.data_updated():
+        sensor = self._get_sensor('checkDataUpdate')
+        if sensor is None:
+            return
+        if sensor.data_updated():
             self.updateData()
 
 
     def updateData(self):
+        sensor = self._get_sensor('updateData')
+        if sensor is None:
+            return
         if self.node is not None:
             while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
-            message_type, action_type = self.yoLeakSensor.get_message_type() # if event some data may not be updated 
-            unix_time = self.yoLeakSensor.get_report_time('reportAt')
+            message_info = sensor.get_message_type()
+            message_type = message_info[0] if isinstance(message_info, (list, tuple)) and len(message_info) >= 1 else None
+            unix_time = sensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 
-            if self.yoLeakSensor.check_system_online():
-                waterState =   self.yoLeakSensor.get_data('state', 'state')
+            if sensor.check_system_online():
+                waterState =   sensor.get_data('state', 'state')
 
                 #logging.debug( 'Leak Sensor 0,1,8: {}  {} {}'.format(waterState,self.yoLeakSensor.getBattery(),self.yoLeakSensor.bool2Nbr(self.yoLeakSensor.online)  ))
                 if waterState in ['alert' , 'wet']:
@@ -164,7 +182,7 @@ class udiYoLeakSensor(udi_interface.Node):
                     self.my_setDriver('ST', 99, type=message_type)   
                 self.last_state = waterState
     
-                batlvl = self.yoLeakSensor.get_data('battery', 'state')
+                batlvl = sensor.get_data('battery', 'state')
                 if isinstance(batlvl, (int, float)):
                     self.my_setDriver('BATLVL', batlvl, type=message_type)
                 else:
@@ -173,14 +191,14 @@ class udiYoLeakSensor(udi_interface.Node):
                 self.my_setDriver('GV2', self.cmd_state, type=message_type)
                 #self.my_setDriver('ST', 1)
 
-                state_change = self.yoLeakSensor.get_data('stateChangedAt', 'state')
+                state_change = sensor.get_data('stateChangedAt', 'state')
                 logging.debug('state_change : {}'.format(state_change))
                 if state_change is not None:
                     self.my_setDriver('GV3', int(state_change/1000), type=message_type)
                 else:
                     self.my_setDriver('GV3', 99, UOM=25, type=message_type)
 
-                devTemp =  self.yoLeakSensor.get_data('devTemperature', 'state')
+                devTemp =  sensor.get_data('devTemperature', 'state')
                 if isinstance(devTemp, (int, float)):
                     if self.temp_unit == 0:
                         self.my_setDriver('CLITEMP', round(devTemp,0), 4, type=message_type)
@@ -188,29 +206,29 @@ class udiYoLeakSensor(udi_interface.Node):
                         self.my_setDriver('CLITEMP', round(devTemp*9/5+32,0), 17, type=message_type)
                 else:
                     self.my_setDriver('CLITEMP', 99, 25)
-                beeping = self.yoLeakSensor.get_data('beep')    
+                beeping = sensor.get_data('beep')    
                 self.my_setDriver('GV4', self.state2ISY(beeping), type=message_type)
-                opmode= self.yoLeakSensor.get_data('sensorMode', 'state')
+                opmode= sensor.get_data('sensorMode', 'state')
                 if opmode in ['WaterLeak', None]:   
                     self.my_setDriver('GV5', 0, type=message_type)
                 elif opmode == 'WaterPeak':
                     self.my_setDriver('GV5', 1, type=message_type)
-                sensitivity = self.yoLeakSensor.get_data('sensitivity', 'state')
+                sensitivity = sensor.get_data('sensitivity', 'state')
                 if sensitivity in ['Low', 'low', None]:
                     self.my_setDriver('GV6', 0, type=message_type)
                 else:
                     self.my_setDriver('GV6', 1, type=message_type)
-                sensorMove = self.yoLeakSensor.get_data('stayError', 'alarmState')
+                sensorMove = sensor.get_data('stayError', 'alarmState')
                 self.my_setDriver('GV7', self.state2ISY(sensorMove), type=message_type)
-                sensorFreeze = self.yoLeakSensor.get_data('freezeError', 'alarmState')
+                sensorFreeze = sensor.get_data('freezeError', 'alarmState')
                 self.my_setDriver('GV8', self.state2ISY(sensorFreeze), type=message_type)
-                sensorDetectError = self.yoLeakSensor.get_data('detectorError', 'alarmState')  
+                sensorDetectError = sensor.get_data('detectorError', 'alarmState')  
                 self.my_setDriver('GV9', self.state2ISY(sensorDetectError), type=message_type)
-                reminderAlert = self.yoLeakSensor.get_data('reminder', 'alarmState')
+                reminderAlert = sensor.get_data('reminder', 'alarmState')
                 self.my_setDriver('GV10', self.state2ISY(reminderAlert), type=message_type)
 
                 self.my_setDriver('GV30', 1, type=message_type)
-                if self.yoLeakSensor.suspended:
+                if sensor.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
                     self.my_setDriver('GV20', 0)             
@@ -232,7 +250,10 @@ class udiYoLeakSensor(udi_interface.Node):
         params = {
             'beep': beeping
         }   
-        self.yoLeakSensor.setAttributes(params)
+        sensor = self._get_sensor('set_beep_alert')
+        if sensor is None:
+            return
+        sensor.setAttributes(params)
 
 
 
@@ -245,7 +266,10 @@ class udiYoLeakSensor(udi_interface.Node):
 
     def update(self, command = None):
         logging.info('Leak Sensor Update Status Executed')
-        self.yoLeakSensor.refreshDevice()
+        sensor = self._get_sensor('update')
+        if sensor is None:
+            return
+        sensor.refreshDevice()
        
     def noop(self, command = None):
         pass

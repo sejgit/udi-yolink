@@ -3,13 +3,15 @@
 MIT License
 """
 
+import importlib
+
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 
 from os import truncate
 import threading
@@ -230,7 +232,6 @@ class udiYoWaterMeterController(udi_interface.Node):
 
     
     def unit2uom(self):
-        logging.debug(f'unit2uom {self.yoWaterCtrl.uom}')
         isy_uom = None
         if self.water_unit == 0:
             isy_uom = 69 # gallon
@@ -249,7 +250,11 @@ class udiYoWaterMeterController(udi_interface.Node):
             if water_ctrl is not None:
                 while not self.node_ready or not self.system_ready or not self.configDone:
                     time.sleep(0.5)
-                message_type, message_action = water_ctrl.get_message_type()
+                message_info = water_ctrl.get_message_type()
+                if not isinstance(message_info, tuple) or len(message_info) != 2:
+                    return
+                message_type = message_info[0]
+                message_action = message_info[1]
                 unix_time = water_ctrl.get_report_time('time')
                 self.my_setDriver('TIME', unix_time, 151)
                 if self.meter_unit is None:

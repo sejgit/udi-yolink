@@ -3,14 +3,15 @@
 MIT License
 """
 
-try:
-    import udi_interface
-    logging = udi_interface.LOGGER
+import importlib
 
-    Custom = udi_interface.Custom
+try:
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 
 from ctypes import set_errno
 from os import truncate
@@ -172,7 +173,11 @@ class udiYoOutlet(udi_interface.Node):
             outlet = self._get_outlet('updateData')
             if outlet is None:
                 return
-            message_type, message_action = outlet.get_message_type()
+            message_info = outlet.get_message_type()
+            if not isinstance(message_info, tuple) or len(message_info) != 2:
+                return
+            message_type = message_info[0]
+            message_action = message_info[1]
             if message_action in ['getSchedules', 'setSchedules']:
                 if self.schedule is not None:
                     self.schedule.update_schedule_data(source_device=outlet)

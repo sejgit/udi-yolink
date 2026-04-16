@@ -3,13 +3,15 @@
 MIT License
 """
 
+import importlib
+
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 
 from os import truncate
 import threading
@@ -143,7 +145,11 @@ class udiYoSiren(udi_interface.Node):
             siren = self._get_siren('updateData')
             if siren is None:
                 return
-            message_type, message_action = siren.get_message_type() # if event some data may not be updated 
+            message_info = siren.get_message_type()
+            if not isinstance(message_info, tuple) or len(message_info) != 2:
+                return
+            message_type = message_info[0]
+            message_action = message_info[1] # if event some data may not be updated 
             unix_time = siren.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
             state_list = ['normal', 'alert', 'off']

@@ -48,15 +48,7 @@ def convert_temp_unit(self, tempStr):
     else:
         return(0)
     
-def convert_water_unit(self, tempStr):
-    if tempStr.capitalize()[:1] == 'G': #Gallon
-        return(0)
-    elif tempStr.capitalize()[:1] == 'C': #CCF
-        return(1) 
-    elif tempStr.capitalize()[:1] == 'M': #m3
-        return(2)
-    else:
-        return(3) #liter
+
 
 def calculate_water_volume(self, volume, volumeunit, targetunit):
     # Placeholder for actual calculation logic

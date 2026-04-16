@@ -5,18 +5,18 @@ Polyglot TEST v3 node server
 
 MIT License
 """
+import importlib
 from os import truncate
 import threading
 
 from yolinkCOSmokeSensorV3 import YoLinkCOSmokeSensor
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 import time
 
 
@@ -133,44 +133,61 @@ class udiYoCOSmokeSensor(udi_interface.Node):
         logging.info('Stop udiYoCOSmokeSensor ')
         #self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
-        if getattr(self, 'yoCOSmokeSensor', None):
-            self.yoCOSmokeSensor.shut_down()
+        sensor = self._get_sensor('stop')
+        if sensor is not None:
+            sensor.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)  
 
+    def _get_sensor(self, caller):
+        sensor = getattr(self, 'yoCOSmokeSensor', None)
+        if sensor is None:
+            logging.warning('udiYoCOSmokeSensor.%s called before device initialization', caller)
+        return sensor
+
     def checkOnline(self):
         #we only get casched values - but MQTT remains alive
-        self.yoCOSmokeSensor.refreshDevice()  
+        sensor = self._get_sensor('checkOnline')
+        if sensor is None:
+            return
+        sensor.refreshDevice()  
 
  
 
 
     def checkDataUpdate(self):
-        if self.yoCOSmokeSensor.data_updated():
+        sensor = self._get_sensor('checkDataUpdate')
+        if sensor is None:
+            return
+        if sensor.data_updated():
             self.updateData()
 
     def updateData(self):
+        sensor = self._get_sensor('updateData')
+        if sensor is None:
+            return
         if self.node is not None:
             while not self.node_ready or not self.system_ready or not self.configDone:
                 time.sleep(0.5)
-            message_type, message_action = self.yoCOSmokeSensor.get_message_type()
-            unix_time = self.yoCOSmokeSensor.get_report_time('reportAt')
+            message_info = sensor.get_message_type()
+            message_type = message_info[0] if isinstance(message_info, (list, tuple)) and len(message_info) >= 1 else None
+            unix_time = sensor.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 
-            if self.yoCOSmokeSensor.check_system_online():
-                smoke_alert =   self.yoCOSmokeSensor.get_data('smoke', 'state')  
+            if sensor.check_system_online():
+                smoke_alert =   sensor.get_data('smoke', 'state')  
                 logging.debug('Smokedetector smoke: {}'.format(smoke_alert))
                 self.my_setDriver('GV0', self.bool2nbr(smoke_alert), type=message_type)
-                CO_alert =   self.yoCOSmokeSensor.get_data('CO', 'state')  
+                CO_alert =   sensor.get_data('CO', 'state')  
                 logging.debug('Smokedetector CO: {}'.format(CO_alert))
                 self.my_setDriver('GV1', self.bool2nbr(CO_alert), type=message_type)
-                hight_alert =   self.yoCOSmokeSensor.get_data('high_temp', 'state')   
+                hight_alert =   sensor.get_data('high_temp', 'state')   
                 logging.debug('Smokedetector high temp: {}'.format(hight_alert))
                 self.my_setDriver('GV2', self.bool2nbr(hight_alert), type=message_type)
-                bat_alert =   self.yoCOSmokeSensor.get_data('sLowBattery', 'state')   
+                bat_alert =   sensor.get_data('sLowBattery', 'state')   
                 logging.debug('Smokedetector battery: {}'.format(bat_alert))
                 self.my_setDriver('GV3', self.bool2nbr(bat_alert), type=message_type)
-                self.my_setDriver('GV4', self.yoCOSmokeSensor.get_data('battery', 'state'), type=message_type)
+                self.my_setDriver('GV4', sensor.get_data('battery', 'state'), type=message_type)
                 alert = smoke_alert or CO_alert or hight_alert or bat_alert
                 self.my_setDriver('ALARM', self.bool2nbr(alert), type=message_type)
                 self.my_setDriver('ST', self.bool2nbr(alert), type=message_type)
@@ -182,10 +199,10 @@ class udiYoCOSmokeSensor(udi_interface.Node):
                         if self.cmd_state in [0,2]:
                             self.node.reportCmd('DOF')
                     self.last_alert = alert
-                self.my_setDriver('GV5', self.bool2nbr(self.yoCOSmokeSensor.get_data('inspect', 'metadata')))
+                self.my_setDriver('GV5', self.bool2nbr(sensor.get_data('inspect', 'metadata')))
                 #self.my_setDriver('ST', 1)
                 self.my_setDriver('GV30', 1)
-                devTemp =  self.yoCOSmokeSensor.get_data('devTemperature', 'state')
+                devTemp =  sensor.get_data('devTemperature', 'state')
                 if devTemp != 'NA':
                     if self.temp_unit == 0:
                         self.my_setDriver('CLITEMP', round(devTemp,0), 4)
@@ -196,7 +213,7 @@ class udiYoCOSmokeSensor(udi_interface.Node):
                 else:
                     self.my_setDriver('CLITEMP', 99, 25)
                 self.my_setDriver('GV7', self.cmd_state)
-                if self.yoCOSmokeSensor.suspended:
+                if sensor.suspended:
                     self.my_setDriver('GV20', 1)
                 else:
                     self.my_setDriver('GV20', 0)
@@ -232,7 +249,10 @@ class udiYoCOSmokeSensor(udi_interface.Node):
 
     def update(self, command = None):
         logging.info('yoCOSmokeSensor Update Status Executed')
-        self.yoCOSmokeSensor.refreshDevice()
+        sensor = self._get_sensor('update')
+        if sensor is None:
+            return
+        sensor.refreshDevice()
        
     def noop(self, command = None):
         pass

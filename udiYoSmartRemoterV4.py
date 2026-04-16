@@ -5,15 +5,16 @@ Polyglot TEST v3 node server
 
 MIT License
 """
+import importlib
 from os import truncate
 import threading
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 
 import time
 import math
@@ -391,16 +392,29 @@ class udiYoSmartRemoter(udi_interface.Node):
     def stop (self):
         logging.info('Stop udiYoSmartRemoter')
         self.my_setDriver('GV30', 0, True, True)
-        if getattr(self, 'yoSmartRemote', None):
-            self.yoSmartRemote.shut_down()
+        remote = self._get_remote('stop')
+        if remote is not None:
+            remote.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
 
+    def _get_remote(self, caller):
+        remote = getattr(self, 'yoSmartRemote', None)
+        if remote is None:
+            logging.warning('udiYoSmartRemoter.%s called before device initialization', caller)
+        return remote
+
     def checkOnline(self):
-        self.yoSmartRemote.refreshDevice()
+        remote = self._get_remote('checkOnline')
+        if remote is None:
+            return
+        remote.refreshDevice()
     
     def checkDataUpdate(self):
-        if self.yoSmartRemote.data_updated():
+        remote = self._get_remote('checkDataUpdate')
+        if remote is None:
+            return
+        if remote.data_updated():
             self.updateData()
 
     def checkNameSync(self):
@@ -420,20 +434,24 @@ class udiYoSmartRemoter(udi_interface.Node):
         pass
     
     def updateData(self):
+        remote = self._get_remote('updateData')
+        if remote is None:
+            return
         try:
             if self.node is not None:
                 while not self.node_ready or not self.system_ready or not self.configDone:
                     time.sleep(0.5)
-                message_type, message_action = self.yoSmartRemote.get_message_type()
-                if self.yoSmartRemote.check_system_online():      
+                message_info = remote.get_message_type()
+                message_type = message_info[0] if isinstance(message_info, (list, tuple)) and len(message_info) >= 1 else None
+                if remote.check_system_online():      
 
 
                     #event_data = self.yoSmartRemote.getEventData()
                     #logging.debug('updateData - event data {}'.format(event_data))
-                    event_data = self.yoSmartRemote.get_data('event', 'state')
+                    event_data = remote.get_data('event', 'state')
                     if event_data is not None:
-                        key_mask = self.yoSmartRemote.get_data('keyMask', 'event')
-                        press_type = self.yoSmartRemote.get_data('type', 'event')
+                        key_mask = remote.get_data('keyMask', 'event')
+                        press_type = remote.get_data('type', 'event')
                         remote_key = self.mask2key(key_mask)
                         if press_type == 'LongPress':
                             press = self.max_remote_keys
@@ -442,7 +460,7 @@ class udiYoSmartRemoter(udi_interface.Node):
                         
                         logging.debug('remote key {} press {}'.format(remote_key, press))
                         if isinstance(remote_key, int):
-                            if self.yoSmartRemote.isControlEvent():
+                            if remote.isControlEvent():
                                 self.keys[remote_key].send_command(press)
                                 #self.yoSmartRemote.clearEventData()
                                 #logging.debug('clearEventData')
@@ -453,10 +471,10 @@ class udiYoSmartRemoter(udi_interface.Node):
                         if isinstance(press, int):  
                             self.my_setDriver('GV2', press, UOM=25)   
 
-                    battery = self.yoSmartRemote.get_data('battery', 'state')
+                    battery = remote.get_data('battery', 'state')
                     if isinstance(battery, int) or battery is None  :                
                         self.my_setDriver('GV3', battery, UOM=25)
-                    tempC = self.yoSmartRemote.get_data('devTemperature', 'state')
+                    tempC = remote.get_data('devTemperature', 'state')
                     logging.debug("udiYoSmartRemoter temp: {}".format(tempC))
                     if isinstance(tempC, (int, float)):
                         if self.temp_unit == 0:
@@ -467,7 +485,7 @@ class udiYoSmartRemoter(udi_interface.Node):
                         self.my_setDriver('CLITEMP', tempC, UOM=25)   
 
                     self.my_setDriver('GV30', 1)
-                    if self.yoSmartRemote.suspended:
+                    if remote.suspended:
                         self.my_setDriver('GV20', 1)
                     else:
                         self.my_setDriver('GV20', 0)
@@ -482,15 +500,19 @@ class udiYoSmartRemoter(udi_interface.Node):
 
     def updateStatus(self, data):
         logging.info('updateStatus - udiYoSmartRemoter')
-        if self.yoSmartRemote is not None:
+        remote = self._get_remote('updateStatus')
+        if remote is not None:
             with self._update_lock:
-                self.yoSmartRemote.updateStatus(data)
+                remote.updateStatus(data)
                 self.updateData()
 
     def update(self, command = None):
         logging.info('udiYoSmartRemoter Update  Executed')
         self.saveCurrentNodeNames()
-        self.yoSmartRemote.refreshDevice()
+        remote = self._get_remote('update')
+        if remote is None:
+            return
+        remote.refreshDevice()
     
 
     def noop(self, command = None):

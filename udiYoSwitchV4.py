@@ -6,13 +6,15 @@ Polyglot TEST v3 node server
 MIT License
 """
 
+import importlib
+
 try:
-    import udi_interface
-    logging = udi_interface.LOGGER
-    Custom = udi_interface.Custom
+    udi_interface = importlib.import_module('udi_interface')
 except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
+    from udi_interface_fallback import udi_interface
+
+logging = udi_interface.LOGGER
+Custom = udi_interface.Custom
 
 #import udi_interface
 #import sys
@@ -194,7 +196,11 @@ class udiYoSwitch(udi_interface.Node):
             switch = self._get_switch('updateData')
             if switch is None:
                 return
-            message_type, message_action = switch.get_message_type()
+            message_info = switch.get_message_type()
+            if not isinstance(message_info, tuple) or len(message_info) != 2:
+                return
+            message_type = message_info[0]
+            message_action = message_info[1]
             if message_action in ['getSchedules', 'setSchedules']:
                 if self.schedule is not None:
                     self.schedule.update_schedule_data(source_device=switch)
