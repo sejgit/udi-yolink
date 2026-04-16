@@ -695,8 +695,8 @@ class udiYoMultiOutlet(udi_interface.Node):
                     self.my_setDriver('ST',1)                    
                     self.my_setDriver('TIME', outlet.getLastUpdateTime(), 151)
                     if outlet.check_system_online():   
-                        for outlet in range(0,self.nbrOutlets):
-                            portName = 'port'+str(outlet)
+                        for port_index in range(0,self.nbrOutlets):
+                            portName = 'port'+str(port_index)
                             state = 99
                             
                             if portName in outletStates:
@@ -719,8 +719,8 @@ class udiYoMultiOutlet(udi_interface.Node):
                                 else:
                                     onDelay = 0
                                     offDelay = 0
-                                logging.debug('Updating subnode {}: {} {} {}'.format(outlet, state, onDelay, offDelay))
-                                self.subOutlet[outlet].updateOutNode(state, onDelay, offDelay)
+                                logging.debug('Updating subnode {}: {} {} {}'.format(port_index, state, onDelay, offDelay))
+                                self.subOutlet[port_index].updateOutNode(state, onDelay, offDelay)
 
                         for usb in range(0,self.nbrUsb):   
                             state = 99    
