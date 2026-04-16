@@ -164,16 +164,21 @@ def wait_for_node_done(self):
         time.sleep(0.1)
     self.n_queue.pop()
 
-def my_setDriver(self, key, value, UOM=None, force=False, type=None):
+def my_setDriver(self, key, value, UOM=None, force=None, type=None):
     with driver_lock:
         logging.debug(f'my_setDriver : {key} {value} {UOM} {type}')
         try:
             if any(item.get('driver') == key for item in self.drivers):
+                if force is None:
+                    if type in ['method']: #methods are forced so force update of data even if not changed
+                        force = True  
+                    else:
+                        force = False     
                 if value is None:
-                    if type  in ['report']: #['event', 'setAttributes', 'setState']:
+                    if type  in ['event']: 
                         logging.debug('None value passed = seting 99, UOM 25')
                         self.node.setDriver(key, 99, True, force, 25)
-                else:                
+                else:  
                     if key in ['GV20']: # Connection state o
                         try:
                             if self.yoAccess.local:
@@ -238,7 +243,7 @@ def bool2Nbr (self, data):
     elif data is False:
         return(0)
     else:
-        return(99)
+        return(None)
 
 def bool2ISY (self, data):
     if data is True:
@@ -246,7 +251,7 @@ def bool2ISY (self, data):
     elif data is False:
         return(0)
     else:
-        return(99)
+        return(None)
 
 def bool2nbr(self, type):
     if type is True:
@@ -254,7 +259,7 @@ def bool2nbr(self, type):
     elif type is False:
         return(0)
     else:
-        return(99)
+        return(None)
 
 def state2Nbr(self, val):
     if val == 'normal':
@@ -262,7 +267,7 @@ def state2Nbr(self, val):
     elif val == 'alert':
         return(1)
     else:
-        return(99)
+        return(None)
 
 def state2ISY(self, val):
     if val in ['normal', 'off' , False, 'closed', 'close']:
@@ -270,11 +275,11 @@ def state2ISY(self, val):
     elif val in ['alert', 'on', True, 'opened', 'open']:
         return(1)
     else:
-        return(99)
+        return(None)
 
 def isy_value(self, value):
     if value == None:
-        return (99)
+        return (None)
     else:
         return(value)
 

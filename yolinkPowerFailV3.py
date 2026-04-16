@@ -55,7 +55,7 @@ class YoLinkPowerFailSensor(YoLinkMQTTDevice):
         elif "off" == tmp:
             return(2)
         else:
-            return(99)
+            return(None)
         
 
 

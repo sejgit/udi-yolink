@@ -123,7 +123,7 @@ class udiYoDoorSensor(udi_interface.Node):
         elif isinstance(state, str) and state.lower() == 'open':
             return(1)
         else:
-            return(99)
+            return(None)
     
     def checkOnline(self):
         # only gets the casched status (battery operated device)
