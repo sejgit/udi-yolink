@@ -173,11 +173,11 @@ def my_setDriver(self, key, value, UOM=None, force=None, type=None):
                 else:  
                     if key in ['GV20']: # Connection state o
                         try:
-                            if self.yoAccess.local:
+                            if isinstance(self.yoAccess, type(None)) == False and self.yoAccess.local:
                                 logging.debug('Local connection - value + 3')
                                 value = value + 3
                         except Exception as e:
-                            logging.debug('Local connection - yolink class not ready - continue : {}'.format(e))
+                            logging.error('Local connection - yolink class not ready - continue : {}'.format(e))
                     if isinstance(UOM, int):
                         self.node.setDriver(key, value, True, force, uom=UOM)
                     else:
