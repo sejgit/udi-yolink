@@ -106,8 +106,8 @@ class udiYoPowerFailSenor(udi_interface.Node):
         while not self.yoPowerFail.check_system_online():
             logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(min(60, 2 * tries))
-            if tries % 10 == 0:
-                self.yoPowerFail.refreshDevice()
+            #if tries % 10 == 0:
+                #self.yoPowerFail.refreshDevice()
             tries += 1
         #self.my_setDriver('GV30', 1)
         self.start_done()

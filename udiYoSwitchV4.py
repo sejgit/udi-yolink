@@ -117,8 +117,8 @@ class udiYoSwitch(udi_interface.Node):
         while not self.yoSwitch.check_system_online():
             logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(min(60, 2 * tries))
-            if tries % 10 == 0:
-                self.yoSwitch.refreshDevice()
+            #if tries % 10 == 0:
+                #self.yoSwitch.refreshDevice()
             tries += 1
         time.sleep(2)
         # deferred: refreshSchedules() will be invoked after startup to avoid API bursts

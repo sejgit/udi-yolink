@@ -277,8 +277,8 @@ class udiYoInfraredRemoter(udi_interface.Node):
         while not self.yoIRrem.check_system_online():
             logging.info(f'Waiting for device {self.name} to come online.. Must be online to get learned codes')
             time.sleep(min(60, 2 * tries))
-            if tries % 10 == 0:
-                self.yoIRrem.refreshDevice()    
+            #if tries % 10 == 0:
+                #self.yoIRrem.refreshDevice()    
             tries += 1
         #self.my_setDriver('ST', 1)
         self.my_setDriver('GV30', 1)

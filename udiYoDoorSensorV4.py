@@ -97,8 +97,8 @@ class udiYoDoorSensor(udi_interface.Node):
         while not self.yoDoorSensor.check_system_online():
             logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(min(60, 2 * tries))
-            if tries % 10 == 0:
-                self.yoDoorSensor.refreshDevice()   
+            #if tries % 10 == 0:
+                #self.yoDoorSensor.refreshDevice()   
             tries += 1
 
         #self.my_setDriver('ST', 1)

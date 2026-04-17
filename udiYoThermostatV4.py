@@ -109,8 +109,8 @@ class udiYoThermostat(udi_interface.Node):
         while not self.yoThermostat.check_system_online():
             logging.info('Waiting for thermostat to come online...')
             time.sleep(min(60, 2 * tries))
-            if tries % 10 == 0:
-                self.yoThermostat.refreshDevice()
+            #if tries % 10 == 0:
+                #self.yoThermostat.refreshDevice()
             tries += 1
 
         # Create child node that owns thermostat properties and related controls.

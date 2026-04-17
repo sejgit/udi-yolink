@@ -566,8 +566,8 @@ class udiYoMultiOutlet(udi_interface.Node):
         while not self.yoMultiOutlet.check_system_online():
             logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(min(60, 2 * tries))
-            if tries % 10 == 0:
-                self.yoMultiOutlet.refreshDevice()
+            #if tries % 10 == 0:
+                #self.yoMultiOutlet.refreshDevice()
             tries += 1
  
         if self.yoMultiOutlet.nbrOutlets == 0:

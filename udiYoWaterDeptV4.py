@@ -113,8 +113,8 @@ class udiYoWaterDept(udi_interface.Node):
         while not self.yoWaterDept.check_system_online():
             logging.info(f'Waiting for device {self.name} to come online...')
             time.sleep(min(60, 2 * tries))
-            if tries % 10 == 0:
-                self.yoWaterDept.refreshDevice()    
+            #if tries % 10 == 0:
+                #self.yoWaterDept.refreshDevice()    
             tries += 1
         time.sleep(2)
         self.temp_unit = self.yoAccess.get_temp_unit()

@@ -174,8 +174,8 @@ class udiYoWaterMeterController(udi_interface.Node):
             logging.info(f'Waiting for device {self.name} to come online...')
             self.poly.Notices['offline'] = f'Waiting for device {self.name} to come online...'
             time.sleep(min(60, tries*2))  # Exponential backoff, max 5 minutes
-            if tries % 10 == 0:
-                self.yoWaterCtrl.refreshDevice()    
+            #if tries % 10 == 0:
+                #self.yoWaterCtrl.refreshDevice()    
             tries += 1
         self.poly.Notices.delete('offline')
         self.meter_unit = self.yoWaterCtrl.getMeterUnit()
