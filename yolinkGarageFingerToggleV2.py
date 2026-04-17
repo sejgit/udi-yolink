@@ -31,6 +31,8 @@ class YoLinkGarageFingerCtrl(YoLinkMQTTDevice):
     def updateStatus(yolink, data):
         yolink.updateCallbackStatus(data, False)
 
+    def check_system_online(yolink):
+        return True 
     
 class YoLinkGarageFingerToggle(YoLinkGarageFingerCtrl):
     def __init__(yolink, yoAccess,  deviceInfo ):

@@ -77,6 +77,14 @@ class udiYoGarageDoor(udi_interface.Node):
         self.my_setDriver('GV30', 0)
         self.yoDoorControl = YoLinkGarageDoorCtrl(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
+        tries = 1
+        while not self.yoDoorControl.check_system_online():
+            logging.info(f'Waiting for device {self.name} to come online...')
+            time.sleep(min(60, 2 * tries))
+            if tries % 10 == 0:
+                self.yoDoorControl.refreshDevice()
+            tries += 1
+
         self.my_setDriver('ST', 1)
         self.my_setDriver('GV30', 1)
         #time.sleep(3)

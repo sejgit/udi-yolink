@@ -371,7 +371,9 @@ class udiYoSmartRemoter(udi_interface.Node):
         tries = 1
         while not self.yoSmartRemote.check_system_online():
             logging.info(f'Waiting for device {self.name} to come online...')
-            time.sleep(min(2 * tries, 60))
+            time.sleep(min(60, 2 * tries))
+            if tries % 10 == 0:
+                self.yoSmartRemote.refreshDevice()
             tries += 1
         time.sleep(2)
         #self.my_setDriver('GV30', 1, True, True)

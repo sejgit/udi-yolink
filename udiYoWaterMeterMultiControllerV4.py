@@ -127,7 +127,9 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                 
                 logging.info(f'Waiting for device {self.name} to come online... Attempt {tries}')
                 self.poly.Notices['offline'] = f'Waiting for device {self.name} to come online...'  
-                time.sleep(min(300, tries*5))
+                time.sleep(min(60, tries*2))
+                if tries % 10 == 0:
+                    self.yoWaterCtrl.refreshDevice()    
                 tries += 1
             self.meter_count = self.yoWaterCtrl.getMeterCount()
             logging.debug(f'Meter count: {self.meter_count}')

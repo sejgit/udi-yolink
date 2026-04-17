@@ -141,7 +141,9 @@ class udiYoSprinkler(udi_interface.Node):
         tries = 1
         while not self.yoSprinkler.check_system_online():
             logging.info(f'Waiting for device {self.name} to come online...')
-            time.sleep(min(2 * tries, 60))
+            time.sleep(min(60, 2 * tries))
+            if tries % 10 == 0:
+                self.yoSprinkler.refreshDevice()
             tries += 1
         self.temp_unit = self.yoAccess.get_temp_unit()
         #self.my_setDriver('GV30', 1)

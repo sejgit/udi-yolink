@@ -144,7 +144,10 @@ class udiYoTHsensor(udi_interface.Node):
         tries = 1
         while not self.yoTHsensor.check_system_online():
             logging.info('Waiting for TH sensor to come online...')
-            time.sleep(min(2 * tries, 60))
+            time.sleep(min(60, 2 * tries))
+            if tries % 10 == 0:
+                self.yoTHsensor.refreshDevice() 
+
             tries += 1
         self.temp_unit = self.yoAccess.get_temp_unit()
         self.start_done()
