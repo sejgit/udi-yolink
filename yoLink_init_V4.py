@@ -440,13 +440,20 @@ class YoLinkInitPAC(object):
             yoAccess.client.subscribe(topicResp, yoAccess.QoS)
             yoAccess.client.subscribe(topicReport,  yoAccess.QoS)
 
-            yoAccess.mqttList[deviceId] = { 'callback': callback, 
+            yoAccess.mqttList[deviceId] = { 'callback': callback,
+                                            'callbacks': [callback],
                                             'request': topicReq,
                                             'response': topicResp,
                                             'report': topicReport,
                                             'subscribed': True
                                             }
             time.sleep(1)
+        else:
+            callback_list = yoAccess.mqttList[deviceId].setdefault('callbacks', [])
+            if callback not in callback_list:
+                callback_list.append(callback)
+            if 'callback' not in yoAccess.mqttList[deviceId] and len(callback_list) > 0:
+                yoAccess.mqttList[deviceId]['callback'] = callback_list[0]
         return(True)
 
     #@measure_time
@@ -475,8 +482,16 @@ class YoLinkInitPAC(object):
 
     def send_to_callback(yoAccess, deviceId, payload):
         if deviceId in yoAccess.mqttList:
-            tempCallback = yoAccess.mqttList[deviceId]['callback']
-            tempCallback(payload)
+            callback_list = yoAccess.mqttList[deviceId].get('callbacks')
+            if not isinstance(callback_list, list) or len(callback_list) == 0:
+                tempCallback = yoAccess.mqttList[deviceId].get('callback')
+                callback_list = [tempCallback] if tempCallback is not None else []
+
+            for tempCallback in callback_list:
+                try:
+                    tempCallback(payload)
+                except Exception as e:
+                    logging.error('Callback failed for {}: {}'.format(deviceId, e), exc_info=True)
         else:
             logging.error('Unsupported device in send_to_callback: {}'.format(deviceId))
 
@@ -500,8 +515,9 @@ class YoLinkInitPAC(object):
             logging.debug(f'{yoAccess.access_mode} process_message for {deviceId}: {payload} {msg.topic}')
             
 
-            if deviceId in yoAccess.mqttList:
-                tempCallback = yoAccess.mqttList[deviceId]['callback']
+            if deviceId not in yoAccess.mqttList:
+                logging.error('Unsupported device: {}'.format(deviceId))
+                return
                 
             #if payload['msgid'] in yoAccess.pendingDict:
             #    yoAccess.pendingDict.pop(payload['msgid'] )
@@ -534,10 +550,10 @@ class YoLinkInitPAC(object):
 
                 logging.debug('processing response: ')
                 if 'code' in payload and payload['code'] == '000000':
-                    tempCallback(payload)
+                    yoAccess.send_to_callback(deviceId, payload)
                 else:
                     logging.error('Non-000000 code {} '.format(payload['desc']))
-                    tempCallback(payload)
+                    yoAccess.send_to_callback(deviceId, payload)
                 if yoAccess.debug:
                     fileData= {}
                     fileData['type'] = 'RESP'

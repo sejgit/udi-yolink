@@ -43,17 +43,38 @@ class BaseScheduleNode(udi_interface.Node):
     
     from  udiYolinkLib import my_setDriver, node_queue, wait_for_node_done, checkNameSync
 
+    def _schedule_actions(self):
+        return (
+            'getSchedules', 'setSchedules',
+            'getLeakSchedules', 'setLeakSchedules',
+            'getValveSchedules', 'setValveSchedules',
+        )
+
+    def _is_schedule_payload(self, payload):
+        try:
+            if not isinstance(payload, dict):
+                return False
+
+            for key in ('method', 'event'):
+                action_value = payload.get(key)
+                if not isinstance(action_value, str):
+                    continue
+
+                action_name = action_value.split('.')[-1]
+                if action_name in self._schedule_actions():
+                    return True
+        except Exception:
+            return False
+
+        return False
+
     def _is_schedule_message(self, source):
         """True only when latest packet type/action is schedule-related."""
         try:
             if source is None:
                 return False
 
-            schedule_actions = (
-                'getSchedules', 'setSchedules',
-                'getLeakSchedules', 'setLeakSchedules',
-                'getValveSchedules', 'setValveSchedules',
-            )
+            schedule_actions = self._schedule_actions()
 
             if hasattr(source, 'get_message_type'):
                 msg_type, msg_action = source.get_message_type()
@@ -343,6 +364,9 @@ class BaseScheduleNode(udi_interface.Node):
 
     def updateStatus(self, deviceInfo):
         """Called when device status updates."""
+        if isinstance(deviceInfo, dict) and not self._is_schedule_payload(deviceInfo):
+            logging.debug(f'{self.__class__.__name__} ignoring non-schedule payload')
+            return
         logging.info(f'{self.__class__.__name__} updateStatus')
         self.updateData()   
 
