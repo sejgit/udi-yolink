@@ -111,9 +111,9 @@ class udiYoManipulator(udi_interface.Node):
         self.yoManipulator.initNode()
         time.sleep(1)
         tries = 1
-        while not self.yoManipulator.check_system_online() and (tries <= 5 or self.yoManipulator.throttled()):
+        while not self.yoManipulator.check_system_online():
             logging.info(f'Waiting for device {self.name} to come online...')
-            time.sleep(2)
+            time.sleep(min(2 * tries, 60))
             tries += 1
         #self.my_setDriver('GV30', 1)
         time.sleep(2)

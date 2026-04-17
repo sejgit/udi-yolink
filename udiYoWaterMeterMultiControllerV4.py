@@ -159,9 +159,9 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         time.sleep(4)
 
         tries = 1
-        while not self.yoWaterCtrl.check_system_online() and (tries <= 5 or self.yoWaterCtrl.throttled()):
+        while not self.yoWaterCtrl.check_system_online():
             logging.info(f'Waiting for device {self.name} to come online...')
-            time.sleep(2)
+            time.sleep(min(300, tries * 5))
             tries += 1
         time.sleep(2)
             

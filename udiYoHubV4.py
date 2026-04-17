@@ -88,9 +88,9 @@ class udiYoBatteryHub(udi_interface.Node):
         time.sleep(2)
         self.yoHub.initNode()
         tries = 1
-        while not self.yoHub.check_system_online() and (tries <= 5 or self.yoHub.throttled()):
+        while not self.yoHub.check_system_online():
             logging.info(f'Waiting for device {self.name} to come online...')
-            time.sleep(2)
+            time.sleep(min(2 * tries, 60))
             tries += 1
         time.sleep(1)
         # refreshDevice() is called by initNode(); avoid duplicate call here to reduce API load
@@ -251,9 +251,9 @@ class udiYoHub(udi_interface.Node):
         self.yoHub.initNode()
         time.sleep(1)
         tries = 1
-        while not self.yoHub.check_system_online() and (tries <= 5 or self.yoHub.throttled()):
+        while not self.yoHub.check_system_online():
             logging.info(f'Waiting for device {self.name} to come online...')
-            time.sleep(2)
+            time.sleep(min(2 * tries, 60))
             tries += 1
 
         

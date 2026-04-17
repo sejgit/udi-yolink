@@ -124,9 +124,9 @@ class udiYoOutlet(udi_interface.Node):
         self.yoOutlet.delayTimerCallback(self.updateDelayCountdown, self.timer_update)
         # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
         tries = 1
-        while not self.yoOutlet.check_system_online() and (tries <= 5 or self.yoOutlet.throttled()):
+        while not self.yoOutlet.check_system_online():
             logging.info(f'Waiting for device {self.name} to come online...')
-            time.sleep(2)
+            time.sleep(min(2*tries, 60))
             tries += 1
         time.sleep(2)
         self.start_done()

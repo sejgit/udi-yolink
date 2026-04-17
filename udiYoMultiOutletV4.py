@@ -562,9 +562,11 @@ class udiYoMultiOutlet(udi_interface.Node):
         self.yoMultiOutlet.nbrOutlets = self.nbrOutlets
         self.yoMultiOutlet.nbrUsb = self.nbrUsb
 
-        while not self.yoMultiOutlet.check_system_online() and not(self.yoMultiOutlet.throttled()):
+        tries = 1
+        while not self.yoMultiOutlet.check_system_online():
             logging.info(f'Waiting for device {self.name} to come online...')
-            time.sleep(2)
+            time.sleep(min(2 * tries, 60))
+            tries += 1
  
         if self.yoMultiOutlet.nbrOutlets == 0:
             logging.debug(' No config yet {} {}'.format(self.yoMultiOutlet.nbrOutlets, self.yoMultiOutlet.check_system_online()))
@@ -623,9 +625,9 @@ class udiYoMultiOutlet(udi_interface.Node):
             time.sleep(2)
             # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
             tries = 1
-            while not self.yoMultiOutlet.check_system_online() and (tries <= 5 or self.yoMultiOutlet.throttled()):
+            while not self.yoMultiOutlet.check_system_online():
                 logging.info(f'Waiting for device {self.name} to come online...')
-                time.sleep(2)
+                time.sleep(min(2 * tries, 60))
                 tries += 1
             time.sleep(3)
             #self.yoMultiOutlet.refreshMultiOutlet()

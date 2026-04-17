@@ -131,9 +131,9 @@ class udiYoSoilSensor(udi_interface.Node):
         time.sleep(1)
         time.sleep(1)
         tries = 1
-        while not self.yoSoilSensor.check_system_online() and (tries <= 5 or self.yoSoilSensor.throttled()):
+        while not self.yoSoilSensor.check_system_online():
             logging.info(f'Waiting for device {self.name} to come online...')
-            time.sleep(2)
+            time.sleep(min(2 * tries, 60))
             tries += 1
         self.temp_unit = self.yoAccess.get_temp_unit()
         #self.my_setDriver('GV30', 1)
