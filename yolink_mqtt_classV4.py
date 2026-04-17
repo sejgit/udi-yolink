@@ -119,6 +119,20 @@ class YoLinkMQTTDevice(object):
 
     def supports_schedule_refresh(yolink):
         return yolink.type in yolink.scheduleRefreshTypes
+
+    def wait_until_online(yolink, timeout_sec=30, poll_interval_sec=2):
+        deadline = time.time() + max(0, timeout_sec)
+        while not yolink.disconnect:
+            if yolink.check_system_online():
+                return True
+
+            remaining = deadline - time.time()
+            if remaining <= 0:
+                break
+
+            time.sleep(min(poll_interval_sec, remaining))
+
+        return yolink.check_system_online()
     
     def reset_structure(yolink):
         if yolink.type in yolink.delaySupport and yolink.type not in yolink.scheduleSupport :
@@ -932,6 +946,14 @@ class YoLinkMQTTDevice(object):
     def refreshSchedules(yolink):
         logging.debug(yolink.type + '- refreshSchedules')
 
+        if not yolink.check_system_online():
+            logging.debug(
+                '{}- refreshSchedules skipped because device is offline'.format(
+                    yolink.type
+                )
+            )
+            return False
+
         unsupported_models = {'YS5029', 'YS5009'}
         model_name = str(yolink.deviceInfo.get('modelName', ''))[:6]
 
@@ -958,7 +980,7 @@ class YoLinkMQTTDevice(object):
                         yolink.type, model_name
                     )
                 )
-                return
+                return False
 
             valve_method = yolink.type + '.getValveSchedules'
             if _can_send_schedule_request(valve_method):
@@ -984,6 +1006,8 @@ class YoLinkMQTTDevice(object):
                 data["token"] = yolink.deviceInfo['token']
                 data['params'] = {}
                 yolink.yoAccess.publish_data(data)
+
+            return True
             
     
     '''

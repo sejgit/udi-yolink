@@ -62,6 +62,8 @@ class YoLinkSetup (udi_interface.Node):
         self.local_port = ':1080'
         self.local_URL = ''
         self.local_MQTT_port = 18080
+        self._schedule_refresh_retry_stop = False
+        self._schedule_refresh_retry_interval_sec = 30
         
         #logging.setLevel(10)
         logging.info(f'Version {version}')
@@ -221,7 +223,8 @@ class YoLinkSetup (udi_interface.Node):
             # Run in background so node server can continue initializing
             try:
                 from threading import Thread
-                t = Thread(target=self.deferred_refresh_schedules)
+                self._schedule_refresh_retry_stop = False
+                t = Thread(target=self.deferred_refresh_schedules, daemon=True)
                 t.start()
             except Exception:
                 logging.debug('Failed to start deferred_refresh_schedules thread')
@@ -231,8 +234,10 @@ class YoLinkSetup (udi_interface.Node):
         """Background pass to refresh schedules for schedule-capable devices.
 
         Iterates created nodes and invokes `refreshSchedules()` on the
-        first attribute that exposes it for each node. Calls are spaced
-        using `yoAccess.time_tracking(dev_id)` to avoid bursting API calls.
+        first attribute that exposes it for each node. Offline devices are
+        queued for later retries so late-online devices still receive the
+        startup refresh. Calls are spaced using `yoAccess.time_tracking(dev_id)`
+        to avoid bursting API calls.
         """
         logging.info('Starting deferred schedule refresh pass')
         try:
@@ -240,6 +245,8 @@ class YoLinkSetup (udi_interface.Node):
         except Exception as e:
             logging.debug(f'Could not enumerate nodes for deferred refresh: {e}')
             return
+
+        pending = []
 
         for addr, node in nodes.items():
             if addr == self.address:
@@ -282,6 +289,20 @@ class YoLinkSetup (udi_interface.Node):
                     logging.debug(f'No deviceId for node {addr}, skipping schedule refresh')
                     continue
 
+                check_system_online = getattr(source, 'check_system_online', None)
+                is_online = False
+                try:
+                    if callable(check_system_online):
+                        is_online = check_system_online()
+                except Exception as e:
+                    logging.debug(f'Online check failed for {addr}: {e}')
+                    is_online = False
+
+                if not is_online:
+                    logging.info(f'Queueing startup schedule refresh retry for {addr}; device is offline')
+                    pending.append({'addr': addr, 'dev_id': dev_id, 'source': source})
+                    continue
+
                 # space calls using yoAccess/yoLocal time tracking
                 delay = 0
                 try:
@@ -296,11 +317,64 @@ class YoLinkSetup (udi_interface.Node):
 
                 try:
                     source.refreshSchedules()
+                    logging.info(f'Startup schedule refresh sent for {addr}')
                 except Exception as e:
                     logging.debug(f'Failed refreshSchedules for {addr}: {e}')
+                    pending.append({'addr': addr, 'dev_id': dev_id, 'source': source})
 
             except Exception as e:
                 logging.debug(f'deferred refresh error for {addr}: {e}')
+
+        while pending and not self._schedule_refresh_retry_stop:
+            logging.info(
+                f'Retrying startup schedule refresh for {len(pending)} offline device(s) in '
+                f'{self._schedule_refresh_retry_interval_sec} seconds'
+            )
+            time.sleep(self._schedule_refresh_retry_interval_sec)
+
+            remaining = []
+            for item in pending:
+                if self._schedule_refresh_retry_stop:
+                    break
+
+                addr = item['addr']
+                dev_id = item['dev_id']
+                source = item['source']
+                check_system_online = getattr(source, 'check_system_online', None)
+
+                is_online = False
+                try:
+                    if callable(check_system_online):
+                        is_online = check_system_online()
+                except Exception as e:
+                    logging.debug(f'Retry online check failed for {addr}: {e}')
+
+                if not is_online:
+                    remaining.append(item)
+                    continue
+
+                delay = 0
+                try:
+                    if self.yoAccess:
+                        delay = self.yoAccess.time_tracking(dev_id)
+                    elif self.yoLocal:
+                        delay = self.yoLocal.time_tracking(dev_id)
+                except Exception:
+                    delay = 0
+                if delay and delay > 0:
+                    time.sleep(delay)
+
+                try:
+                    source.refreshSchedules()
+                    logging.info(f'Startup schedule refresh retry sent for {addr}')
+                except Exception as e:
+                    logging.debug(f'Failed refreshSchedules retry for {addr}: {e}')
+                    remaining.append(item)
+
+            pending = remaining
+
+        if pending and self._schedule_refresh_retry_stop:
+            logging.info('Stopping deferred schedule refresh retry queue')
 
             
         #self.poly.updateProfile()        
@@ -313,6 +387,7 @@ class YoLinkSetup (udi_interface.Node):
         try:
             logging.info('Stop Called:')
             #self.yoAccess.writeTtsFile() #save current TTS messages
+            self._schedule_refresh_retry_stop = True
 
             self.my_setDriver('ST', 0)
 
@@ -323,6 +398,7 @@ class YoLinkSetup (udi_interface.Node):
             exit()
         except Exception as e:
             logging.error(f'Stop Exception : {e}')
+            self._schedule_refresh_retry_stop = True
             if getattr(self, 'yoAccess', None):
                 self.yoAccess.shut_down()
             if getattr(self, 'yoLocal', None):
