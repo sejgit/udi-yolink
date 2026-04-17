@@ -93,7 +93,6 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
         #self.poly.subscribe(self.poly.STARTDONE, self.start_done)
         # start processing events and create add our controller node
-        self.poly.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
@@ -380,7 +379,6 @@ class udiYoSubWaterMeter(udi_interface.Node):
         #    if self.yoWaterCtrl.devInfo['model'] in ['YS5029']: # dual channel model  -  no temps and not 
 
         # start processing events and create add our controller node
-        polyglot.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)

@@ -142,7 +142,6 @@ class udiYoWaterMeterController(udi_interface.Node):
         #if self.yoWaterCtrl.devInfo['model'] in known_meters:
         #    logging.debug(f'Known water meter model {self.yoWaterCtrl.devInfo["model"]}')   
         #    if self.yoWaterCtrl.devInfo['model'] in ['YS5029']: # dual channel model  -  no temps and not 
-        self.poly.ready()
 
         # start processing events and create add our controller node
       

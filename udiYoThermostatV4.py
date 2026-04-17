@@ -80,7 +80,6 @@ class udiYoThermostat(udi_interface.Node):
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
 
         # Add node and wait
-        polyglot.ready()
         self.poly.addNode(self, conn_status=None, rename=True)
         self.wait_for_node_done()
 

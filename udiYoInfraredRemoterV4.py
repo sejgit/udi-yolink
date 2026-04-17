@@ -47,7 +47,6 @@ class udiYoInfraredCode(udi_interface.Node):
         self.yoAccess = yoAccess    
         self.code = code_indx
         self.n_queue = []   
-        self.poly.ready()
        
         #self.poly.subscribe(polyglot.START, self.start, self.address)
         #self.poly.subscribe(polyglot.STOP, self.stop)
@@ -220,7 +219,6 @@ class udiYoInfraredRemoter(udi_interface.Node):
           
 
         # start processing events and create add our controller node
-        self.poly.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)

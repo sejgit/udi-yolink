@@ -66,7 +66,6 @@ class udiRemoteKey(udi_interface.Node):
         self.poly.subscribe(self.poly.CONFIGDONE, self.configHandler)
         # start processing events and create add our controller node
         
-        self.poly.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
@@ -314,7 +313,6 @@ class udiYoSmartRemoter(udi_interface.Node):
         
 
         # start processing events and create add our controller node
-        self.poly.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)

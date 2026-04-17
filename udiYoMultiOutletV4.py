@@ -65,7 +65,6 @@ class udiYoSubOutlet(udi_interface.Node):
         self.onDelay = 0
 
 
-        self.poly.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = polyglot.getNode(self.address)        
@@ -327,7 +326,6 @@ class udiYoSubUSB(udi_interface.Node):
        
 
         # start processing events and create add our controller node
-        self.poly.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = polyglot.getNode(self.address)
@@ -533,7 +531,6 @@ class udiYoMultiOutlet(udi_interface.Node):
         polyglot.subscribe(polyglot.CONFIGDONE, self.configDoneHandler)
 
         # start processing events and create add our controller node
-        polyglot.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)

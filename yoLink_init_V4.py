@@ -240,6 +240,18 @@ class YoLinkInitPAC(object):
     '''
 
     #@measure_time
+    def token_needs_refresh(yoAccess):
+        if yoAccess.token is None:
+            return True
+
+        expiration_time = yoAccess.token.get('expirationTime')
+        if expiration_time is None:
+            return True
+
+        now = int(time.time())
+        return now >= (expiration_time - yoAccess.timeExpMarging)
+
+    #@measure_time
     def refresh_token(yoAccess):
         
         try:
@@ -386,7 +398,7 @@ class YoLinkInitPAC(object):
         """
         try: 
             logging.info(f"{yoAccess.access_mode} Connecting to broker...")
-            while not yoAccess.refresh_token():
+            while yoAccess.token_needs_refresh() and not yoAccess.refresh_token():
                 time.sleep(35) # Wait 35 sec and try again (35sec ensure less than 10 attempts in 5 min)
                 logging.info('Trying to obtain new Token - Network/YoLink connection may be down')
             logging.info('Retrieving YoLink API info')

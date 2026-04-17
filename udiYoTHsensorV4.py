@@ -118,7 +118,6 @@ class udiYoTHsensor(udi_interface.Node):
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
                      
         # start processing events and create add our controller node
-        self.poly.ready()
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
 
