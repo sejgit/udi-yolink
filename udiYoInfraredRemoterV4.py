@@ -357,7 +357,7 @@ class udiYoInfraredRemoter(udi_interface.Node):
             unix_time = remote.get_report_time('reportAt')
             self.my_setDriver('TIME', unix_time, 151)
 
-            if message_type and 'Schedules' in str(message_type):
+            if isinstance(message_action, str) and 'Schedules' in message_action:
                 if self.schedule is not None:
                     self.schedule.update_schedule_data(source_device=remote)
                 return

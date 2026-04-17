@@ -36,7 +36,7 @@ from yolink_delay_timer import CountdownTimer
 Object representation for YoLink MQTT Client
 """
 class YoLinkMQTTDevice(object):
-    def __init__(yolink, yoAccess, deviceInfo, callback ):
+    def __init__(yolink, yoAccess, deviceInfo, callback, subscribe_mqtt=True, route_filter='default' ):
         #super().__init__( yolink_URL, csid, csseckey, deviceInfo)
         #yolink.callback = callback
         #yolink.build_device_api_request_data()
@@ -72,8 +72,9 @@ class YoLinkMQTTDevice(object):
         yolink.nbrPorts = 1
         yolink.nbrOutlets = 1
         yolink.nbrUsb = 0 
-        logging.debug(f"{yoAccess.access_mode} subscribe_mqtt: {yolink.deviceInfo['deviceId']}")
-        yolink.yoAccess.subscribe_mqtt(deviceInfo['deviceId'], callback)
+        if subscribe_mqtt:
+            logging.debug(f"{yoAccess.access_mode} subscribe_mqtt: {yolink.deviceInfo['deviceId']}")
+            yolink.yoAccess.subscribe_mqtt(deviceInfo['deviceId'], callback, route_filter=route_filter)
         yolink.lastDataPacket = ''
         yolink.lastControlPacket = {}
         yolink.TZcomp = (yolink.timezoneOffsetSec() /60 /60)
@@ -738,6 +739,7 @@ class YoLinkMQTTDevice(object):
             elif 'event' in data:
                 #logging.debug('Event deteced')
                 yolink.online = True # Event generated so it must be online 
+                yolink.noconnect = 0
      
                 last_update = yolink.getLastUpdate()
                 if 'time' in data and isinstance(data['time'], int) and isinstance(last_update, int):             
@@ -751,6 +753,9 @@ class YoLinkMQTTDevice(object):
                     elif '.HourlyUsageReport' in  data['event']:
                         if data['time'] >= last_update:
                             yolink.updateHourlyData(data)
+                    else:
+                        if data['time'] >= last_update:
+                            yolink.updateMessageInfo(data)
 
 
                 elif '.setInitState' in  data['event']:
@@ -760,25 +765,8 @@ class YoLinkMQTTDevice(object):
                         yolink.refreshDevice()
                         yolink.refreshSchedules()
                         #yolink.updateScheduleStatus(data)   
-                #else:
-                #    logging.debug('Unsupported Event passed - trying anyway; {}'.format(data) )
-                #    if int(data['time']) >= int(yolink.getLastUpdate()):
-                #        yolink.updatePacketData(data)
-                        '''
-                        try:
-                            if int(data['time']) >= int(yolink.getLastUpdate()) and data['data'] != {}:
-                                if data['event'].find('chedule') >= 0 :
-                                    yolink.updateScheduleStatus(data)    
-                                elif data['event'].find('ersion') >= 0 :
-                                    yolink.updateFWStatus(data)
-                                else:
-                                    yolink.updatePacketData(data)   
-                            else:
-                                yolink.online = False
-                                logging.error('Device appears offline: '+ data['desc'])
-                        except logging.exception as E:
-                            logging.error('Unsupported event detected: ' + str(E))
-                        '''    
+                else:
+                    yolink.updateMessageInfo(data)
                 if eventSupport:
                     yolink.eventQueue.put(data['event']) 
                 yolink.lastDataPacket = data

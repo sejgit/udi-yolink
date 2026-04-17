@@ -1291,7 +1291,7 @@ class YoLinkSchedule(YoLinkMQTTDevice):
     """
     
     def __init__(yolink, yoAccess, deviceInfo, callback):
-        super().__init__(yoAccess, deviceInfo, callback)
+        super().__init__(yoAccess, deviceInfo, callback, subscribe_mqtt=True, route_filter='schedule')
 
         yolink.methodList = ['getSchedules', 'setSchedules']
         yolink.eventList = ['StatusChange', 'Report', 'getState']

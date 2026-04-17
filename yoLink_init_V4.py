@@ -425,7 +425,49 @@ class YoLinkInitPAC(object):
             return(False)
 
     #@measure_time
-    def subscribe_mqtt(yoAccess, deviceId, callback) -> bool:
+    def _classify_callback_route(yoAccess, payload):
+        schedule_actions = {
+            'getSchedules', 'setSchedules',
+            'getLeakSchedules', 'setLeakSchedules',
+            'getValveSchedules', 'setValveSchedules',
+        }
+
+        if not isinstance(payload, dict):
+            return('default')
+
+        for key in ['method', 'event']:
+            value = payload.get(key)
+            if isinstance(value, str):
+                action = value.split('.')[-1]
+                if action in schedule_actions:
+                    return('schedule')
+
+        return('default')
+
+    def _get_callback_entries(yoAccess, deviceId):
+        if deviceId not in yoAccess.mqttList:
+            return([])
+
+        callback_entries = yoAccess.mqttList[deviceId].get('callbacks', [])
+        normalized_entries = []
+
+        for entry in callback_entries:
+            if callable(entry):
+                normalized_entries.append({'callback': entry, 'route_filter': 'default'})
+            elif isinstance(entry, dict) and callable(entry.get('callback')):
+                normalized_entries.append({
+                    'callback': entry['callback'],
+                    'route_filter': entry.get('route_filter', 'default'),
+                })
+
+        if len(normalized_entries) == 0:
+            tempCallback = yoAccess.mqttList[deviceId].get('callback')
+            if callable(tempCallback):
+                normalized_entries.append({'callback': tempCallback, 'route_filter': 'default'})
+
+        return(normalized_entries)
+
+    def subscribe_mqtt(yoAccess, deviceId, callback, route_filter='default') -> bool:
 
         logging.info(f'{yoAccess.access_mode} Subscribing deviceId {deviceId} to MQTT {yoAccess.mqtt_str}+{ yoAccess.homeID}')
         topicReq = yoAccess.mqtt_str +yoAccess.homeID+'/'+ deviceId +'/request'
@@ -441,7 +483,7 @@ class YoLinkInitPAC(object):
             yoAccess.client.subscribe(topicReport,  yoAccess.QoS)
 
             yoAccess.mqttList[deviceId] = { 'callback': callback,
-                                            'callbacks': [callback],
+                                            'callbacks': [{'callback': callback, 'route_filter': route_filter}],
                                             'request': topicReq,
                                             'response': topicResp,
                                             'report': topicReport,
@@ -450,10 +492,24 @@ class YoLinkInitPAC(object):
             time.sleep(1)
         else:
             callback_list = yoAccess.mqttList[deviceId].setdefault('callbacks', [])
-            if callback not in callback_list:
-                callback_list.append(callback)
+            callback_exists = False
+            for entry in callback_list:
+                if isinstance(entry, dict):
+                    if entry.get('callback') == callback and entry.get('route_filter', 'default') == route_filter:
+                        callback_exists = True
+                        break
+                elif entry == callback and route_filter == 'default':
+                    callback_exists = True
+                    break
+
+            if not callback_exists:
+                callback_list.append({'callback': callback, 'route_filter': route_filter})
             if 'callback' not in yoAccess.mqttList[deviceId] and len(callback_list) > 0:
-                yoAccess.mqttList[deviceId]['callback'] = callback_list[0]
+                first_entry = callback_list[0]
+                if isinstance(first_entry, dict):
+                    yoAccess.mqttList[deviceId]['callback'] = first_entry.get('callback')
+                else:
+                    yoAccess.mqttList[deviceId]['callback'] = first_entry
         return(True)
 
     #@measure_time
@@ -482,12 +538,21 @@ class YoLinkInitPAC(object):
 
     def send_to_callback(yoAccess, deviceId, payload):
         if deviceId in yoAccess.mqttList:
-            callback_list = yoAccess.mqttList[deviceId].get('callbacks')
-            if not isinstance(callback_list, list) or len(callback_list) == 0:
-                tempCallback = yoAccess.mqttList[deviceId].get('callback')
-                callback_list = [tempCallback] if tempCallback is not None else []
+            payload_route = yoAccess._classify_callback_route(payload)
+            callback_entries = yoAccess._get_callback_entries(deviceId)
 
-            for tempCallback in callback_list:
+            matched_callbacks = []
+            for entry in callback_entries:
+                route_filter = entry.get('route_filter', 'default')
+                if route_filter in ['all', payload_route]:
+                    matched_callbacks.append(entry['callback'])
+
+            if len(matched_callbacks) == 0 and payload_route != 'default':
+                for entry in callback_entries:
+                    if entry.get('route_filter', 'default') == 'default':
+                        matched_callbacks.append(entry['callback'])
+
+            for tempCallback in matched_callbacks:
                 try:
                     tempCallback(payload)
                 except Exception as e:
