@@ -72,6 +72,7 @@ def udiTssProfileUpdate(messages):
             nls = open(''./profile/nls/en_us.txt')
     '''
     foundChanges = False
+    NLSstr = None
     if (os.path.exists('./profile/editor/editors.xml')):
         Tree = ET.parse('./profile/editor/editors.xml')
         #efile.close()
@@ -85,7 +86,7 @@ def udiTssProfileUpdate(messages):
                 if editorRoot[indx][0].attrib['subset'] != "0-"+str(len(messages)-1):
                     editorRoot[indx][0].attrib['subset'] = "0-"+str(len(messages)-1)
                     foundChanges = True
-                NLSstr = editorRoot[indx][0].attrib['nls']                
+                NLSstr = editorRoot[indx][0].attrib['nls']
             else:
                 indx = indx + 1
 
@@ -93,29 +94,39 @@ def udiTssProfileUpdate(messages):
     else:
         logging.error('./profile/editor/editors.xml NOT FOUND ')
 
+    if NLSstr is None:
+        logging.error('messages editor entry not found in ./profile/editor/editors.xml')
+        return foundChanges
+
     if (os.path.exists('./profile/nls/en_us.txt')):
         nfile = open('./profile/nls/en_us.txt', 'r')
         nls = nfile.readlines()
         nfile.close()
-        #remove existing defines
+
+        # Gather existing message labels so we can compare old vs new values exactly.
         removedLines = {}
         for line in range(len(nls)-1, 0, -1):
             if nls[line].find(NLSstr, 0, len(NLSstr)) != -1:
-                splitLine = re.split('=', nls[line])                
-                index = int(re.findall("[0-9]", splitLine[0])[0])
-                TTS = splitLine[1]
-                removedLines[index] = TTS
+                splitLine = re.split('=', nls[line], maxsplit=1)
+                key_part = splitLine[0].strip()
+                key_prefix = f'{NLSstr}-'
+                if key_part.startswith(key_prefix):
+                    idx_text = key_part[len(key_prefix):].strip()
+                    if idx_text.isdigit():
+                        index = int(idx_text)
+                        TTS = splitLine[1].strip() if len(splitLine) > 1 else ''
+                        removedLines[index] = TTS
                 nls.pop(line)
 
-        #add new ones
-        #nls.append('\n')
+        newLines = {}
         for line in range(0,len(messages)):
-            nls.append('{}-{} = {}\n'.format(NLSstr, line, messages[line]))
-            if index and index < len(messages):
-                if messages[line] != removedLines[index]:
-                    foundChanges = True
-            else:
-                foundChanges = True
+            msg = str(messages[line]).strip()
+            newLines[line] = msg
+            nls.append('{}-{} = {}\n'.format(NLSstr, line, msg))
+
+        if removedLines != newLines:
+            foundChanges = True
+
         nfile = open('./profile/nls/en_us.txt', 'w')
         nfile.writelines(nls)
         nfile.close()
@@ -223,6 +234,8 @@ def addNodes (self, deviceList) -> list:
                 logging.info('Updating profile files ')
                 if udiTssProfileUpdate(dev_access.TtsMessages):
                     self.poly.Notices['tts'] = 'Speaker hub messages updated - Polisy/eISY need to be restarted to take effect'
+                else:
+                    self.poly.Notices.delete('tts')
                 self.poly.updateProfile()   
                 #for nbr in range(0,self.nbrTTS):
                 #    index = 'TTS'+str(nbr)
