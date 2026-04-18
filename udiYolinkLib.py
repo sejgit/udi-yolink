@@ -148,8 +148,15 @@ def retrieve_cmd_struct(self):
 
 
 def node_queue(self, data):
+    if not isinstance(data, dict):
+        return
+
+    address = data.get('address')
+    if address != getattr(self, 'address', None):
+        return
+
     logging.debug('node_queue - {}'.format(data))
-    self.n_queue.append(data['address'])
+    self.n_queue.append(address)
 
 def wait_for_node_done(self):
     while len(self.n_queue) == 0:
