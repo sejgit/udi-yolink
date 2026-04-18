@@ -280,7 +280,7 @@ class YoLinkInitPAC(object):
     #####################################
     #@measure_time
     def getDeviceList(yoAccess):
-        logging.debug(f'Device list: {yoAccess.deviceList}')
+        logging.debug('Device list summary: %s', _summarize_device_list(yoAccess.deviceList))
         return(yoAccess.deviceList)
 
     '''

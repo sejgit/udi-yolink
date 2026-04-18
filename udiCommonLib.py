@@ -3,7 +3,7 @@
 Yolink Control Main Node  program 
 MIT License
 """
-version = '1.8.34'
+version = '1.8.35'
 import sys
 import re
 import time
@@ -521,7 +521,7 @@ def addNodes (self, deviceList) -> list:
     for remove_dev in remove_list:
         deviceList.remove(remove_dev)
         
-    logging.debug('Device list after removals: {}'.format(deviceList))
+    logging.debug('Device list after removals count: {}'.format(len(deviceList)))
   
     time.sleep(1)
     # checking params for erassed nodes
