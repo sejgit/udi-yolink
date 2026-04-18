@@ -1240,6 +1240,14 @@ class YoLinkInitPAC(object):
                             if key in seen_keys:
                                 continue
                             seen_keys.add(key)
+                            retry_attempt = retry_data.get('retry', 0) + 1
+                            logging.info(
+                                '%s retrying %s for %s (attempt %s)',
+                                yoAccess.access_mode,
+                                retry_data.get('method'),
+                                retry_data.get('targetDevice'),
+                                retry_attempt,
+                            )
                             logging.debug(f'{yoAccess.access_mode} ADDING RETRY TO PUBLISH QUEUE {retry_data}')
                             yoAccess.publish_data(retry_data) # place selected_data in publishQueue
                             time.sleep(2) # give some time to process the publish before waiting for response

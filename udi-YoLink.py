@@ -128,7 +128,10 @@ class YoLinkSetup (udi_interface.Node):
             if addr == self.address or addr not in self.Parameters:
                 continue
             try:
-                del self.Parameters[addr]
+                if hasattr(self.Parameters, 'delete'):
+                    self.Parameters.delete(addr)
+                else:
+                    del self.Parameters[addr]
                 removed.append(addr)
             except Exception as e:
                 logging.debug(f'Failed removing legacy custom param for {addr}: {e}')
