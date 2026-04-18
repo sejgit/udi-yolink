@@ -560,6 +560,9 @@ class udiYoMultiOutlet(udi_interface.Node):
         self.yoMultiOutlet.nbrOutlets = self.nbrOutlets
         self.yoMultiOutlet.nbrUsb = self.nbrUsb
 
+        # Seed the MQTT request/retry path before entering the passive online wait.
+        self.yoMultiOutlet.refreshDevice()
+
         tries = 1
         while not self.yoMultiOutlet.check_system_online():
             logging.info(f'Waiting for device {self.name} to come online...')
