@@ -1,0 +1,86 @@
+---LAST 80 WARNING---
+2026-04-17 19:23:23.376 MainThread udi_interface.interface WARNING  interface:db_getNodeDrivers: setup not found in database.
+`n---LAST 80 ERROR---
+2026-04-17 20:53:22.364 Thread-1205 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 20:53:22.375 Thread-1205 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:00:58.724 Thread-1209 (process_message) udi_interface      ERROR    yoLink_init_V4:process_message: Non-000000 code Cannot connect to the device 
+2026-04-17 21:00:58.724 Thread-1208 (transfer_data) udi_interface      ERROR    yoLink_init_V4:transfer_data: Error code 000201 received for message {'method': 'Switch.getState', 'targetDevice': 'd88b4c010008018b', 'token': 'E967095C104FF2D1E7B941B7048179F8', 'params': {}, 'time': '1776484854707', 'retry': 10, 'last_retry_time': 1776483821175} - initiating retry
+2026-04-17 21:00:58.724 Thread-1209 (process_message) udi_interface      ERROR    yolink_mqtt_classV4:Status: Status YoLink Switch - Off line detected: {'code': '000201', 'time': 1776484858716, 'msgid': '1776484854707', 'method': 'Switch.getState', 'data': {}, 'targetDevice': 'd88b4c010008018b', 'desc': 'Cannot connect to the device'}
+2026-04-17 21:00:58.725 Thread-1209 (process_message) udi_interface      ERROR    yolink_mqtt_classV4:Status: Status YoLink Switch - Off line detected: {'code': '000201', 'time': 1776484858716, 'msgid': '1776484854707', 'method': 'Switch.getState', 'data': {}, 'targetDevice': 'd88b4c010008018b', 'desc': 'Cannot connect to the device', 'emptyData': True, 'type': 'method', 'action': 'getState', 'report_time': 1776484858, 'lastStateTime': 1776484858716}
+2026-04-17 21:00:58.725 Thread-1209 (process_message) udi_interface      ERROR    yolink_mqtt_classV4:updateCallbackStatus: Switch: Cannot connect to the device
+2026-04-17 21:03:22.333 Thread-1212 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: valve error : False
+2026-04-17 21:03:22.333 Thread-1212 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: high temp error : None
+2026-04-17 21:03:22.333 Thread-1212 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: low temp error : None
+2026-04-17 21:03:22.348 Thread-1212 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:03:22.354 Thread-1212 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:03:22.366 Thread-1212 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:03:22.371 Thread-1212 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:13:22.339 Thread-1214 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: valve error : False
+2026-04-17 21:13:22.340 Thread-1214 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: high temp error : None
+2026-04-17 21:13:22.340 Thread-1214 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: low temp error : None
+2026-04-17 21:13:22.355 Thread-1214 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:13:22.361 Thread-1214 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:13:22.375 Thread-1214 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:13:22.381 Thread-1214 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:23:22.342 Thread-1221 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: valve error : False
+2026-04-17 21:23:22.344 Thread-1221 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: high temp error : None
+2026-04-17 21:23:22.346 Thread-1221 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: low temp error : None
+2026-04-17 21:23:22.367 Thread-1221 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:23:22.387 Thread-1221 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:23:22.416 Thread-1221 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:23:22.432 Thread-1221 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:23:36.112 Thread-1226 (process_message) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: valve error : False
+2026-04-17 21:23:36.112 Thread-1226 (process_message) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: high temp error : None
+2026-04-17 21:23:36.112 Thread-1226 (process_message) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: low temp error : None
+2026-04-17 21:23:42.198 Thread-1228 (process_message) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:23:42.210 Thread-1228 (process_message) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:25:00.662 Thread-1250 (process_message) udi_interface      ERROR    yoLink_init_V4:process_message: Non-000000 code Cannot connect to the device 
+2026-04-17 21:25:00.663 Thread-1249 (transfer_data) udi_interface      ERROR    yoLink_init_V4:transfer_data: Error code 000201 received for message {'method': 'Switch.getState', 'targetDevice': 'd88b4c010008018b', 'token': 'E967095C104FF2D1E7B941B7048179F8', 'params': {}, 'time': '1776486296647'} - initiating retry
+2026-04-17 21:25:00.663 Thread-1250 (process_message) udi_interface      ERROR    yolink_mqtt_classV4:Status: Status YoLink Switch - Off line detected: {'code': '000201', 'time': 1776486300654, 'msgid': '1776486296647', 'method': 'Switch.getState', 'data': {}, 'targetDevice': 'd88b4c010008018b', 'desc': 'Cannot connect to the device'}
+2026-04-17 21:25:00.663 Thread-1250 (process_message) udi_interface      ERROR    yolink_mqtt_classV4:Status: Status YoLink Switch - Off line detected: {'code': '000201', 'time': 1776486300654, 'msgid': '1776486296647', 'method': 'Switch.getState', 'data': {}, 'targetDevice': 'd88b4c010008018b', 'desc': 'Cannot connect to the device', 'emptyData': True, 'type': 'method', 'action': 'getState', 'report_time': 1776486300, 'lastStateTime': 1776486300654}
+2026-04-17 21:25:00.663 Thread-1250 (process_message) udi_interface      ERROR    yolink_mqtt_classV4:updateCallbackStatus: Switch: Cannot connect to the device
+2026-04-17 21:33:22.348 Thread-1256 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: valve error : False
+2026-04-17 21:33:22.348 Thread-1256 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: high temp error : None
+2026-04-17 21:33:22.348 Thread-1256 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: low temp error : None
+2026-04-17 21:33:22.363 Thread-1256 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:33:22.369 Thread-1256 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:33:22.384 Thread-1256 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:33:22.391 Thread-1256 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:43:22.350 Thread-1261 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: valve error : False
+2026-04-17 21:43:22.350 Thread-1261 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: high temp error : None
+2026-04-17 21:43:22.350 Thread-1261 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: low temp error : None
+2026-04-17 21:43:22.364 Thread-1261 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:43:22.393 Thread-1261 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:43:22.400 Thread-1261 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:43:22.416 Thread-1261 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:53:22.360 Thread-1267 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: valve error : False
+2026-04-17 21:53:22.360 Thread-1267 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: high temp error : None
+2026-04-17 21:53:22.360 Thread-1267 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: low temp error : None
+2026-04-17 21:53:22.375 Thread-1267 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:53:22.382 Thread-1267 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:53:22.396 Thread-1267 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:53:22.402 Thread-1267 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 21:53:26.147 Thread-1268 (process_message) udi_interface      ERROR    yolinkInfraredRemoterV3:updateStatus: InfraredRemoter - Exception - Circular reference detected 
+2026-04-17 21:53:26.147 Thread-1268 (process_message) udi_interface      ERROR    yolinkInfraredRemoterV3:updateStatus: {'battery': 3, 'keys': [True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False], 'version': '0306', 'time': '2026-03-17T21:53:43.000Z', 'tz': -7, 'loraInfo': {'netId': '010204', 'devNetType': 'D', 'signal': -6, 'gatewayId': 'd88b4c1606000221', 'gateways': 4}}
+2026-04-17 21:59:14.984 Thread-1273 (process_message) udi_interface      ERROR    yoLink_init_V4:process_message: Non-000000 code Cannot connect to the device 
+2026-04-17 21:59:14.984 Thread-1272 (transfer_data) udi_interface      ERROR    yoLink_init_V4:transfer_data: Error code 000201 received for message {'method': 'Switch.getState', 'targetDevice': 'd88b4c010008018b', 'token': 'E967095C104FF2D1E7B941B7048179F8', 'params': {}, 'time': '1776488350970', 'retry': 11, 'last_retry_time': 1776486296647} - initiating retry
+2026-04-17 21:59:14.984 Thread-1273 (process_message) udi_interface      ERROR    yolink_mqtt_classV4:Status: Status YoLink Switch - Off line detected: {'code': '000201', 'time': 1776488354976, 'msgid': '1776488350970', 'method': 'Switch.getState', 'data': {}, 'targetDevice': 'd88b4c010008018b', 'desc': 'Cannot connect to the device'}
+2026-04-17 21:59:14.985 Thread-1273 (process_message) udi_interface      ERROR    yolink_mqtt_classV4:Status: Status YoLink Switch - Off line detected: {'code': '000201', 'time': 1776488354976, 'msgid': '1776488350970', 'method': 'Switch.getState', 'data': {}, 'targetDevice': 'd88b4c010008018b', 'desc': 'Cannot connect to the device', 'emptyData': True, 'type': 'method', 'action': 'getState', 'report_time': 1776488354, 'lastStateTime': 1776488354976}
+2026-04-17 21:59:14.985 Thread-1273 (process_message) udi_interface      ERROR    yolink_mqtt_classV4:updateCallbackStatus: Switch: Cannot connect to the device
+2026-04-17 22:03:22.365 Thread-1278 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: valve error : False
+2026-04-17 22:03:22.366 Thread-1278 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: high temp error : None
+2026-04-17 22:03:22.366 Thread-1278 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: low temp error : None
+2026-04-17 22:03:22.380 Thread-1278 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 22:03:22.387 Thread-1278 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 22:03:22.400 Thread-1278 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 22:03:22.408 Thread-1278 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 22:13:22.367 Thread-1281 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: valve error : False
+2026-04-17 22:13:22.368 Thread-1281 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: high temp error : None
+2026-04-17 22:13:22.368 Thread-1281 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterControllerV4:updateData: low temp error : None
+2026-04-17 22:13:22.383 Thread-1281 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 22:13:22.389 Thread-1281 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 22:13:22.404 Thread-1281 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+2026-04-17 22:13:22.411 Thread-1281 (systemPoll) udi_interface      DEBUG    udiYoWaterMeterMultiControllerV4:updateData: valve error : False
+`n---LAST 40 CRITICAL---
+`n---LAST 40 EXCEPTION---
+2026-04-17 21:53:26.147 Thread-1268 (process_message) udi_interface      ERROR    yolinkInfraredRemoterV3:updateStatus: InfraredRemoter - Exception - Circular reference detected 

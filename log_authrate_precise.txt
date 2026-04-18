@@ -1,0 +1,3 @@
+Pattern: Unauthorized|unauthorized|Forbidden|forbidden|Too Many Requests|too many requests|rate limit|rate-limit|HTTP\s*401|HTTP\s*403|HTTP\s*429|status\s*code\s*401|status\s*code\s*403|status\s*code\s*429
+Matches: 0
+---LAST 120 MATCHES---

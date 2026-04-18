@@ -119,7 +119,10 @@ class YoLinkInfraredRemoter(YoLinkMQTTDevice):
                         #yolink.data[yolink.dData]['IRtype'] = 'send'        
 
             if 'event' in data:
-                logging.debug(f'event detected {json.dumps(data, sort_keys=True, indent=4, separators=(",", ": "))}')
+                # Avoid circular-reference errors when debug-serializing payloads that include lastMessage self-links.
+                safe_data = dict(data)
+                safe_data.pop('lastMessage', None)
+                logging.debug(f'event detected {json.dumps(safe_data, sort_keys=True, indent=4, separators=(",", ": "), default=str)}')
                 if '.learn' in data['event']:
                     if 'data' in data:
                         if 'success' in data['data']:
@@ -189,7 +192,7 @@ class YoLinkInfraredRemoter(YoLinkMQTTDevice):
     def check_learn_completed(yolink, code):
         logging.debug('YoLinkInfraredRem check_learn_completed {}'.format(code))
         try:
-            logging.debug('Analyzed Message: {}'.format(yolink.getLastDataPacket()))
+            #logging.debug('Analyzed Message: {}'.format(yolink.getLastDataPacket()))
             key = yolink.get_data('key' )
             errorCode = yolink.get_data('errorCode' )
             success = yolink.get_data('success' )
@@ -249,7 +252,7 @@ class YoLinkInfraredRemoter(YoLinkMQTTDevice):
             logging.error('YoLinkInfraredRem send_code - Exception: {}'.format(E))
             return(False)
         
-
+    ''''
     def get_last_message_type(yolink):
         logging.debug( '{} - get_last_message_type'.format(yolink.type))
         last_msg = yolink.getLastDataPacket()
@@ -272,6 +275,7 @@ class YoLinkInfraredRemoter(YoLinkMQTTDevice):
                     logging.error('{} - get_last_message_type -unsupported event: {}'.format(yolink.type,last_msg['event']))
         else:
             return(None)
+    '''
     '''
     def get_learn_status(yolink):
         logging.debug( '{} - get_learn_status'.format(yolink.type))

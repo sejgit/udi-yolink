@@ -85,6 +85,12 @@ class udiYoOutlet(udi_interface.Node):
             self.id = 'yooutletPwr'
             self.powerSupported = True  
 
+        # Use instance-level drivers so power models can expose GV3/GV4 without affecting non-power outlets.
+        self.drivers = [dict(d) for d in type(self).drivers]
+        if self.powerSupported:
+            self.drivers.insert(3, {'driver': 'GV3', 'value': 0, 'uom': 73})
+            self.drivers.insert(4, {'driver': 'GV4', 'value': 0, 'uom': 119})
+
         self.last_state = ''
         self.timer_update = 5
         self.timer_expires = 0
