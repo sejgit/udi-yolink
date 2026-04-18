@@ -175,8 +175,8 @@ def my_setDriver(self, key, value, UOM=None, force=None, type=None):
                         force = False     
                 if value is None:
                     if type  in ['event']: 
-                        logging.debug('None value passed = seting 99, UOM 25')
-                        self.node.setDriver(key, 99, True, force, 25)
+                        logging.debug('None value passed for event update; preserving existing driver value')
+                        return
                 else:  
                     if key in ['GV20']: # Connection state o
                         try:
