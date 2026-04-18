@@ -514,6 +514,7 @@ class udiYoMultiOutlet(udi_interface.Node):
         self.node_ready = False
         self.configDone = False
         self.system_ready=False
+        self.main_node_ready = False
         self._update_lock = threading.Lock()
         self.subUsb = []
         self.subOutlet = []
