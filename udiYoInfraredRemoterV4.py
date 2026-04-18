@@ -208,6 +208,8 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.node_ready = False
         self.configDone = False
         self.system_ready=False
+        self.main_node_ready = False
+        self.sub_nodes_ready = False
         self._update_lock = threading.Lock()
         self.powerSupported = True # assume 
         self.n_queue = []     
@@ -246,7 +248,6 @@ class udiYoInfraredRemoter(udi_interface.Node):
         self.code_nodes = {}
         # Track the initial learned-code scan, but allow later child-node additions.
         self.main_node_ready = True
-        self.sub_nodes_ready = False
         self.node_ready = True
 
     def add_code_node(self, code):

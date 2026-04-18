@@ -292,6 +292,8 @@ class udiYoSmartRemoter(udi_interface.Node):
         self.node_ready = False
         self.configDone = False
         self.system_ready=False
+        self.main_node_ready = False
+        self.sub_nodes_ready = False
         self._update_lock = threading.Lock()
         self.last_state = 99
         self.n_queue = []
@@ -340,7 +342,6 @@ class udiYoSmartRemoter(udi_interface.Node):
 
         # Track the initial child-key build, but do not block parent readiness on it.
         self.main_node_ready = True
-        self.sub_nodes_ready = False
         self.node_ready = True
 
     '''

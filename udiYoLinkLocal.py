@@ -25,6 +25,60 @@ except ImportError:
 #version = '0.0.0
 from udiCommonLib import version
 
+
+SENSITIVE_LOG_KEYS = {
+    'access_token',
+    'refresh_token',
+    'token',
+    'authorization',
+    'client_secret',
+    'local_client_secret',
+    'secret_key',
+    'password',
+    'secid',
+    'uaid',
+    'local_client_id',
+}
+
+
+def _mask_secret(value, keep=4):
+    text = str(value)
+    if len(text) <= keep:
+        return '*' * len(text)
+    return f"***{text[-keep:]}"
+
+
+def _redact_log_value(value):
+    if isinstance(value, dict):
+        redacted = {}
+        for key, item in value.items():
+            if str(key).lower() in SENSITIVE_LOG_KEYS:
+                redacted[key] = _mask_secret(item)
+            else:
+                redacted[key] = _redact_log_value(item)
+        return redacted
+
+    if isinstance(value, list):
+        return [_redact_log_value(item) for item in value]
+
+    return value
+
+
+def _summarize_device_list(device_list):
+    devices = []
+    for device in device_list:
+        if not isinstance(device, dict):
+            continue
+        devices.append({
+            'deviceId': device.get('deviceId'),
+            'name': device.get('name'),
+            'type': device.get('type'),
+            'modelName': device.get('modelName'),
+            'parentDeviceId': device.get('parentDeviceId'),
+            'access': device.get('access'),
+        })
+    return {'count': len(devices), 'devices': devices}
+
 class YoLinkSetup (udi_interface.Node):
     from udiYolinkLib import my_setDriver, node_queue, wait_for_node_done, updateEpochTime, convert_temp_unit, convert_water_unit
     from udiCommonLib import systemPoll, addNodes, heartbeat, configDoneHandler, checkNodes, handleLevelChange, saveNodeNames
@@ -98,7 +152,11 @@ class YoLinkSetup (udi_interface.Node):
 
 
     def parse_device_lists (self, cloud_list = [], local_list =[]) -> list:
-        logging.debug(f'parse_device_lists {cloud_list} {local_list}')
+        logging.debug(
+            'parse_device_lists cloud=%s local=%s',
+            _summarize_device_list(cloud_list),
+            _summarize_device_list(local_list),
+        )
         device_list = []        
         cloud_devs = {}
         for dev in cloud_list:
@@ -117,7 +175,7 @@ class YoLinkSetup (udi_interface.Node):
                 dev['access'] = 1
                 device_list.append(dev)
 
-        logging.debug(f'Resulting Device List {device_list}')
+        logging.debug('Resulting Device List %s', _summarize_device_list(device_list))
         return(device_list)
 
     def start (self):
@@ -135,14 +193,19 @@ class YoLinkSetup (udi_interface.Node):
         #                        'WaterDepthSensor', 'WaterMeterMultiController']
         logging.info (f'Access mode : {self.access_mode}')
         self.updateEpochTime()
-        logging.debug(f'credentials {self.access_mode} {self.uaid} {self.secretKey} {self.local_client_id} {self.local_client_secret}')
+        logging.debug(
+            'credentials mode=%s cloud_configured=%s local_configured=%s',
+            self.access_mode,
+            bool(self.uaid and self.secretKey),
+            bool(self.local_client_id and self.local_client_secret),
+        )
         if 'cloud' in self.access_mode:
             if self.uaid == None or self.uaid == '' or self.secretKey==None or self.secretKey=='':
                 logging.error('UAID and secretKey must be provided to start node server')
                 self.poly.Notices['cloud'] = 'UAID and secretKey must be provided to start node server in cloud or hybrid mode'
                 exit() 
             else:
-                logging.debug(f'initialiing Cloud mode {self.uaid} {self.secretKey}')
+                logging.debug('initializing Cloud mode with configured credentials')
                 self.yoAccess = YoLinkInitPAC (self.uaid, self.secretKey )
         if 'local' in self.access_mode:
             if self.local_client_id == None or self.local_client_id == '' or self.local_client_secret==None or self.local_client_secret=='':
@@ -152,7 +215,14 @@ class YoLinkSetup (udi_interface.Node):
             else:
                 tokenURL = self.local_URL+'/open/yolink/token'
                 apiURL = self.local_URL+'/open/yolink/v2/api'
-                logging.debug(f'initializing Local mode {self.local_client_id} {self.local_client_secret} {tokenURL} {apiURL} {self.local_ip} {self.local_MQTT_port} {self.subnet_id} ')
+                logging.debug(
+                    'initializing Local mode token_url=%s api_url=%s host=%s mqtt_port=%s subnet_id=%s',
+                    tokenURL,
+                    apiURL,
+                    self.local_ip,
+                    self.local_MQTT_port,
+                    self.subnet_id,
+                )
                 self.yoLocal = YoLinkInitPAC (self.local_client_id, self.local_client_secret, tokenURL, apiURL, self.local_ip, self.local_MQTT_port, self.subnet_id  )
    
 
@@ -214,7 +284,7 @@ class YoLinkSetup (udi_interface.Node):
 
         self.deviceList = self.parse_device_lists(deviceListCloud, deviceListLocal )
 
-        logging.debug('{} devices detected : {}'.format(len(self.deviceList), self.deviceList) )
+        logging.debug('Devices detected: %s', _summarize_device_list(self.deviceList))
         if self.yoAccess or self.yoLocal:
             self.my_setDriver('ST', 1)
             self.my_setDriver('GV1', 1)
@@ -543,7 +613,7 @@ class YoLinkSetup (udi_interface.Node):
 
 
         except Exception as e:
-            logging.debug('Error: {} {}'.format(e, userParam))
+            logging.debug('Error: %s %s', e, _redact_log_value(userParam))
 
 
 

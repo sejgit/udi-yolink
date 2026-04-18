@@ -31,6 +31,69 @@ from queue import Queue, Empty
 from threading import Thread, Event, Lock
 DEBUG = False
 
+SENSITIVE_LOG_KEYS = {
+    'access_token',
+    'refresh_token',
+    'token',
+    'authorization',
+    'client_secret',
+    'secret_key',
+    'password',
+    'secid',
+    'uaid',
+}
+
+
+def _mask_secret(value, keep=4):
+    text = str(value)
+    if len(text) <= keep:
+        return '*' * len(text)
+    return f"***{text[-keep:]}"
+
+
+def _redact_log_value(value):
+    if isinstance(value, dict):
+        redacted = {}
+        for key, item in value.items():
+            if str(key).lower() in SENSITIVE_LOG_KEYS:
+                redacted[key] = _mask_secret(item)
+            else:
+                redacted[key] = _redact_log_value(item)
+        return redacted
+
+    if isinstance(value, list):
+        return [_redact_log_value(item) for item in value]
+
+    return value
+
+
+def _response_log_summary(response):
+    summary = {
+        'ok': response.ok,
+        'status_code': response.status_code,
+    }
+    try:
+        summary['body'] = _redact_log_value(response.json())
+    except ValueError:
+        summary['body'] = '<non-json response>'
+    return summary
+
+
+def _summarize_device_list(device_list):
+    devices = []
+    for device in device_list:
+        if not isinstance(device, dict):
+            continue
+        devices.append({
+            'deviceId': device.get('deviceId'),
+            'name': device.get('name'),
+            'type': device.get('type'),
+            'modelName': device.get('modelName'),
+            'parentDeviceId': device.get('parentDeviceId'),
+            'serviceZone': device.get('serviceZone'),
+        })
+    return {'count': len(devices), 'devices': devices}
+
 
 class YoLinkInitPAC(object):
     def __init__(yoAccess, ID, secret, tokenURL='https://api.yosmart.com/open/yolink/token' , apiURL='https://api.yosmart.com/open/yolink/v2/api', mqttURL= 'api.yosmart.com', mqttPort = 8003, home_id = None):
@@ -126,7 +189,14 @@ class YoLinkInitPAC(object):
             #    logging.info('Trying to obtain new Token - Network/YoLink connection may be down')
             #logging.info('Retrieving YoLink API info')
             time.sleep(1)
-            logging.debug(f'Start info: {yoAccess.homeID } {yoAccess.mqttURL} {yoAccess.mqttPort} {yoAccess.keepAlive} {yoAccess.token}')
+            logging.debug(
+                'Start info: home_id=%s mqtt=%s:%s keepalive=%s token_present=%s',
+                yoAccess.homeID,
+                yoAccess.mqttURL,
+                yoAccess.mqttPort,
+                yoAccess.keepAlive,
+                yoAccess.token is not None,
+            )
             if 'cloud' in yoAccess.access_mode:
                 while not yoAccess.refresh_token():
                     time.sleep(35) # Wait 35 sec and try again - 35 sec ensures less than 10 attemps in 5min - API restriction
@@ -134,7 +204,11 @@ class YoLinkInitPAC(object):
                 logging.info('Retrieving YoLink API info')
                 time.sleep(1)
                 yoAccess.mqtt_str = 'yl-home/'
-                logging.debug(f'cloud mode {yoAccess.mqtt_str} {yoAccess.token}')
+                logging.debug(
+                    'cloud mode topic_prefix=%s token=%s',
+                    yoAccess.mqtt_str,
+                    _redact_log_value(yoAccess.token),
+                )
                 if yoAccess.token != None:
                     yoAccess.retrieve_homeID()                    
                     yoAccess.retrieve_device_list()
@@ -146,7 +220,14 @@ class YoLinkInitPAC(object):
             #except Exception as e:
             #    logging.debug('Using non pG3x code {e}')
             #    yoAccess.client = mqtt.Client(yoAccess.homeID,  clean_session=True, userdata=None,  protocol=mqtt.MQTTv311, transport="tcp")
-            logging.debug(f'MQTT info: {yoAccess.homeID} {yoAccess.mqttURL} {yoAccess.mqttPort} {yoAccess.keepAlive} {yoAccess.token}')
+            logging.debug(
+                'MQTT info: home_id=%s mqtt=%s:%s keepalive=%s token=%s',
+                yoAccess.homeID,
+                yoAccess.mqttURL,
+                yoAccess.mqttPort,
+                yoAccess.keepAlive,
+                _redact_log_value(yoAccess.token),
+            )
             yoAccess.client.on_connect = yoAccess.on_connect
             yoAccess.client.on_message = yoAccess.on_message
             yoAccess.client.on_subscribe = yoAccess.on_subscribe
@@ -255,7 +336,7 @@ class YoLinkInitPAC(object):
     def refresh_token(yoAccess):
         
         try:
-            logging.info(f'{yoAccess.access_mode} Refreshing Token {yoAccess.token }')
+            logging.info(f'{yoAccess.access_mode} Refreshing token; token_present={yoAccess.token is not None}')
             now = int(time.time())
             
             if yoAccess.token != None:
@@ -274,7 +355,7 @@ class YoLinkInitPAC(object):
                             "client_id" : yoAccess.uaID,
                             "client_secret" : yoAccess.secID }, timeout= 5
                 )
-                logging.debug(f'Refresh response : {response} {response.ok} {response.text}')
+                logging.debug('Refresh response: %s', _response_log_summary(response))
                 if response.ok:
                     yoAccess.token =  response.json()
                     yoAccess.token['expirationTime'] = int(yoAccess.token['expires_in']) + now
@@ -290,7 +371,7 @@ class YoLinkInitPAC(object):
                         "client_id" : yoAccess.uaID,
                         "client_secret" : yoAccess.secID }, timeout= 5
                 )
-                logging.debug(f'Refresh response : {response} {response.ok} {response.text}')
+                logging.debug('Refresh response: %s', _response_log_summary(response))
                 if response.ok:
                     yoAccess.token =  response.json()
                     yoAccess.token['expirationTime'] = int(yoAccess.token['expires_in']) + now
@@ -338,13 +419,13 @@ class YoLinkInitPAC(object):
             yoAccess.time_tracking('global')
             r = requests.post(yoAccess.apiv2URL, data=json.dumps(data), headers=headers1, timeout=5) 
             info = r.json()
-            logging.debug('info : {}'.format(json.dumps(info, indent=4, separators=(',', ': ') )))
+            logging.debug('retrieve_device_list summary: %s', _summarize_device_list(info.get('data', {}).get('devices', [])))
             
             if 'cloud' in yoAccess.access_mode:
                 yoAccess.deviceList = info['data']['devices']
             elif 'local' in yoAccess.access_mode:
                 yoAccess.deviceList = info['data']['devices']
-            logging.debug(f'{yoAccess.access_mode} yoAccess.deviceList: { yoAccess.deviceList}')
+            logging.debug('%s device list summary: %s', yoAccess.access_mode, _summarize_device_list(yoAccess.deviceList))
                        
         except Exception as e:
             logging.error('Exception  -  retrieve_device_list : {}'.format(e))             
@@ -405,15 +486,28 @@ class YoLinkInitPAC(object):
             #yoAccess.retrieve_device_list()
             #yoAccess.retrieve_homeID()
             time.sleep(1)
-            logging.debug(f'Connect info: {yoAccess.access_mode} {yoAccess.mqttURL} {yoAccess.mqttPort} {yoAccess.keepAlive} {yoAccess.token}')
+            logging.debug(
+                'Connect info: mode=%s mqtt=%s:%s keepalive=%s token=%s',
+                yoAccess.access_mode,
+                yoAccess.mqttURL,
+                yoAccess.mqttPort,
+                yoAccess.keepAlive,
+                _redact_log_value(yoAccess.token),
+            )
             if 'cloud' in yoAccess.access_mode:
-                logging.debug('cloud : {}'.format(yoAccess.token['access_token']))
+                logging.debug('cloud connect using access token')
                 yoAccess.client.username_pw_set(username=yoAccess.token['access_token'], password=None)
             elif 'local' in yoAccess.access_mode:
-                logging.debug(f'local ; {yoAccess.local_client_id} {yoAccess.local_client_secret}')
+                logging.debug('local connect using configured client credentials')
                 yoAccess.client.username_pw_set(username=yoAccess.local_client_id, password=yoAccess.local_client_secret)
 
-            logging.debug(f'Connect 2 info: {yoAccess.mqttURL} {yoAccess.mqttPort} {yoAccess.keepAlive} {yoAccess.token}')
+            logging.debug(
+                'Connect 2 info: mqtt=%s:%s keepalive=%s token=%s',
+                yoAccess.mqttURL,
+                yoAccess.mqttPort,
+                yoAccess.keepAlive,
+                _redact_log_value(yoAccess.token),
+            )
             temp = yoAccess.client.connect(yoAccess.mqttURL, yoAccess.mqttPort, keepalive= yoAccess.keepAlive)
             logging.debug(f'yoAccess.client.connect: {temp}' )  
 
@@ -589,7 +683,13 @@ class YoLinkInitPAC(object):
             else:
                 logging.debug('Unknow device in payload : {}'.format(payload))
 
-            logging.debug(f'{yoAccess.access_mode} process_message for {deviceId}: {payload} {msg.topic}')
+            logging.debug(
+                '%s process_message for %s: payload=%s topic=%s',
+                yoAccess.access_mode,
+                deviceId,
+                _redact_log_value(payload),
+                msg.topic,
+            )
             
 
             if deviceId not in yoAccess.mqttList:
@@ -781,7 +881,11 @@ class YoLinkInitPAC(object):
         """
         Callback for broker published events
         """
-        logging.debug(f'{yoAccess.access_mode} on_message: {json.loads(msg.payload.decode("utf-8"))}')
+        logging.debug(
+            '%s on_message: %s',
+            yoAccess.access_mode,
+            _redact_log_value(json.loads(msg.payload.decode("utf-8"))),
+        )
         yoAccess.messageQueue.put(msg)
         #qsize = yoAccess.messageQueue.qsize()
         #logging.debug('Message received and put in queue (size : {})'.format(qsize))
@@ -938,7 +1042,11 @@ class YoLinkInitPAC(object):
 
     #@measure_time
     def publish_data(yoAccess, data):
-        logging.debug( f'{yoAccess.access_mode} Publish Data to Queue: {json.dumps(data, indent=4, separators=(",", ": "))}')
+        logging.debug(
+            '%s Publish Data to Queue: %s',
+            yoAccess.access_mode,
+            json.dumps(_redact_log_value(data), indent=4, separators=(",", ": ")),
+        )
         sleeping = False
         while not yoAccess.connectedToBroker:
             logging.debug('Connection to Broker not established - waiting')

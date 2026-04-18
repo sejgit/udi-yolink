@@ -180,7 +180,7 @@ def my_setDriver(self, key, value, UOM=None, force=None, type=None):
                 else:  
                     if key in ['GV20']: # Connection state o
                         try:
-                            if isinstance(self.yoAccess, type(None)) == False and self.yoAccess.local:
+                            if self.yoAccess is not None and getattr(self.yoAccess, 'local', False):
                                 logging.debug('Local connection - value + 3')
                                 value = value + 3
                         except Exception as e:

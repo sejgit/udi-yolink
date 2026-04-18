@@ -26,6 +26,21 @@ except ImportError:
 from udiCommonLib import version
 
 
+def _summarize_devices_for_log(device_list):
+    devices = []
+    for device in device_list:
+        if not isinstance(device, dict):
+            continue
+        devices.append({
+            'deviceId': device.get('deviceId'),
+            'name': device.get('name'),
+            'type': device.get('type'),
+            'modelName': device.get('modelName'),
+            'parentDeviceId': device.get('parentDeviceId'),
+        })
+    return {'count': len(devices), 'devices': devices}
+
+
 class YoLinkSetup (udi_interface.Node):
     from udiYolinkLib import my_setDriver, node_queue, wait_for_node_done, updateEpochTime, convert_temp_unit, convert_water_unit
     from udiCommonLib import systemPoll, addNodes, heartbeat, checkNodes, handleLevelChange, saveNodeNames
@@ -154,7 +169,7 @@ class YoLinkSetup (udi_interface.Node):
         self.deviceList = self.yoAccess.getDeviceList()
 
 
-        logging.debug('{} devices detected : {}'.format(len(self.deviceList), self.deviceList) )
+        logging.debug('Devices detected: %s', _summarize_devices_for_log(self.deviceList))
         if self.yoAccess:
             self.my_setDriver('ST', 1)
             self.my_setDriver('GV1', 1)
