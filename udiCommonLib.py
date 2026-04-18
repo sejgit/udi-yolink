@@ -232,10 +232,31 @@ def addNodes (self, deviceList) -> list:
                 #self.yoAccess.writeTtsFile()
                 logging.info('TTS messages : {}'.format(dev_access.TtsMessages))
                 logging.info('Updating profile files ')
-                if udiTssProfileUpdate(dev_access.TtsMessages):
+                tts_signature = '|'.join(
+                    [str(dev_access.TtsMessages[idx]).strip() for idx in sorted(dev_access.TtsMessages.keys())]
+                )
+                tts_signature = f'{self.nbrTTS}:{tts_signature}'
+
+                try:
+                    custom_data = Custom(self.poly, 'customdata')
+                    prev_tts_signature = custom_data.get('tts_signature')
+                except Exception as e:
+                    logging.debug(f'Unable to access customdata for tts signature tracking: {e}')
+                    custom_data = None
+                    prev_tts_signature = None
+
+                profile_changed = udiTssProfileUpdate(dev_access.TtsMessages)
+                tts_changed = (
+                    prev_tts_signature is not None and prev_tts_signature != tts_signature
+                )
+
+                if tts_changed:
                     self.poly.Notices['tts'] = 'Speaker hub messages updated - Polisy/eISY need to be restarted to take effect'
                 else:
                     self.poly.Notices.delete('tts')
+
+                if custom_data is not None and (tts_changed or profile_changed):
+                    custom_data['tts_signature'] = tts_signature
                 self.poly.updateProfile()   
                 #for nbr in range(0,self.nbrTTS):
                 #    index = 'TTS'+str(nbr)
