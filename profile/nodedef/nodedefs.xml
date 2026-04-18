@@ -1205,6 +1205,7 @@
          <st id="GV23" editor="count" /> <!-- aoverrun AC --> 
          <st id="GV24" editor="minutes" />
 
+         <st id="GV25" editor="enable" /> <!--leak-->
          <st id="GV26" editor="enable" /> <!--leak-->
          <st id="GV27" editor="enable" /> <!--Overrun amount-->
          <st id="GV28" editor="enable" /> <!--Overrun duration-->
@@ -1333,6 +1334,7 @@
          <st id="GV23" editor="count" /> <!-- aoverrun AC --> 
          <st id="GV24" editor="minutes" />
 
+         <st id="GV25" editor="enable" /> <!--leak-->
          <st id="GV26" editor="enable" /> <!--leak-->
          <st id="GV27" editor="enable" /> <!--Overrun amount-->
          <st id="GV28" editor="enable" /> <!--Overrun duration-->         

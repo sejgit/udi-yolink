@@ -67,6 +67,7 @@ class udiYoWaterMeterController(udi_interface.Node):
             {'driver': 'GV23', 'value': 99, 'uom': 25}, #Overrtun limit
             {'driver': 'GV24', 'value': 99, 'uom': 25}, #Overrun Time
     
+            {'driver': 'GV25', 'value': 99, 'uom': 25}, #Leak AC
             {'driver': 'GV26', 'value': 99, 'uom': 25}, #LEakAC
             {'driver': 'GV27', 'value': 99, 'uom': 25}, #Overrun AC
             {'driver': 'GV28', 'value': 99, 'uom': 25}, #OverrunTIme AC        
