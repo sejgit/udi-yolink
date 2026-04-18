@@ -333,15 +333,13 @@ class udiYoWaterMeterOnly(udi_interface.Node):
         state = int(command.get('value'))
         if state == 1:
             self.yoWaterCtrl.setState('open')
-            self.valveState = 1
-            self.my_setDriver('GV0',self.valveState)
+
    
             #self.node.reportCmd('DON')
         elif state == 0:
             self.yoWaterCtrl.setState('closed')
             self.valveState  = 0
-            self.my_setDriver('GV0',self.valveState)
-            #self.node.reportCmd('DOF')
+
         elif state == 5:
             logging.info('udiYoWaterMeterController set Delays Executed: {} {}'.format(self.onDelay, self.offDelay))
             #self.yolink.setMultiOutDelay(self.port, self.onDelay, self.offDelay)
@@ -356,10 +354,6 @@ class udiYoWaterMeterOnly(udi_interface.Node):
         if ctrl is None:
             return
         ctrl.setState('open')
-        self.valveState  = 1
-        self.my_setDriver('GV0',self.valveState )
-
-        #self.node.reportCmd('DON')
 
     def set_close(self, command = None):
         logging.info('udiYoWaterMeterController - set_close')
@@ -367,9 +361,6 @@ class udiYoWaterMeterOnly(udi_interface.Node):
         if ctrl is None:
             return
         ctrl.setState('closed')
-        self.valveState  = 0
-        self.my_setDriver('GV0',self.valveState )
-        #self.node.reportCmd('DOF')
 
 
     def prepOnDelay(self, command ):

@@ -72,6 +72,7 @@ class udiYoManipulator(udi_interface.Node):
         self.system_ready=False
         self._update_lock = threading.Lock()
         self.last_state = ''
+        self._last_reported_state = None
         self.timer_cleared = True
         self.timer_update = 5
         self.timer_expires = 0
@@ -142,6 +143,31 @@ class udiYoManipulator(udi_interface.Node):
             logging.warning(f'udiYoManipulator - {caller} skipped; manipulator not initialized yet')
             return None
         return self.yoManipulator
+
+    def _normalize_binary_state(self, state):
+        if not isinstance(state, str):
+            return None
+        state_l = state.lower()
+        if state_l in ['on', 'open']:
+            return 'on'
+        if state_l in ['off', 'closed', 'close']:
+            return 'off'
+        return None
+
+    def _report_binary_state_change(self, state):
+        normalized_state = self._normalize_binary_state(state)
+        if normalized_state is None:
+            return
+        if self._last_reported_state is None:
+            self._last_reported_state = normalized_state
+            return
+        if self._last_reported_state == normalized_state:
+            return
+        if normalized_state == 'on':
+            self.node.reportCmd('DON')
+        else:
+            self.node.reportCmd('DOF')
+        self._last_reported_state = normalized_state
             
     def checkOnline(self):
         #get get info even if battery operated 
@@ -183,21 +209,18 @@ class udiYoManipulator(udi_interface.Node):
                 if manipulator.check_system_online():
                     state =  manipulator.get_data('state')
 
-                    if state.upper() == 'OPEN':
+                    if isinstance(state, str) and state.upper() == 'OPEN':
                         self.valveState = 1
                         self.my_setDriver('GV0', self.valveState, type = message_type )
                         self.my_setDriver('ST', self.valveState, type = message_type )
-                        if self.last_state != state:
-                            self.node.reportCmd('DON')
-                    elif state.upper() == 'CLOSED':
+                    elif isinstance(state, str) and state.upper() == 'CLOSED':
                         self.valveState = 0
                         self.my_setDriver('GV0', self.valveState, type=message_type )
                         self.my_setDriver('ST', self.valveState, type=message_type )
-                        if self.last_state != state:    
-                            self.node.reportCmd('DOF')
                     else:
                         self.my_setDriver('GV0', 99)
                         self.my_setDriver('ST',99)
+                    self._report_binary_state_change(state)
                     self.last_state = state
                     self.my_setDriver('GV30', 1)
                     #logging.debug('Timer info : {} '. format(time.time() - self.timer_expires))
@@ -264,22 +287,11 @@ class udiYoManipulator(udi_interface.Node):
         state = int(command.get('value'))
         if state == 1:
             manipulator.setState('open')
-            self.valveState = 1
-            self.my_setDriver('GV0',self.valveState  )  
-            self.my_setDriver('ST',self.valveState  )  
-   
-            #self.node.reportCmd('DON')
         elif state == 0:
             manipulator.setState('closed')
-            self.valveState  = 0
-            self.my_setDriver('GV0',self.valveState )
-            self.my_setDriver('ST',self.valveState  )
-            #self.node.reportCmd('DOF')
         elif state == 5:
             logging.info('manipuControl set Delays Executed: {} {}'.format(self.onDelay, self.offDelay))
             #self.yolink.setMultiOutDelay(self.port, self.onDelay, self.offDelay)
-            self.my_setDriver('GV1', self.onDelay * 60)
-            self.my_setDriver('GV2', self.offDelay * 60 )
             manipulator.setDelayList([{'on':self.onDelay, 'off':self.offDelay}]) 
 
 
@@ -289,11 +301,6 @@ class udiYoManipulator(udi_interface.Node):
         if manipulator is None:
             return
         manipulator.setState('open')
-        self.valveState  = 1
-        self.my_setDriver('GV0',self.valveState  )
-        self.my_setDriver('ST',self.valveState  )
-
-        #self.node.reportCmd('DON')
 
     def set_close(self, command = None):
         logging.info('Manipulator - set_close')
@@ -301,11 +308,6 @@ class udiYoManipulator(udi_interface.Node):
         if manipulator is None:
             return
         manipulator.setState('closed')
-        self.valveState  = 0
-        self.my_setDriver('GV0',self.valveState  )
-        self.my_setDriver('ST',self.valveState  )
-
-        #self.node.reportCmd('DOF')
 
 
     def prepOnDelay(self, command ):

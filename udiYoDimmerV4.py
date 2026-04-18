@@ -79,6 +79,7 @@ class udiYoDimmer(udi_interface.Node):
         self.timer_cleared = True
         self.n_queue = [] # one queue for all
         self.last_state = ''
+        self._last_reported_state = None
         self.timer_update = 5
         self.timer_expires = 0
         self.onDelay = 0
@@ -185,6 +186,31 @@ class udiYoDimmer(udi_interface.Node):
         if dimmer is None:
             logging.warning('udiYoDimmer.%s called before device initialization', caller)
         return dimmer
+
+    def _normalize_binary_state(self, state):
+        if not isinstance(state, str):
+            return None
+        state_l = state.lower()
+        if state_l in ['on', 'open']:
+            return 'on'
+        if state_l in ['off', 'closed', 'close']:
+            return 'off'
+        return None
+
+    def _report_binary_state_change(self, state):
+        normalized_state = self._normalize_binary_state(state)
+        if normalized_state is None:
+            return
+        if self._last_reported_state is None:
+            self._last_reported_state = normalized_state
+            return
+        if self._last_reported_state == normalized_state:
+            return
+        if normalized_state == 'on':
+            self.node.reportCmd('DON')
+        else:
+            self.node.reportCmd('DOF')
+        self._last_reported_state = normalized_state
             
     def checkOnline(self):
         dimmer = self._get_dimmer('checkOnline')
@@ -228,16 +254,12 @@ class udiYoDimmer(udi_interface.Node):
                 #self.my_setDriver('ST', 1)
                 self.my_setDriver('GV30', 1)               
                 if state in[ 'ON', 'open', 'on', 'OPEN']:
-                    if self.last_state != state:
-                        self.my_setDriver('GV0', 1)
-                        self.node.reportCmd('DON')  
+                    self.my_setDriver('GV0', 1)
                 elif  state in ['OFF', 'closed', 'off', 'CLOSED']:
-                    #self.my_setDriver('GV0', 0)
-                    if self.last_state != state:
-                        self.my_setDriver('GV0', 0)
-                        self.node.reportCmd('DOF')  
+                    self.my_setDriver('GV0', 0)
                 else:
                     self.my_setDriver('GV0', 99)
+                self._report_binary_state_change(state)
                 self.last_state = state
                 if self.dim_setting['previous'] is None:
                     self.dim_setting['previous'] = dimmer.brightness
@@ -293,8 +315,6 @@ class udiYoDimmer(udi_interface.Node):
         if dimmer is None:
             return
         dimmer.setState('ON')
-        self.my_setDriver('GV0',1 )
-        self.node.reportCmd('DON')
 
     def set_switch_off(self, command = None):
         logging.info('udiYoDimmer set_switch_off')  
@@ -302,8 +322,6 @@ class udiYoDimmer(udi_interface.Node):
         if dimmer is None:
             return
         dimmer.setState('OFF')
-        self.my_setDriver('GV0',0 )
-        self.node.reportCmd('DOF')
 
     def set_switch_fon(self, command = None):
         logging.info('udiyoDimmer set_switch_on')  
@@ -311,8 +329,6 @@ class udiYoDimmer(udi_interface.Node):
         if dimmer is None:
             return
         dimmer.setState('ON')
-        self.my_setDriver('GV0',1 )
-        self.node.reportCmd('DFON')
 
     def set_switch_foff(self, command = None):
         logging.info('udiYoDimmer set_switch_off')  
@@ -320,8 +336,6 @@ class udiYoDimmer(udi_interface.Node):
         if dimmer is None:
             return
         dimmer.setState('OFF')
-        self.my_setDriver('GV0',0 )
-        self.node.reportCmd('DFOF')
 
 
     def increase_level(self, command = None):
@@ -331,10 +345,7 @@ class udiYoDimmer(udi_interface.Node):
             return
         dimmer.brightness += self.dimmer_step
         dimmer.setBrightness(dimmer.brightness)
-        self.my_setDriver('GV3', dimmer.brightness)
-        self.my_setDriver('ST', dimmer.brightness)
-        #self.my_setDriver('GV0',0 )
-        #self.node.reportCmd('DFOF')
+
 
     def decrease_level(self, command = None):
         logging.info(f'udiYoDimmer decrease_level - {command}')
@@ -343,10 +354,6 @@ class udiYoDimmer(udi_interface.Node):
             return
         dimmer.brightness -= self.dimmer_step
         dimmer.setBrightness(dimmer.brightness) 
-        self.my_setDriver('GV3', dimmer.brightness)
-        self.my_setDriver('ST', dimmer.brightness)
-        #self.my_setDriver('GV0',0 )
-        #self.node.reportCmd('DFOF')
 
     def scene_dim(self, command = None):
         logging.info(f'udiYoDimmer scene_dim - {command}')
@@ -386,8 +393,6 @@ class udiYoDimmer(udi_interface.Node):
         if dimmer is None:
             return
         dimmer.setBrightness(brightness) #????
-        self.my_setDriver('GV3',brightness )
-        self.my_setDriver('ST',brightness )
         self.dim_setting['dim'] = brightness
         self.save_cmd_struct(self.dim_setting)
 
@@ -418,29 +423,19 @@ class udiYoDimmer(udi_interface.Node):
         logging.debug('switchControl : {}'.format(ctrl))
         if ctrl == 1:
             dimmer.setState('ON')
-            self.my_setDriver('GV0',1 )
-            self.node.reportCmd('DON')
         elif ctrl == 0:
             dimmer.setState('OFF')
-            self.my_setDriver('GV0',0 )
-            self.node.reportCmd('DOF')
         elif ctrl == 2: #toggle
             state = str(dimmer.get_data('State'))
             logging.debug('switchControl : {}, {}'.format(ctrl, state))
             if state == 'on' or state == 'open' or state == 'ON' or state == 'OPEN':
                 dimmer.setState('OFF')
-                self.my_setDriver('GV0',0 )
-                self.node.reportCmd('DOF')
             elif state == 'off' or state == 'closed' or state == 'OFF' or state == 'CLOSED' :
                 dimmer.setState('ON')
-                self.my_setDriver('GV0',1 )
-                self.node.reportCmd('DON')
             #Unknown remains unknown
         elif ctrl == 5:
             logging.info('switchControl set Delays Executed: {} {}'.format(self.onDelay, self.offDelay))
             #self.yolink.setMultiOutDelay(self.port, self.onDelay, self.offDelay)
-            self.my_setDriver('GV1', self.onDelay * 60)
-            self.my_setDriver('GV2', self.offDelay * 60 )
             dimmer.setDelayList([{'on':self.onDelay, 'off':self.offDelay}]) 
 
     def setOnDelay(self, command ):

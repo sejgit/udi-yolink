@@ -224,13 +224,11 @@ class udiYoSiren(udi_interface.Node):
         if state == 1:
             siren.setState('on')
             self.sirenState = 1
-            self.my_setDriver('GV0',self.sirenState , True, True)
-            self.my_setDriver('ST',self.sirenState , True, True)
+
         else:
             siren.setState('off')
             self.sirenState  = 0
-            self.my_setDriver('GV0', self.sirenState , True, True)
-            self.my_setDriver('ST', self.sirenState , True, True)
+
 
 
 

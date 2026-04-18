@@ -172,10 +172,6 @@ class udiYoSubOutlet(udi_interface.Node):
         if outlet is None:
             return
         outlet.setMultiOutState(self.port, 'ON')
-        self.my_setDriver('GV0',1 )
-        self.my_setDriver('ST', 1) 
-        #self.node.reportCmd('DON')
-        self.portState = 1
 
     def set_port_off(self, command = None):
         logging.info('udiYoSubOutlet set_port_off')
@@ -183,10 +179,6 @@ class udiYoSubOutlet(udi_interface.Node):
         if outlet is None:
             return
         outlet.setMultiOutState(self.port, 'OFF')
-        self.my_setDriver('GV0',0 )
-        self.my_setDriver('ST', 0) 
-        #self.node.reportCmd('DOF')
-        self.portState = 0
 
     def switchControl(self, command):
         logging.info('udiYoSubOutlet switchControl')
@@ -197,31 +189,14 @@ class udiYoSubOutlet(udi_interface.Node):
         ctrl = int(command.get('value'))     
         if ctrl == 0:
             outlet.setMultiOutState(self.port, 'OFF')
-            self.my_setDriver('GV0',0 )
-            self.my_setDriver('ST', 0) 
-            self.node.reportCmd('DOF')
-
-            self.portState = 0        
         elif ctrl == 1:
             outlet.setMultiOutState(self.port, 'ON')
-            self.my_setDriver('GV0',1 )
-            self.my_setDriver('ST', 1) 
-            self.node.reportCmd('DON')
-            self.portState = 1
 
         elif ctrl == 2: #Toggle            
             if self.portState == 1 :
                 outlet.setMultiOutState(self.port, 'OFF')
-                self.my_setDriver('GV0',0 )
-                self.my_setDriver('ST', 0) 
-                self.node.reportCmd('DOF')
-                self.portState = 0
             elif self.portState == 0:
                 outlet.setMultiOutState(self.port, 'ON')
-                self.my_setDriver('GV0',1 )
-                self.my_setDriver('ST', 1) 
-                self.node.reportCmd('DON')
-                self.portState = 1
         
         #elif ctrl == 3: #Fast OFF
         #    self.yolink.setMultiOutState(self.port, 'OFF')

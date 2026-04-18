@@ -209,14 +209,10 @@ class udiYoOutlet(udi_interface.Node):
                         self.my_setDriver('GV0',1, type=message_type)
                         self.my_setDriver('ST',1, type=message_type)
                         state =  'open'
-                        #if self.last_state != state:
-                        #    self.node.reportCmd('DON')  
                     elif state in [ 'off', 'closed']:
                         self.my_setDriver('GV0', 0, type=message_type)
                         self.my_setDriver('ST', 0, type=message_type)
                         state = 'closed'
-                        #if self.last_state != state:
-                        #    self.node.reportCmd('DOF')  
                     #else:
                     #    self.my_setDriver('GV0', 99)
                     self.last_state = state           
@@ -290,9 +286,6 @@ class udiYoOutlet(udi_interface.Node):
         if outlet is None:
             return
         outlet.setState('open')
-        self.my_setDriver('GV0',1 )
-        self.my_setDriver('ST',1 )
-        #self.node.reportCmd('DON')
 
     def set_outlet_off(self, command = None):
         logging.info('udiYoOutlet set_outlet_off')
@@ -300,9 +293,6 @@ class udiYoOutlet(udi_interface.Node):
         if outlet is None:
             return
         outlet.setState('closed')
-        self.my_setDriver('GV0',0 )
-        self.my_setDriver('ST',0 )
-        #self.node.reportCmd('DOF')
 
 
 
@@ -316,27 +306,14 @@ class udiYoOutlet(udi_interface.Node):
         ctrl = int(command.get('value'))
         if ctrl == 1:
             outlet.setState('open')
-            self.my_setDriver('GV0',1 ) 
-            self.my_setDriver('ST',1 )
-
-            self.node.reportCmd('DON')
         elif ctrl == 0:
             outlet.setState('closed')
-            self.my_setDriver('GV0',0 )
-            self.my_setDriver('ST',0 )
-            self.node.reportCmd('DOF')
         elif ctrl == 2: #toggle
             state = str(outlet.get_data('state')) 
             if state == 'open':
                 outlet.setState('closed')
-                self.my_setDriver('GV0',0 )
-                self.my_setDriver('ST',0 )
-                self.node.reportCmd('DOF')
             elif state == 'closed':
                 outlet.setState('open')
-                self.my_setDriver('GV0',1 )
-                self.my_setDriver('ST',1 )
-                self.node.reportCmd('DON')                
         elif ctrl == 5:
             logging.info('outletControl set Delays Executed: {} {}'.format(self.onDelay, self.offDelay))
             #self.yolink.setMultiOutDelay(self.port, self.onDelay, self.offDelay)

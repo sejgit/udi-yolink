@@ -364,6 +364,7 @@ class udiYoSubWaterMeter(udi_interface.Node):
         self.configDone = False
         self.system_ready=False
         self.last_state = ''
+        self._last_reported_state = None
         self.ISYmeter_uom= None
         self.valveState = 99 # needed as class c device - keep value until online again 
         #polyglot.subscribe(polyglot.POLL, self.poll)
@@ -418,6 +419,31 @@ class udiYoSubWaterMeter(udi_interface.Node):
         if ctrl is None:
             logging.warning('udiYoSubWaterMeter.%s called before water-meter initialization', caller)
         return ctrl
+
+    def _normalize_binary_state(self, state):
+        if not isinstance(state, str):
+            return None
+        state_l = state.lower()
+        if state_l in ['on', 'open']:
+            return 'on'
+        if state_l in ['off', 'closed', 'close']:
+            return 'off'
+        return None
+
+    def _report_binary_state_change(self, state):
+        normalized_state = self._normalize_binary_state(state)
+        if normalized_state is None:
+            return
+        if self._last_reported_state is None:
+            self._last_reported_state = normalized_state
+            return
+        if self._last_reported_state == normalized_state:
+            return
+        if normalized_state == 'on':
+            self.node.reportCmd('DON')
+        else:
+            self.node.reportCmd('DOF')
+        self._last_reported_state = normalized_state
             
     def checkOnline(self):
         #get get info even if battery operated 
@@ -462,13 +488,10 @@ class udiYoSubWaterMeter(udi_interface.Node):
                         if state.lower() == 'open':
                             self.valveState = 1
                             self.my_setDriver('GV0', self.valveState, type=message_type)
-                            if self.last_state != state:
-                                self.node.reportCmd('DON')
                         elif state.lower() in ['closed', 'close']:
                             self.valveState = 0
                             self.my_setDriver('GV0', self.valveState, type=message_type)
-                            if self.last_state != state:
-                                self.node.reportCmd('DOF')                 
+                        self._report_binary_state_change(state)
                         self.last_state = state
 
                     water_flowing = ctrl.get_data('waterFlowing', 'state', self.WM_index)
@@ -597,15 +620,10 @@ class udiYoSubWaterMeter(udi_interface.Node):
         state = int(command.get('value'))
         if state == 1:
             self.yoWaterCtrl.setState('open')
-            self.valveState = 1
-            self.my_setDriver('GV0',self.valveState)
-   
-            #self.node.reportCmd('DON')
+
         elif state == 0:
             self.yoWaterCtrl.setState('closed')
-            self.valveState  = 0
-            self.my_setDriver('GV0',self.valveState)
-            #self.node.reportCmd('DOF')
+
         elif state == 5:
             logging.info('udiYoWaterMeterMultiController set Delays Executed: {} {}'.format(self.onDelay, self.offDelay))
             #self.yolink.setMultiOutDelay(self.port, self.onDelay, self.offDelay)
@@ -620,10 +638,6 @@ class udiYoSubWaterMeter(udi_interface.Node):
         if ctrl is None:
             return
         ctrl.setValveState('open', self.WM_index)
-        self.valveState  = 1
-        self.my_setDriver('GV0',self.valveState )
-
-        #self.node.reportCmd('DON')
 
     def set_close(self, command = None):
         logging.info('udiYoWaterMeterMultiController - set_close')
@@ -631,9 +645,6 @@ class udiYoSubWaterMeter(udi_interface.Node):
         if ctrl is None:
             return
         ctrl.setValveState('closed', self.WM_index)
-        self.valveState  = 0
-        self.my_setDriver('GV0',self.valveState )
-        #self.node.reportCmd('DOF')
 
 
     

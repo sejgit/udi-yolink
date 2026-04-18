@@ -64,6 +64,7 @@ class udiYoLockV2(udi_interface.Node):
         self.system_ready=False
         self._update_lock = threading.Lock()
         self.last_state = ''
+        self._last_reported_lock_state = None
         self.powerSupported = True # assume
         if deviceInfo.get('type') in ['LockV2']:
             self.isLockV2 = True
@@ -153,6 +154,30 @@ class udiYoLockV2(udi_interface.Node):
         else:
             return 99            
 
+    def _normalize_lock_state(self, state):
+        state_str = str(state).lower()
+        if state_str in ['lock', 'locked']:
+            return 'locked'
+        if state_str in ['unlock', 'unlocked']:
+            return 'unlocked'
+        return None
+
+    def _report_lock_state_change(self, state):
+        normalized_state = self._normalize_lock_state(state)
+        if normalized_state is None:
+            return
+        # Prime baseline on first status read; only emit on subsequent transitions.
+        if self._last_reported_lock_state is None:
+            self._last_reported_lock_state = normalized_state
+            return
+        if self._last_reported_lock_state == normalized_state:
+            return
+        if normalized_state == 'locked':
+            self.node.reportCmd('DON')
+        elif normalized_state == 'unlocked':
+            self.node.reportCmd('DOF')
+        self._last_reported_lock_state = normalized_state
+
     def updateData(self):
         if self.node is not None:
             while not self.node_ready or not self.system_ready or not self.configDone:
@@ -174,19 +199,15 @@ class udiYoLockV2(udi_interface.Node):
                 if state in ['lock','locked'] :
                     self.my_setDriver('GV0', 1, type=message_type)
                     self.my_setDriver('ST', 1, type=message_type)
-
-                    if self.last_state != state:
-                        self.node.reportCmd('DON')
                 elif state in ['unlock', 'unlocked']: 
                     self.my_setDriver('GV0', 0, type=message_type)
                     self.my_setDriver('ST', 0, type=message_type    )
-                    if self.last_state != state:
-                        self.node.reportCmd('DOF')
                 else:
                     self.my_setDriver('GV0', 99)
                     self.my_setDriver('ST', 99)
 
                 self.last_state = state
+                self._report_lock_state_change(state)
                 battery = lock.get_data('battery')
                 self.my_setDriver('GV1', battery, type=message_type)
                 #bell = self.yoLock.getDoorBellRing()
@@ -252,9 +273,6 @@ class udiYoLockV2(udi_interface.Node):
         if lock is None:
             return
         lock.setState('LOCK')
-        self.my_setDriver('GV0',1 )
-        self.my_setDriver('ST',1 )
-        self.node.reportCmd('DON')
 
     def set_unlock(self, command = None):
         logging.info('udiYoLock set_unlock')
@@ -262,9 +280,6 @@ class udiYoLockV2(udi_interface.Node):
         if lock is None:
             return
         lock.setState('UNLOCK')
-        self.my_setDriver('GV0',0 )
-        self.my_setDriver('ST',0 )
-        self.node.reportCmd('DOF')
 
     def lockControl(self, command):
         lock = self._get_lock('lockControl')
@@ -274,14 +289,8 @@ class udiYoLockV2(udi_interface.Node):
         logging.info('udiYoLock lockControl - {}'.format(ctrl))
         if ctrl == 1:
             lock.setState('LOCK')
-            self.my_setDriver('GV0',1 )
-            self.my_setDriver('ST',1 )
-            self.node.reportCmd('DON')
         elif ctrl == 0:
             lock.setState('UNLOCK')
-            self.my_setDriver('GV0',0 )
-            self.my_setDriver('ST',0 )
-            self.node.reportCmd('DOF')
 
 
         
@@ -345,6 +354,7 @@ class udiYoLock(udi_interface.Node):
         self.system_ready=False
         self._update_lock = threading.Lock()
         self.last_state = ''
+        self._last_reported_lock_state = None
         self.powerSupported = True # assume
         if deviceInfo.get('type') in ['LockV2']:
             self.isLockV2 = True
@@ -403,6 +413,30 @@ class udiYoLock(udi_interface.Node):
         if lock.data_updated():
             self.updateData()
 
+    def _normalize_lock_state(self, state):
+        state_str = str(state).lower()
+        if state_str in ['lock', 'locked']:
+            return 'locked'
+        if state_str in ['unlock', 'unlocked']:
+            return 'unlocked'
+        return None
+
+    def _report_lock_state_change(self, state):
+        normalized_state = self._normalize_lock_state(state)
+        if normalized_state is None:
+            return
+        # Prime baseline on first status read; only emit on subsequent transitions.
+        if self._last_reported_lock_state is None:
+            self._last_reported_lock_state = normalized_state
+            return
+        if self._last_reported_lock_state == normalized_state:
+            return
+        if normalized_state == 'locked':
+            self.node.reportCmd('DON')
+        elif normalized_state == 'unlocked':
+            self.node.reportCmd('DOF')
+        self._last_reported_lock_state = normalized_state
+
  
 
     def updateData(self):
@@ -426,19 +460,15 @@ class udiYoLock(udi_interface.Node):
                 if state in ['lock','locked'] :
                     self.my_setDriver('GV0', 1, type=message_type)
                     self.my_setDriver('ST', 1, type=message_type)
-
-                    if self.last_state != state:
-                        self.node.reportCmd('DON')
                 elif state in ['unlock', 'unlocked']: 
                     self.my_setDriver('GV0', 0, type=message_type)
                     self.my_setDriver('ST', 0, type=message_type    )
-                    if self.last_state != state:
-                        self.node.reportCmd('DOF')
                 else:
                     self.my_setDriver('GV0', 99)
                     self.my_setDriver('ST', 99)
 
                 self.last_state = state
+                self._report_lock_state_change(state)
                 battery = lock.get_data('battery', 'state')
                 self.my_setDriver('GV1', battery, type=message_type)
                 #bell = self.yoLock.getDoorBellRing()
@@ -489,10 +519,6 @@ class udiYoLock(udi_interface.Node):
         if lock is None:
             return
         lock.setState('LOCK')
-        self.my_setDriver('GV0',1 )
-        self.my_setDriver('ST',1 )
-
-        self.node.reportCmd('DON')
 
     def set_unlock(self, command = None):
         logging.info('udiYoLock set_outlet_off')
@@ -500,9 +526,6 @@ class udiYoLock(udi_interface.Node):
         if lock is None:
             return
         lock.setState('UNLOCK')
-        self.my_setDriver('GV0',0 )
-        self.my_setDriver('ST',0 )
-        self.node.reportCmd('DOF')
 
 
 
@@ -515,14 +538,8 @@ class udiYoLock(udi_interface.Node):
         ctrl = int(command.get('value'))     
         if ctrl == 1:
             lock.setState('LOCK')
-            self.my_setDriver('GV0',1 )
-            self.my_setDriver('ST',1 )    
-            self.node.reportCmd('DON')
         elif ctrl == 0:
             lock.setState('UNLOCK')
-            self.my_setDriver('GV0',0 ) 
-            self.my_setDriver('ST',0 )
-            self.node.reportCmd('DOF')
       
         
         

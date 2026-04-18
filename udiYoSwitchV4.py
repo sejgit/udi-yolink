@@ -60,6 +60,7 @@ class udiYoSwitch(udi_interface.Node):
         self.timer_cleared = True
         self.n_queue = [] 
         self.last_state = ''
+        self._last_reported_state = None
         self.timer_update = 5
         self.timer_expires = 0
         self.onDelay = 0
@@ -174,6 +175,31 @@ class udiYoSwitch(udi_interface.Node):
             logging.warning(f'udiYoSwitch - {caller} skipped; switch not initialized yet')
             return None
         return self.yoSwitch
+
+    def _normalize_binary_state(self, state):
+        if not isinstance(state, str):
+            return None
+        state_l = state.lower()
+        if state_l in ['on', 'open']:
+            return 'on'
+        if state_l in ['off', 'closed', 'close']:
+            return 'off'
+        return None
+
+    def _report_binary_state_change(self, state):
+        normalized_state = self._normalize_binary_state(state)
+        if normalized_state is None:
+            return
+        if self._last_reported_state is None:
+            self._last_reported_state = normalized_state
+            return
+        if self._last_reported_state == normalized_state:
+            return
+        if normalized_state == 'on':
+            self.node.reportCmd('DON')
+        else:
+            self.node.reportCmd('DOF')
+        self._last_reported_state = normalized_state
             
     def checkOnline(self):
         switch = self._get_switch('checkOnline')
@@ -218,12 +244,10 @@ class udiYoSwitch(udi_interface.Node):
                         if state in ['on', 'ON', 'open', 'OPEN']:
                             self.my_setDriver('GV0', 1, type=message_type)
                             self.my_setDriver('ST', 1, type=message_type)
-                
-                            self.node.reportCmd('DON')  
                         elif  state in ['off', 'OFF', 'closed', 'CLOSED', 'close', 'CLOSE' ]:
                             self.my_setDriver('GV0', 0, type=message_type)
                             self.my_setDriver('ST', 0, type=message_type)
-                            self.node.reportCmd('DOF')  
+                        self._report_binary_state_change(state)
                     else:
                          self.my_setDriver('GV0', None, type=message_type)
                          self.my_setDriver('ST', None, type=message_type)
@@ -341,7 +365,7 @@ class udiYoSwitch(udi_interface.Node):
         ctrl = int(command.get('value'))     
         if ctrl == 1:
             switch.setState('ON')
-            self.my_setDriver('GV0',1 )
+            #self.my_setDriver('GV0',1 )
             #self.my_setDriver('ST',1 )
             #self.node.reportCmd('DON')
         elif ctrl == 0:
