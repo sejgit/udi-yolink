@@ -178,6 +178,26 @@ class YoLinkSetup (udi_interface.Node):
         logging.debug('Resulting Device List %s', _summarize_device_list(device_list))
         return(device_list)
 
+    def remove_legacy_node_name_params(self):
+        removed = []
+        try:
+            nodes = self.poly.getNodes()
+        except Exception as e:
+            logging.debug(f'Could not load nodes while cleaning legacy custom params: {e}')
+            return
+
+        for addr in list(nodes.keys()):
+            if addr == self.address or addr not in self.Parameters:
+                continue
+            try:
+                del self.Parameters[addr]
+                removed.append(addr)
+            except Exception as e:
+                logging.debug(f'Failed removing legacy custom param for {addr}: {e}')
+
+        if removed:
+            logging.info('Removed legacy node-name custom params for %s', removed)
+
     def start (self):
         logging.info('Executing start - udi-YoLink')
         
@@ -289,6 +309,7 @@ class YoLinkSetup (udi_interface.Node):
             self.my_setDriver('ST', 1)
             self.my_setDriver('GV1', 1)
             self.deviceList = self.addNodes(self.deviceList)
+            self.remove_legacy_node_name_params()
             # Defer non-critical schedule refreshes to avoid startup API bursts
             # Run in background so node server can continue initializing
             try:
@@ -300,6 +321,7 @@ class YoLinkSetup (udi_interface.Node):
                 logging.debug('Failed to start deferred_refresh_schedules thread')
         else:
             self.my_setDriver('ST', 0)
+
     def deferred_refresh_schedules(self):
         """Background pass to refresh schedules for schedule-capable devices.
 
@@ -588,22 +610,7 @@ class YoLinkSetup (udi_interface.Node):
                 self.poly.Notices['ck'] = 'Missing LOCAL_IP parameter'
                 self.secretKey = 'x.x.x.x'
 
-            
-            nodes = self.poly.getNodes()
-            #logging.debug('nodes: {}'.format(nodes))
-            for nde in nodes:
-                #logging.debug('node : {}'.format(nde))
-                if nde in userParam:
-
-                    user_param_name = userParam[nde]
-                    temp_node = nodes[nde]
-                    #logging.debug('User param name : {}, node name {}'.format(user_param_name, temp_node.name))
-                    if user_param_name != temp_node.name:
-                        temp_node.rename(user_param_name)
-                        logging.info('Renaming node {} to {}'.format(nde, temp_node.name))
-
-
-
+            self.remove_legacy_node_name_params()
 
             #    if param not in supportParams:
             #        del self.Parameters[param]
@@ -621,14 +628,14 @@ class YoLinkSetup (udi_interface.Node):
 
     id = 'setup'
     commands = {
-                #'EPOCHTIME': updateEpochTime,
-                }
+          #'EPOCHTIME': updateEpochTime,
+          }
 
     drivers = [
-            {'driver': 'ST', 'value':0, 'uom':25},
-            {'driver': 'GV1', 'value':0, 'uom':25},
-            {'driver': 'TIME', 'value':int(time.time()), 'uom':151},
-           ]
+         {'driver': 'ST', 'value':0, 'uom':25},
+         {'driver': 'GV1', 'value':0, 'uom':25},
+         {'driver': 'TIME', 'value':int(time.time()), 'uom':151},
+        ]
 
 
 if __name__ == "__main__":

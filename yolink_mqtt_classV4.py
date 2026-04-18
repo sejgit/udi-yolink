@@ -117,6 +117,27 @@ class YoLinkMQTTDevice(object):
         yolink.messagePending = False
         yolink._schedule_refresh_last_sent = {}
         yolink.scheduleRefreshCooldownSec = 4 if yolink.type == 'InfraredRemoter' else 2
+        yolink.offlineLogThrottleSec = 300
+        yolink._lastOfflineLogTime = 0
+        yolink._lastOfflineLogSig = None
+
+    def log_offline_detected(yolink, dataPacket):
+        code = dataPacket.get('code') if isinstance(dataPacket, dict) else None
+        method = dataPacket.get('method') if isinstance(dataPacket, dict) else None
+        event = dataPacket.get('event') if isinstance(dataPacket, dict) else None
+        desc = dataPacket.get('desc') if isinstance(dataPacket, dict) else None
+        signature = (code, method, event, desc)
+        now = time.time()
+
+        if (
+            yolink._lastOfflineLogSig == signature
+            and now - yolink._lastOfflineLogTime < yolink.offlineLogThrottleSec
+        ):
+            return
+
+        yolink._lastOfflineLogSig = signature
+        yolink._lastOfflineLogTime = now
+        logging.error('Status {} - Off line detected: {}'.format(yolink.deviceInfo['name'], dataPacket))
 
     def supports_schedule_refresh(yolink):
         return yolink.type in yolink.scheduleRefreshTypes
@@ -321,7 +342,7 @@ class YoLinkMQTTDevice(object):
             if isinstance(yolink.data['lastStateTime'], (int, float)):
                 if yolink.data['lastStateTime'] + 60*60*4 <= time.time(): # if no update for 4 hours then assume offline
                     yolink.online = False
-                    logging.error('Status {} - Off line detected: {}'.format(yolink.deviceInfo['name'], yolink.data))
+                    yolink.log_offline_detected(yolink.data)
                 else:
                     yolink.online = True
             return(yolink.online)
@@ -344,7 +365,7 @@ class YoLinkMQTTDevice(object):
 
         
         if not yolink.online:
-            logging.error('Status {} - Off line detected: {}'.format(yolink.deviceInfo['name'], yolink.data))
+            yolink.log_offline_detected(yolink.data)
         
         logging.debug(f'check_system_online result for {yolink.deviceInfo["name"]}: {yolink.online}')   
         return(yolink.online)
@@ -697,7 +718,7 @@ class YoLinkMQTTDevice(object):
             yolink.online = False
             logging.debug(f'OFFLINE STRANGE {dataPacket}')
         if not yolink.online:
-            logging.error('Status {} - Off line detected: {}'.format(yolink.deviceInfo['name'], dataPacket))
+            yolink.log_offline_detected(dataPacket)
         return(yolink.online)
 
     #@measure_time
