@@ -252,6 +252,11 @@ class YoLinkSetup (udi_interface.Node):
             if addr == self.address:
                 continue
             try:
+                node_class_name = getattr(getattr(node, '__class__', None), '__name__', '')
+                if node_class_name.endswith('ScheduleNode'):
+                    logging.debug(f'Skipping schedule child node {addr} during deferred refresh')
+                    continue
+
                 # prefer device-level devInfo if present
                 dev_id = None
                 try:
