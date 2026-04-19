@@ -1271,6 +1271,8 @@
          <st id="GV23" editor="count" /> <!-- aoverrun AC --> 
          <st id="GV24" editor="minutes" />
 
+            <st id="GV25" editor="enable" /> <!--leak-->
+
          <st id="GV26" editor="enable" /> <!--leak-->
          <st id="GV27" editor="enable" /> <!--Overrun amount-->
          <st id="GV28" editor="enable" /> <!--Overrun duration-->
@@ -1382,6 +1384,7 @@
       <editors />
       <sts>
          <st id="ST" editor="waterrun" /> <!-- On line-->
+         <st id="GV1" editor="count" />
          <st id="BATLVL" editor="batlevel" />
          <st id="GV5" editor="alarm" />
          <st id="GV20" editor="suspendstate" />
@@ -1406,6 +1409,7 @@
       <editors />
       <sts>
          <st id="ST" editor="waterrun" /> <!-- On line-->
+       <st id="GV1" editor="count" />
          <st id="BATLVL" editor="batlevel" />
          <st id="GV5" editor="alarm" /> 
          <st id="GV20" editor="suspendstate" />
@@ -1485,9 +1489,12 @@
          <st id="GV23" editor="count" /> <!-- aoverrun AC --> 
          <st id="GV24" editor="minutes" />
 
+         <st id="GV25" editor="enable" /> <!--leak-->
          <st id="GV26" editor="enable" /> <!--leak-->
          <st id="GV27" editor="enable" /> <!--Overrun amount-->
          <st id="GV28" editor="enable" /> <!--Overrun duration-->
+
+         <st id="GV20" editor="suspendstate" />
 
       </sts>
       <cmds>
@@ -1534,9 +1541,12 @@
          <st id="GV24" editor="count" /> <!-- count/Times --> 
 
 
+         <st id="GV25" editor="enable" /> <!--leak-->
          <st id="GV26" editor="enable" /> <!--overrun-->
          <st id="GV27" editor="enable" /> <!--Overrun duration-->
          <st id="GV28" editor="enable" /> <!--overrun time 24H-->
+
+         <st id="GV20" editor="suspendstate" />
 
       </sts>
       <cmds>

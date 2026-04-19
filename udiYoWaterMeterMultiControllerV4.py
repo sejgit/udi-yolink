@@ -40,6 +40,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
     ''' 
     drivers = [
             {'driver': 'ST', 'value': 0, 'uom': 25}, # On line
+            {'driver': 'GV1', 'value': 0, 'uom': 25}, # Meter count
             {'driver': 'GV5', 'value': 99, 'uom': 25}, #Leak
             {'driver': 'BATLVL', 'value': 99, 'uom': 25},
             #{'driver': 'GV4', 'value': 99, 'uom' : 25}, # Unit
@@ -334,9 +335,11 @@ class udiYoSubWaterMeter(udi_interface.Node):
             {'driver': 'GV23', 'value': 99, 'uom': 25}, #Overrtun limit
             {'driver': 'GV24', 'value': 99, 'uom': 25}, #Overrun Time
     
+            {'driver': 'GV25', 'value': 99, 'uom': 25}, #Leak AC
             {'driver': 'GV26', 'value': 99, 'uom': 25}, #LEakAC
             {'driver': 'GV27', 'value': 99, 'uom': 25}, #Overrun AC
-            {'driver': 'GV28', 'value': 99, 'uom': 25}, #OverrunTIme AC                                             
+            {'driver': 'GV28', 'value': 99, 'uom': 25}, #OverrunTIme AC
+            {'driver': 'GV20', 'value': 99, 'uom': 25}, #Connection state
 
              
             ]
