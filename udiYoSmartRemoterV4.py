@@ -203,7 +203,7 @@ class udiRemoteKey(udi_interface.Node):
                 new_state = 'DFOF'
                 isy_val = 2
 
-            elif 'DFON' == state:
+            elif 'DFOF' == state:
                 new_state = 'DFON'
                 isy_val = 3
 
@@ -297,6 +297,8 @@ class udiYoSmartRemoter(udi_interface.Node):
         self._update_lock = threading.Lock()
         self.last_state = 99
         self.n_queue = []
+        self._last_processed_press_signature = None
+        self._last_status_packet = None
         self.max_remote_keys = 8
         model = str(self.devInfo['modelName'][:6])
         if model in ['YS3614', 'YS3615']:
@@ -385,6 +387,9 @@ class udiYoSmartRemoter(udi_interface.Node):
 
             self.keys[key] = udiRemoteKey(self.poly, self.address, k_address, k_name, key)
             self.adr_list.append(k_address)
+            logging.debug('SmartRemoter child key added: key=%s address=%s name=%s', key, k_address, k_name)
+        self._capture_press_baseline(self.yoSmartRemote)
+        logging.debug('SmartRemoter child key build complete: keys=%s adr_list=%s', sorted(self.keys.keys()), self.adr_list)
         self.sub_nodes_ready = True
         self.wait_for_node_done()
 
@@ -433,6 +438,72 @@ class udiYoSmartRemoter(udi_interface.Node):
 
     def updateLastTime(self):
         pass
+
+    def _extract_press_event(self, packet):
+        if not isinstance(packet, dict):
+            return None
+
+        data = packet.get('data')
+        if not isinstance(data, dict):
+            return None
+
+        event_data = data.get('event')
+        if isinstance(event_data, dict):
+            logging.debug('SmartRemoter raw press event extracted from data.event: %s', event_data)
+            return event_data, packet.get('time'), packet.get('msgid')
+
+        state_data = data.get('state')
+        if isinstance(state_data, dict):
+            event_data = state_data.get('event')
+            if isinstance(event_data, dict):
+                logging.debug('SmartRemoter raw press event extracted from data.state.event: %s', event_data)
+                return event_data, packet.get('time'), packet.get('msgid')
+
+        return None
+
+    def _get_press_info(self, remote):
+        signature_time = remote.lastUpdate() if remote is not None else None
+        signature_msgid = None
+
+        extracted = self._extract_press_event(self._last_status_packet)
+        if extracted is not None:
+            event_data, signature_time, signature_msgid = extracted
+            logging.debug('SmartRemoter press info using raw packet source: msgid=%s time=%s event=%s', signature_msgid, signature_time, event_data)
+        else:
+            event_data = remote.get_data('event', 'state')
+            if not isinstance(event_data, dict):
+                logging.debug('SmartRemoter press info unavailable: raw packet had no event and normalized state event missing; last_status_packet=%s', self._last_status_packet)
+                return None
+            logging.debug('SmartRemoter press info using normalized state source: event=%s', event_data)
+
+        key_mask = event_data.get('keyMask')
+        press_type = event_data.get('type')
+        if not isinstance(key_mask, int) or not isinstance(press_type, str):
+            logging.debug('SmartRemoter press info invalid payload: keyMask=%s press_type=%s event=%s', key_mask, press_type, event_data)
+            return None
+
+        remote_key = self.mask2key(key_mask)
+        if not isinstance(remote_key, int) or remote_key not in self.keys:
+            logging.debug('SmartRemoter press info key not mapped: keyMask=%s remote_key=%s available_keys=%s', key_mask, remote_key, sorted(self.keys.keys()))
+            return None
+
+        press = self.max_remote_keys if press_type == 'LongPress' else 0
+        signature = (signature_time, signature_msgid, key_mask, press_type)
+        logging.debug('SmartRemoter press info resolved: remote_key=%s press_type=%s press=%s signature=%s', remote_key, press_type, press, signature)
+        return {
+            'remote_key': remote_key,
+            'press_type': press_type,
+            'press': press,
+            'signature': signature,
+        }
+
+    def _capture_press_baseline(self, remote):
+        if remote is None:
+            return
+        press_info = self._get_press_info(remote)
+        if press_info is not None:
+            self._last_processed_press_signature = press_info['signature']
+            logging.debug('SmartRemoter press baseline captured: %s', self._last_processed_press_signature)
     
     def updateData(self):
         remote = self._get_remote('updateData')
@@ -449,28 +520,22 @@ class udiYoSmartRemoter(udi_interface.Node):
 
                     #event_data = self.yoSmartRemote.getEventData()
                     #logging.debug('updateData - event data {}'.format(event_data))
-                    event_data = remote.get_data('event', 'state')
-                    if event_data is not None:
-                        key_mask = remote.get_data('keyMask', 'event')
-                        press_type = remote.get_data('type', 'event')
-                        remote_key = self.mask2key(key_mask)
-                        if press_type == 'LongPress':
-                            press = self.max_remote_keys
-                        else:
-                            press = 0
-                        
-                        logging.debug('remote key {} press {}'.format(remote_key, press))
-                        if isinstance(remote_key, int):
-                            if remote.isControlEvent():
-                                self.keys[remote_key].send_command(press)
-                                #self.yoSmartRemote.clearEventData()
-                                #logging.debug('clearEventData')
-                            if isinstance(press, int):
-                                self.my_setDriver('GV0', remote_key + press, UOM=25)
-                                self.my_setDriver('ST', remote_key + press, UOM=25)
-                            self.my_setDriver('GV1', remote_key, UOM=25)
-                        if isinstance(press, int):  
-                            self.my_setDriver('GV2', press, UOM=25)   
+                    press_info = self._get_press_info(remote)
+                    if press_info is not None:
+                        remote_key = press_info['remote_key']
+                        press = press_info['press']
+
+                        logging.debug('remote key {} press {} type {}'.format(remote_key, press, press_info['press_type']))
+                        if press_info['signature'] != self._last_processed_press_signature:
+                            self.keys[remote_key].send_command(press_info['press_type'])
+                            self._last_processed_press_signature = press_info['signature']
+
+                        self.my_setDriver('GV0', remote_key + press, UOM=25)
+                        self.my_setDriver('ST', remote_key + press, UOM=25)
+                        self.my_setDriver('GV1', remote_key, UOM=25)
+                        self.my_setDriver('GV2', press, UOM=25)
+                    elif isinstance(self._last_status_packet, dict) and self._last_status_packet.get('event', '').startswith('SmartRemoter.'):
+                        logging.debug('SmartRemoter updateData saw SmartRemoter event packet but no press info was resolved: packet=%s', self._last_status_packet)
 
                     battery = remote.get_data('battery', 'state')
                     if isinstance(battery, int) or battery is None  :                
@@ -504,6 +569,8 @@ class udiYoSmartRemoter(udi_interface.Node):
         remote = self._get_remote('updateStatus')
         if remote is not None:
             with self._update_lock:
+                self._last_status_packet = data
+                logging.debug('SmartRemoter updateStatus received packet: %s', data)
                 remote.updateStatus(data)
                 self.updateData()
 
