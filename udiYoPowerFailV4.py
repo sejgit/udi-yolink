@@ -161,14 +161,16 @@ class udiYoPowerFailSenor(udi_interface.Node):
                     state_val = alert_state.index(state) 
                     self.my_setDriver('GV0', state_val, type=message_type)
                     self.my_setDriver('ST', state_val, type=message_type)
+                    if state_val != self.last_state:
+                        if state_val == 1 and self.cmd_state in [0, 1]:
+                            self.node.reportCmd('DON')
+                        elif state_val == 0 and self.cmd_state in [0, 2]:
+                            self.node.reportCmd('DOF')
+                    self.last_state = state_val
                 else:
                     self.my_setDriver('GV0', 99, type=message_type)
                     self.my_setDriver('ST', 99, type=message_type)
-                if state != self.last_state:
-                    if state ==1 and self.cmd_state in [0,1]:
-                        self.node.reportCmd('DON')
-                    elif state == 0 and self.cmd_state in [0,2]:
-                        self.node.reportCmd('DOF')                    
+                    self.last_state = 99
                 self.my_setDriver('GV1', sensor.get_data('battery', 'state'))
                 alert = sensor.get_data('alertType', 'state')
                 logging.debug('AlertState GV2 : {}'.format(alert))

@@ -152,18 +152,18 @@ class udiYoVibrationSensor(udi_interface.Node):
             self.my_setDriver('TIME', unix_time, 151)
             if sensor.check_system_online():               
                 vib_state = sensor.get_data('state', 'state')
-                if vib_state == ['normal'] :
-                    self.my_setDriver('GV0', 1, type=message_type)
-                    self.my_setDriver('ST', 1, type=message_type)
-                    if self.last_state!= 1 and self.cmd_state in [0,1]:
-                        self.node.reportCmd('DON')   
-                        self.last_state = 1
-                elif vib_state == ['alert']:
+                if vib_state in ['normal']:
                     self.my_setDriver('GV0', 0, type=message_type)
                     self.my_setDriver('ST', 0, type=message_type)
-                    if self.last_state!= 0 and self.cmd_state in [0,2]:
+                    if self.last_state != 0 and self.cmd_state in [0, 2]:
                         self.node.reportCmd('DOF')
                         self.last_state = 0
+                elif vib_state in ['alert']:
+                    self.my_setDriver('GV0', 1, type=message_type)
+                    self.my_setDriver('ST', 1, type=message_type)
+                    if self.last_state != 1 and self.cmd_state in [0, 1]:
+                        self.node.reportCmd('DON')
+                        self.last_state = 1
                 else:
                     self.my_setDriver('GV0', 99) 
                     self.my_setDriver('ST', 99)

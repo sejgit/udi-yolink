@@ -25,7 +25,7 @@ from udiYoSmartRemoterV4 import udiRemoteKey
 from udiYoSchedule import udiYoSchedule
 
 class udiYoSwitch(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, start_done, configDoneHandler,  prep_schedule, state2ISY, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, configDoneHandler,  prep_schedule, state2ISY, bool2ISY, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key, checkNameSync
     id = 'yoswitch'
 
     drivers = [
@@ -272,10 +272,10 @@ class udiYoSwitch(udi_interface.Node):
                             energyWh = round(energyWh/10,1) # reports 1/10Wh                    
                         self.my_setDriver('GV4', energyWh, 119, type=message_type)
 
-                        self.my_setDriver('GV5', self.state2ISY(switch.get_data('overload', 'alertType')), type=message_type)
-                        self.my_setDriver('GV6', self.state2ISY(switch.get_data('highload', 'alertType')), type=message_type)
-                        self.my_setDriver('GV7', self.state2ISY(switch.get_data('lowload', 'alertType')), type=message_type)
-                        self.my_setDriver('GV8', self.state2ISY(switch.get_data('highTemperature', 'alertType')), type=message_type)
+                        self.my_setDriver('GV5', self.bool2ISY(switch.get_data('overload', 'alertType')), type=message_type)
+                        self.my_setDriver('GV6', self.bool2ISY(switch.get_data('highload', 'alertType')), type=message_type)
+                        self.my_setDriver('GV7', self.bool2ISY(switch.get_data('lowload', 'alertType')), type=message_type)
+                        self.my_setDriver('GV8', self.bool2ISY(switch.get_data('highTemperature', 'alertType')), type=message_type)
 
                         #logging.debug('Timer info : {} '. format(time.time() - self.timer_expires))
                     if time.time() >= self.timer_expires - self.timer_update and self.timer_expires != 0:

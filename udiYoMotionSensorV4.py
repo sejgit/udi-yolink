@@ -170,18 +170,18 @@ class udiYoMotionSensor(udi_interface.Node):
             if sensor.check_system_online():
                 logging.debug('Motion sensor CMD setting: {}'.format(self.cmd_state))
                 motion_state = sensor.get_data('state', 'state')
-                if motion_state in ['normal'] :
-                    self.my_setDriver('GV0', 1, type=message_type)  
-                    self.my_setDriver('ST', 1, type=message_type)                
-                    if  self.last_state!= 1 and self.cmd_state in [0,1]:
-                        self.node.reportCmd('DON')
-                        self.last_state = 1
-                elif motion_state in ['alert']:
+                if motion_state in ['normal']:
                     self.my_setDriver('GV0', 0, type=message_type)
                     self.my_setDriver('ST', 0, type=message_type)
-                    if self.last_state!= 0 and  self.cmd_state in [0,2]:
+                    if self.last_state != 0 and self.cmd_state in [0, 2]:
                         self.node.reportCmd('DOF')
                         self.last_state = 0
+                elif motion_state in ['alert']:
+                    self.my_setDriver('GV0', 1, type=message_type)
+                    self.my_setDriver('ST', 1, type=message_type)
+                    if self.last_state != 1 and self.cmd_state in [0, 1]:
+                        self.node.reportCmd('DON')
+                        self.last_state = 1
                 else:
                     self.my_setDriver('GV0', 99)
                     self.my_setDriver('ST', 99)
