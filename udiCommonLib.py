@@ -3,7 +3,7 @@
 Yolink Control Main Node  program 
 MIT License
 """
-version = '1.8.38'
+version = '1.8.39'
 import sys
 import re
 import time
@@ -168,7 +168,7 @@ def addNodes (self, deviceList) -> list:
     #supportedYoTypes = ['SprinklerV2', 'Sprinkler', 'Thermostat', 'SoilThcSensor', 'THSensor' ]     
     #supportedYoTypes = ['WaterMeterController', 'WaterMeterMultiController']   
     #supportedYoTypes = ['WaterMeterMultiController']     
-    #supportedYoTypes = ['Switch', 'InfraredRemoter']
+    supportedYoTypes = ['Switch', 'InfraredRemoter', 'SmartRemoter']
     remove_list= []
     schedule_queue = []
     for dev in deviceList:

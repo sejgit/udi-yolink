@@ -510,12 +510,21 @@ class udiYoSmartRemoter(udi_interface.Node):
         if remote is None:
             return
         try:
+            logging.debug('SmartRemoter updateData entered: node_ready=%s system_ready=%s configDone=%s main_node_ready=%s sub_nodes_ready=%s', self.node_ready, self.system_ready, self.configDone, self.main_node_ready, self.sub_nodes_ready)
             if self.node is not None:
+                wait_logged = False
                 while not self.node_ready or not self.system_ready or not self.configDone:
+                    if not wait_logged:
+                        logging.debug('SmartRemoter updateData waiting for readiness: node_ready=%s system_ready=%s configDone=%s', self.node_ready, self.system_ready, self.configDone)
+                        wait_logged = True
                     time.sleep(0.5)
+                if wait_logged:
+                    logging.debug('SmartRemoter updateData readiness wait complete: node_ready=%s system_ready=%s configDone=%s', self.node_ready, self.system_ready, self.configDone)
                 message_info = remote.get_message_type()
                 message_type = message_info[0] if isinstance(message_info, (list, tuple)) and len(message_info) >= 1 else None
+                logging.debug('SmartRemoter updateData message_info=%s message_type=%s', message_info, message_type)
                 if remote.check_system_online():      
+                    logging.debug('SmartRemoter updateData system online, evaluating press info')
 
 
                     #event_data = self.yoSmartRemote.getEventData()
@@ -556,11 +565,14 @@ class udiYoSmartRemoter(udi_interface.Node):
                     else:
                         self.my_setDriver('GV20', 0)
                 else:
+                    logging.debug('SmartRemoter updateData system offline, updating offline drivers')
 
                     self.my_setDriver('GV30', 0, True, True)
                     self.my_setDriver('GV20', 2)
+                logging.debug('SmartRemoter updateData completed for message_type=%s', message_type)
         except Exception as e:
             logging.error('Smart Remote updateData exeption: {}'.format(e))
+            logging.exception('SmartRemoter updateData traceback')
 
 
 
@@ -568,11 +580,17 @@ class udiYoSmartRemoter(udi_interface.Node):
         logging.info('updateStatus - udiYoSmartRemoter')
         remote = self._get_remote('updateStatus')
         if remote is not None:
+            logging.debug('SmartRemoter updateStatus preparing to acquire lock: msgid=%s event=%s method=%s thread=%s', data.get('msgid') if isinstance(data, dict) else None, data.get('event') if isinstance(data, dict) else None, data.get('method') if isinstance(data, dict) else None, threading.current_thread().name)
             with self._update_lock:
+                logging.debug('SmartRemoter updateStatus acquired lock: msgid=%s event=%s method=%s thread=%s', data.get('msgid') if isinstance(data, dict) else None, data.get('event') if isinstance(data, dict) else None, data.get('method') if isinstance(data, dict) else None, threading.current_thread().name)
                 self._last_status_packet = data
                 logging.debug('SmartRemoter updateStatus received packet: %s', data)
+                logging.debug('SmartRemoter updateStatus calling remote.updateStatus for msgid=%s', data.get('msgid') if isinstance(data, dict) else None)
                 remote.updateStatus(data)
+                logging.debug('SmartRemoter updateStatus remote.updateStatus complete for msgid=%s', data.get('msgid') if isinstance(data, dict) else None)
+                logging.debug('SmartRemoter updateStatus calling updateData for msgid=%s', data.get('msgid') if isinstance(data, dict) else None)
                 self.updateData()
+                logging.debug('SmartRemoter updateStatus updateData complete for msgid=%s', data.get('msgid') if isinstance(data, dict) else None)
 
     def update(self, command = None):
         logging.info('udiYoSmartRemoter Update  Executed')
