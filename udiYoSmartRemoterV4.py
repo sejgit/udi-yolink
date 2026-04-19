@@ -588,9 +588,9 @@ class udiYoSmartRemoter(udi_interface.Node):
                 logging.debug('SmartRemoter updateStatus calling remote.updateStatus for msgid=%s', data.get('msgid') if isinstance(data, dict) else None)
                 remote.updateStatus(data)
                 logging.debug('SmartRemoter updateStatus remote.updateStatus complete for msgid=%s', data.get('msgid') if isinstance(data, dict) else None)
-                logging.debug('SmartRemoter updateStatus calling updateData for msgid=%s', data.get('msgid') if isinstance(data, dict) else None)
-                self.updateData()
-                logging.debug('SmartRemoter updateStatus updateData complete for msgid=%s', data.get('msgid') if isinstance(data, dict) else None)
+            logging.debug('SmartRemoter updateStatus released lock, calling updateData for msgid=%s', data.get('msgid') if isinstance(data, dict) else None)
+            self.updateData()
+            logging.debug('SmartRemoter updateStatus updateData complete for msgid=%s', data.get('msgid') if isinstance(data, dict) else None)
 
     def update(self, command = None):
         logging.info('udiYoSmartRemoter Update  Executed')
