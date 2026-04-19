@@ -217,7 +217,7 @@ class udiYoMotionSensor(udi_interface.Node):
         if self.yoMotionsSensor is not None:
             with self._update_lock:
                 self.yoMotionsSensor.updateStatus(data)
-                self.updateData()
+            self.updateData()
 
     def set_cmd(self, command):
         ctrl = int(command.get('value'))   

@@ -16,6 +16,7 @@ logging = udi_interface.LOGGER
 Custom = udi_interface.Custom
 #import sys
 import time
+import threading
 from yolinkWaterDeptV3 import YoLinkWaterDeptSensor
 
 
@@ -69,6 +70,7 @@ class udiYoWaterDept(udi_interface.Node):
         self.yoAccess = yoAccess
         self.devInfo =  deviceInfo
         self.yoWaterDept  = None
+        self._update_lock = threading.Lock()
         self.node_ready = False
         self.configDone = False
         self.system_ready=False
@@ -213,7 +215,8 @@ class udiYoWaterDept(udi_interface.Node):
     def updateStatus(self, data):
         logging.debug('udiYoWaterDept - updateStatus')
         if self.yoWaterDept is not None:        
-            self.yoWaterDept.updateStatus(data)
+            with self._update_lock:
+                self.yoWaterDept.updateStatus(data)
             self.updateData()
 
     def set_attributes(self, command):

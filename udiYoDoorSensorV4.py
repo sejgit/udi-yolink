@@ -213,7 +213,7 @@ class udiYoDoorSensor(udi_interface.Node):
         if self.yoDoorSensor is not None:
             with self._update_lock:
                 self.yoDoorSensor.updateStatus(data)
-                self.updateData()
+            self.updateData()
 
 
     def set_cmd(self, command):

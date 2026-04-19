@@ -148,7 +148,7 @@ class udiYoThermostat(udi_interface.Node):
         if thermostat is not None:
             with self._update_lock:
                 thermostat.updateStatus(data)
-                self.updateData()
+            self.updateData()
 
     def updateData(self):
         """Parse device state and update drivers"""

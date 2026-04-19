@@ -255,7 +255,7 @@ class udiYoManipulator(udi_interface.Node):
         if self.yoManipulator is not None:
             with self._update_lock:
                 self.yoManipulator.updateStatus(data)
-                self.updateData()
+            self.updateData()
 
       
 

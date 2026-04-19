@@ -328,7 +328,7 @@ class udiYoSprinkler2(udi_interface.Node):
         if self.yoSprinkler is not None:
             with self._update_lock:
                 self.yoSprinkler.updateStatus(data)
-                self.updateData()
+            self.updateData()
 
 
     def start_stop(self, command):

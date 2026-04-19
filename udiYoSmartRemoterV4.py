@@ -391,8 +391,7 @@ class udiYoSmartRemoter(udi_interface.Node):
         self._capture_press_baseline(self.yoSmartRemote)
         logging.debug('SmartRemoter child key build complete: keys=%s adr_list=%s', sorted(self.keys.keys()), self.adr_list)
         self.sub_nodes_ready = True
-        self.wait_for_node_done()
-
+        logging.debug('SmartRemoter startup marking parent ready after child key build')
         self.start_done()
 
     def stop (self):

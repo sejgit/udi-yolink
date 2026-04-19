@@ -203,7 +203,7 @@ class udiYoPowerFailSenor(udi_interface.Node):
         if sensor is not None:
             with self._update_lock:
                 sensor.updateStatus(data)
-                self.updateData()
+            self.updateData()
 
     def set_cmd(self, command):
         ctrl = int(command.get('value'))   

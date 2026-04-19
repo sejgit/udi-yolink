@@ -198,7 +198,7 @@ class udiYoVibrationSensor(udi_interface.Node):
         if self.yoVibrationSensor is not None:
             with self._update_lock:
                 self.yoVibrationSensor.updateStatus(data)
-                self.updateData()
+            self.updateData()
 
     def set_cmd(self, command):
         ctrl = int(command.get('value'))   

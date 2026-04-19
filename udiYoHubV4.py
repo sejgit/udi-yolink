@@ -171,7 +171,7 @@ class udiYoBatteryHub(udi_interface.Node):
         if self.yoHub is not None:
             with self._update_lock:
                 self.yoHub.updateStatus(data)
-                self.updateData()
+            self.updateData()
            
 
     def update(self, command = None):
@@ -332,7 +332,7 @@ class udiYoHub(udi_interface.Node):
         if self.yoHub is not None:
             with self._update_lock:
                 self.yoHub.updateStatus(data)
-                self.updateData()
+            self.updateData()
            
 
     def update(self, command = None):

@@ -465,7 +465,7 @@ class udiYoWaterMeterController(udi_interface.Node):
         if self.yoWaterCtrl is not None:        
             with self._update_lock:
                 self.yoWaterCtrl.updateStatus(data)
-                self.updateData()
+            self.updateData()
 
 
     def set_open(self, command = None):

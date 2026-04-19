@@ -314,7 +314,7 @@ class udiYoSwitch(udi_interface.Node):
         if self.yoSwitch is not None:
             with self._update_lock:
                 self.yoSwitch.updateStatus(data)
-                self.updateData()
+            self.updateData()
  
     def set_switch_on(self, command = None):
         logging.info('udiYoSwitch set_switch_on')  

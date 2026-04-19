@@ -389,17 +389,17 @@ class udiYoInfraredRemoter(udi_interface.Node):
         if remote is not None:
             with self._update_lock:
                 remote.updateStatus(data)
-                self.updateData()
-                #res = self.yoIRrem.getIRstatus_info()
-                #logging.debug(f'IR status info: {res}')
-                logging.debug(f'Code nodes: {self.code_nodes}')
-                update_type = remote.get_info('type')
-                action = remote.get_info('action')
-                if action in ['send', 'report'] or update_type == 'event':
-                    res_code = remote.get_data('key')
-                    if isinstance(res_code, int) and res_code in self.code_nodes:
-                        logging.debug(f'Updating code node {res_code}')
-                        self.code_nodes[res_code].updateData()
+            self.updateData()
+            #res = self.yoIRrem.getIRstatus_info()
+            #logging.debug(f'IR status info: {res}')
+            logging.debug(f'Code nodes: {self.code_nodes}')
+            update_type = remote.get_info('type')
+            action = remote.get_info('action')
+            if action in ['send', 'report'] or update_type == 'event':
+                res_code = remote.get_data('key')
+                if isinstance(res_code, int) and res_code in self.code_nodes:
+                    logging.debug(f'Updating code node {res_code}')
+                    self.code_nodes[res_code].updateData()
                     
     def checkOnline(self):
         remote = self._get_remote('checkOnline')

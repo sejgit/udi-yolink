@@ -212,7 +212,7 @@ class udiYoSiren(udi_interface.Node):
         if self.yoSiren is not None:
             with self._update_lock:
                 self.yoSiren.updateStatus(data)
-                self.updateData()
+            self.updateData()
     
 
     def sirenControl(self, command):

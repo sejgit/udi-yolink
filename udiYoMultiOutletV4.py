@@ -741,7 +741,7 @@ class udiYoMultiOutlet(udi_interface.Node):
         if outlet is not None:
             with self._update_lock:
                 outlet.updateStatus(data)
-                self.updateData()
+            self.updateData()
 
         logging.debug( 'updateStatus data: {} {}'.format(self.node_fully_config, outlet.nbrOutlets if outlet is not None else 'NA' ))
         if not self.node_fully_config: # Device was never initialized

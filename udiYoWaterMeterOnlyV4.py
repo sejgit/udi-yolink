@@ -307,7 +307,7 @@ class udiYoWaterMeterOnly(udi_interface.Node):
         if ctrl is not None:        
             with self._update_lock:
                 ctrl.updateStatus(data)
-                self.updateData()
+            self.updateData()
 
     '''
     def updateDelayCountdown( self, timeRemaining):

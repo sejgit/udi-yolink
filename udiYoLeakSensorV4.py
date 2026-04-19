@@ -243,7 +243,7 @@ class udiYoLeakSensor(udi_interface.Node):
         if self.yoLeakSensor is not None:
             with self._update_lock:
                 self.yoLeakSensor.updateStatus(data)
-                self.updateData()
+            self.updateData()
 
     def set_beep_alert(self, command):
         beeping = int(command.get('value')) == 1   

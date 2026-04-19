@@ -338,7 +338,7 @@ class udiYoSprinkler(udi_interface.Node):
                 time.sleep(0.5)
         with self._update_lock:
             sprinkler.updateStatus(data)
-            self.updateData()
+        self.updateData()
 
     def set_cmd(self, command):
         ctrl = int(command.get('value'))   

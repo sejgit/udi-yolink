@@ -253,7 +253,7 @@ class udiYoOutlet(udi_interface.Node):
         if self.yoOutlet is not None:
             with self._update_lock:
                 self.yoOutlet.updateStatus(data)
-                self.updateData()
+            self.updateData()
 
 
     def updateDelayCountdown( self, timeRemaining):

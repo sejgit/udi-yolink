@@ -209,7 +209,7 @@ class udiYoSpeakerHub(udi_interface.Node):
         if self.yoSpeakerHub is not None:
             with self._update_lock:
                 self.yoSpeakerHub.updateStatus(data)
-                self.updateData()
+            self.updateData()
 
 
     def setWiFi (self, command):

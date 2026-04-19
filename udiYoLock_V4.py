@@ -255,7 +255,7 @@ class udiYoLockV2(udi_interface.Node):
         if self.yoLock is not None:
             with self._update_lock:
                 self.yoLock.updateStatus(data)
-                self.updateData()
+            self.updateData()
 
 
 
@@ -501,7 +501,7 @@ class udiYoLock(udi_interface.Node):
             return
         with self._update_lock:
             lock.updateStatus(data)
-            self.updateData()
+        self.updateData()
 
 
 

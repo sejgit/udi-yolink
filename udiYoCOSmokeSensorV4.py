@@ -239,7 +239,7 @@ class udiYoCOSmokeSensor(udi_interface.Node):
         if self.yoCOSmokeSensor is not None:
             with self._update_lock:
                 self.yoCOSmokeSensor.updateStatus(data)
-                self.updateData()
+            self.updateData()
 
     def set_cmd(self, command):
         ctrl = int(command.get('value'))   

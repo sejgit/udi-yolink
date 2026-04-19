@@ -297,7 +297,7 @@ class udiYoWaterMeterMulti(udi_interface.Node):
         if ctrl is not None:        
             with self._update_lock:
                 ctrl.updateStatus(data)  # always update device data immediately so check_system_online() can unblock start()
-                self.updateData()
+            self.updateData()
 
     commands = {
                 'UPDATE': update,

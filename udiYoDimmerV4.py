@@ -307,7 +307,7 @@ class udiYoDimmer(udi_interface.Node):
         if self.yoDimmer is not None:   
             with self._update_lock:
                 self.yoDimmer.updateStatus(data)
-                self.updateData()
+            self.updateData()
  
     def set_switch_on(self, command = None):
         logging.info('udiyoDimmer set_switch_on')  
