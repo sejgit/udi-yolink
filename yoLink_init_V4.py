@@ -732,8 +732,8 @@ class YoLinkInitPAC(object):
                     yoAccess.send_to_callback(deviceId, payload)
                 elif 'code' in payload and payload['code'] in ['000201', '020104' ]:
                     log_level = OFFLINE if payload['code'] == '000201' else BUSY
-                    logging.log(log_level, 'Error code {} received for message {} - initiating retry'.format(msg_code, data))
-                else
+                    logging.log(log_level, 'Error code {} received for message {} - initiating retry'.format(payload['code'], payload.get('msgid', 'N/A')))
+                else:
                     logging.error('Non-000000 code {} '.format(payload['desc']))
                     yoAccess.send_to_callback(deviceId, payload)
                 if yoAccess.debug:
