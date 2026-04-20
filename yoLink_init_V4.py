@@ -6,6 +6,8 @@ import psutil
 import sys
 import math
 
+from yolink_logging import BUSY, OFFLINE
+
 from  datetime import datetime
 try:
     import udi_interface
@@ -200,7 +202,7 @@ class YoLinkInitPAC(object):
             if 'cloud' in yoAccess.access_mode:
                 while not yoAccess.refresh_token():
                     time.sleep(35) # Wait 35 sec and try again - 35 sec ensures less than 10 attemps in 5min - API restriction
-                    logging.info('Trying to obtain new Token - Network/YoLink connection may be down')
+                    logging.log(OFFLINE, 'Trying to obtain new token - network or YoLink connection may be down')
                 logging.info('Retrieving YoLink API info')
                 time.sleep(1)
                 yoAccess.mqtt_str = 'yl-home/'
@@ -481,7 +483,7 @@ class YoLinkInitPAC(object):
             logging.info(f"{yoAccess.access_mode} Connecting to broker...")
             while yoAccess.token_needs_refresh() and not yoAccess.refresh_token():
                 time.sleep(35) # Wait 35 sec and try again (35sec ensure less than 10 attempts in 5 min)
-                logging.info('Trying to obtain new Token - Network/YoLink connection may be down')
+                logging.log(OFFLINE, 'Trying to obtain new token - network or YoLink connection may be down')
             logging.info('Retrieving YoLink API info')
             #yoAccess.retrieve_device_list()
             #yoAccess.retrieve_homeID()
@@ -989,7 +991,7 @@ class YoLinkInitPAC(object):
             yoAccess.client.loop_stop()
             
         else:
-            logging.error('Unintentional disconnect - Reacquiring connection')
+            logging.log(OFFLINE, 'Unintentional disconnect - Reacquiring connection')
 
             try:
                 netid = yoAccess.check_connection(yoAccess.mqttPort)
@@ -1380,7 +1382,8 @@ class YoLinkInitPAC(object):
                 logging.debug(f'transfer_data - response received message_id {message_id} completed_message_id {completed_message_id} finishQueue size {yoAccess.finishQueue.qsize()}')
             yoAccess.processing_access.release()
             if msg_code in ['000201', '020104']: # device off line or busy 
-                logging.error('Error code {} received for message {} - initiating retry'.format(msg_code, data))
+                log_level = OFFLINE if msg_code == '000201' else BUSY
+                logging.log(log_level, 'Error code {} received for message {} - initiating retry'.format(msg_code, data))
                 if 'retry' in data:
                     data['retry']= data['retry']+1
                     data['last_retry_time'] = int(data['time'])
@@ -1390,7 +1393,7 @@ class YoLinkInitPAC(object):
                 yoAccess._enqueue_retry(data)
             elif msg_code in ['000000'] :
                 if data is None: 
-                    logging.error('No data received - device not ready - initiating retry'.format( data))
+                    logging.log(BUSY, 'No data received - device not ready - initiating retry'.format( data))
                     data['retry'] = 0 # starting retry
                     data['last_retry_time'] = int(data['time'])
                     yoAccess._enqueue_retry(data)

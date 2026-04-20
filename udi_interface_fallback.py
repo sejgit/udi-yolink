@@ -1,6 +1,10 @@
 import logging as _logging
 from types import SimpleNamespace
 
+from yolink_logging import install_custom_log_levels
+
+install_custom_log_levels()
+
 _logging.basicConfig(level=_logging.INFO)
 LOGGER = _logging.getLogger("udi_interface_fallback")
 

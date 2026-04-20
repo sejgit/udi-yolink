@@ -55,6 +55,8 @@ except ImportError:
     import logging
     logging.basicConfig(level=logging.DEBUG)
 
+from yolink_logging import resolve_log_level
+
 
 
 
@@ -698,7 +700,12 @@ def systemPoll (self, polltype):
 
 def handleLevelChange(self, level):
     logging.info('New log level: {}'.format(level))
-    logging.setLevel(level['level'])
+    new_level = resolve_log_level(level['level'])
+    if hasattr(logging, 'setLevel'):
+        logging.setLevel(new_level)
+    else:
+        import logging as std_logging
+        std_logging.getLogger().setLevel(new_level)
 
 
 
