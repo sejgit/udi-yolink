@@ -701,8 +701,9 @@ def systemPoll (self, polltype):
 def handleLevelChange(self, level):
     logging.info('New log level: {}'.format(level))
     new_level = resolve_log_level(level['level'])
-    if hasattr(logging, 'setLevel'):
-        logging.setLevel(new_level)
+    set_level = getattr(logging, 'setLevel', None)
+    if callable(set_level):
+        set_level(new_level)
     else:
         import logging as std_logging
         std_logging.getLogger().setLevel(new_level)
