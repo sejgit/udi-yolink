@@ -19,7 +19,9 @@ except ImportError:
     import logging
     import sys
     logging.basicConfig(level=logging.DEBUG)
-    
+
+# Ensure custom log levels are available regardless of import path
+from yolink_logging import BUSY, OFFLINE
     #root = logging.getLogger()
     #root.setLevel(logging.DEBUG)
     #handler = logging.StreamHandler(sys.stdout)
@@ -209,6 +211,17 @@ class YoLinkMQTTDevice(object):
     def deviceError(yolink, data):
         logging.debug(f'{yolink.type} ({yolink.name}) - deviceError : {data}')
         yolink.online = False
+        # Determine appropriate log level for known transient/busy codes
+        code = None
+        if isinstance(data, dict):
+            code = data.get('code') or (data.get('data') and data.get('data').get('code'))
+        msg = f'{yolink.type} ({yolink.name}) - deviceError : {data}'
+        if code == '000201':
+            logging.log(OFFLINE, msg)
+        elif code == '020401':
+            logging.log(BUSY, msg)
+        else:
+            logging.error(msg)
         # may need to add more error handling 
 
     #@measure_time
@@ -755,8 +768,15 @@ class YoLinkMQTTDevice(object):
 
                 else:
                     yolink.deviceError(data)
-
-                    logging.error(yolink.type+ ': ' + data['desc'])
+                    # map specific codes to levels: 000201 -> OFFLINE, 020401 -> BUSY, else error
+                    code = data.get('code') if isinstance(data, dict) else None
+                    desc = data.get('desc', str(data)) if isinstance(data, dict) else str(data)
+                    if code == '000201':
+                        logging.log(OFFLINE, yolink.type + ': ' + desc)
+                    elif code == '020401':
+                        logging.log(BUSY, yolink.type + ': ' + desc)
+                    else:
+                        logging.error(yolink.type + ': ' + desc)
             elif 'event' in data:
                 #logging.debug('Event deteced')
                 yolink.online = True # Event generated so it must be online 
