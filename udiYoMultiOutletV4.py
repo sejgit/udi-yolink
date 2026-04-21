@@ -678,6 +678,8 @@ class udiYoMultiOutlet(udi_interface.Node):
                         for port_index in range(0,self.nbrOutlets):
                             portName = 'port'+str(port_index)
                             state = 99
+                            onDelay = 0
+                            offDelay = 0
                             
                             if portName in outletStates:
                                 if 'state' in outletStates[portName]:
@@ -696,19 +698,22 @@ class udiYoMultiOutlet(udi_interface.Node):
                                         offDelay = outletStates[portName]['delays']['off']*60
                                     else:
                                         offDelay = 0
-                                else:
-                                    onDelay = 0
-                                    offDelay = 0
                                 logging.debug('Updating subnode {}: {} {} {}'.format(port_index, state, onDelay, offDelay))
+                                self.subOutlet[port_index].updateOutNode(state, onDelay, offDelay)
+                            else:
+                                logging.debug('Missing outlet state for %s on %s; leaving subnode in unknown state', portName, self.nodeName)
                                 self.subOutlet[port_index].updateOutNode(state, onDelay, offDelay)
 
                         for usb in range(0,self.nbrUsb):   
                             state = 99    
                             usbName = 'usb'+str(usb)
-                            if outletStates[usbName]['state'] == 'open':
+                            usbState = outletStates.get(usbName, {}).get('state')
+                            if usbState == 'open':
                                 state = 1
-                            elif outletStates[usbName]['state'] == 'closed':
-                                state = 0          
+                            elif usbState == 'closed':
+                                state = 0
+                            else:
+                                logging.debug('Missing USB state for %s on %s; leaving subnode in unknown state', usbName, self.nodeName)
                             self.subUsb[usb].updateUsbNode(state)
                 else:
 

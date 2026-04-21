@@ -255,8 +255,12 @@ class udiYoWaterMeterMulti(udi_interface.Node):
                         self.ISYmeter_uom= self.water_meter_unit2uom( self.meter_unit)            
                     water_state = ctrl.get_data('waterFlowing', 'state')
                     logging.debug(f'water flowing : {water_state}')
-                    if water_state is not None and len(water_state) == 2:   
-                        self.my_setDriver('ST', self.state2ISY(water_state['0'] or water_state['1']), type=message_type)
+                    if isinstance(water_state, dict):
+                        active_water_flow = water_state.get('0') or water_state.get('1')
+                        if active_water_flow is not None:
+                            self.my_setDriver('ST', self.state2ISY(active_water_flow), type=message_type)
+                        else:
+                            logging.debug('Missing waterFlowing channel state for %s', self.nodeName)
                     pwr_mode, bat_lvl =  ctrl.getBattery()  
                     logging.debug('udiYoWaterMeterMultiController - getBattery: {},  {}  '.format(pwr_mode, bat_lvl))
                     if pwr_mode == 'PowerLine':
