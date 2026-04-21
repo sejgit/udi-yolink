@@ -504,12 +504,16 @@ class YoLinkSetup (udi_interface.Node):
     def stop(self):
         yo_access = getattr(self, 'yoAccess', None)
         yo_local = getattr(self, 'yoLocal', None)
+        driver_ready = getattr(self, 'nodeDefineDone', False) and getattr(self, 'node', None) is not None
         try:
             logging.info('Stop Called:')
             #self.yoAccess.writeTtsFile() #save current TTS messages
             self._schedule_refresh_retry_stop = True
 
-            self.my_setDriver('ST', 0)
+            if driver_ready:
+                self.my_setDriver('ST', 0)
+            else:
+                logging.debug('Stop: skipping ST driver update before node is ready')
             self.saveNodeNames()
 
             if yo_access is not None and hasattr(yo_access, 'shut_down'):
