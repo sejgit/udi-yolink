@@ -226,7 +226,7 @@ class YoLinkSetup (udi_interface.Node):
             self.my_setDriver('ST', 0)
             self.saveNodeNames()
 
-            if self.yoAccess:
+            if self.yoAccess and hasattr(self.yoAccess, 'shut_down'):
                 self.yoAccess.shut_down()
             self.poly.stop()
             exit()
@@ -237,7 +237,7 @@ class YoLinkSetup (udi_interface.Node):
                 self.saveNodeNames()
             except Exception as save_err:
                 logging.debug(f'Stop saveNodeNames failed: {save_err}')
-            if self.yoAccess:
+            if self.yoAccess and hasattr(self.yoAccess, 'shut_down'):
                 self.yoAccess.shut_down()
             self.poly.stop()
 

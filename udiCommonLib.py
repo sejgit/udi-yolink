@@ -624,6 +624,15 @@ def saveNodeNames(self):
     Called from longPoll so saves happen promptly after a user renames on ISY.
     """
     try:
+        if not getattr(self, 'nodeDefineDone', False) or not getattr(self, 'configDone', False):
+            logging.debug('saveNodeNames: skipped before setup/config is ready')
+            return
+
+        yolink_nodes = getattr(self, 'yolink_nodes', None)
+        if not isinstance(yolink_nodes, dict):
+            logging.debug('saveNodeNames: skipped before node cache is ready')
+            return
+
         cd = Custom(self.poly, 'customdata')
         nodes = self.poly.getNodes()
         for addr, node in nodes.items():
@@ -643,7 +652,7 @@ def saveNodeNames(self):
                     else:
                         logging.debug(f'saveNodeNames: {addr} name \'{current_name}\' saved for first time')
                     # update in-memory cache on any matching yolink_node
-                    ynode = self.yolink_nodes.get(addr)
+                    ynode = yolink_nodes.get(addr)
                     if ynode is not None:
                         ynode._name_sync_saved = current_name
             except Exception as e:

@@ -502,25 +502,33 @@ class YoLinkSetup (udi_interface.Node):
         #self.updateEpochTime()
         
     def stop(self):
+        yo_access = getattr(self, 'yoAccess', None)
+        yo_local = getattr(self, 'yoLocal', None)
         try:
             logging.info('Stop Called:')
             #self.yoAccess.writeTtsFile() #save current TTS messages
             self._schedule_refresh_retry_stop = True
 
             self.my_setDriver('ST', 0)
+            self.saveNodeNames()
 
-            if getattr(self, 'yoAccess', None):
-                self.yoAccess.shut_down()
-            if getattr(self, 'yoLocal', None):
-                self.yoLocal.shut_down()
+            if yo_access is not None and hasattr(yo_access, 'shut_down'):
+                yo_access.shut_down()
+            if yo_local is not None and hasattr(yo_local, 'shut_down'):
+                yo_local.shut_down()
+            self.poly.stop()
             exit()
         except Exception as e:
             logging.error(f'Stop Exception : {e}')
             self._schedule_refresh_retry_stop = True
-            if getattr(self, 'yoAccess', None):
-                self.yoAccess.shut_down()
-            if getattr(self, 'yoLocal', None):
-                self.yoLocal.shut_down()
+            try:
+                self.saveNodeNames()
+            except Exception as save_err:
+                logging.debug(f'Stop saveNodeNames failed: {save_err}')
+            if yo_access is not None and hasattr(yo_access, 'shut_down'):
+                yo_access.shut_down()
+            if yo_local is not None and hasattr(yo_local, 'shut_down'):
+                yo_local.shut_down()
             self.poly.stop()
 
 
