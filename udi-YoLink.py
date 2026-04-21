@@ -257,9 +257,16 @@ class YoLinkSetup (udi_interface.Node):
             logging.debug(f'Could not enumerate nodes for deferred refresh: {e}')
             return
 
-        pending = []
+        try:
+            node_items = list(nodes.items())
+        except Exception as e:
+            logging.debug(f'Could not snapshot nodes for deferred refresh: {e}')
+            return
 
-        for addr, node in nodes.items():
+        pending = []
+        processed_dev_ids = set()
+
+        for addr, node in node_items:
             if addr == self.address:
                 continue
             try:
@@ -305,6 +312,10 @@ class YoLinkSetup (udi_interface.Node):
                     logging.debug(f'No deviceId for node {addr}, skipping schedule refresh')
                     continue
 
+                if dev_id in processed_dev_ids:
+                    logging.debug(f'Skipping duplicate startup schedule refresh for {addr}; device {dev_id} already handled')
+                    continue
+
                 check_system_online = getattr(source, 'check_system_online', None)
                 is_online = False
                 try:
@@ -328,8 +339,12 @@ class YoLinkSetup (udi_interface.Node):
                     time.sleep(delay)
 
                 try:
-                    source.refreshSchedules()
-                    logging.info(f'Startup schedule refresh sent for {addr}')
+                    refreshed = source.refreshSchedules()
+                    processed_dev_ids.add(dev_id)
+                    if refreshed:
+                        logging.info(f'Startup schedule refresh sent for {addr}')
+                    else:
+                        logging.debug(f'Startup schedule refresh skipped for {addr}')
                 except Exception as e:
                     logging.debug(f'Failed refreshSchedules for {addr}: {e}')
                     pending.append({'addr': addr, 'dev_id': dev_id, 'source': source})
@@ -373,8 +388,11 @@ class YoLinkSetup (udi_interface.Node):
                     time.sleep(delay)
 
                 try:
-                    source.refreshSchedules()
-                    logging.info(f'Startup schedule refresh retry sent for {addr}')
+                    refreshed = source.refreshSchedules()
+                    if refreshed:
+                        logging.info(f'Startup schedule refresh retry sent for {addr}')
+                    else:
+                        logging.debug(f'Startup schedule refresh retry skipped for {addr}')
                 except Exception as e:
                     logging.debug(f'Failed refreshSchedules retry for {addr}: {e}')
                     remaining.append(item)
