@@ -99,7 +99,8 @@ class YoLinkSetup (udi_interface.Node):
         self.TTSstr = 'TTS'
         self.nbr_API_calls = 19
         self.nbr_dev_API_calls = 5
-        self.supportParams = ['YOLINKV2_URL', 'TOKEN_URL','MQTT_URL', 'MQTT_PORT', 'UAID', 'SECRET_KEY', 'NBR_TTS', 'TEMP_UNIT' ]
+        self.supportParams = ['YOLINKV2_URL', 'TOKEN_URL','MQTT_URL', 'MQTT_PORT', 'UAID', 'SECRET_KEY', 'NBR_TTS', 'TEMP_UNIT', 'NODE_READY_POLL_SEC' ]
+        self.node_ready_poll_seconds = 0.2
         self.yolinkURL = 'https://api.yosmart.com/openApi'
         self.yolinkV2URL = 'https://api.yosmart.com/open/yolink/v2/api' 
         self.temp_unit = 0
@@ -540,7 +541,7 @@ class YoLinkSetup (udi_interface.Node):
 
     def handleParams (self, userParam ):
         logging.debug('handleParams')
-        supportParams = ['YOLINKV2_URL', 'TOKEN_URL','MQTT_URL', 'MQTT_PORT', 'UAID', 'SECRET_KEY', 'NBR_TTS', 'TEMP_UNIT' ]
+        supportParams = ['YOLINKV2_URL', 'TOKEN_URL','MQTT_URL', 'MQTT_PORT', 'UAID', 'SECRET_KEY', 'NBR_TTS', 'TEMP_UNIT', 'NODE_READY_POLL_SEC' ]
         self.Parameters.load(userParam)
 
        
@@ -595,6 +596,13 @@ class YoLinkSetup (udi_interface.Node):
 
             if 'NBR_TTS' in userParam:
                 self.nbrTTS = int(userParam['NBR_TTS'])
+
+            if 'NODE_READY_POLL_SEC' in userParam:
+                try:
+                    self.node_ready_poll_seconds = float(userParam['NODE_READY_POLL_SEC'])
+                except (TypeError, ValueError):
+                    logging.warning('Invalid NODE_READY_POLL_SEC value: %s', userParam['NODE_READY_POLL_SEC'])
+                    self.node_ready_poll_seconds = 0.2
               
                 #self.yoAccess.writeTtsFile()    
                 
