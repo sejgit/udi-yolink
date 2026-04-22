@@ -8,7 +8,7 @@
     'MotionSensor', 'Outlet', 'GarageDoor', 'LeakSensor', 'Hub', 
     'SpeakerHub', 'VibrationSensor', 'Finger', 'Lock' , 'LockV2', 'Dimmer', 'InfraredRemoter',
     'PowerFailureAlarm', 'SmartRemoter', 'COSmokeSensor', 'Siren', 'WaterMeterController',
-    'WaterDepthSensor', 'WaterMeterMultiController', 'SprinklerV2', 'Sprinkler', 'Thermostat',
+    'WaterDepthSensor', 'WaterMeterMultiController', 'SprinklerV2', 'Thermostat',
     'SoilThcSensor'
 
 

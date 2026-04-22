@@ -8,9 +8,10 @@
     
     'Switch', 'THSensor', 'MultiOutlet', 'DoorSensor','Manipulator', 
     'MotionSensor', 'Outlet', 'GarageDoor', 'LeakSensor', 'Hub', 
-    'SpeakerHub', 'VibrationSensor', 'Finger', 'Lock', 'Dimmer', 'InfraredRemoter', 
-    'PowerFailureAlarm', 'SmartRemoter', 'COSmokeSensor', 'Siren'
-    'WaterMeterController','WaterDepthSensor','LockV2', 'WaterMeterMultiController'
+    'SpeakerHub', 'VibrationSensor', 'Finger', 'Lock' , 'LockV2', 'Dimmer', 'InfraredRemoter',
+    'PowerFailureAlarm', 'SmartRemoter', 'COSmokeSensor', 'Siren', 'WaterMeterController',
+    'WaterDepthSensor', 'WaterMeterMultiController', 'SprinklerV2', 'Thermostat',
+    'SoilThcSensor''
 
     
     Code uses MQTT communications
