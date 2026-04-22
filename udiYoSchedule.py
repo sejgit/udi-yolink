@@ -357,9 +357,14 @@ class BaseScheduleNode(udi_interface.Node):
         self.my_setDriver('GV30', 0)
         if getattr(self, 'yoSchedule', None):
             self.yoSchedule.shut_down()
-    def checkDataUpdate(self):
-        """Check for schedule data updates."""
+
+    def checkOnline(self):
+        """Long-poll hook: refresh schedule data at long poll cadence."""
         self.updateData()
+
+    def checkDataUpdate(self):
+        """Short-poll hook: intentionally no-op for schedule refreshes."""
+        return
 
     def updateStatus(self, deviceInfo):
         """Called when device status updates."""

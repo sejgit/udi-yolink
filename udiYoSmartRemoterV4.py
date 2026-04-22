@@ -152,7 +152,7 @@ class udiRemoteKey(udi_interface.Node):
         pass
     
     def send_command (self, press_type):
-        logging.debug('send_command - press type : {}'.format(press_type))
+        logging.info('send_command - press type : {}'.format(press_type))
         if press_type == 0 or press_type == 'Press' : #short press
             self.short_press_state, isy_val = self.get_new_state(self.cmd_struct['short_press'], self.short_press_state)
             if self.short_press_state  != 'UNKNOWN':

@@ -1553,10 +1553,27 @@ class YoLinkMQTTDevice(object):
                 yolink.data['report_time'] = int(data['time']/1000)
             else:
                 yolink.data['report_time'] = None
-            if 'delays' in data['data']:
-                yolink.nbrOutlets = len(data['data']['delays'])
-                yolink.nbrUsb = data['data']['delays'][0]['ch']
-                yolink.nbrPorts = yolink.nbrOutlets + yolink.nbrUsb                
+            data_section = data.get(yolink.dData, {}) if isinstance(data, dict) else {}
+            if isinstance(data_section, dict) and 'delays' in data_section:
+                delays = data_section.get('delays')
+                if isinstance(delays, list) and len(delays) > 0:
+                    yolink.nbrOutlets = len(delays)
+                    first_delay = delays[0] if isinstance(delays[0], dict) else {}
+                    if isinstance(first_delay.get('ch'), int):
+                        yolink.nbrUsb = first_delay['ch']
+                    yolink.nbrPorts = yolink.nbrOutlets + yolink.nbrUsb
+                elif isinstance(data_section.get('state'), list):
+                    # Some MultiOutlet status events report full state with delays=[].
+                    inferred_ports = len(data_section.get('state', []))
+                    if not isinstance(yolink.nbrUsb, int) or yolink.nbrUsb < 0 or yolink.nbrUsb > inferred_ports:
+                        yolink.nbrUsb = 0
+                    yolink.nbrOutlets = max(0, inferred_ports - yolink.nbrUsb)
+                    yolink.nbrPorts = inferred_ports
+                    logging.debug(
+                        '{} - inferred port layout from state because delays was empty: ports={}, outlets={}, usb={}'.format(
+                            yolink.type, yolink.nbrPorts, yolink.nbrOutlets, yolink.nbrUsb
+                        )
+                    )
             if 'reportAt' in data['data'] :
                 reportAt = datetime.strptime(data['data']['reportAt'], '%Y-%m-%dT%H:%M:%S.%fZ')
                 yolink.data['lastStateTime'] = (reportAt.timestamp() -  yolink.timezoneOffset_Sec)*1000
@@ -1574,7 +1591,7 @@ class YoLinkMQTTDevice(object):
             logging.debug('After parsing NEW {}'.format(json.dumps(yolink.data, indent=4)))
 
         except Exception as e:
-            logging.error('Exception updateStatusData - {}'.format(e))
+            logging.error('Exception updatePacketData - {}'.format(e))
             logging.error('Exception Data - {}'.format(json.dumps(data, indent=4)))
 
     '''
