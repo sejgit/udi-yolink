@@ -511,7 +511,8 @@ class udiYoSmartRemoter(udi_interface.Node):
                         remote_key = press_info['remote_key']
                         press = press_info['press']
 
-                        if press_info['signature'] != self._last_processed_press_signature:
+                        # Only send command for actual event messages, not status responses (getState)
+                        if message_info[0] == 'event' and press_info['signature'] != self._last_processed_press_signature:
                             self.keys[remote_key].send_command(press_info['press_type'])
                             self._last_processed_press_signature = press_info['signature']
 
