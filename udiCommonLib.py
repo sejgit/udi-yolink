@@ -193,7 +193,7 @@ def addNodes (self, deviceList) -> list:
     #supportedYoTypes = ['SprinklerV2', 'Sprinkler', 'Thermostat', 'SoilThcSensor', 'THSensor' ]     
     #supportedYoTypes = ['WaterMeterController', 'WaterMeterMultiController']   
     #supportedYoTypes = ['WaterMeterMultiController']     
-    #supportedYoTypes = ['Switch', 'InfraredRemoter', 'SmartRemoter']
+    supportedYoTypes = ['Hub', 'THSensor', 'LeakSensor']
     remove_list= []
     schedule_queue = []
     node_ready_poll = _resolve_node_ready_poll_seconds(self)
