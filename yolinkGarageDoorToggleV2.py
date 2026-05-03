@@ -2,7 +2,7 @@
 import time
 
 
-from yolink_mqtt_classV3 import YoLinkMQTTDevice
+from yolink_mqtt_classV4 import YoLinkMQTTDevice
 
 try:
     import udi_interface
@@ -17,9 +17,9 @@ class YoLinkGarageDoorCtrl(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__(yoAccess, deviceInfo, callback)
         yolink.methodList = ['toggle' ]
-        yolink.eventList = ['Report']
-        yolink.ToggleName = 'GarageEvent'
-        yolink.eventTime = 'Time'
+        #yolink.eventList = ['Report']
+        #yolink.ToggleName = 'GarageEvent'
+        #yolink.eventTime = 'Time'
         yolink.type = deviceInfo['type']
         yolink.online = True # No way to check 
         
@@ -31,6 +31,8 @@ class YoLinkGarageDoorCtrl(YoLinkMQTTDevice):
     def updateStatus(yolink, data):
         yolink.updateCallbackStatus(data, False)
 
+    def check_system_online(yolink):
+        return True
     
 class YoLinkGarageDoorToggle(YoLinkGarageDoorCtrl):
     def __init__(yolink, yoAccess,  deviceInfo ):

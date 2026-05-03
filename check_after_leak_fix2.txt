@@ -1,0 +1,111 @@
+[1/4] Parsing profile/nodedef/nodedefs.xml...
+   Γ£ô 59 nodeDef entries
+
+[2/4] Parsing profile/nls/en_us.txt...
+   Γ£ô 408 ST labels
+
+[3/4] Scanning udiYo*.py files with udi_interface.Node classes...
+
+====================================================================================================
+VALIDATION REPORT: udiYo*.py Γåö nodedefs.xml Γåö en_us.txt
+====================================================================================================
+
+Γ£à PASSING (27):
+   udiYoCOSmokeSensorV4.py                       udiYoCOSmokeSensor        yoCOSmokesens, yoCOSmokesensF
+   udiYoDoorSensorV4.py                          udiYoDoorSensor           yodoorsens
+   udiYoGarageDoorCtrlV2.py                      udiYoGarageDoor           yogarage
+   udiYoGarageFingerCtrlV2.py                    udiYoGarageFinger         yogarage
+   udiYoHubV4.py                                 udiYoBatteryHub           yohubbat
+   udiYoHubV4.py                                 udiYoHub                  yohub
+   udiYoInfraredRemoterV4.py                     udiYoInfraredCode         yoircode
+   udiYoInfraredRemoterV4.py                     udiYoInfraredRemoter      yoirremote
+   udiYoLeakSensorV4.py                          udiYoLeakSensor           yoleaksens, yoleaksensF
+   udiYoLinkLocal.py                             YoLinkSetup               setup
+   udiYoLock_V4.py                               udiYoLockV2               yolockv2
+   udiYoMotionSensorV4.py                        udiYoMotionSensor         yomotionsens, yomotionsensF
+   udiYoMultiOutletV2.py                         udiYoSubOutlet            yosubout
+   udiYoMultiOutletV2.py                         udiYoSubUSB               yosubusb
+   udiYoMultiOutletV2.py                         udiYoMultiOutlet          yomultiout
+   udiYoPowerFailV4.py                           udiYoPowerFailSenor       yopwralarm
+   udiYoSirenV4.py                               udiYoSiren                yosiren
+   udiYoSmartRemoterV3.py                        udiRemoteKey              smremotekey
+   udiYoSmartRemoterV3.py                        udiYoSmartRemoter         yosmremote, yosmremoteF
+   udiYoSpeakerHubV2.py                          udiYoSpeakerHub           yospeakerh
+   udiYoSprinkler2V4.py                          udiYoSprinkler2           yosprinklerv2
+   udiYoTHsensorV4.py                            udiYoTHsensor             yothsens, yothsensF, yotsens, yotsensF
+   udiYoVibrationSensorV4.py                     udiYoVibrationSensor      yovibrasens, yovibrasensF
+   udiYoWaterDeptV4.py                           udiYoWaterDept            yowaterdept
+   udiYoWaterMeterMultiControllerV4.py           udiYoWaterMeterMulti      yowatermeterMulti, yowatermeterMultiF
+   udiYoWaterMeterMultiControllerV4.py           udiYoSubWaterMeter        yowatermeterSubG, yowatermeterSubL
+   udiYoWaterMeterOnlyV4.py                      udiYoWaterMeterOnly       yowatermeterOnly, yowatermeterOnlyF
+
+Γ¥î ISSUES (10):
+
+   udiYoDimmerV4.py:
+     ΓÜá∩╕Å  class udiYoDimmer id='yodimmer': missing drivers ['GV13', 'GV14', 'GV15', 'GV16', 'GV17', 'GV18', 'GV19', 'GV21', 'GV22']
+
+   udiYoLock_V4.py:
+     ΓÜá∩╕Å  class udiYoLock id='yolock': missing commands ['LOCK', 'LOCKCTRL', 'UNLOCK']
+
+   udiYoManipulatorV4.py:
+     ΓÜá∩╕Å  class udiYoManipulator id='yomanipu': extra commands ['CTRLSCH', 'DEFINESCH', 'LOOKUPSCH']
+
+   udiYoOutletV4.py:
+     ΓÜá∩╕Å  class udiYoOutlet id='yooutlet': extra drivers ['GV3', 'GV4', 'GV5', 'GV6', 'GV7', 'GV8']
+
+   udiYoSchedule.py:
+     ΓÜá∩╕Å  class BaseScheduleNode id='yoSchedule': extra drivers ['GV21', 'GV22']
+
+   udiYoSoilSensorV4.py:
+     ΓÜá∩╕Å  class udiYoSoilSensor id='yosoilsensorF': missing drivers ['GV16', 'GV17']
+     ΓÜá∩╕Å  class udiYoSoilSensor id='yosoilsensorF': extra drivers ['GV3']
+     Γ¥î class udiYoSoilSensor id='yosoilsensorF' state 'GV17': missing ST-nlssoilsensor-GV17-NAME in en_us.txt
+     Γ¥î class udiYoSoilSensor id='yosoilsensorF' state 'GV16': missing ST-nlssoilsensor-GV16-NAME in en_us.txt
+
+   udiYoSprinklerV4.py:
+     ΓÜá∩╕Å  class udiYoSprinkler id='yosprinkler': missing drivers ['GV0', 'GV14', 'GV22', 'GV23', 'GV24', 'GV26', 'GV27', 'GV28', 'GV3', 'GV6']
+     ΓÜá∩╕Å  class udiYoSprinkler id='yosprinkler': extra drivers ['CLIHUM', 'GV4']
+     ΓÜá∩╕Å  class udiYoSprinkler id='yosprinkler': missing commands ['DOF', 'DON', 'SETATTRIB']
+     ΓÜá∩╕Å  class udiYoSprinkler id='yosprinkler': extra commands ['SETCMD']
+     Γ¥î class udiYoSprinkler id='yosprinkler' state 'GV27': missing ST-nlssprinkler-GV27-NAME in en_us.txt
+     Γ¥î class udiYoSprinkler id='yosprinkler' state 'GV23': missing ST-nlssprinkler-GV23-NAME in en_us.txt
+     Γ¥î class udiYoSprinkler id='yosprinkler' state 'GV28': missing ST-nlssprinkler-GV28-NAME in en_us.txt
+     Γ¥î class udiYoSprinkler id='yosprinkler' state 'GV0': missing ST-nlssprinkler-GV0-NAME in en_us.txt
+     Γ¥î class udiYoSprinkler id='yosprinkler' state 'GV11': missing ST-nlssprinkler-GV11-NAME in en_us.txt
+     Γ¥î class udiYoSprinkler id='yosprinkler' state 'GV2': missing ST-nlssprinkler-GV2-NAME in en_us.txt
+     Γ¥î class udiYoSprinkler id='yosprinkler' state 'GV13': missing ST-nlssprinkler-GV13-NAME in en_us.txt
+     Γ¥î class udiYoSprinkler id='yosprinkler' state 'GV3': missing ST-nlssprinkler-GV3-NAME in en_us.txt
+     Γ¥î class udiYoSprinkler id='yosprinkler' state 'GV26': missing ST-nlssprinkler-GV26-NAME in en_us.txt
+     Γ¥î class udiYoSprinkler id='yosprinkler' state 'GV22': missing ST-nlssprinkler-GV22-NAME in en_us.txt
+     Γ¥î class udiYoSprinkler id='yosprinkler' state 'GV24': missing ST-nlssprinkler-GV24-NAME in en_us.txt
+     Γ¥î class udiYoSprinkler id='yosprinkler' state 'GV6': missing ST-nlssprinkler-GV6-NAME in en_us.txt
+     Γ¥î class udiYoSprinkler id='yosprinkler' state 'GV14': missing ST-nlssprinkler-GV14-NAME in en_us.txt
+
+   udiYoSwitchV4.py:
+     ΓÜá∩╕Å  class udiYoSwitch id='yoswitch': extra drivers ['GV3', 'GV4', 'GV5', 'GV6', 'GV7', 'GV8']
+     ΓÜá∩╕Å  class udiYoSwitch id='yoswitchPwr': extra commands ['DELAYCTRL']
+
+   udiYoThermostatV4.py:
+     Γ¥î class udiYoThermostat: id='yothermostat' NOT in nodedefs.xml
+
+   udiYoWaterMeterControllerV4.py:
+     ΓÜá∩╕Å  class udiYoWaterMeterController id='yowatermeterOnly': missing drivers ['GV16']
+     ΓÜá∩╕Å  class udiYoWaterMeterController id='yowatermeterOnly': extra drivers ['GV0', 'GV22', 'GV23', 'GV24', 'GV26', 'GV27', 'GV28', 'GV8']
+     ΓÜá∩╕Å  class udiYoWaterMeterController id='yowatermeterOnly': extra commands ['DOF', 'DON']
+     ΓÜá∩╕Å  class udiYoWaterMeterController id='yowatermeterOnlyF': missing drivers ['GV16']
+     ΓÜá∩╕Å  class udiYoWaterMeterController id='yowatermeterOnlyF': extra drivers ['GV0', 'GV22', 'GV23', 'GV24', 'GV26', 'GV27', 'GV28', 'GV8']
+     ΓÜá∩╕Å  class udiYoWaterMeterController id='yowatermeterOnlyF': extra commands ['DOF', 'DON']
+
+ΓÅ¡∩╕Å  SKIPPED - no udi_interface.Node (1):
+   udiYolinkLib.py
+
+====================================================================================================
+SUMMARY
+====================================================================================================
+Total udiYo*.py files:    31
+Classes validated:        27
+Files with issues:        10
+Files skipped:            1
+nodeDefs in profile:      59
+ST labels in en_us.txt:   408
+====================================================================================================

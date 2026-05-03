@@ -20,6 +20,20 @@ from os import truncate
 import time
 import json
 import math
+import threading
+#import datetime
+from datetime import datetime
+
+driver_lock = threading.Lock()
+
+
+def start_done(self):
+    logging.info(f'start_done called  - {self.devInfo["name"]}')
+    self.system_ready = True
+
+def configDoneHandler(self):
+    logging.info(f'configDoneHandler called  - {self.devInfo["name"]}')
+    self.configDone = True
 
 def updateEpochTime(self, command=None ):
     logging.info('updateEpochTime ')
@@ -34,19 +48,11 @@ def convert_temp_unit(self, tempStr):
     else:
         return(0)
     
-def convert_water_unit(self, tempStr):
-    if tempStr.capitalize()[:1] == 'G': #Gallon
-        return(0)
-    elif tempStr.capitalize()[:1] == 'C': #CCF
-        return(1) 
-    elif tempStr.capitalize()[:1] == 'M': #m3
-        return(2)
-    else:
-        return(3) #liter
+
 
 def calculate_water_volume(self, volume, volumeunit, targetunit):
     # Placeholder for actual calculation logic
-
+    logging.debug('calculate_water_volume - volume: {}, volumeunit: {}, targetunit: {}'.format(volume, volumeunit, targetunit)) 
     if volumeunit == 0 and targetunit == 1:  # Gallon to CCF
         temp_volume = volume * 0.133681/100
     elif volumeunit == 0 and targetunit == 2:  # Gallon to m3
@@ -100,6 +106,19 @@ def save_cmd_struct(self, cmd_struct):
     except IOError as e:
         logging.error('An error occurred saving command state: {}'.format(e))
 
+def convert_timestr_to_epoch(self, timestr):
+    logging.debug('convert_timestr_to_epoch - {}'.format(timestr))
+    try:
+        dt =int(datetime.strptime(timestr, "%Y-%m-%dT%H:%M:%S.%fZ"))
+        epoch = int(dt.timestamp())
+        logging.debug('epoch time {} for  {}'.format(epoch, timestr ))
+
+    except Exception as e:
+        logging.error('Error converting time string to epoch: {}'.format(e))
+        epoch = 0
+    return(epoch)
+
+
 
 
 def retrieve_cmd_state(self):
@@ -129,39 +148,53 @@ def retrieve_cmd_struct(self):
 
 
 def node_queue(self, data):
-    self.n_queue.append(data['address'])
+    if not isinstance(data, dict):
+        return
+
+    address = data.get('address')
+    if address != getattr(self, 'address', None):
+        return
+
+    logging.debug('node_queue - {}'.format(data))
+    self.n_queue.append(address)
 
 def wait_for_node_done(self):
     while len(self.n_queue) == 0:
         time.sleep(0.1)
     self.n_queue.pop()
 
-def my_setDriver(self, key, value, Unit=None, force=False):
-    logging.debug(f'my_setDriver : {key} {value} {Unit} ')
-    try:
-        if any(item.get('driver') == key for item in self.drivers):
-            if value is None:
-                logging.debug('None value passed = seting 99, UOM 25')
-                self.node.setDriver(key, 99, True, force, 25)
+def my_setDriver(self, key, value, UOM=None, force=None, type=None):
+    with driver_lock:
+        logging.debug(f'my_setDriver : {key} {value} {UOM} {type}')
+        try:
+            if any(item.get('driver') == key for item in self.drivers):
+                if force is None:
+                    if type in ['method']: #methods are forced so force update of data even if not changed
+                        force = True  
+                    else:
+                        force = False     
+                if value is None:
+                    if type  in ['event']: 
+                        logging.debug('None value passed for event update; preserving existing driver value')
+                        return
+                else:  
+                    if key in ['GV20']: # Connection state o
+                        try:
+                            if self.yoAccess is not None and getattr(self.yoAccess, 'local', False):
+                                logging.debug('Local connection - value + 3')
+                                value = value + 3
+                        except Exception as e:
+                            logging.error('Local connection - yolink class not ready - continue : {}'.format(e))
+                    if isinstance(UOM, int):
+                        self.node.setDriver(key, value, True, force, uom=UOM)
+                    else:
+                        self.node.setDriver(key, value, True, force)
             else:
-                
-                if key in ['GV20']: # Connection state o
-                    try:
-                        if self.yoAccess.local:
-                            logging.debug('Local connection - value + 3')
-                            value = value + 3
-                    except Exception as e:
-                        logging.debug('Local connection - yolink class not ready - continue : {}'.format(e))
-                if isinstance(Unit, int):
-                    self.node.setDriver(key, value, True, force, uom=Unit)
-                else:
-                    self.node.setDriver(key, value,True, force)
-        else:
-            logging.debug(f'Passed driver {key} does not exist in {self.drivers}')
+                logging.debug(f'Passed driver {key} does not exist in {self.drivers}')
 
-    except ValueError: #A non number was passed 
-        logging.error('Non numeric value passed to my_setDriver - setting 99 ')
-        self.node.setDriver(key, 99, True, True, 25)
+        except ValueError: #A non number was passed 
+            logging.error('Non numeric value passed to my_setDriver - setting 99 ')
+            self.node.setDriver(key, 99, True, True, 25)
         
 
 def mask2key (self, mask):
@@ -209,7 +242,7 @@ def bool2Nbr (self, data):
     elif data is False:
         return(0)
     else:
-        return(99)
+        return(None)
 
 def bool2ISY (self, data):
     if data is True:
@@ -217,7 +250,7 @@ def bool2ISY (self, data):
     elif data is False:
         return(0)
     else:
-        return(99)
+        return(None)
 
 def bool2nbr(self, type):
     if type is True:
@@ -225,7 +258,7 @@ def bool2nbr(self, type):
     elif type is False:
         return(0)
     else:
-        return(99)
+        return(None)
 
 def state2Nbr(self, val):
     if val == 'normal':
@@ -233,7 +266,7 @@ def state2Nbr(self, val):
     elif val == 'alert':
         return(1)
     else:
-        return(99)
+        return(None)
 
 def state2ISY(self, val):
     if val in ['normal', 'off' , False, 'closed', 'close']:
@@ -241,13 +274,137 @@ def state2ISY(self, val):
     elif val in ['alert', 'on', True, 'opened', 'open']:
         return(1)
     else:
-        return(99)
+        return(None)
 
 def isy_value(self, value):
     if value == None:
-        return (99)
+        return (None)
     else:
         return(value)
+
+
+def set_node_custom(self, key, value):
+    """Persist small node-level custom data using Polyglot customdata store,
+    with fallback to a per-node JSON file when running without Polyglot."""
+    try:
+        if hasattr(self, 'poly'):
+            try:
+                cd = Custom(self.poly, 'customdata')
+                cd[f"{self.address}_{key}"] = value
+                logging.debug(f'set_node_custom customdata: {self.address}_{key}={value}')
+                return
+            except Exception as e:
+                logging.debug(f'set_node_custom customdata failed: {e}')
+        # fallback to file per-address (e.g. when running without Polyglot)
+        fname = f"{self.address}_custom.json"
+        try:
+            try:
+                with open(fname, 'r') as fh:
+                    data = json.load(fh)
+            except Exception:
+                data = {}
+            data[key] = value
+            with open(fname, 'w') as fh:
+                json.dump(data, fh)
+            logging.debug(f'set_node_custom fallback file {fname} {key}={value}')
+        except Exception as e:
+            logging.error(f'Failed to write node custom data file {fname}: {e}')
+    except Exception as e:
+        logging.error(f'set_node_custom unexpected error: {e}')
+
+
+def get_node_custom(self, key):
+    """Retrieve node-level custom data. Returns None if not found."""
+    try:
+        if hasattr(self, 'poly'):
+            try:
+                cd = Custom(self.poly, 'customdata')
+                val = cd.get(f"{self.address}_{key}")
+                if val is not None:
+                    logging.debug(f'get_node_custom customdata: {self.address}_{key}={val}')
+                    return val
+            except Exception as e:
+                logging.debug(f'get_node_custom customdata failed: {e}')
+        fname = f"{self.address}_custom.json"
+        try:
+            with open(fname, 'r') as fh:
+                data = json.load(fh)
+            if key in data:
+                logging.debug(f'get_node_custom fallback file {fname} {key}={data[key]}')
+                return data[key]
+        except Exception:
+            return None
+    except Exception as e:
+        logging.error(f'get_node_custom unexpected error: {e}')
+    return None
+
+
+def checkNameSync(self):
+    """Called during longPoll to detect ISY-side node renames and re-apply saved names.
+    Uses lazy instance attributes so no per-class __init__ changes are needed."""
+    now = time.time()
+    if not hasattr(self, '_name_sync_last'):
+        self._name_sync_last = 0
+        self._name_sync_saved = None
+    if now - self._name_sync_last < 30:
+        return
+    self._name_sync_last = now
+    node = getattr(self, 'node', None)
+    if node is None:
+        return
+    try:
+        if self._name_sync_saved is None:
+            self._name_sync_saved = get_node_custom(self, 'saved_name')
+        if self._name_sync_saved and hasattr(self, 'poly'):
+            valid_name = self.poly.getValidName(self._name_sync_saved)
+            if valid_name != self._name_sync_saved:
+                self._name_sync_saved = valid_name
+                set_node_custom(self, 'saved_name', valid_name)
+        if self._name_sync_saved:
+            if getattr(node, 'name', None) != self._name_sync_saved:
+                try:
+                    node.rename(self._name_sync_saved)
+                    logging.info(f'checkNameSync: renamed {self.address} to {self._name_sync_saved}')
+                except Exception as e:
+                    logging.debug(f'checkNameSync: rename failed for {self.address}: {e}')
+        else:
+            name = getattr(node, 'name', None)
+            if name:
+                if hasattr(self, 'poly'):
+                    name = self.poly.getValidName(name)
+                set_node_custom(self, 'saved_name', name)
+                self._name_sync_saved = name
+    except Exception as e:
+        logging.debug(f'checkNameSync error for {self.address}: {e}')
+
+
+def saveCurrentNodeNames(self):
+    """Persist current Polyglot node names through the setup controller.
+    This reuses YoLinkSetup.saveNodeNames() so UPDATE and STOP follow the
+    same persistence path as longPoll."""
+    try:
+        poly = getattr(self, 'poly', None)
+        if poly is None:
+            return False
+
+        setup_node = None
+        try:
+            setup_node = poly.getNode('setup')
+        except Exception:
+            setup_node = None
+
+        if setup_node is None:
+            try:
+                setup_node = poly.getNodes().get('setup')
+            except Exception:
+                setup_node = None
+
+        if setup_node is not None and hasattr(setup_node, 'saveNodeNames'):
+            setup_node.saveNodeNames()
+            return True
+    except Exception as e:
+        logging.debug(f'saveCurrentNodeNames error for {getattr(self, "address", "unknown")}: {e}')
+    return False
     
 def daylist2bin(self, daylist):
     sum = 0
@@ -432,16 +589,12 @@ def send_rel_temp_to_isy(self, temperature, stateVar):
             self.my_setDriver(stateVar, round(temperature,1), 4)
         else: # messana = Farenheit
             self.my_setDriver(stateVar, round(temperature*5/9,1), 17)
-    elif  self.ISY_temp_unit == 1: # Farenheit in ISY
+    else : # Farenheit in ISY
         if self.messana_temp_unit == 'Celsius' or self.messana_temp_unit == 0:
             self.my_setDriver(stateVar, round((temperature*9/5),1),  4)
         else:
             self.my_setDriver(stateVar, round(temperature,1), 17)
-    else: # kelvin
-        if self.messana_temp_unit == 'Celsius' or self.messana_temp_unit == 0:
-            self.my_setDriver(stateVar, round((temperature,1), 4))
-        else:
-            self.my_setDriver(stateVar, round((temperature)*9/5,1),  17)
+
 
 
 def send_temp_to_isy (self, temperature, stateVar):
@@ -452,13 +605,9 @@ def send_temp_to_isy (self, temperature, stateVar):
             self.my_setDriver(stateVar, round(temperature,1),  4)
         else: # messana = Farenheit
             self.my_setDriver(stateVar, round((temperature-32)*5/9,1),  17)
-    elif  self.ISY_temp_unit == 1: # Farenheit in ISY
+    else: # Farenheit in ISY
         if self.messana_temp_unit == 'Celsius' or self.messana_temp_unit == 0:
             self.my_setDriver(stateVar, round((temperature*9/5+32),1), 4)
         else:
             self.my_setDriver(stateVar, round(temperature,1),  17)
-    else: # kelvin
-        if self.messana_temp_unit == 'Celsius' or self.messana_temp_unit == 0:
-            self.my_setDriver(stateVar, round((temperature+273.15,1), 4))
-        else:
-            self.my_setDriver(stateVar, round((temperature+273.15-32)*9/5,1),  17)
+

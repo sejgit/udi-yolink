@@ -1,7 +1,7 @@
 import json
 import time
 
-from yolink_mqtt_classV3 import YoLinkMQTTDevice
+from yolink_mqtt_classV4 import YoLinkMQTTDevice
 try:
     import udi_interface
     logging = udi_interface.LOGGER
@@ -11,16 +11,18 @@ except ImportError:
     logging.basicConfig(level=logging.DEBUG)
 
 
-class YoLinkOutl(YoLinkMQTTDevice):
+class YoLinkOutlet(YoLinkMQTTDevice):
     def __init__(yolink, yoAccess,  deviceInfo, callback):
         super().__init__(yoAccess,  deviceInfo, callback)
         
-        yolink.methodList = ['getState', 'setState', 'setDelay', 'getSchedules', 'setSchedules', 'getUpdate'   ]
-        yolink.eventList = ['StatusChange', 'Report', 'getState']
-        yolink.stateList = ['open', 'closed', 'on', 'off']
-        yolink.ManipulatorName = 'OutletEvent'
-        yolink.eventTime = 'Time'
+        #yolink.methodList = ['getState', 'setState', 'setDelay', 'getSchedules', 'setSchedules', 'getUpdate'   ]
+        #yolink.eventList = ['StatusChange', 'Report', 'getState']
+        #yolink.stateList = ['open', 'closed', 'on', 'off']
+        #yolink.ManipulatorName = 'OutletEvent'
+        #yolink.eventTime = 'Time'
         yolink.type = deviceInfo['type']
+        yolink.maxSchedules = 6
+        logging.debug(f'Outlet - GV23 maxSchedules: {yolink.maxSchedules}')
         #time.sleep(2)
         
         #yolink.refreshState()
@@ -47,68 +49,42 @@ class YoLinkOutl(YoLinkMQTTDevice):
     '''
     
     def updateStatus(self, data):
-        
         self.updateCallbackStatus(data, False)
 
     def setState(yolink, state):
-        logging.debug(yolink.type + ' - setState')
+        logging.debug(yolink.type + ' - setState + {}'.format(state))
         outlet = str(state)
         #yolink.online = yolink.getOnlineStatus()
-        if yolink.online:
-            if 'setState'  in yolink.methodList:          
-                if outlet.lower() not in yolink.stateList:
-                    logging.error('Unknows state passed')
-                    return(False, yolink.dataAPI[yolink.dOnline])
-                if outlet.lower() == 'on':
-                    state = 'open'
-                if state.lower() == 'off':
-                    state = 'closed'
-                data = {}
-                data['params'] = {}
-                data['params']['state'] = state.lower()
-                return(yolink.setDevice( data))
-        else:
-            return(False)
+
+        if outlet.lower() in [ 'on', 'open']:
+            state = 'open'
+        if state.lower() in ['off', 'closed']:
+            state = 'closed'
+        data = {}
+        data['params'] = {}
+        data['params']['state'] = state.lower()
+        return(yolink.setDevice( data))
     
 
     def getState(yolink):
-        logging.debug(yolink.type+' - getState :{}'.format(yolink.dataAPI))
+        
         dev_state = 'Unknown'
         #yolink.online = yolink.getOnlineStatus()
         try:
-            if yolink.online or  'lastMessage' in yolink.dataAPI:
-                logging.debug(yolink.type+' - getState online')
-                #while yolink.dataAPI[yolink.dData][yolink.dState]  == {} and attempts < 3:
-                #    time.sleep(1)
-                #    attempts = attempts + 1
-                logging.debug(yolink.type+' - getState data {}'.format(yolink.dataAPI[yolink.dData]))    
-                #logging.debug(yolink.type+' - getState data  state {}'.format(yolink.dataAPI[yolink.dData][yolink.dState]))    
-                if yolink.dState in yolink.dataAPI[yolink.dData]:
-                    if isinstance(yolink.dataAPI[yolink.dData][yolink.dState], dict):
-                        #logging.debug('DICT - {} '.format(yolink.dataAPI[yolink.dData][yolink.dState]))
-                        temp = 'state' in yolink.dataAPI[yolink.dData][yolink.dState]
+            state_data = yolink.get_data('state')
+            logging.debug(yolink.type+' - getState data {}'.format(state_data))
+            state_val = None
+            if isinstance(state_data, dict):
+                state_val = state_data.get('state')
+            elif isinstance(state_data, str):
+                state_val = state_data
 
-                        logging.debug('if  - {} '.format(temp))
-
-                        if 'state' in yolink.dataAPI[yolink.dData][yolink.dState]:
-                            #logging.debug('state  - {} '.format(yolink.dataAPI[yolink.dData][yolink.dState]['state']))
-                            if  yolink.dataAPI[yolink.dData][yolink.dState]['state'] == 'open':
-                                dev_state = 'ON'
-                            elif yolink.dataAPI[yolink.dData][yolink.dState]['state'] == 'closed':
-                                dev_state = 'OFF'
-
-                        else:
-                            dev_state = 'Unknown'
-                        #logging.debug('dev_state  - {} '.format(dev_state))
-                    else:
-                        if  yolink.dataAPI[yolink.dData][yolink.dState] == 'open':
-                            dev_state = 'ON'
-                        elif yolink.dataAPI[yolink.dData][yolink.dState] == 'closed':
-                            dev_state = 'OFF'
-                        else:
-                            dev_state = 'Unknown'
-                else:
-                    dev_state = 'Unknown'
+            if state_val == 'open':
+                dev_state = 'ON'
+            elif state_val == 'closed':
+                dev_state = 'OFF'
+            else:
+                dev_state = 'Unknown'
             logging.debug(yolink.type+' - getState - return {} '.format(dev_state))
             return(dev_state)
         except Exception as e:
@@ -117,21 +93,17 @@ class YoLinkOutl(YoLinkMQTTDevice):
         
         
     def getEnergy(yolink):
-        logging.debug(yolink.type+' - getEnergy : {}'.format(yolink.dataAPI))
+        logging.debug(yolink.type+' - getEnergy : ')
 
         #yolink.online = yolink.getOnlineStatus()
-        if yolink.online:   
-            try:    
-                return({'power':yolink.dataAPI[yolink.dData][yolink.dState]['power'], 'watt':yolink.dataAPI[yolink.dData][yolink.dState]['watt']})
+        if yolink.check_system_online():   
+            try:
+                power = yolink.get_data('power')
+                watt = yolink.get_data('watt')
+                if power is None and watt is None:
+                    return(None)
+                return({'power': power, 'watt': watt})
             except:
                 return(None)
     
     
-class YoLinkOutlet(YoLinkOutl):
-    def __init__(yolink, yoAccess,  deviceInfo):
-        super().__init__(  yoAccess,  deviceInfo, yolink.updateStatus)
-        yolink.initNode()
-
-
-    def updateStatus(yolink, data):
-        yolink.updateCallbackStatus(data, True)

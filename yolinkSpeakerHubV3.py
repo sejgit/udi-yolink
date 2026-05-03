@@ -1,7 +1,7 @@
 #import json
 import time
 
-from yolink_mqtt_classV3 import YoLinkMQTTDevice
+from yolink_mqtt_classV4 import YoLinkMQTTDevice
 try:
     import udi_interface
     logging = udi_interface.LOGGER
@@ -15,10 +15,10 @@ class YoLinkSpeakerH(YoLinkMQTTDevice):
         super().__init__(yoAccess,  deviceInfo, callback)
         yolink.WiFipassword = ''
         yolink.WiFiSSID = ''
-        yolink.methodList = ['getState', 'setWiFi', 'playAudio', 'setOption' ]
-        yolink.eventList = ['StatusChange', 'Report', 'getState']
-        yolink.toneList = ['none', 'Emergency', 'Alert', 'Warn', 'Tip'] #index used
-        yolink.eventTime = 'Time'
+        #yolink.methodList = ['getState', 'setWiFi', 'playAudio', 'setOption' ]
+        #yolink.eventList = ['StatusChange', 'Report', 'getState']
+        #yolink.toneList = ['none', 'Emergency', 'Alert', 'Warn', 'Tip'] #index used
+        #yolink.eventTime = 'Time'
         yolink.type = deviceInfo['type']
 
         yolink.volume = 5
@@ -48,19 +48,11 @@ class YoLinkSpeakerH(YoLinkMQTTDevice):
 
     def getWiFiInfo(yolink):
         logging.debug('getWiFiInfo')
-        if 'data' in yolink.dataAPI['lastMessage']:
-            if 'wifi' in yolink.dataAPI['lastMessage']['data']:
-                return(yolink.dataAPI['lastMessage']['data']['wifi'])
-        else:
-            return(None)
+        return(yolink.get_dict_data('wifi'))
 
     def getEthernetInfo(yolink):
         logging.debug('getEthernetInfo')
-        if 'data' in yolink.dataAPI['lastMessage']:
-            if 'eth' in yolink.dataAPI['lastMessage']['data']:
-                return(yolink.dataAPI['lastMessage']['data']['eth'])
-        else:
-            return(None)
+        return(yolink.get_dict_data('eth'))
             
     def getOptionInfo(yolink):
         logging.debug('getOptionInfo')
@@ -80,7 +72,7 @@ class YoLinkSpeakerH(YoLinkMQTTDevice):
         while  not yolink.yoAccess.publish_data( data) and attempt <= maxAttempts:
                time.sleep(1)
                attempt = attempt + 1
-        yolink.lastControlPacket = data
+
 
     def setVolume(yolink, volume):
         logging.debug(yolink.type+' - setVolume: {}'.format(volume))
@@ -147,7 +139,7 @@ class YoLinkSpeakerH(YoLinkMQTTDevice):
         while  not yolink.yoAccess.publish_data( data) and attempt <= maxAttempts:
                time.sleep(4)
                attempt = attempt + 1
-        yolink.lastControlPacket = data
+
 
     '''
     def playAudio(yolink):
@@ -171,7 +163,7 @@ class YoLinkSpeakerH(YoLinkMQTTDevice):
         while  not yolink.yoAccess.publish_data( data) and attempt <= maxAttempts:
                time.sleep(4)
                attempt = attempt + 1
-        yolink.lastControlPacket = data
+
     '''
 
     def setOptions(yolink):
@@ -189,27 +181,9 @@ class YoLinkSpeakerH(YoLinkMQTTDevice):
         data['params']['mute'] = yolink.mute
         print('dataStr: {}'.format(data))
         yolink.yoAccess.publish_data( data)
-        yolink.lastControlPacket = data
 
-    '''
-    def getState(yolink):
-        logging.debug(yolink.type+' - getState')
-        attempts = 0
-        yolink.refreshDevice
-        while yolink.dState not in yolink.dataAPI[yolink.dData] and attempts < 5:
-            time.sleep(1)
-            attempts = attempts + 1
-        if attempts < 5 and 'state' in yolink.dataAPI[yolink.dData][yolink.dState]:
-            if  yolink.dataAPI[yolink.dData][yolink.dState]['state'] == 'open':
-                return('on')
-            elif yolink.dataAPI[yolink.dData][yolink.dState]['state'] == 'closed':
-                return('off')
-            else:
-                return('Unkown')
-        else:
-            return('Unkown')
-    '''
- 
+
+
 
 class YoLinkSpeakerHub(YoLinkSpeakerH):
     def __init__(yolink, yoAccess,  deviceInfo):
@@ -222,7 +196,7 @@ class YoLinkSpeakerHub(YoLinkSpeakerH):
         print('SpeakerHub update data {}'.format(data))
         if 'method' in  data:
             if data['code'] == '000000':                
-                yolink.online = yolink.checkOnlineStatus(data)
+                yolink.online = yolink.check_system_online()
                 if  '.setWiFi' in data['method'] :
                     if int(data['time']) > int(yolink.getLastUpdate()):
                         #yolink.updateStatusData(data)       
@@ -241,7 +215,7 @@ class YoLinkSpeakerHub(YoLinkSpeakerH):
                 yolink.updateCallbackStatus(data, True)
             else:
                 yolink.deviceError(data)
-                yolink.online = yolink.checkOnlineStatus(data)
+                yolink.online = yolink.check_system_online()
                 logging.error(yolink.type+ ': ' + data['desc'])
         else:
             yolink.updateCallbackStatus(data, True)

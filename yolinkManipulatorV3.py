@@ -1,0 +1,85 @@
+import json
+import time
+
+
+from yolink_mqtt_classV4 import YoLinkMQTTDevice
+try:
+    import udi_interface
+    logging = udi_interface.LOGGER
+    Custom = udi_interface.Custom
+except ImportError:
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
+
+class YoLinkManipulator(YoLinkMQTTDevice):
+    def __init__(yolink, yoAccess,  deviceInfo, callback):
+        super().__init__( yoAccess,  deviceInfo, callback)
+        yolink.maxSchedules = 6
+        logging.debug(f'Manipulator - GV23 maxSchedules: {yolink.maxSchedules}')
+        #yolink.methodList = ['getState', 'setState', 'setDelay', 'getSchedules', 'setSchedules', 'getUpdate'   ]
+        #yolink.eventList = ['StatusChange', 'Report']
+        #yolink.stateList = ['open', 'closed', 'on', 'off']
+        #yolink.ManipulatorName = 'ManipulatorEvent'
+        #yolink.eventTime = 'Time'
+        yolink.type = deviceInfo['type']
+        yolink.MQTT_type = 'c'
+        #time.sleep(1)
+
+    '''
+    def initNode(yolink):
+        yolink.refreshState()
+        time.sleep(2)
+        if not yolink.online:
+            logging.error('Manipulator device not online')
+        #    yolink.refreshSchedules()
+        #else:
+        #    
+        #yolink.refreshFW
+    ''' 
+
+    
+    def updateStatus(yolink, data):
+        yolink.updateCallbackStatus(data, False)
+
+    def setState(yolink, state):
+        logging.debug(yolink.type+' - setState')
+        #yolink.online = yolink.getOnlineStatus()
+ 
+        if state.lower() in ['on', 'open']:
+            state = 'open'
+        if state.lower() in ['off', 'closed']:
+            state = 'closed'
+        data = {}
+        data['params'] = {}
+        data['params']['state'] = state.lower()
+        return(yolink.setDevice(data))
+
+
+    def getState(yolink):
+        logging.debug(yolink.type+' - getState')
+        #yolink.online = yolink.getOnlineStatus()
+        if yolink.check_system_online():   
+            attempts = 0
+            while yolink.no_data() and attempts < 3:
+                time.sleep(1)
+                attempts = attempts + 1
+            if attempts <= 5:
+                state_data = yolink.get_data("state")
+                if state_data and 'state' in state_data:
+                    if state_data['state'] == 'open':
+                        return('open')
+                    elif state_data['state'] == 'closed':
+                        return('closed')
+                    else:
+                        return('Unkown')
+                else:
+                    return('Unkown')
+            else:
+                return('Unkown')
+    
+    def getData(yolink):
+        #yolink.online = yolink.getOnlineStatus()
+        if yolink.check_system_online():   
+            return(yolink.getData())
+
+

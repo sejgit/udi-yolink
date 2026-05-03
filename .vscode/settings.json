@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^\\$root = 'c:\\\\Users\\\\chris\\\\OneDrive\\\\Documents\\\\GitHub\\\\udi-yolink'; \\$files = Get-ChildItem -LiteralPath \\$root -Filter 'udiYo\\*\\.py' -File; \\$changed = @\\(\\); foreach \\(\\$file in \\$files\\) \\{ \\$text = \\[System\\.IO\\.File\\]::ReadAllText\\(\\$file\\.FullName\\); \\$pattern = '\\(\\?m\\)\\^\\(\\?<indent>\\\\s\\*\\)self\\\\\\.node_ready\\\\s\\*=\\\\s\\*False\\\\s\\*\\(\\?<nl>\\\\r\\?\\\\n\\)\\(\\?!\\\\k<indent>self\\\\\\.system_ready\\\\s\\*=\\\\s\\*False\\\\b\\)'; \\$updated = \\[System\\.Text\\.RegularExpressions\\.Regex\\]::Replace\\(\\$text, \\$pattern, \\{ param\\(\\$m\\) \\$m\\.Value \\+ \\$m\\.Groups\\['indent'\\]\\.Value \\+ 'self\\.system_ready=False' \\+ \\$m\\.Groups\\['nl'\\]\\.Value \\}\\); if \\(\\$updated -ne \\$text\\) \\{ \\$utf8NoBom = New-Object System\\.Text\\.UTF8Encoding\\(\\$false\\); \\[System\\.IO\\.File\\]::WriteAllText\\(\\$file\\.FullName, \\$updated, \\$utf8NoBom\\); \\$changed \\+= \\$file\\.Name \\} \\}; 'Changed files: ' \\+ \\$changed\\.Count; \\$changed \\| Sort-Object$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
