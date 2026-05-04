@@ -63,7 +63,7 @@ class YoLinkTHSensor(YoLinkMQTTDevice):
         if hmin == 101:
             hmin = None
         logging.debug(f'24H Data - tmin: {tmin}, tmax: {tmax}, hmin: {hmin}, hmax: {hmax} ')
-        logging.debug(f'24H Data Store: {json.dumps(yolink.sensordata_24_hours, indent=4)} ')
+        #logging.debug(f'24H Data Store: {json.dumps(yolink.sensordata_24_hours, indent=4)} ')
         return(tmin, tmax, hmin, hmax)
     
     def updateStatus(yolink, data):
