@@ -90,7 +90,7 @@ class udiYoTHsensor(udi_interface.Node):
 
         self.cmd_state = self.retrieve_cmd_state()
         model = str(self.devInfo['modelName'][:6])
-        if model in ['YS8017', 'YS8014', 'YS8004', 'YS8008', 'YS8003']:
+        if model in ['YS8017', 'YS8014', 'YS8004', 'YS8008']:
             self.meas_support = ['temp']
         else:
             self.meas_support = ['temp', 'hum']
