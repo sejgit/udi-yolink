@@ -79,7 +79,7 @@ class YoLinkMQTTDevice(object):
             yolink.yoAccess.subscribe_mqtt(deviceInfo['deviceId'], callback, route_filter=route_filter)
         yolink.lastDataPacket = ''
         yolink.lastControlPacket = {}
-        yolink.TZcomp = (yolink.timezoneOffsetSec() /60 /60)
+        #yolink.TZcomp = (yolink.timezoneOffsetSec() /60 /60)
         yolink.lastUpdateTime = 0
         #yolink.yolink_URL = yoAccess.apiv2URL
         #yolink.mqttURL = yoAccess.mqttURL
@@ -1424,11 +1424,15 @@ class YoLinkMQTTDevice(object):
                 tz = yolink.get_data('tz')
                 logging.debug('Time String: {} TZ: {}'.format(time_str, tz))
                 dt = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S.%fZ")
-                # Optionally adjust for timezone if tz is valid
-                if tz is None:
-                    epoch_time = yolink.unix_time_seconds(dt.timestamp()) - yolink.timezoneOffset_Sec
-                else
-                    epoch_time = yolink.unix_time_seconds(dt.timestamp())
+
+                if dt is not None:
+                    # Adjust for timezone if tz is not valid
+                    if tz is None:
+                        epoch_time = yolink.unix_time_seconds(dt.timestamp()) - yolink.timezoneOffset_Sec
+                    else:
+                        epoch_time = yolink.unix_time_seconds(dt.timestamp())
+                else:
+                    epoch_time = None
                 return epoch_time
             except Exception as e:
                 logging.debug(f'get_report_time: failed to parse time_str: {e}')
