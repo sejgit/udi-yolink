@@ -156,14 +156,18 @@ class udiRemoteKey(udi_interface.Node):
         if press_type == 0 or press_type == 'Press' : #short press
             self.short_press_state, isy_val = self.get_new_state(self.cmd_struct['short_press'], self.short_press_state)
             if self.short_press_state  != 'UNKNOWN':
+                logging.info('SmartRemoter key%d (%s) reportCmd sending %s for %s press', self.key + 1, self.address, self.short_press_state, press_type)
                 self.node.reportCmd(self.short_press_state )
+                logging.debug('SmartRemoter key%d (%s) reportCmd queued command %s', self.key + 1, self.address, self.short_press_state)
             self.my_setDriver('ST', isy_val)
 
             logging.debug('send short press command cmd:{} driver{}'.format(self.short_press_state, isy_val))
         else:
             self.long_press_state, isy_val = self.get_new_state(self.cmd_struct['long_press'], self.long_press_state)
             if self.long_press_state  != 'UNKNOWN':
+                logging.info('SmartRemoter key%d (%s) reportCmd sending %s for %s press', self.key + 1, self.address, self.long_press_state, press_type)
                 self.node.reportCmd(self.long_press_state )
+                logging.debug('SmartRemoter key%d (%s) reportCmd queued command %s', self.key + 1, self.address, self.long_press_state)
             self.my_setDriver('ST', isy_val)
    
             logging.debug('send long press command cmd:{} driver{}'.format(self.long_press_state, isy_val))
