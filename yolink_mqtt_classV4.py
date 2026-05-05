@@ -764,6 +764,13 @@ class YoLinkMQTTDevice(object):
     def updateCallbackStatus(yolink, data, eventSupport = False):
         try:
             logging.debug('{} - updateCallbackStatus '.format(yolink.type))
+            if isinstance(data, dict):
+                event_name = data.get('event')
+                if isinstance(event_name, str) and event_name.split('.')[-1] == 'DataRecord':
+                    # DataRecord payloads are historical rollups and can omit live state keys.
+                    # Ignore them globally so they do not overwrite current runtime state.
+                    logging.debug('{} ({}) - skipping DataRecord packet'.format(yolink.type, yolink.name))
+                    return
             yolink.updatePacketData(data)
             if 'method' in  data and 'event' not in data:
                 logging.debug('Method detected')
