@@ -90,7 +90,7 @@ class udiYoTHsensor(udi_interface.Node):
 
         self.cmd_state = self.retrieve_cmd_state()
         model = str(self.devInfo['modelName'][:6])
-        if model in ['YS8017', 'YS8014', 'YS8004', 'YS8008', 'YS8003']:
+        if model in ['YS8017', 'YS8014', 'YS8004', 'YS8008']:
             self.meas_support = ['temp']
         else:
             self.meas_support = ['temp', 'hum']
@@ -221,8 +221,8 @@ class udiYoTHsensor(udi_interface.Node):
                 tempC = sensor.get_data('temperature', 'state')
                 tempLimMin = sensor.get_data('min', 'tempLimit')
                 tempLimMax = sensor.get_data('max', 'tempLimit')    
-                lowTempAlarm = sensor.get_data('lowTemp', 'alarms')
-                highTempAlarm = sensor.get_data('highTemp', 'alarms')     
+                lowTempAlarm = sensor.get_data('lowTemp', 'alarm')
+                highTempAlarm = sensor.get_data('highTemp', 'alarm')     
                 alarm_det = alarm_det or lowTempAlarm or highTempAlarm        
                 hum = None
                 humLimMin = None
@@ -233,8 +233,8 @@ class udiYoTHsensor(udi_interface.Node):
                     hum = sensor.get_data('humidity', 'state')
                     humLimMin = sensor.get_data('min', 'humidityLimit')
                     humLimMax = sensor.get_data('max', 'humidityLimit') 
-                    lowHumAlarm = sensor.get_data('lowHumidity', 'alarms')
-                    highHumAlarm = sensor.get_data('highHumidity', 'alarms')  
+                    lowHumAlarm = sensor.get_data('lowHumidity', 'alarm')
+                    highHumAlarm = sensor.get_data('highHumidity', 'alarm')  
                     alarm_det = alarm_det or lowHumAlarm or highHumAlarm
                 tempMeasMin, tempMeasMax, humMeasMin, humMeasMax = sensor.update_data_24_hours(unix_time, tempC, hum)
                 bat_lvl = sensor.get_data('battery', 'state')

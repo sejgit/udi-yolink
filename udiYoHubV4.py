@@ -68,12 +68,10 @@ class udiYoBatteryHub(udi_interface.Node):
         self.poly.subscribe(self.poly.ADDNODEDONE, self.node_queue)
         self.poly.subscribe(self.poly.CONFIGDONE, self.configDoneHandler)
                
-
         # start processing events and create add our controller node
         self.poly.addNode(self, conn_status = None, rename = True)
         self.wait_for_node_done()
         self.node = self.poly.getNode(address)
-  
         self.adr_list = [address]
         self.node_ready = True
     
@@ -148,7 +146,7 @@ class udiYoBatteryHub(udi_interface.Node):
                 #battery_exists = self.yoHub.get_data('battery', 'power')
                 battery_state = hub.get_data('batteryState', 'power')
                 if isinstance(dc_power, bool):
-                    if dc_power:
+                    if not dc_power:
                         self.my_setDriver('ST', 1, type=message_type)
                     else:
                         self.my_setDriver('ST', 0, type=message_type)
