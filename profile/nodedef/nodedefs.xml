@@ -2630,6 +2630,7 @@
          <st id="ST" editor="keyscenedef" />
          <st id="GV1" editor="keyscenedef" />
          <st id="GV2" editor="keyscenedef" />
+         <st id="TIME" editor="unixtime" />
       </sts>
       <cmds>
          <sends>
