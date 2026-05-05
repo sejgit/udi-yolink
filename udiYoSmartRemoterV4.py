@@ -114,8 +114,8 @@ class udiRemoteKey(udi_interface.Node):
         '''
 
         self.my_setDriver('ST', 99)
-        self.my_setDriver('GV1', self.cmd_struct['short_press'])
-        self.my_setDriver('GV2', self.cmd_struct['long_press'])
+        self.my_setDriver('GV1', self.cmd_struct['short_press'], 25)
+        self.my_setDriver('GV2', self.cmd_struct['long_press'], 25)
         self.my_setDriver('TIME', self.cmd_struct.get('last_press_time', 0), 151)
         self.system_ready=True
 
@@ -241,7 +241,7 @@ class udiRemoteKey(udi_interface.Node):
         logging.debug('short_cmdtype {}'.format(val))
         self.cmd_struct['short_press'] = val
         #self.KeyOperations[self.SHORT_CMD] = val  
-        self.my_setDriver('GV1', val, True, True)
+        self.my_setDriver('GV1', val, True, True, 25)
         self.save_cmd_struct(self.cmd_struct)
 
     def long_cmdtype(self, command):
@@ -249,7 +249,7 @@ class udiRemoteKey(udi_interface.Node):
         logging.debug('long_cmdype {}'.format(val))
         self.cmd_struct['long_press'] = val
         #self.KeyOperations[self.LONG_CMD] = val
-        self.my_setDriver('GV2', val, True, True)
+        self.my_setDriver('GV2', val, True, True, 25)
         self.save_cmd_struct(self.cmd_struct)
 
         
