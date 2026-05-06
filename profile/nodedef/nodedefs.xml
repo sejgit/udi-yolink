@@ -2633,10 +2633,10 @@
          </sends>
          <accepts>                                          
             <cmd id="KEYPRESS" >   
-               <p id="" editor="keyscene" />
+               <p id="" editor="keyscene" init="GV1" />
             </cmd > 
             <cmd id="KEYLPRESS" >   
-               <p id="" editor="keyscene" />
+               <p id="" editor="keyscene" init="GV2" />
             </cmd > 
          </accepts>
       </cmds>
@@ -2684,7 +2684,7 @@
          </sends>
          <accepts>
             <cmd id="PRESSCMD" >
-               <p id="" editor="keyscene" />
+               <p id="" editor="keyscene" init="GV1" />
             </cmd >
          </accepts>
       </cmds>

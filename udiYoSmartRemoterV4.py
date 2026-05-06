@@ -38,6 +38,11 @@ class udiRemoteKey(udi_interface.Node):
             {'driver': 'GV2', 'value': 1, 'uom': 25}, # Long Keypress setting
             {'driver': 'TIME', 'value': 0, 'uom': 151}, # Last successful key press (unix time)
             ]
+    single_press_drivers = [
+            {'driver': 'ST', 'value': 99, 'uom': 25}, # Command
+            {'driver': 'GV1', 'value': 0, 'uom': 25}, # Press setting
+            {'driver': 'TIME', 'value': 0, 'uom': 151}, # Last successful key press (unix time)
+            ]
 
     def __init__(self, polyglot, primary, address, name, key, single_press_only=False, single_press_event_type='Press'):
         super().__init__( polyglot, primary, address, name)
@@ -54,6 +59,10 @@ class udiRemoteKey(udi_interface.Node):
         self.name = name
         self.primary = primary
         self.id = 'smremotekeysingle' if self.single_press_only else 'smremotekeydual'
+        if self.single_press_only:
+            self.drivers = [dict(d) for d in type(self).single_press_drivers]
+        else:
+            self.drivers = [dict(d) for d in type(self).drivers]
         #self.presstype = 99
         self.long_press_state = 'UNKNOWN'
         self.short_press_state = 'UNKNOWN'
@@ -282,14 +291,14 @@ class udiRemoteKey(udi_interface.Node):
         logging.debug('short_cmdtype {}'.format(val))
         self.cmd_struct['short_press'] = val
         #self.KeyOperations[self.SHORT_CMD] = val  
-        self.my_setDriver('GV1', val, True, True, 25)
+        self.my_setDriver('GV1', val, UOM=25, force=True)
         self.save_cmd_struct(self.cmd_struct)
 
     def press_cmdtype(self, command):
         val = int(command.get('value'))
         logging.debug('press_cmdtype {}'.format(val))
         self.cmd_struct['press_command'] = val
-        self.my_setDriver('GV1', val, True, True, 25)
+        self.my_setDriver('GV1', val, UOM=25, force=True)
         self.save_cmd_struct(self.cmd_struct)
 
     def long_cmdtype(self, command):
@@ -297,7 +306,7 @@ class udiRemoteKey(udi_interface.Node):
         logging.debug('long_cmdype {}'.format(val))
         self.cmd_struct['long_press'] = val
         #self.KeyOperations[self.LONG_CMD] = val
-        self.my_setDriver('GV2', val, True, True, 25)
+        self.my_setDriver('GV2', val, UOM=25, force=True)
         self.save_cmd_struct(self.cmd_struct)
 
         
