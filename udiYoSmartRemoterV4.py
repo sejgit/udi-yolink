@@ -313,17 +313,7 @@ class udiYoSmartRemoter(udi_interface.Node):
 
     id = 'yosmremote'
 
-    '''
-       drivers = [
-            'GV0' = Keypress
-            'GV1' = Keynumber
-            'GV2' = press type
-            'GV3' = batlevel
-            'CLITEMP' = temperature   
-            'ST' = Online
-            ]
 
-    ''' 
         
     drivers = [
             {'driver': 'ST', 'value': 99, 'uom': 25},
@@ -370,6 +360,7 @@ class udiYoSmartRemoter(udi_interface.Node):
         else:
             self.nbr_keys = 4
         self.keys = {}
+        logging.debug(f'Model {self.model} identified as remote type {self.remote_type} with {self.nbr_keys} keys and single_press_only={self.single_press_only}')
         #self.Parameters = Custom(polyglot, 'customparams')
         # subscribe to the events we want
         #polyglot.subscribe(polyglot.CUSTOMPARAMS, self.parameterHandler)
