@@ -428,7 +428,7 @@ class udiYoSmartRemoter(udi_interface.Node):
         while not self.main_node_ready  or not self.configDone:
             time.sleep(0.5)
         logging.debug(f'SmartRemoter {self.name} starting with model {self.model}, remote_type {self.remote_type}, single_press_only {self.single_press_only}')
-        self.my_setDriver('ST', int(self.remote_type), UOM=25, force=True)
+        self.my_setDriver('ST', self.remote_type, UOM=25, force=True)
         self.my_setDriver('GV30', 0, UOM=25, force=True)
         self.yoSmartRemote  = YoLinkSmartRemoter(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
