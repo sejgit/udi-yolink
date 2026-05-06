@@ -180,6 +180,9 @@
   <editor id="keypress">
     <range uom="25" subset="0,1,2,3,8-11,99" nls="keypress" />
   </editor>
+  <editor id="remotetype">
+    <range uom="25" subset="0,1,99" nls="remotetype" />
+  </editor>
   <editor id="keynumber">
     <range uom="25" subset="0,1,2,3,99" nls="keynumber" />
   </editor>

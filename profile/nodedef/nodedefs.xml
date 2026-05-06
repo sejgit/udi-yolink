@@ -2581,14 +2581,10 @@
    <nodeDef id="yosmremote" nls="nlssmremote">
       <editors />
       <sts>
-         <st id="GV0" editor="keypress" />
-         <st id="GV1" editor="keynumber" />
-         <st id="GV2" editor="presstype" />                  
+         <st id="ST" editor="remotetype" />
          <st id="GV3" editor="batlevel" />
          <st id="CLITEMP" editor="celsius" />
 
-         <!-- <st id="GV8" editor="online" /> -->
-         <st id="ST"  editor="keypress" />
          <st id="GV20" editor="suspendstate" />   
          <st id="GV30" editor="status" />        
       </sts>
@@ -2604,14 +2600,10 @@
   <nodeDef id="yosmremoteF" nls="nlssmremote">
       <editors />
       <sts>
-         <st id="GV0" editor="keypress" />
-         <st id="GV1" editor="keynumber" />
-         <st id="GV2" editor="presstype" />                  
+         <st id="ST" editor="remotetype" />
          <st id="GV3" editor="batlevel" />
          <st id="CLITEMP" editor="farenheit" />
 
-         <!-- <st id="GV8" editor="online" /> -->
-         <st id="ST"  editor="keypress" />
          <st id="GV20" editor="suspendstate" />   
          <st id="GV30"  editor="status" />        
       </sts>
@@ -2646,6 +2638,54 @@
             <cmd id="KEYLPRESS" >   
                <p id="" editor="keyscene" />
             </cmd > 
+         </accepts>
+      </cmds>
+   </nodeDef>
+
+   <nodeDef id="smremotekeydual" nls="nlssmkeydual">
+      <editors />
+      <sts>
+         <st id="ST" editor="keyscenedef" />
+         <st id="GV1" editor="keyscenedef" />
+         <st id="GV2" editor="keyscenedef" />
+         <st id="TIME" editor="unixtime" />
+      </sts>
+      <cmds>
+         <sends>
+            <cmd id="DON" />
+            <cmd id="DOF" />
+            <cmd id="DFON" />
+            <cmd id="DFOF" />
+         </sends>
+         <accepts>
+            <cmd id="KEYPRESS" >
+               <p id="" editor="keyscene" />
+            </cmd >
+            <cmd id="KEYLPRESS" >
+               <p id="" editor="keyscene" />
+            </cmd >
+         </accepts>
+      </cmds>
+   </nodeDef>
+
+   <nodeDef id="smremotekeysingle" nls="nlssmkeysingle">
+      <editors />
+      <sts>
+         <st id="ST" editor="keyscenedef" />
+         <st id="GV1" editor="keyscenedef" />
+         <st id="TIME" editor="unixtime" />
+      </sts>
+      <cmds>
+         <sends>
+            <cmd id="DON" />
+            <cmd id="DOF" />
+            <cmd id="DFON" />
+            <cmd id="DFOF" />
+         </sends>
+         <accepts>
+            <cmd id="PRESSCMD" >
+               <p id="" editor="keyscene" />
+            </cmd >
          </accepts>
       </cmds>
    </nodeDef>
