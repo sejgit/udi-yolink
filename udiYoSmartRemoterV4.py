@@ -209,7 +209,7 @@ class udiRemoteKey(udi_interface.Node):
                 logging.debug('SmartRemoter key%d (%s) reportCmd queued command %s', self.key + 1, self.address, command_state)
                 self.short_press_state = command_state
                 self.updateLastTime()
-            self.my_setDriver('ST', isy_val)
+            self.my_setDriver('ST', isy_val, uom=25, force=True)
             logging.debug('send single press command cmd:{} driver {}'.format(command_state, isy_val))
             return
 
@@ -220,7 +220,7 @@ class udiRemoteKey(udi_interface.Node):
                 self.node.reportCmd(self.short_press_state )
                 logging.debug('SmartRemoter key%d (%s) reportCmd queued command %s', self.key + 1, self.address, self.short_press_state)
                 self.updateLastTime()
-            self.my_setDriver('ST', isy_val)
+            self.my_setDriver('ST', isy_val, uom=25, force=True)
 
             logging.debug('send short press command cmd:{} driver{}'.format(self.short_press_state, isy_val))
         else:
@@ -427,8 +427,9 @@ class udiYoSmartRemoter(udi_interface.Node):
         logging.info('start - udiYoSmartRemoter')
         while not self.main_node_ready  or not self.configDone:
             time.sleep(0.5)
-        self.my_setDriver('ST', self.remote_type, True, True)
-        self.my_setDriver('GV30', 0, True, True)
+        logging.debug(f'SmartRemoter {self.name} starting with model {self.model}, remote_type {self.remote_type}, single_press_only {self.single_press_only}')
+        self.my_setDriver('ST', int(self.remote_type), UOM=25, force=True)
+        self.my_setDriver('GV30', 0, UOM=25, force=True)
         self.yoSmartRemote  = YoLinkSmartRemoter(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.temp_unit = self.yoAccess.get_temp_unit()
@@ -442,7 +443,7 @@ class udiYoSmartRemoter(udi_interface.Node):
                 #self.yoSmartRemote.refreshDevice()
             tries += 1
         time.sleep(2)
-        #self.my_setDriver('GV30', 1, True, True)
+        #self.my_setDriver('GV30', 1, UOM=25, force=True)
         for key in range(0, self.nbr_keys):
             k_address =  self.address[4:14]+'key' + str(key)
             k_address = self.poly.getValidAddress(str(k_address))
@@ -466,7 +467,7 @@ class udiYoSmartRemoter(udi_interface.Node):
 
     def stop (self):
         logging.info('Stop udiYoSmartRemoter')
-        self.my_setDriver('GV30', 0, True, True)
+        self.my_setDriver('GV30', 0, UOM=25, force=True)
         remote = self._get_remote('stop')
         if remote is not None:
             remote.shut_down()
@@ -592,7 +593,8 @@ class udiYoSmartRemoter(udi_interface.Node):
                         if message_info[0] == 'event' and press_info['signature'] != self._last_processed_press_signature:
                             self.keys[remote_key].send_command(press_info['press_type'])
                             self._last_processed_press_signature = press_info['signature']
-
+                    if isinstance(self.remote_type, int):
+                        self.my_setDriver('ST', self.remote_type, UOM=25)
                     battery = remote.get_data('battery', 'state')
                     if isinstance(battery, int) or battery is None  :                
                         self.my_setDriver('GV3', battery, UOM=25)
