@@ -608,6 +608,7 @@ ST-nlsdimmer-GV2-NAME=Off Delay
 ST-nlsdimmer-GV3-NAME=Light Level
 ST-nlsdimmer-GV4-NAME=Light Down Level
 ST-nlsdimmer-GV5-NAME=Light Up Level
+ST-nlsdimmer-GV9-NAME=LED Status
 ST-nlsdimmer-GV13-NAME=Schedule Index
 ST-nlsdimmer-GV14-NAME=Activated
 ST-nlsdimmer-GV15-NAME=On Hour
@@ -633,6 +634,7 @@ CMD-nlsdimmer-UPDATE-NAME=Update Status
 CMD-nlsdimmer-ONDELAY-NAME=Set On Delay
 CMD-nlsdimmer-OFFDELAY-NAME=Set Off Delay (0 if no delay)
 CMD-nlsdimmer-SWCTRL-NAME=Switch control
+CMD-nlsdimmer-SETATTRIB-NAME=LED control
 
 ND-yoirremote-NAME=YoLink Ir Remoter
 ND-yoirremote-ICON=Output

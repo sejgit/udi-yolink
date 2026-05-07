@@ -388,11 +388,13 @@ class YoLinkMQTTDevice(object):
             logging.error(f'OFFLINE STRANGE {yolink.data}')
 
         if yolink.online:
-            freshness_time_sec = yolink.unix_time_seconds(yolink.data.get('report_time'))
-            if freshness_time_sec is None:
-                freshness_time_sec = yolink.unix_time_seconds(yolink.data.get(yolink.messageTime))
+            # Prefer envelope/packet timestamps over state-change timestamps.
+            # report_time may remain old when state does not change for long periods.
+            freshness_time_sec = yolink.unix_time_seconds(yolink.data.get(yolink.messageTime))
             if freshness_time_sec is None:
                 freshness_time_sec = yolink.unix_time_seconds(yolink.data.get(yolink.lastUpd))
+            if freshness_time_sec is None:
+                freshness_time_sec = yolink.unix_time_seconds(yolink.data.get('report_time'))
 
             if freshness_time_sec is not None and freshness_time_sec + 60*60*4 <= time.time():
                 yolink.online = False
@@ -460,7 +462,7 @@ class YoLinkMQTTDevice(object):
     def setDeviceAttributes(yolink,  data):
         logging.debug(yolink.type+f' - setDeviceAttributes {data}')
         if data is None:
-            data = {}  
+            data = {}
             data['params'] = {}
         methodStr = yolink.type+'.setDeviceAttributes'
         #data['time'] = str(int(time.time_ns()//1e6))# we assign time just before publish

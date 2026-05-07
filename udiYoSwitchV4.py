@@ -121,6 +121,7 @@ class udiYoSwitch(udi_interface.Node):
                 #self.yoSwitch.refreshDevice()
             tries += 1
         time.sleep(2)
+        self.yoSwitch.get_attributes()
         # deferred: refreshSchedules() will be invoked after startup to avoid API bursts
         time.sleep(1)
         #self.my_setDriver('GV30', 1)
@@ -437,7 +438,7 @@ class udiYoSwitch(udi_interface.Node):
                 params['led']['status'] = 'on'
             else:
                 params['led']['status'] = 'off'
-            switch.setDeviceAttributes(params)
+            switch.set_attributes(params)
 
     def update(self, command = None):
         logging.info('udiYoSwitch Update Status')
@@ -445,6 +446,7 @@ class udiYoSwitch(udi_interface.Node):
         if switch is None:
             return
         switch.refreshDevice()
+        switch.get_attributes()
         #self.yoSwitch.refreshSchedules()
         
     '''    

@@ -861,7 +861,8 @@
          <st id="GV2" editor="delay" />
          <st id="GV3" editor="dimlvl" />
          <st id="GV4" editor="dimlvl" />
-         <st id="GV5" editor="dimlvl" />         
+         <st id="GV5" editor="dimlvl" />
+         <st id="GV9" editor="LED" />
          <st id="GV13" editor="schIndex" />      
          <st id="GV14" editor="schActive" />    
          <st id="GV15" editor="stHour" />      
@@ -917,6 +918,10 @@
                <p id="ondelay" editor="delaymin" init="GV1" /> 
                <p id="offdelay" editor="delaymin" init="GV2" />                                     
              </cmd >   
+
+            <cmd id="SETATTRIB" >
+               <p id="" editor="LEDctrl" init="GV9" />
+            </cmd >
 
             <!--<cmd id="LOOKUPSCH" > 
                <p id="" editor="schIndexS" init="GV13" /> 

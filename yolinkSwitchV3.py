@@ -35,6 +35,20 @@ class YoLinkSwitch(YoLinkMQTTDevice):
     ''' Assume no event support needed if using MQTT'''
     def updateStatus(yolink, data):
         yolink.updateCallbackStatus(data, False)
+
+    def get_attributes(yolink):
+        logging.debug('get_attributes')
+        yolink.setDeviceAttributes(None)
+        return()
+
+    def set_attributes(yolink, params):
+        logging.debug(yolink.type+' - set_attributes {}'.format(params))
+        if params is None:
+            return(yolink.setDeviceAttributes(None))
+        data = {'params': {}}
+        if isinstance(params, dict):
+            data['params'].update(params)
+        return(yolink.setDeviceAttributes(data))
     '''
     def initNode(yolink):
         yolink.refreshState()
