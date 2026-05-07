@@ -209,7 +209,7 @@ class udiRemoteKey(udi_interface.Node):
                 logging.debug('SmartRemoter key%d (%s) reportCmd queued command %s', self.key + 1, self.address, command_state)
                 self.short_press_state = command_state
                 self.updateLastTime()
-            self.my_setDriver('ST', isy_val, uom=25, force=True)
+            self.my_setDriver('ST', isy_val, UOM=25, force=True)
             logging.debug('send single press command cmd:{} driver {}'.format(command_state, isy_val))
             return
 
@@ -220,7 +220,7 @@ class udiRemoteKey(udi_interface.Node):
                 self.node.reportCmd(self.short_press_state )
                 logging.debug('SmartRemoter key%d (%s) reportCmd queued command %s', self.key + 1, self.address, self.short_press_state)
                 self.updateLastTime()
-            self.my_setDriver('ST', isy_val, uom=25, force=True)
+            self.my_setDriver('ST', isy_val, UOM=25, force=True)
 
             logging.debug('send short press command cmd:{} driver{}'.format(self.short_press_state, isy_val))
         else:

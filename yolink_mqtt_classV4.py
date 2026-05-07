@@ -140,7 +140,7 @@ class YoLinkMQTTDevice(object):
 
         yolink._lastOfflineLogSig = signature
         yolink._lastOfflineLogTime = now
-        logging.error('Status {} - Off line detected: {}'.format(yolink.deviceInfo['name'], dataPacket))
+        logging.log(OFFLINE, 'Status {} - Off line detected: {}'.format(yolink.deviceInfo['name'], dataPacket))
 
     def supports_schedule_refresh(yolink):
         return yolink.type in yolink.scheduleRefreshTypes
@@ -370,17 +370,7 @@ class YoLinkMQTTDevice(object):
             return(yolink.online)
         logging.debug(f'check_system_online : {yolink.data}')
         yolink.online = True
-        if 'lastStateTime' in yolink.data:
-            #logging.debug('lastStateTime selected')
-            last_state_time_sec = yolink.unix_time_seconds(yolink.data.get('lastStateTime'))
-            if last_state_time_sec is not None:
-                if last_state_time_sec + 60*60*4 <= time.time(): # if no update for 4 hours then assume offline
-                    yolink.online = False
-                    yolink.log_offline_detected(yolink.data)
-                else:
-                    yolink.online = True
-            return(yolink.online)
-        
+
         if 'code' in yolink.data:
             #logging.debug('code selected')
             if yolink.data['code'] == '000000':
@@ -396,6 +386,16 @@ class YoLinkMQTTDevice(object):
         else:
             yolink.online = False
             logging.error(f'OFFLINE STRANGE {yolink.data}')
+
+        if yolink.online:
+            freshness_time_sec = yolink.unix_time_seconds(yolink.data.get('report_time'))
+            if freshness_time_sec is None:
+                freshness_time_sec = yolink.unix_time_seconds(yolink.data.get(yolink.messageTime))
+            if freshness_time_sec is None:
+                freshness_time_sec = yolink.unix_time_seconds(yolink.data.get(yolink.lastUpd))
+
+            if freshness_time_sec is not None and freshness_time_sec + 60*60*4 <= time.time():
+                yolink.online = False
 
         
         if not yolink.online:
