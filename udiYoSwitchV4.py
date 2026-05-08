@@ -33,6 +33,7 @@ class udiYoSwitch(udi_interface.Node):
             {'driver': 'GV0', 'value': 99, 'uom': 25},
             {'driver': 'GV1', 'value': 0, 'uom': 57}, 
             {'driver': 'GV2', 'value': 0, 'uom': 57}, 
+            {'driver': 'BATLVL', 'value': 99, 'uom': 25},
             {'driver': 'GV5', 'value': 99, 'uom': 25},
             {'driver': 'GV6', 'value': 99, 'uom': 25},
             {'driver': 'GV7', 'value': 99, 'uom': 25},
@@ -69,6 +70,7 @@ class udiYoSwitch(udi_interface.Node):
         self.schedule_selected = 0
         self.keys = {}
         self.support_power = False
+        self.support_battery = False
         self.nbr_keys = 0
         self.max_remote_keys = 0
         model = str(self.devInfo['modelName'][:6])
@@ -76,6 +78,9 @@ class udiYoSwitch(udi_interface.Node):
             self.meas_support = ['pwr']
             self.support_power = True
             self.id = 'yoswitchPwr'
+        elif model in ['YS5709']:
+            self.id = 'yoswitchBat'
+            self.support_battery = True
         else:
             self.meas_support = []
         if  model in ['YS5708', 'YS5709']:
@@ -240,7 +245,10 @@ class udiYoSwitch(udi_interface.Node):
 
                 if switch.check_system_online():
                     self.my_setDriver('GV30', 1)                    
-                    state =  switch.get_data('state')
+                    state = switch.get_data('state')
+                    if not isinstance(state, str) and isinstance(self.last_state, str):
+                        # Battery devices sometimes publish partial state payloads; keep last valid state.
+                        state = self.last_state
                     if isinstance(state, str):
                         if state in ['on', 'ON', 'open', 'OPEN']:
                             self.my_setDriver('GV0', 1, type=message_type)
@@ -253,6 +261,14 @@ class udiYoSwitch(udi_interface.Node):
                          self.my_setDriver('GV0', None, type=message_type)
                          self.my_setDriver('ST', None, type=message_type)
                     self.last_state = state 
+
+                    if self.support_battery:
+                        battery = switch.get_data('battery')
+                        if not isinstance(battery, (int, float)):
+                            battery = switch.get_data('state', 'battery')
+                        if isinstance(battery, (int, float)):
+                            self.my_setDriver('BATLVL', int(round(battery)), type=message_type)
+
                     led_state = switch.get_data('status', 'led')
                     if isinstance(led_state, str):
                         if led_state.lower() == 'on':   

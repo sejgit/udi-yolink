@@ -152,10 +152,13 @@ CMD-nlswmleakschedule-UPDATE-NAME=Update Status
 # YoLink Switch
 ND-yoswitch-NAME=YoLink Switch
 ND-yoswitch-ICON=Switch
+ND-yoswitchBat-NAME=YoLink Battery Switch
+ND-yoswitchBat-ICON=Switch
 ST-nlsswitch-ST-NAME=Switch State
 ST-nlsswitch-GV0-NAME=Switch State (Legacy)
 ST-nlsswitch-GV1-NAME=On Delay (min)
 ST-nlsswitch-GV2-NAME=Off Delay (min)
+ST-nlsswitch-BATLVL-NAME=Battery Level
 ST-nlsswitch-GV3-NAME=Watt
 ST-nlsswitch-GV4-NAME=Energy
 ST-nlsswitch-GV5-NAME=Overload Alert
