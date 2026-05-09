@@ -314,7 +314,7 @@ class udiYoLockV2(udi_interface.Node):
 
 
 class udiYoLock(udi_interface.Node):
-    from  udiYolinkLib import my_setDriver, save_cmd_state, retrieve_cmd_state, bool2ISY, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key, checkNameSync
+    from  udiYolinkLib import my_setDriver, start_done, configDoneHandler, save_cmd_state, retrieve_cmd_state, bool2ISY, prep_schedule, activate_schedule, update_schedule_data, node_queue, wait_for_node_done, mask2key, checkNameSync
 
     id = 'yolock'
     '''
@@ -455,7 +455,7 @@ class udiYoLock(udi_interface.Node):
             self.my_setDriver('TIME', unix_time, 151)
 
             if  lock.check_system_online():
-                state = str(lock.get_data('state','state'))
+                state = str(lock.get_data('state'))
                 logging.debug('Lock state: {}'.format(state))
                 if state in ['lock','locked'] :
                     self.my_setDriver('GV0', 1, type=message_type)
@@ -469,7 +469,7 @@ class udiYoLock(udi_interface.Node):
 
                 self.last_state = state
                 self._report_lock_state_change(state)
-                battery = lock.get_data('battery', 'state')
+                battery = lock.get_data('battery')
                 self.my_setDriver('GV1', battery, type=message_type)
                 #bell = self.yoLock.getDoorBellRing()
                 door_state = lock.get_data('door', 'state')
