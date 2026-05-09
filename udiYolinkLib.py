@@ -185,16 +185,18 @@ def my_setDriver(self, key, value, UOM=None, force=None, type=None):
                                 value = value + 3
                         except Exception as e:
                             logging.error('Local connection - yolink class not ready - continue : {}'.format(e))
-                    if isinstance(UOM, int):
-                        self.node.setDriver(key, value, True, force, uom=UOM)
-                    else:
-                        self.node.setDriver(key, value, True, force)
+                    if self.node:
+                        if isinstance(UOM, int):
+                            self.node.setDriver(key, value, True, force, uom=UOM)
+                        else:
+                            self.node.setDriver(key, value, True, force)
             else:
                 logging.debug(f'Passed driver {key} does not exist in {self.drivers}')
 
         except ValueError: #A non number was passed 
             logging.error('Non numeric value passed to my_setDriver - setting 99 ')
-            self.node.setDriver(key, 99, True, True, 25)
+            if self.node:
+                self.node.setDriver(key, 99, True, True, 25)
         
 
 def mask2key (self, mask):

@@ -37,6 +37,7 @@ class udiYoDimmer(udi_interface.Node):
             {'driver': 'GV3', 'value': 0, 'uom': 51},
             {'driver': 'GV4', 'value': 0, 'uom': 51},
             {'driver': 'GV5', 'value': 0, 'uom': 51},
+            {'driver': 'GV9', 'value': 99, 'uom': 25},
             {'driver': 'GV13', 'value': 0, 'uom': 25}, #Schedule index/no
             {'driver': 'GV14', 'value': 99, 'uom': 25}, # Active
             {'driver': 'GV15', 'value': 99, 'uom': 25}, #start Hour
@@ -241,7 +242,7 @@ class udiYoDimmer(udi_interface.Node):
             message_type = message_info[0] if isinstance(message_info, (list, tuple)) and len(message_info) >= 1 else None
             self.my_setDriver('TIME', dimmer.getLastUpdateTime(), 151)
             state = dimmer.get_data('state')
-            if message_type == 'setAttributes':
+            if message_type in ['setAttributes', 'setDeviceAttributes']:
                 logging.debug('Attributes updated')
                 dimmer.ramp_up_time = dimmer.get_data('on', 'gradient')
                 dimmer.ramp_down_time = dimmer.get_data('off', 'gradient')
@@ -282,6 +283,14 @@ class udiYoDimmer(udi_interface.Node):
                 if self.dim_setting['previous'] != self.dim_setting['dim']:
                     self.dim_setting['previous'] = self.dim_setting['dim']
                     self.save_cmd_struct(self.dim_setting)
+                led_state = dimmer.get_data('status', 'led')
+                if isinstance(led_state, str):
+                    if led_state.lower() == 'on':
+                        self.my_setDriver('GV9', 1)
+                    else:
+                        self.my_setDriver('GV9', 0)
+                else:
+                    self.my_setDriver('GV9', None)
                 self.my_setDriver('GV3', self.dim_setting['dim'], 51)
                 self.my_setDriver('ST', self.dim_setting['dim'], 51)
                 self.my_setDriver('GV4', self.dim_setting['dim_down'], 51)
@@ -468,6 +477,22 @@ class udiYoDimmer(udi_interface.Node):
             return
         dimmer.setDelayList([{'on':self.onDelay, 'off':self.offDelay}]) 
 
+    def set_attributes(self, command):
+        logging.debug(f'set_attributes {command}')
+        dimmer = self._get_dimmer('set_attributes')
+        if dimmer is None:
+            return
+        led_state = int(command.get('value'))
+        if isinstance(led_state, int) and led_state in [0, 1]:
+            logging.info('Set LED attribute to {}'.format(led_state))
+            params = {}
+            params['led'] = {}
+            if led_state == 1:
+                params['led']['status'] = 'on'
+            else:
+                params['led']['status'] = 'off'
+            dimmer.set_attributes(params)
+
 
     def lookup_schedule(self, command):
         logging.info('udiYoDimmer lookup_schedule {}'.format(command))
@@ -502,6 +527,7 @@ class udiYoDimmer(udi_interface.Node):
         if dimmer is None:
             return
         dimmer.refreshDevice()
+        dimmer.get_attributes()
         #self.yoDimmer.refreshSchedules()     
 
 
@@ -516,6 +542,7 @@ class udiYoDimmer(udi_interface.Node):
                 'DIMUP' : setDimUp,
                 'DIMDOWN' : setDimDown,
                 'DELAYCTRL'    : program_delays, 
+                'SETATTRIB'    : set_attributes,
                 #'LOOKUPSCH'    : lookup_schedule,
                 #'DEFINESCH'    : define_schedule,
                 #'CTRLSCH'      : control_schedule,

@@ -388,11 +388,32 @@ class YoLinkMQTTDevice(object):
             logging.error(f'OFFLINE STRANGE {yolink.data}')
 
         if yolink.online:
-            freshness_time_sec = yolink.unix_time_seconds(yolink.data.get('report_time'))
+            # Online freshness is based on device update/report timestamps only.
+            # lastStateTime/stateChangedAt are preserved for state history but must
+            # not participate in online evaluation.
+            # Prefer reportAt when present because it reflects device data update time.
+            freshness_time_sec = None
+
+            data_section = yolink.data.get(yolink.dData, {}) if isinstance(yolink.data, dict) else {}
+            report_at_str = None
+            if isinstance(data_section, dict):
+                report_at_str = data_section.get('reportAt')
+            if report_at_str is None and isinstance(yolink.data.get('reportAt'), str):
+                report_at_str = yolink.data.get('reportAt')
+
+            if isinstance(report_at_str, str):
+                try:
+                    report_at_dt = datetime.strptime(report_at_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+                    freshness_time_sec = yolink.unix_time_seconds(report_at_dt.timestamp())
+                except Exception as e:
+                    logging.debug(f'check_system_online reportAt parse failed: {e} value={report_at_str}')
+
             if freshness_time_sec is None:
                 freshness_time_sec = yolink.unix_time_seconds(yolink.data.get(yolink.messageTime))
             if freshness_time_sec is None:
                 freshness_time_sec = yolink.unix_time_seconds(yolink.data.get(yolink.lastUpd))
+            if freshness_time_sec is None:
+                freshness_time_sec = yolink.unix_time_seconds(yolink.data.get('report_time'))
 
             if freshness_time_sec is not None and freshness_time_sec + 60*60*4 <= time.time():
                 yolink.online = False
@@ -460,7 +481,7 @@ class YoLinkMQTTDevice(object):
     def setDeviceAttributes(yolink,  data):
         logging.debug(yolink.type+f' - setDeviceAttributes {data}')
         if data is None:
-            data = {}  
+            data = {}
             data['params'] = {}
         methodStr = yolink.type+'.setDeviceAttributes'
         #data['time'] = str(int(time.time_ns()//1e6))# we assign time just before publish
