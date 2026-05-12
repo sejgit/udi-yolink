@@ -20,6 +20,14 @@ import time
 import math
 from yolinkSmartRemoterV3 import YoLinkSmartRemoter
 
+
+SINGLE_PRESS_REMOTE_MODELS = {
+    'YS3605', 'YS3615', 'YS3606', 'YS3607',
+}
+TWO_KEY_REMOTE_MODELS = {'YS3614', 'YS3615'}
+REMOTE_TYPE_SINGLE_PRESS = 0
+REMOTE_TYPE_DUAL_PRESS = 1
+
 class udiRemoteKey(udi_interface.Node):
     from  udiYolinkLib import my_setDriver, save_cmd_struct, retrieve_cmd_struct, node_queue, wait_for_node_done, mask2key, set_node_custom, get_node_custom, checkNameSync
 
@@ -28,13 +36,21 @@ class udiRemoteKey(udi_interface.Node):
             {'driver': 'ST', 'value': 99, 'uom': 25}, # Command
             {'driver': 'GV1', 'value': 0, 'uom': 25}, # Short Keypress setting
             {'driver': 'GV2', 'value': 1, 'uom': 25}, # Long Keypress setting
+            {'driver': 'TIME', 'value': 0, 'uom': 151}, # Last successful key press (unix time)
+            ]
+    single_press_drivers = [
+            {'driver': 'ST', 'value': 99, 'uom': 25}, # Command
+            {'driver': 'GV1', 'value': 0, 'uom': 25}, # Press setting
+            {'driver': 'TIME', 'value': 0, 'uom': 151}, # Last successful key press (unix time)
             ]
 
-    def __init__(self, polyglot, primary, address, name, key):
+    def __init__(self, polyglot, primary, address, name, key, single_press_only=False, single_press_event_type='Press'):
         super().__init__( polyglot, primary, address, name)
 
         logging.debug('__init__ smremotekey : {} {} {}'.format(address,name, key))
         self.key = key
+        self.single_press_only = single_press_only
+        self.single_press_event_type = single_press_event_type
         self.poly = polyglot
         self.address = address
         self.node_ready = False
@@ -42,6 +58,11 @@ class udiRemoteKey(udi_interface.Node):
         self.SHORT_CMD = self.address+'_S_CMD'
         self.name = name
         self.primary = primary
+        self.id = 'smremotekeysingle' if self.single_press_only else 'smremotekeydual'
+        if self.single_press_only:
+            self.drivers = [dict(d) for d in type(self).single_press_drivers]
+        else:
+            self.drivers = [dict(d) for d in type(self).drivers]
         #self.presstype = 99
         self.long_press_state = 'UNKNOWN'
         self.short_press_state = 'UNKNOWN'
@@ -50,6 +71,15 @@ class udiRemoteKey(udi_interface.Node):
         if self.cmd_struct == {}:
             self.cmd_struct['short_press'] = 1
             self.cmd_struct['long_press']  = 0
+            self.cmd_struct['last_press_time'] = 0
+            if self.single_press_only:
+                self.cmd_struct['press_command'] = self._resolve_single_press_command({})
+            self.save_cmd_struct(self.cmd_struct)
+        else:
+            if 'last_press_time' not in self.cmd_struct:
+                self.cmd_struct['last_press_time'] = 0
+            if self.single_press_only and 'press_command' not in self.cmd_struct:
+                self.cmd_struct['press_command'] = self._resolve_single_press_command(self.cmd_struct)
             self.save_cmd_struct(self.cmd_struct)
         self.configDone = False
         self.n_queue = []
@@ -108,8 +138,12 @@ class udiRemoteKey(udi_interface.Node):
         '''
 
         self.my_setDriver('ST', 99)
-        self.my_setDriver('GV1', self.cmd_struct['short_press'])
-        self.my_setDriver('GV2', self.cmd_struct['long_press'])
+        if self.single_press_only:
+            self.my_setDriver('GV1', self.cmd_struct['press_command'], 25)
+        else:
+            self.my_setDriver('GV1', self.cmd_struct['short_press'], 25)
+            self.my_setDriver('GV2', self.cmd_struct['long_press'], 25)
+        self.my_setDriver('TIME', self.cmd_struct.get('last_press_time', 0), 151)
         self.system_ready=True
 
     def stop(self):
@@ -122,7 +156,10 @@ class udiRemoteKey(udi_interface.Node):
         pass
 
     def updateLastTime(self):
-        pass
+        unix_time = int(time.time())
+        self.cmd_struct['last_press_time'] = unix_time
+        self.my_setDriver('TIME', unix_time, 151)
+        self.save_cmd_struct(self.cmd_struct)
 
     '''
     def handleData(self, data):
@@ -150,23 +187,52 @@ class udiRemoteKey(udi_interface.Node):
 
     def noop(self, command = None):
         pass
+
+    def _resolve_single_press_command(self, cmd_struct):
+        expected_press = str(self.single_press_event_type or 'Press')
+        primary_key = 'long_press' if expected_press == 'LongPress' else 'short_press'
+        fallback_key = 'short_press' if primary_key == 'long_press' else 'long_press'
+
+        if primary_key in cmd_struct:
+            return cmd_struct[primary_key]
+        if fallback_key in cmd_struct:
+            return cmd_struct[fallback_key]
+        return 1
     
     def send_command (self, press_type):
         logging.info('send_command - press type : {}'.format(press_type))
+        if self.single_press_only:
+            command_state, isy_val = self.get_new_state(self.cmd_struct['press_command'], self.short_press_state)
+            if command_state != 'UNKNOWN':
+                logging.info('SmartRemoter key%d (%s) reportCmd sending %s for %s press', self.key + 1, self.address, command_state, press_type)
+                self.node.reportCmd(command_state)
+                logging.debug('SmartRemoter key%d (%s) reportCmd queued command %s', self.key + 1, self.address, command_state)
+                self.short_press_state = command_state
+                self.updateLastTime()
+            self.my_setDriver('ST', isy_val, UOM=25, force=True)
+            logging.debug('send single press command cmd:{} driver {}'.format(command_state, isy_val))
+            return
+
         if press_type == 0 or press_type == 'Press' : #short press
             self.short_press_state, isy_val = self.get_new_state(self.cmd_struct['short_press'], self.short_press_state)
             if self.short_press_state  != 'UNKNOWN':
+                logging.info('SmartRemoter key%d (%s) reportCmd sending %s for %s press', self.key + 1, self.address, self.short_press_state, press_type)
                 self.node.reportCmd(self.short_press_state )
-            self.my_setDriver('ST', isy_val)
+                logging.debug('SmartRemoter key%d (%s) reportCmd queued command %s', self.key + 1, self.address, self.short_press_state)
+                self.updateLastTime()
+            self.my_setDriver('ST', isy_val, UOM=25, force=True)
 
             logging.debug('send short press command cmd:{} driver{}'.format(self.short_press_state, isy_val))
         else:
             self.long_press_state, isy_val = self.get_new_state(self.cmd_struct['long_press'], self.long_press_state)
             if self.long_press_state  != 'UNKNOWN':
+                logging.info('SmartRemoter key%d (%s) reportCmd sending %s for %s press', self.key + 1, self.address, self.long_press_state, press_type)
                 self.node.reportCmd(self.long_press_state )
+                logging.debug('SmartRemoter key%d (%s) reportCmd queued command %s', self.key + 1, self.address, self.long_press_state)
+                self.updateLastTime()
             self.my_setDriver('ST', isy_val)
    
-            logging.debug('send long press command cmd:{} driver{}'.format(self.long_press_state, isy_val))
+            logging.debug('send long press command cmd:{} driver {}'.format(self.long_press_state, isy_val))
             
 
     def get_new_state(self, cmd_type, state):
@@ -225,7 +291,14 @@ class udiRemoteKey(udi_interface.Node):
         logging.debug('short_cmdtype {}'.format(val))
         self.cmd_struct['short_press'] = val
         #self.KeyOperations[self.SHORT_CMD] = val  
-        self.my_setDriver('GV1', val, True, True)
+        self.my_setDriver('GV1', val, UOM=25, force=True)
+        self.save_cmd_struct(self.cmd_struct)
+
+    def press_cmdtype(self, command):
+        val = int(command.get('value'))
+        logging.debug('press_cmdtype {}'.format(val))
+        self.cmd_struct['press_command'] = val
+        self.my_setDriver('GV1', val, UOM=25, force=True)
         self.save_cmd_struct(self.cmd_struct)
 
     def long_cmdtype(self, command):
@@ -233,11 +306,12 @@ class udiRemoteKey(udi_interface.Node):
         logging.debug('long_cmdype {}'.format(val))
         self.cmd_struct['long_press'] = val
         #self.KeyOperations[self.LONG_CMD] = val
-        self.my_setDriver('GV2', val, True, True)
+        self.my_setDriver('GV2', val, UOM=25, force=True)
         self.save_cmd_struct(self.cmd_struct)
 
         
     commands = {
+                'PRESSCMD'  : press_cmdtype,
                 'KEYPRESS'  : short_cmdtype, 
                 'KEYLPRESS' : long_cmdtype,
     }
@@ -248,25 +322,12 @@ class udiYoSmartRemoter(udi_interface.Node):
 
     id = 'yosmremote'
 
-    '''
-       drivers = [
-            'GV0' = Keypress
-            'GV1' = Keynumber
-            'GV2' = press type
-            'GV3' = batlevel
-            'CLITEMP' = temperature   
-            'ST' = Online
-            ]
 
-    ''' 
         
     drivers = [
-            {'driver': 'GV0', 'value': 99, 'uom': 25},
-            {'driver': 'GV1', 'value': 99, 'uom': 25},
-            {'driver': 'GV2', 'value': 99, 'uom': 25},
+            {'driver': 'ST', 'value': 99, 'uom': 25},
             {'driver': 'GV3', 'value': 99, 'uom': 25},
             {'driver': 'CLITEMP', 'value': 99, 'uom': 25},
-            {'driver': 'ST', 'value': 0, 'uom': 25},
             {'driver': 'GV20', 'value': 99, 'uom': 25},
             {'driver': 'GV30', 'value': 99, 'uom': 25},
             ]
@@ -300,12 +361,15 @@ class udiYoSmartRemoter(udi_interface.Node):
         self._last_processed_press_signature = None
         self._last_status_packet = None
         self.max_remote_keys = 8
-        model = str(self.devInfo['modelName'][:6])
-        if model in ['YS3614', 'YS3615']:
+        self.model = str(self.devInfo.get('modelName', '')[:6])
+        self.single_press_only = self.model in SINGLE_PRESS_REMOTE_MODELS
+        self.remote_type = REMOTE_TYPE_SINGLE_PRESS if self.single_press_only else REMOTE_TYPE_DUAL_PRESS
+        if self.model in TWO_KEY_REMOTE_MODELS:
              self.nbr_keys = 2
         else:
             self.nbr_keys = 4
         self.keys = {}
+        logging.debug(f'Model {self.model} identified as remote type {self.remote_type} with {self.nbr_keys} keys and single_press_only={self.single_press_only}')
         #self.Parameters = Custom(polyglot, 'customparams')
         # subscribe to the events we want
         #polyglot.subscribe(polyglot.CUSTOMPARAMS, self.parameterHandler)
@@ -363,7 +427,9 @@ class udiYoSmartRemoter(udi_interface.Node):
         logging.info('start - udiYoSmartRemoter')
         while not self.main_node_ready  or not self.configDone:
             time.sleep(0.5)
-        self.my_setDriver('GV30', 0, True, True)
+        logging.debug(f'SmartRemoter {self.name} starting with model {self.model}, remote_type {self.remote_type}, single_press_only {self.single_press_only}')
+        self.my_setDriver('ST', self.remote_type, UOM=25, force=True)
+        self.my_setDriver('GV30', 0, UOM=25, force=True)
         self.yoSmartRemote  = YoLinkSmartRemoter(self.yoAccess, self.devInfo, self.updateStatus)
         time.sleep(2)
         self.temp_unit = self.yoAccess.get_temp_unit()
@@ -377,7 +443,7 @@ class udiYoSmartRemoter(udi_interface.Node):
                 #self.yoSmartRemote.refreshDevice()
             tries += 1
         time.sleep(2)
-        #self.my_setDriver('GV30', 1, True, True)
+        #self.my_setDriver('GV30', 1, UOM=25, force=True)
         for key in range(0, self.nbr_keys):
             k_address =  self.address[4:14]+'key' + str(key)
             k_address = self.poly.getValidAddress(str(k_address))
@@ -385,7 +451,15 @@ class udiYoSmartRemoter(udi_interface.Node):
             k_name =  str(self.name) + ' key' + str(key+1)
             k_name = self.poly.getValidName(str(k_name))
 
-            self.keys[key] = udiRemoteKey(self.poly, self.address, k_address, k_name, key)
+            self.keys[key] = udiRemoteKey(
+                self.poly,
+                self.address,
+                k_address,
+                k_name,
+                key,
+                single_press_only=self.single_press_only,
+                single_press_event_type=self._get_single_press_event_type_for_key(key),
+            )
             self.adr_list.append(k_address)
         self._capture_press_baseline(self.yoSmartRemote)
         self.sub_nodes_ready = True
@@ -393,7 +467,7 @@ class udiYoSmartRemoter(udi_interface.Node):
 
     def stop (self):
         logging.info('Stop udiYoSmartRemoter')
-        self.my_setDriver('GV30', 0, True, True)
+        self.my_setDriver('GV30', 0, UOM=25, force=True)
         remote = self._get_remote('stop')
         if remote is not None:
             remote.shut_down()
@@ -434,6 +508,11 @@ class udiYoSmartRemoter(udi_interface.Node):
 
     def updateLastTime(self):
         pass
+
+    def _get_single_press_event_type_for_key(self, key):
+        if key % 2 == 0:
+            return 'Press'
+        return 'LongPress'
 
     def _extract_press_event(self, packet):
         if not isinstance(packet, dict):
@@ -509,18 +588,13 @@ class udiYoSmartRemoter(udi_interface.Node):
                     press_info = self._get_press_info(remote)
                     if press_info is not None:
                         remote_key = press_info['remote_key']
-                        press = press_info['press']
 
                         # Only send command for actual event messages, not status responses (getState)
                         if message_info[0] == 'event' and press_info['signature'] != self._last_processed_press_signature:
                             self.keys[remote_key].send_command(press_info['press_type'])
                             self._last_processed_press_signature = press_info['signature']
-
-                        self.my_setDriver('GV0', remote_key + press, UOM=25)
-                        self.my_setDriver('ST', remote_key + press, UOM=25)
-                        self.my_setDriver('GV1', remote_key, UOM=25)
-                        self.my_setDriver('GV2', press, UOM=25)
-
+                    if isinstance(self.remote_type, int):
+                        self.my_setDriver('ST', self.remote_type, UOM=25)
                     battery = remote.get_data('battery', 'state')
                     if isinstance(battery, int) or battery is None  :                
                         self.my_setDriver('GV3', battery, UOM=25)
@@ -534,14 +608,14 @@ class udiYoSmartRemoter(udi_interface.Node):
                     elif    tempC is None:
                         self.my_setDriver('CLITEMP', tempC, UOM=25)   
 
-                    self.my_setDriver('GV30', 1)
+                    self.my_setDriver('GV30', 1,UOM=25)
                     if remote.suspended:
-                        self.my_setDriver('GV20', 1)
+                        self.my_setDriver('GV20', 1, UOM=25)
                     else:
-                        self.my_setDriver('GV20', 0)
+                        self.my_setDriver('GV20', 0, UOM=25)
                 else:
-                    self.my_setDriver('GV30', 0, True, True)
-                    self.my_setDriver('GV20', 2)
+                    self.my_setDriver('GV30', 0, UOM=25)
+                    self.my_setDriver('GV20', 2, UOM=25)
         except Exception as e:
             logging.error('Smart Remote updateData exeption: {}'.format(e))
             logging.exception('SmartRemoter updateData traceback')

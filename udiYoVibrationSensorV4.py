@@ -114,7 +114,7 @@ class udiYoVibrationSensor(udi_interface.Node):
         #self.my_setDriver('ST', 0)
         self.my_setDriver('GV30', 0)
         sensor = self._get_sensor('stop')
-        if sensor is not None:
+        if sensor is not None:            
             sensor.shut_down()
         #if self.node:
         #    self.poly.delNode(self.node.address)
